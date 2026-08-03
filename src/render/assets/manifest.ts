@@ -151,16 +151,16 @@ export type AssetId =
   | 'character.player'
 
 /**
- * TEMPORARY: No models wired — force placeholder mode.
- * 
- * This is the clean-slate state. Real assets will be added back incrementally
- * as the new rig is built. Gameplay is fully playable with placeholders.
+ * Wyvern model wired with new clean rig (wyvern.glb).
+ * 46 joints, wings parented to Spine3 (not Neck), RootMotion bone.
+ * Animations pending — model renders in T-pose/rest for now.
  */
 export const ASSETS: Record<AssetId, AssetEntry> = {
-  /** Wyvern - using placeholder until new rig is built */
+  /** Wyvern - new clean rig, no animations yet */
   'wyvern.drogon': {
-    url: null, // Force placeholder
-    scale: 1,
+    url: '/models/wyvern.glb',
+    scale: 0.01, // Mesh is in cm (~1000 units), scale down to meters
+    yOffset: 0,
     animations: {
       idle: { clip: 'idle', yOffset: 0 },
       fly: { clip: 'fly', loop: false, next: 'airborne', yOffset: 0 },
