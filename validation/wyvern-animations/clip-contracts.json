@@ -1,0 +1,1037 @@
+{
+  "schema": "wyvern_clip_contract.v1",
+  "about": [
+    "The prose pose contracts in docs/FLIGHT_ANIMATION_DEVELOPMENT.md, restated as thresholds",
+    "against channels in clip-signatures.json. Asserted by",
+    "src/render/assets/animationContracts.test.ts, so pnpm test fails when an authored clip",
+    "stops satisfying its locomotion mode.",
+    "",
+    "Every threshold carries the measurement it came from. The bar is the vendor corpus: 52",
+    "artist-authored clips on this rig establish what the wyvern can do, and an authored clip",
+    "is held to what the artist already demonstrated rather than to a number someone liked.",
+    "symmetry_error reflects the left wingtip through the sagittal plane rather than comparing magnitudes. The magnitude form scored two wings stacked on one side as perfectly symmetric; the reflected form does not. The two agree on 43 of 65 clips and diverge only where a wingtip crosses the midline, which is exactly where the old form under-reported.",
+    "Regenerate the measurements with `pnpm assets:analyze-clips`."
+  ],
+  "modes": {
+    "cruise": {
+      "summary": "long, near-horizontal body line, symmetric powered wingbeat, anchored origin",
+      "clips": [
+        "Sanct_Cruise"
+      ],
+      "rules": [
+        {
+          "channel": "wingtip_L.stroke_arc_deg",
+          "min": 70,
+          "because": "Battle_Down02, the measured cruise source, sweeps 96.3 deg. Freezing the torso raises the authored loop to 107.7, because in the source the body pitches under the wing and cancels part of the swing; on a level body the same local wing motion reads larger. That sits between Battle_Down02 and Battle_Up's 109.7, inside the vendor envelope. Below 70 the wing reads as a twitch, which is how a 27.3 deg loop shipped."
+        },
+        {
+          "channel": "wing_elev_L.range",
+          "min": 60,
+          "because": "Battle_Down02 swings the wingtip through 84.0 deg of elevation. A cruise loop with no elevation range has no propulsion in it."
+        },
+        {
+          "channel": "body_axis_deg.mean",
+          "min": -15,
+          "max": 15,
+          "because": "Battle_Down02 holds 7.8 deg mean head-to-tail. Battle_Up's 23.5 deg is why the takeoff stayed a takeoff and did not become the cruise source."
+        },
+        {
+          "channel": "symmetry_error.mean",
+          "max": 2.0,
+          "because": "Battle_Up 1.25 and Battle_Down02 1.49 are what a symmetric powered beat measures on this rig. The asymmetric swoops sit at 14-23."
+        },
+        {
+          "channel": "wing_elev_bias.mean",
+          "min": -3.5,
+          "max": 3.5,
+          "because": "Cruise is level flight: neither wing may sit lower than the other. The floor is not zero because the rig is not symmetric at rest - L-Hand sits at z=-3.36 against R-Hand's +4.13 - so mirroring one wing's local basis onto the other reproduces its motion and still leaves the tips 2.7 deg apart, measured with the mirror applied and no bank. Cancelling it with an equal-sign trim buys the bias back as stroke asymmetry (0.019 rad takes cruise to -0.41 bias but -4.2 asymmetry, and hover to -8.2), so the residual stays and this bound is set from it. The banks break it deliberately at +-24 to +30, a 9x separation."
+        },
+        {
+          "channel": "wing_azimuth_L.range",
+          "min": 45,
+          "because": "The stroke plane: how far the wingtip sweeps fore and aft, which is what makes a beat a figure-eight rather than a hinge. Battle_Down02's own cycle sweeps 53.9 deg and the whole clip 73.5. This is the channel that silently collapsed to 40.5 when the loop was rebuilt from four landmarks 12 frames apart - amplitude still measured fine at 84.6, so nothing caught it. Measured 52.1."
+        },
+        {
+          "channel": "wing_extension_L.range",
+          "min": 5.5,
+          "because": "The wrist fold. A real recovery stroke folds the wing to cut drag and opens it again for the power stroke; Battle_Down02 travels 11.9 over the clip and 6.2 within one cycle. Four-landmark sampling flattened this to 5.15 because all four frames happened to sit near full extension. Measured 6.37."
+        },
+        {
+          "channel": "pelvis.path",
+          "max": 0.5,
+          "because": "Battle_Down02's pelvis is constant on all 112 frames. A cruise loop that translates its own body fights the simulation, which owns position."
+        },
+        {
+          "channel": "root_roll_delta_deg.range",
+          "max": 2,
+          "because": "Despite the name this channel is not roll on this rig. Probed by rotating the flight root and reading both channels back, its local Y moves root_roll_deg by exactly +0.2 rad and body_axis_deg by -0.2: it measures the torso's own pitch, and the pelvis tracks it 1:1 (-50.7 to -88.0 deg across Battle_Down02 f40-f66 against root_roll's 140.8 to 179.6). So the number to keep near zero is the landing flare the cruise source drags along with its wingbeat, which would otherwise pitch the body through the beat and snap back at the loop seam. Sampling the body from one frame removes it outright; measured 0.0, against 11.4 when whole poses were sampled. Holding only the flight root is not a substitute - that leaves the spine's counter-rotation uncompensated and swings the body line from 2.2 to 39.6 deg over one beat."
+        },
+        {
+          "channel": "loop.pose_mean",
+          "max": 0.05,
+          "because": "docs/WYVERN_ANIMATIONS.md calls a clip loopable under 0.25 on a 44-unit creature. An authored loop closes on its own opening key and should be at zero."
+        },
+        {
+          "channel": "cycle.beats",
+          "min": 2,
+          "because": "A cruise loop must contain a countable number of wingbeats. A null cycle means the elevation trace never crossed its own mean, i.e. the wing is static."
+        },
+        {
+          "channel": "wingtip_L.lateral.min",
+          "min": 4,
+          "because": "The left wingtip must stay on the left of the pelvis (+x) on every frame; measured floor is 11.5 across the flight family. This is the rule the old symmetry metric could not express: it compared |left.x| to |right.x|, so two wings stacked on the same side scored zero, identical to a perfect mirror."
+        },
+        {
+          "channel": "wingtip_R.lateral.max",
+          "max": -4,
+          "because": "Mirror of the left-side rule."
+        },
+        {
+          "channel": "wing_stroke_asymmetry",
+          "min": -3,
+          "max": 3,
+          "because": "Level flight sweeps both wings equally far. Cruise measures -1.40 and hover -1.38, both residue of the rig's own left/right rest difference rather than an authored turn; the banks now reach -29.1 and +27.4, and the vendor's own banking clip Battle_SkyMoveL 52.8. The previous bound cited 0.14 and 0.24, which no shipped clip has measured since."
+        },
+        {
+          "channel": "foot_drop.mean",
+          "min": 2.6,
+          "max": 3.4,
+          "because": "The aerodynamic family tucks and hover hangs, and the gap between them is what makes the two silhouettes readable. Measured: cruise and both banks 2.95, scout 3.06, glide 3.09, speed 2.33, dive 2.20 - against hover's 4.15 and hunt_carry's 4.25. The ceiling sits above the highest tucked clip and a clear 0.75 below the lowest hanging one. Before the flexion axis was corrected every one of these measured 4.0-4.3, because hind_leg_pulse drove each limb's own long axis and bought 0.04 units of travel. The floor holds cruise and the banks together: they share phaseGroup 'flight', so a leg carriage that drifted apart would pop across the crossfade. Both measure 2.95."
+        },
+        {
+          "channel": "foot_drop.range",
+          "min": 0.1,
+          "because": "The legs answer the wingbeat rather than hanging as dead weight. Measured 0.18 over the loop, from body_response's 0.06-rad share of the stroke."
+        },
+        {
+          "channel": "foot_asymmetry.max",
+          "min": -0.15,
+          "max": 0.15,
+          "because": "The flight family flies on a matched pair of legs, and until PoseKey.mirror_legs it did not: foot_drop had only ever been measured on the left foot, so the right one was free to drift. It was drifting by the width of the vendor base pose PoseKey.body freezes - Battle_Down02 f40 measures foot_drop 4.263 left against 3.544 right - and all eight flight clips inherited it, at 0.63-1.05. Mirroring the left hind limb onto the right takes that to 0.04-0.06: dive 0.04, hover 0.05, the other six 0.06. The band is signed and symmetric at +-0.15, 2.5x the measurement and 4x inside the 0.63 an unmirrored clip returns, so dropping the mirror from a recipe or reversing it fails here. foot_drop itself is deliberately unmoved - it watches the side the mirror holds fixed - so every limb-carriage band above still measures what it was derived from."
+        },
+        {
+          "channel": "toe_curl_deg.mean",
+          "min": 5,
+          "because": "Claws gathered for flight. toe_curl_deg reads the toe fan's local Z, the axis that actually opens and closes it; toe_deg reads local X, which swings +-40 deg for under 0.09 of change in outer-toe span and is why the claws could sit at range 0.00 in every flight clip without failing anything. Measured: cruise, banks and glide 9.79, scout 7.49, speed and dive 19.52 - all positive, against hover's -17.99."
+        },
+        {
+          "channel": "head_reach.horizontal.mean",
+          "min": 11.0,
+          "because": "The neck reaches forward along the direction of travel. Measured 11.45, against hover's 8.72 where the neck is drawn back over an upright torso."
+        },
+        {
+          "channel": "head_reach.vertical.mean",
+          "min": 1.2,
+          "max": 3.2,
+          "because": "Head carried a little above the hips on a level body line. Measured 2.13. Above 3.2 this is scout's loitering lift (3.00) or hover's upright carry (6.76); below 1.2 it is speed's flattened line (0.06)."
+        },
+        {
+          "channel": "head_reach.lateral.mean",
+          "min": -0.1,
+          "max": 0.3,
+          "because": "Level flight looks down the flight path, not off to one side. Measured +0.09, which is the rig's own resting offset rather than an authored lean - scout, speed, glide, dive and hover all sit at +0.09 to +0.11 for the same reason. The banks break it deliberately to +0.47 and -0.29. Signed, and +x is the rig's left, exactly like tail_reach.lateral."
+        },
+        {
+          "channel": "body_axis_deg.range",
+          "max": 8.4,
+          "because": "The neck answers the wingbeat one measured landmark behind the chest and the tail two, which is the overlapping secondary motion docs/FLIGHT_ANIMATION_DEVELOPMENT.md asks forward flight for. Because the head and tail no longer swing in lockstep with the chest, their contributions to the head-to-tail line partly cancel instead of adding: Sanct_Cruise measures 7.87 with the lag against 8.63 without it. This is the lag's consequence, not the lag itself - a phase channel would gate it directly, and does not exist yet - so read it as a regression guard on a body that pumped as one rigid piece, not as proof of the phase."
+        }
+      ]
+    },
+    "scout": {
+      "summary": "a symmetric, near-horizontal powered search loop whose slower cadence distinguishes loitering from travel",
+      "clips": [
+        "Sanct_Scout"
+      ],
+      "rules": [
+        {
+          "channel": "cycle.cadence_hz",
+          "max": 0.42,
+          "because": "Cadence is the mode: Scout measures 0.333 Hz (two beats in six seconds) against cruise's 0.5, speed's 0.8, and hover's 0.667. 0.42 leaves a margin above the measured loop while remaining unambiguously below cruise."
+        },
+        {
+          "channel": "cycle.beats",
+          "min": 2,
+          "because": "Scout is still powered flight, so it needs countable propulsion. Measured 2."
+        },
+        {
+          "channel": "wingtip_L.stroke_arc_deg",
+          "min": 70,
+          "because": "Scout reuses cruise's measured wing mechanics; slowing the timing must not turn its propulsion into the 27-degree twitch that once shipped as cruise. Measured 107.0."
+        },
+        {
+          "channel": "wing_elev_L.range",
+          "min": 60,
+          "because": "Scout is a powered cruise variant, so its wing elevation must retain cruise's propulsion amplitude. Measured 100.65."
+        },
+        {
+          "channel": "body_axis_deg.mean",
+          "min": -15,
+          "max": 15,
+          "because": "Scout is a cadence variant rather than a new attitude. Its slight -6 degree root trim measures +8.08 degrees, inside cruise's near-horizontal envelope."
+        },
+        {
+          "channel": "symmetry_error.mean",
+          "max": 2,
+          "because": "A loitering search loop is level flight, not a turn. The symmetric vendor sources Battle_Up and Battle_Down02 measure 1.25 and 1.49; scout measures 1.02."
+        },
+        {
+          "channel": "wing_elev_bias.mean",
+          "min": -3.5,
+          "max": 3.5,
+          "because": "Scout is level flight: neither wing may lead. Its 2.73 degree residual is the same mirrored-rig residue as cruise, not an authored bank."
+        },
+        {
+          "channel": "wing_azimuth_L.range",
+          "min": 45,
+          "because": "The slow beat still needs cruise's figure-eight stroke plane rather than a hinge. Measured 54.59."
+        },
+        {
+          "channel": "wing_extension_L.range",
+          "min": 5.5,
+          "because": "The recovery stroke must retain a readable wrist fold when retimed. Measured 6.52."
+        },
+        {
+          "channel": "pelvis.path",
+          "max": 0.5,
+          "because": "The simulation owns position; a scout loop cannot translate its own body. Measured 0.0."
+        },
+        {
+          "channel": "root_roll_delta_deg.range",
+          "max": 2,
+          "because": "This channel measures the flight root's pitch on this rig, so it guards against reintroducing the cruise source's landing flare. Scout's frozen primary posture measures 0.0."
+        },
+        {
+          "channel": "loop.pose_mean",
+          "max": 0.05,
+          "because": "Scout may play indefinitely while a wyvern searches, so its seam must close exactly. Measured 0.0."
+        },
+        {
+          "channel": "wingtip_L.lateral.min",
+          "min": 4,
+          "because": "The left wingtip must stay on the left of the pelvis on every frame. Scout's measured floor is 7.71."
+        },
+        {
+          "channel": "wingtip_R.lateral.max",
+          "max": -4,
+          "because": "Mirror of the left-side rule. Scout's measured ceiling is -8.32."
+        },
+        {
+          "channel": "wing_stroke_asymmetry",
+          "min": -3,
+          "max": 3,
+          "because": "A scout is not a bank, so both wings must travel equally far. Measured -1.33, inside cruise's level-flight residue band."
+        },
+        {
+          "channel": "foot_drop.mean",
+          "min": 2.6,
+          "max": 3.4,
+          "because": "The aerodynamic family tucks and hover hangs, and the gap between them is what makes the two silhouettes readable. Measured: cruise and both banks 2.95, scout 3.06, glide 3.09, speed 2.33, dive 2.20 - against hover's 4.15 and hunt_carry's 4.25. The ceiling sits above the highest tucked clip and a clear 0.75 below the lowest hanging one. Before the flexion axis was corrected every one of these measured 4.0-4.3, because hind_leg_pulse drove each limb's own long axis and bought 0.04 units of travel. Scout measures 3.06."
+        },
+        {
+          "channel": "foot_asymmetry.max",
+          "min": -0.15,
+          "max": 0.15,
+          "because": "The flight family flies on a matched pair of legs, and until PoseKey.mirror_legs it did not: foot_drop had only ever been measured on the left foot, so the right one was free to drift. It was drifting by the width of the vendor base pose PoseKey.body freezes - Battle_Down02 f40 measures foot_drop 4.263 left against 3.544 right - and all eight flight clips inherited it, at 0.63-1.05. Mirroring the left hind limb onto the right takes that to 0.04-0.06: dive 0.04, hover 0.05, the other six 0.06. The band is signed and symmetric at +-0.15, 2.5x the measurement and 4x inside the 0.63 an unmirrored clip returns, so dropping the mirror from a recipe or reversing it fails here. foot_drop itself is deliberately unmoved - it watches the side the mirror holds fixed - so every limb-carriage band above still measures what it was derived from."
+        },
+        {
+          "channel": "toe_curl_deg.mean",
+          "min": 5,
+          "because": "Claws gathered for flight. toe_curl_deg reads the toe fan's local Z, the axis that actually opens and closes it; toe_deg reads local X, which swings +-40 deg for under 0.09 of change in outer-toe span and is why the claws could sit at range 0.00 in every flight clip without failing anything. Measured: cruise, banks and glide 9.79, scout 7.49, speed and dive 19.52 - all positive, against hover's -17.99."
+        },
+        {
+          "channel": "body_axis_deg.range",
+          "max": 8.4,
+          "because": "The neck answers the wingbeat one measured landmark behind the chest and the tail two, which is the overlapping secondary motion docs/FLIGHT_ANIMATION_DEVELOPMENT.md asks forward flight for. Because the head and tail no longer swing in lockstep with the chest, their contributions to the head-to-tail line partly cancel instead of adding: Sanct_Scout measures 7.6 with the lag against 8.54 without it. This is the lag's consequence, not the lag itself - a phase channel would gate it directly, and does not exist yet - so read it as a regression guard on a body that pumped as one rigid piece, not as proof of the phase."
+        }
+      ]
+    },
+    "bank": {
+      "summary": "cruise posture plus a genuinely asymmetric turn: inside wing low, tail to the outside",
+      "clips": [
+        "Sanct_BankL",
+        "Sanct_BankR"
+      ],
+      "rules": [
+        {
+          "channel": "wingtip_L.stroke_arc_deg",
+          "min": 70,
+          "because": "A bank is cruise plus deformation, so even the wing doing less work keeps a real stroke. The inside wing measures 102.2 on the left bank against cruise's 107.7; the outside wing opens to 112.1."
+        },
+        {
+          "channel": "body_axis_deg.mean",
+          "min": -15,
+          "max": 15,
+          "because": "Turning does not change the locomotion mode. The body line stays cruise's."
+        },
+        {
+          "channel": "pelvis.path",
+          "max": 0.5,
+          "because": "Same origin contract as cruise."
+        },
+        {
+          "channel": "root_roll_delta_deg.range",
+          "max": 2,
+          "because": "Same channel, same ceiling and same reason as cruise: it measures torso pitch, not roll, and a bank must not reintroduce the landing flare its wingbeat was sampled from. The banks share cruise's frozen primary posture, so they measure 0.0 alongside it."
+        },
+        {
+          "channel": "loop.pose_mean",
+          "max": 0.05,
+          "because": "Banks are steady-state loops entered and left by crossfade."
+        },
+        {
+          "channel": "wing_elev_bias.range",
+          "min": 5,
+          "because": "The rule three earlier recipes failed silently, and it took a rig probe to see why. bank_wings drove the two wing chains with opposite signs, on the assumption that opposite signs bank and equal signs flap. Measured with the mirror applied - the state it actually runs in - (a, -a) moves the bias from 2.58 to 2.69 across the whole usable range of a, against an unbanked 2.67: no effect whatsoever. The chains are mirrored, so the same local X points opposite ways in world space and equal signs are what separate the tips. (a, a) reaches 23.6 deg of bias at 0.12 rad. Shipped banks measured +3.24 against a contract demanding -8 or lower. Now 42.5 and 40.4."
+        },
+        {
+          "channel": "wingtip_L.lateral.min",
+          "min": 4,
+          "because": "The left wingtip must stay on the left of the pelvis (+x) on every frame; measured floor is 11.5 across the flight family. This is the rule the old symmetry metric could not express: it compared |left.x| to |right.x|, so two wings stacked on the same side scored zero, identical to a perfect mirror."
+        },
+        {
+          "channel": "wingtip_R.lateral.max",
+          "max": -4,
+          "because": "Mirror of the left-side rule."
+        },
+        {
+          "channel": "foot_drop.mean",
+          "min": 2.6,
+          "max": 3.4,
+          "because": "A bank is cruise plus a turn: the legs stay tucked and streamlined and must match cruise's carriage exactly, or the shared phaseGroup 'flight' hands a visible leg pop across the crossfade. Both banks measure 2.95, identical to cruise."
+        },
+        {
+          "channel": "foot_asymmetry.max",
+          "min": -0.15,
+          "max": 0.15,
+          "because": "The flight family flies on a matched pair of legs, and until PoseKey.mirror_legs it did not: foot_drop had only ever been measured on the left foot, so the right one was free to drift. It was drifting by the width of the vendor base pose PoseKey.body freezes - Battle_Down02 f40 measures foot_drop 4.263 left against 3.544 right - and all eight flight clips inherited it, at 0.63-1.05. Mirroring the left hind limb onto the right takes that to 0.04-0.06: dive 0.04, hover 0.05, the other six 0.06. The band is signed and symmetric at +-0.15, 2.5x the measurement and 4x inside the 0.63 an unmirrored clip returns, so dropping the mirror from a recipe or reversing it fails here. foot_drop itself is deliberately unmoved - it watches the side the mirror holds fixed - so every limb-carriage band above still measures what it was derived from."
+        },
+        {
+          "channel": "toe_curl_deg.mean",
+          "min": 5,
+          "because": "Claws gathered for flight. toe_curl_deg reads the toe fan's local Z, the axis that actually opens and closes it; toe_deg reads local X, which swings +-40 deg for under 0.09 of change in outer-toe span and is why the claws could sit at range 0.00 in every flight clip without failing anything. Measured: cruise, banks and glide 9.79, scout 7.49, speed and dive 19.52 - all positive, against hover's -17.99."
+        },
+        {
+          "channel": "body_axis_deg.range",
+          "max": 8.4,
+          "because": "The neck answers the wingbeat one measured landmark behind the chest and the tail two, which is the overlapping secondary motion docs/FLIGHT_ANIMATION_DEVELOPMENT.md asks forward flight for. Because the head and tail no longer swing in lockstep with the chest, their contributions to the head-to-tail line partly cancel instead of adding: the banks measures 7.84 with the lag against 8.63 without it. This is the lag's consequence, not the lag itself - a phase channel would gate it directly, and does not exist yet - so read it as a regression guard on a body that pumped as one rigid piece, not as proof of the phase."
+        }
+      ]
+    },
+    "bank_left": {
+      "summary": "the left bank drops the left wing and counterbalances the tail to the right",
+      "clips": [
+        "Sanct_BankL"
+      ],
+      "rules": [
+        {
+          "channel": "wing_elev_bias.mean",
+          "max": -8,
+          "because": "flightPose.ts selects bankLeft on a positive bank, which rotates the model left-wing-down. The authored deformation must drop the same wing or it fights the procedural roll. Measured -24.25."
+        },
+        {
+          "channel": "tail_reach.lateral.mean",
+          "max": -0.4,
+          "because": "+x is the rig's left (L-Clavicle sits at x=+83.77), so a counterbalance in a left turn puts the tail at negative x. Measured -1.17."
+        },
+        {
+          "channel": "wing_stroke_asymmetry",
+          "max": -20,
+          "because": "The inside wing of a turn does less work and travels less far. For a left bank that is the left wing, so the asymmetry must be negative. Measured -29.08: inside 82.9 deg of elevation travel against the outside wing's 112.1. One constant supplies this and the attitude above, because the geometry couples them - holding the inside wing low also shortens its stroke - which is why the previous recipe's separate stroke-varying differential is gone. It lands near the artist's own swoop Battle_Skill11_L at 31.2 and stays short of the full banking turn Battle_SkyMoveL at 52.8."
+        },
+        {
+          "channel": "head_reach.lateral.mean",
+          "min": 0.25,
+          "because": "The head looks into the turn while the tail counterbalances out of it. +x is the rig's left, so a left bank puts the head at positive x and the tail at negative. Measured +0.47 against level flight's +0.09. The lean lives on Neck2 and the head, not on the whole neck chain: the wing clavicles hang off Neck and Neck1, and a probe puts a four-bone lean's cost at 0.39 units of wingtip travel and +0.6 symmetry error for 0.28 of head travel, against 0.000 and 0.000 below them. That constraint is why the previous neck_bank was capped at 0.055 rad - and it was signed the wrong way, holding the head at -0.04 on a left turn, i.e. following the tail to the outside."
+        }
+      ]
+    },
+    "bank_right": {
+      "summary": "the mirror of the left bank",
+      "clips": [
+        "Sanct_BankR"
+      ],
+      "rules": [
+        {
+          "channel": "wing_elev_bias.mean",
+          "min": 8,
+          "because": "Mirror of bank_left. Measured +29.80."
+        },
+        {
+          "channel": "tail_reach.lateral.mean",
+          "min": 0.4,
+          "because": "Mirror of bank_left. Measured +1.18 against the left bank's -1.17."
+        },
+        {
+          "channel": "wing_stroke_asymmetry",
+          "min": 20,
+          "because": "Mirror of bank_left. Measured +27.38 against the left bank's -29.08."
+        },
+        {
+          "channel": "head_reach.lateral.mean",
+          "max": -0.1,
+          "because": "Mirror of bank_left. Measured -0.29 against level flight's +0.09. The bound is not the mirror image of the left bank's because the level baseline is not zero: the head rests 0.09 to the rig's left, so an equal lean lands at +0.47 and -0.29 rather than at +-0.38."
+        }
+      ]
+    },
+    "hover": {
+      "summary": "upright, centre of mass under the wing roots, legs hanging, faster cadence than cruise",
+      "clips": [
+        "Sanct_Hover"
+      ],
+      "rules": [
+        {
+          "channel": "body_axis_deg.mean",
+          "min": 25,
+          "because": "The mode's defining difference from cruise. Cruise measures 6.2 deg; hover measures 36.0. Below 25 the two silhouettes are not distinguishable and hover is a slowed cruise again, which is what it was."
+        },
+        {
+          "channel": "cycle.beats",
+          "min": 4,
+          "because": "Hover holds station on wing power alone, so its cadence is faster than cruise's. Four beats in the same six seconds against cruise's three."
+        },
+        {
+          "channel": "wingtip_L.stroke_arc_deg",
+          "min": 70,
+          "because": "Hover is the most powered of the flight modes; it may not have a smaller stroke than cruise."
+        },
+        {
+          "channel": "symmetry_error.mean",
+          "max": 2.0,
+          "because": "Hovering is symmetric by definition: an asymmetric hover is a turn."
+        },
+        {
+          "channel": "wing_elev_bias.mean",
+          "min": -3.5,
+          "max": 3.5,
+          "because": "Same reason and same rig residual as cruise; neither wing leads. Measured 2.05."
+        },
+        {
+          "channel": "pelvis.path",
+          "max": 0.5,
+          "because": "Same origin contract as every other flight loop."
+        },
+        {
+          "channel": "loop.pose_mean",
+          "max": 0.05,
+          "because": "Hover is held indefinitely, so its loop has to be exact."
+        },
+        {
+          "channel": "wingtip_L.lateral.min",
+          "min": 4,
+          "because": "The left wingtip must stay on the left of the pelvis (+x) on every frame; measured floor is 11.5 across the flight family. This is the rule the old symmetry metric could not express: it compared |left.x| to |right.x|, so two wings stacked on the same side scored zero, identical to a perfect mirror."
+        },
+        {
+          "channel": "wingtip_R.lateral.max",
+          "max": -4,
+          "because": "Mirror of the left-side rule."
+        },
+        {
+          "channel": "wing_stroke_asymmetry",
+          "min": -3,
+          "max": 3,
+          "because": "Level flight sweeps both wings equally far. Cruise measures -1.40 and hover -1.38, both residue of the rig's own left/right rest difference rather than an authored turn; the banks now reach -29.1 and +27.4, and the vendor's own banking clip Battle_SkyMoveL 52.8. The previous bound cited 0.14 and 0.24, which no shipped clip has measured since."
+        },
+        {
+          "channel": "foot_drop.mean",
+          "min": 3.7,
+          "because": "The one flight mode that hangs. Legs down under the shifted centre of mass, ready for touchdown. Measured 4.15, inside the 3.5-4.5 the pose contract asks for and 1.2 clear of cruise's 2.95. Hover's own -30 deg root pitch swings the feet up toward the pelvis, so this has to be authored against that pitch: a token -0.15 tuck measured 3.54 and the two silhouettes were barely half a unit apart."
+        },
+        {
+          "channel": "toe_curl_deg.mean",
+          "max": -8,
+          "because": "Claws open, not gathered - a hovering wyvern is one beat from a touchdown or a grab. Measured -17.99, the opposite sign from every aerodynamic mode. This sign split is the rule; the magnitudes on either side of it are free."
+        },
+        {
+          "channel": "head_reach.horizontal.mean",
+          "max": 9.6,
+          "because": "The neck is drawn back over an upright torso rather than reaching forward. Measured 8.72, against 10.99-11.79 across the whole forward-flight family."
+        },
+        {
+          "channel": "head_reach.vertical.mean",
+          "min": 5.0,
+          "because": "Head carried high over the dropped hips as the body pitches 34 deg nose-up. Measured 6.76, the highest in the flight family."
+        },
+        {
+          "channel": "foot_asymmetry.max",
+          "min": -0.15,
+          "max": 0.15,
+          "because": "The flight family flies on a matched pair of legs, and until PoseKey.mirror_legs it did not: foot_drop had only ever been measured on the left foot, so the right one was free to drift. It was drifting by the width of the vendor base pose PoseKey.body freezes - Battle_Down02 f40 measures foot_drop 4.263 left against 3.544 right - and all eight flight clips inherited it, at 0.63-1.05. Mirroring the left hind limb onto the right takes that to 0.04-0.06: dive 0.04, hover 0.05, the other six 0.06. The band is signed and symmetric at +-0.15, 2.5x the measurement and 4x inside the 0.63 an unmirrored clip returns, so dropping the mirror from a recipe or reversing it fails here. foot_drop itself is deliberately unmoved - it watches the side the mirror holds fixed - so every limb-carriage band above still measures what it was derived from."
+        }
+      ]
+    },
+    "grounded_loop": {
+      "summary": "ambient behaviour that sits on terrain and repeats without a visible seam",
+      "clips": [
+        "Sanct_Sleep",
+        "Sanct_Rest",
+        "Sanct_SitLoop",
+        "Sanct_Drink",
+        "Sanct_Groom",
+        "Sanct_PerchGrip"
+      ],
+      "rules": [
+        {
+          "channel": "loop.pose_mean",
+          "max": 0.05,
+          "because": "These play for minutes at a perch. Any endpoint gap is a visible twitch on every cycle."
+        },
+        {
+          "channel": "ground_clearance.min",
+          "min": -2.5,
+          "because": "A grounded pose is planted: docs/WYVERN_ANIMATIONS.md calls anything reaching more than 0.9 below the origin non-planted, and the sleep pose's -2.04 is the deliberate floor. A clip reaching -10 is an airborne pose that would put a wing through the terrain."
+        },
+        {
+          "channel": "pelvis.path",
+          "max": 12,
+          "because": "Battle_Walk, an in-place cycle with a bob, travels 5.6. Ambient behaviour is calmer than walking; the groom's 9.9 is the busiest of these."
+        }
+      ]
+    },
+    "sleep": {
+      "summary": "a closed-jaw curled sleep pose with a small, readable resting breath",
+      "clips": [
+        "Sanct_Sleep"
+      ],
+      "rules": [
+        {
+          "channel": "jaw_deg.mean",
+          "max": -65,
+          "because": "The dragon's measured lower-head control stays firmly closed in sleep. Sanct_Sleep measures -77.35 degrees on the corrected Drogon jaw control."
+        },
+        {
+          "channel": "head_reach.vertical.range",
+          "min": 0.2,
+          "because": "A sleeping body still needs a visible breath rather than a frozen pose. The measured neck-and-tail breath travels 0.30 units vertically."
+        }
+      ]
+    },
+    "rest": {
+      "summary": "an injured but wakeful low rest with a restrained open-mouth breath",
+      "clips": [
+        "Sanct_Rest"
+      ],
+      "rules": [
+        {
+          "channel": "jaw_deg.mean",
+          "min": -50,
+          "max": -30,
+          "because": "Rest remains more open than sleep while avoiding the source pose's full gape. It measures -40.17 degrees on the corrected Drogon jaw control."
+        },
+        {
+          "channel": "head_reach.vertical.range",
+          "min": 0.4,
+          "because": "The low pant must read more actively than sleep's resting breath. Rest measures 0.55 units of vertical head travel."
+        }
+      ]
+    },
+    "hunt_eat": {
+      "summary": "a planted feeding loop with distinct bite, tear, chew and swallow motion",
+      "clips": [
+        "Sanct_Eat"
+      ],
+      "rules": [
+        {
+          "channel": "loop.pose_mean",
+          "max": 0.05,
+          "because": "Eating may repeat for ambient feeding, so the revised 8-second cycle must close exactly."
+        },
+        {
+          "channel": "ground_clearance.min",
+          "min": -1,
+          "because": "The feet and folded wings remain planted while the muzzle reaches the carcass. Measured -0.86."
+        },
+        {
+          "channel": "jaw_deg.range",
+          "min": 18,
+          "because": "Separate bite and chew beats require visible lower-jaw motion. Measured 20.85 degrees."
+        },
+        {
+          "channel": "head_reach.vertical.range",
+          "min": 2,
+          "because": "The muzzle must lower to the prey and lift for the swallow. Measured 2.39 units."
+        },
+        {
+          "channel": "toe_deg.range",
+          "min": 5,
+          "because": "The planted claws visibly tighten through the bite and release at the exact loop seam."
+        }
+      ]
+    },
+    "hunt_grip": {
+      "summary": "a planted one-shot that opens, bites and braces prey for takeoff",
+      "clips": [
+        "Sanct_HuntGrip"
+      ],
+      "rules": [
+        {
+          "channel": "duration_s",
+          "max": 3.1,
+          "because": "Grip is a committed transition rather than a second feeding loop. Measured 3.0 seconds."
+        },
+        {
+          "channel": "ground_clearance.min",
+          "min": -0.75,
+          "because": "The grip happens on the ground before takeoff. Measured -0.49."
+        },
+        {
+          "channel": "jaw_deg.range",
+          "min": 30,
+          "because": "The mouth must visibly open and close around the prey. Measured 34.38 degrees."
+        },
+        {
+          "channel": "toe_deg.range",
+          "min": 8,
+          "because": "The hind toes tighten progressively as the body braces the captured prey."
+        }
+      ]
+    },
+    "hunt_carry": {
+      "summary": "an exact powered flight loop with a locked neck, jaw and simulation-owned origin",
+      "clips": [
+        "Sanct_HuntCarry"
+      ],
+      "rules": [
+        {
+          "channel": "loop.pose_mean",
+          "max": 0.05,
+          "because": "Carry may remain active for an arbitrary flight path and must loop without a prey jerk."
+        },
+        {
+          "channel": "cycle.beats",
+          "min": 3,
+          "max": 3,
+          "because": "Carry retains cruise's three measured propulsion beats."
+        },
+        {
+          "channel": "wing_elev_L.range",
+          "min": 90,
+          "because": "A loaded wyvern still needs a real powered stroke. Measured 98.56 degrees."
+        },
+        {
+          "channel": "head_reach.vertical.range",
+          "max": 0.05,
+          "because": "The attachment follows the head; a frozen head prevents the carried doe from whipping. Measured 0.0."
+        },
+        {
+          "channel": "jaw_deg.range",
+          "max": 0.05,
+          "because": "The jaw stays clamped around the prey for the full loop. Measured 0.0."
+        },
+        {
+          "channel": "pelvis.path",
+          "max": 0.05,
+          "because": "The Highlands director owns world translation. Measured 0.0."
+        },
+        {
+          "channel": "foot_drop.range",
+          "min": 0.12,
+          "because": "The airborne hind legs compress and release visibly with the loaded power stroke."
+        },
+        {
+          "channel": "tail_reach.vertical.range",
+          "min": 0.5,
+          "because": "The tail trails the wing impulse by one landmark instead of moving as a rigid body extension."
+        }
+      ]
+    },
+    "hunt_finish": {
+      "summary": "a planted swallow, head lift and satisfied scan ending at idle",
+      "clips": [
+        "Sanct_HuntFinish"
+      ],
+      "rules": [
+        {
+          "channel": "duration_s",
+          "min": 4.5,
+          "max": 5.5,
+          "because": "The finish needs time for a swallow and two-sided scan without becoming another idle loop. Measured 5.0 seconds."
+        },
+        {
+          "channel": "ground_clearance.min",
+          "min": 0.5,
+          "because": "The recovery remains fully planted. Measured +0.88."
+        },
+        {
+          "channel": "jaw_deg.range",
+          "min": 8,
+          "because": "A visible final swallow separates recovery from a head-only look. Measured 11.42 degrees."
+        },
+        {
+          "channel": "head_reach.vertical.range",
+          "min": 2,
+          "because": "The head must lift out of the feeding pose before scanning. Measured 2.37 units."
+        }
+      ]
+    },
+    "grounded_gesture": {
+      "summary": "one-shot ambient gestures that must return to the idle pose they interrupt",
+      "clips": [
+        "Sanct_Nuzzle",
+        "Sanct_Calm",
+        "Sanct_Sit",
+        "Sanct_Rise"
+      ],
+      "rules": [
+        {
+          "channel": "ground_clearance.min",
+          "min": -2.5,
+          "because": "Same planted contract as the ambient loops."
+        }
+      ]
+    },
+    "vendor_cruise_source": {
+      "summary": "the artist-authored clips the authored flight family is measured against; a regression guard on the vendor GLB itself",
+      "clips": [
+        "SKM_DaenerysDragon|DaenerysDragon_Battle_Down02",
+        "SKM_DaenerysDragon|DaenerysDragon_Battle_Up"
+      ],
+      "rules": [
+        {
+          "channel": "wingtip_L.stroke_arc_deg",
+          "min": 90,
+          "because": "Battle_Down02 96.3 and Battle_Up 109.7. These two numbers are the amplitude bar every authored cruise threshold is set from, so the bar itself needs a guard: if rebuild-drogon.py ever ships a different vendor file, the contracts below it are silently rebased."
+        },
+        {
+          "channel": "symmetry_error.mean",
+          "max": 2.0,
+          "because": "Battle_Up 1.25, Battle_Down02 1.49. These are the two symmetric artist clips; everything else airborne in the vendor file is a swoop at 14-23."
+        }
+      ]
+    },
+    "speed": {
+      "summary": "cruise's posture at a faster cadence, on a body line that never lifts its nose",
+      "clips": [
+        "Sanct_Speed"
+      ],
+      "rules": [
+        {
+          "channel": "cycle.cadence_hz",
+          "min": 0.75,
+          "because": "Cadence is the mode. Cruise measures 0.5 Hz and hover 0.667; speed measures 0.8, and the 1.6x ratio over cruise is the speed ratio the mode is entered at rather than a chosen feel — the sanctuary sprint is 28/18 = 1.56 and the battle throttle multiplier is 1.6. 0.75 is the floor that separates it from both other powered modes."
+        },
+        {
+          "channel": "cycle.beats",
+          "min": 4,
+          "because": "Same countable-propulsion rule as cruise's >= 2. Measured 4."
+        },
+        {
+          "channel": "body_axis_deg.max",
+          "max": 0,
+          "because": "Speed never lifts its nose. Cruise's own maximum is +5.0; this measures -7.0, so the body line is nose-down on every frame."
+        },
+        {
+          "channel": "body_axis_deg.min",
+          "min": -15,
+          "because": "Cruise's envelope, unchanged: speed is cruise's posture at a faster cadence, not a new attitude. Measured -12.62."
+        },
+        {
+          "channel": "wingtip_L.stroke_arc_deg",
+          "min": 70,
+          "because": "A faster beat may not be a smaller one. Cruise sweeps 107.7; this measures 106.3."
+        },
+        {
+          "channel": "wing_elev_L.range",
+          "min": 60,
+          "because": "Cruise measures 103.17, this 105.98. A loop with no elevation range has no propulsion in it."
+        },
+        {
+          "channel": "wing_azimuth_L.range",
+          "min": 40,
+          "because": "The stroke plane — the fore-and-aft sweep that makes a beat a figure-eight rather than a hinge. The floor is 40 rather than cruise's 45 because a faster beat has less time to travel: measured 44.34 against cruise's 52.1, with the vendor cycle at 53.9."
+        },
+        {
+          "channel": "wing_extension_L.range",
+          "min": 5.5,
+          "because": "The wrist fold, the channel that silently vanished when the cruise beat was built from four landmarks. Cruise measures 6.37, this 6.48."
+        },
+        {
+          "channel": "symmetry_error.mean",
+          "max": 2.0,
+          "because": "A powered beat is symmetric; the asymmetric vendor swoops sit at 14-23."
+        },
+        {
+          "channel": "wing_elev_bias.mean",
+          "min": -3.5,
+          "max": 3.5,
+          "because": "Level flight: neither wing sits lower. Same rig residual as cruise, and the same band. Measured 2.87."
+        },
+        {
+          "channel": "wing_stroke_asymmetry",
+          "min": -3,
+          "max": 3,
+          "because": "Level flight sweeps both wings equally far. Measured -0.26; the banks reach -29.1 and +27.4."
+        },
+        {
+          "channel": "pelvis.path",
+          "max": 0.5,
+          "because": "Same origin contract as cruise: the simulation owns position, not the mixer."
+        },
+        {
+          "channel": "root_roll_delta_deg.range",
+          "max": 2,
+          "because": "Same channel and reason as cruise: it measures torso pitch, not roll, and a flight loop must not reintroduce the landing flare its pose was sampled from. Measured 0.0, as every clip built on the single-frame body is."
+        },
+        {
+          "channel": "loop.pose_mean",
+          "max": 0.05,
+          "because": "An authored loop closes on its own opening key and should be at zero."
+        },
+        {
+          "channel": "wingtip_L.lateral.min",
+          "min": 4,
+          "because": "The left wingtip must stay on the left of the pelvis (+x) on every frame."
+        },
+        {
+          "channel": "wingtip_R.lateral.max",
+          "max": -4,
+          "because": "Mirror of the left-side rule."
+        },
+        {
+          "channel": "foot_drop.mean",
+          "max": 2.6,
+          "because": "Tucked tight against the abdomen - the ceiling is below the rest of the aerodynamic family, not just below hover. Measured 2.33, against cruise's 2.95."
+        },
+        {
+          "channel": "foot_asymmetry.max",
+          "min": -0.15,
+          "max": 0.15,
+          "because": "The flight family flies on a matched pair of legs, and until PoseKey.mirror_legs it did not: foot_drop had only ever been measured on the left foot, so the right one was free to drift. It was drifting by the width of the vendor base pose PoseKey.body freezes - Battle_Down02 f40 measures foot_drop 4.263 left against 3.544 right - and all eight flight clips inherited it, at 0.63-1.05. Mirroring the left hind limb onto the right takes that to 0.04-0.06: dive 0.04, hover 0.05, the other six 0.06. The band is signed and symmetric at +-0.15, 2.5x the measurement and 4x inside the 0.63 an unmirrored clip returns, so dropping the mirror from a recipe or reversing it fails here. foot_drop itself is deliberately unmoved - it watches the side the mirror holds fixed - so every limb-carriage band above still measures what it was derived from."
+        },
+        {
+          "channel": "toe_curl_deg.mean",
+          "min": 15,
+          "because": "The fastest silhouettes carry the tightest claw fold. Measured 19.52 in both, against cruise's 9.79. Claws gathered for flight. toe_curl_deg reads the toe fan's local Z, the axis that actually opens and closes it; toe_deg reads local X, which swings +-40 deg for under 0.09 of change in outer-toe span and is why the claws could sit at range 0.00 in every flight clip without failing anything. "
+        },
+        {
+          "channel": "head_reach.horizontal.mean",
+          "min": 11.4,
+          "because": "The spearhead: the longest forward neck reach in the family. Measured 11.79, against cruise's 11.45 and hover's 8.72."
+        },
+        {
+          "channel": "head_reach.vertical.mean",
+          "max": 1.2,
+          "because": "Head level with the flattened body line rather than carried above it. Measured 0.06, against cruise's 2.13."
+        },
+        {
+          "channel": "body_axis_deg.range",
+          "max": 8.4,
+          "because": "The neck answers the wingbeat one measured landmark behind the chest and the tail two, which is the overlapping secondary motion docs/FLIGHT_ANIMATION_DEVELOPMENT.md asks forward flight for. Because the head and tail no longer swing in lockstep with the chest, their contributions to the head-to-tail line partly cancel instead of adding: Sanct_Speed measures 7.9 with the lag against 8.89 without it. This is the lag's consequence, not the lag itself - a phase channel would gate it directly, and does not exist yet - so read it as a regression guard on a body that pumped as one rigid piece, not as proof of the phase."
+        }
+      ]
+    },
+    "glide": {
+      "summary": "unpowered: wings held extended and level, the flattest body line of the family",
+      "clips": [
+        "Sanct_Soar"
+      ],
+      "rules": [
+        {
+          "channel": "wing_elev_L.range",
+          "min": 3,
+          "max": 14,
+          "because": "This bound is exactly the statement 'this clip has no wingbeat'. CYCLE_MIN_RANGE_DEG in analyze-clips-blender.py is 15.0, so `cycle` measures null if and only if this stays under 15 — and that null is what makes the mode unpowered rather than a slowed cruise. The floor of 3 keeps it from being a statue. Cruise measures 103.17."
+        },
+        {
+          "channel": "wingtip_L.stroke_arc_deg",
+          "max": 25,
+          "because": "Cruise sweeps 107.7 and even the inside wing of a bank 102.2. A held wing that sweeps is a cruise."
+        },
+        {
+          "channel": "wing_extension_L.range",
+          "max": 2,
+          "because": "The wrist fold is a propulsion feature: the wing folds on the recovery stroke to cut drag and opens for the power stroke. Cruise travels 6.37 within one cycle. An unpowered wing does not fold."
+        },
+        {
+          "channel": "symmetry_error.mean",
+          "max": 2.0,
+          "because": "Battle_Up 1.25 and Battle_Down02 1.49 are what a symmetric pose measures on this rig."
+        },
+        {
+          "channel": "wing_elev_bias.mean",
+          "min": -4.5,
+          "max": 4.5,
+          "because": "Level flight, with a wider band than cruise's +-3.5 for a measured reason: the residual is the rig's own left/right rest difference (L-Hand z=-3.36 against R-Hand's +4.13), and holding the wing at a non-level elevation projects more of it than a stroke averaging through level does. Measured 3.34 gliding and 3.40 diving, against cruise's 2.76. The banks break it deliberately at -24 to +30."
+        },
+        {
+          "channel": "wing_extension_L.mean",
+          "min": 15.5,
+          "because": "A gliding wing is held at the extended end of the artist's own range. Battle_Down02 travels 8.06-19.97 and the cruise loop 11.18-17.55 with a mean of 14.93; this holds 16.47. Below 15.5 the wing is mid-fold, which is a recovery stroke, and there is no stroke here."
+        },
+        {
+          "channel": "body_axis_deg.mean",
+          "min": -10,
+          "max": 6,
+          "because": "The flattest line in the family: a glide trades altitude for speed, so it sits below cruise's +2.13 and well below Battle_Down02's +7.8, without reaching anything that reads as a descent. Measured -1.83."
+        },
+        {
+          "channel": "pelvis.path",
+          "max": 0.5,
+          "because": "Same origin contract as cruise: the simulation owns position, not the mixer."
+        },
+        {
+          "channel": "root_roll_delta_deg.range",
+          "max": 2,
+          "because": "Same channel and reason as cruise: it measures torso pitch, not roll, and a flight loop must not reintroduce the landing flare its pose was sampled from. Measured 0.0, as every clip built on the single-frame body is."
+        },
+        {
+          "channel": "loop.pose_mean",
+          "max": 0.05,
+          "because": "An authored loop closes on its own opening key and should be at zero."
+        },
+        {
+          "channel": "wingtip_L.lateral.min",
+          "min": 4,
+          "because": "The left wingtip must stay on the left of the pelvis (+x) on every frame."
+        },
+        {
+          "channel": "wingtip_R.lateral.max",
+          "max": -4,
+          "because": "Mirror of the left-side rule."
+        },
+        {
+          "channel": "foot_drop.mean",
+          "min": 2.6,
+          "max": 3.4,
+          "because": "The aerodynamic family tucks and hover hangs, and the gap between them is what makes the two silhouettes readable. Measured: cruise and both banks 2.95, scout 3.06, glide 3.09, speed 2.33, dive 2.20 - against hover's 4.15 and hunt_carry's 4.25. The ceiling sits above the highest tucked clip and a clear 0.75 below the lowest hanging one. Before the flexion axis was corrected every one of these measured 4.0-4.3, because hind_leg_pulse drove each limb's own long axis and bought 0.04 units of travel. Glide measures 3.09."
+        },
+        {
+          "channel": "foot_asymmetry.max",
+          "min": -0.15,
+          "max": 0.15,
+          "because": "The flight family flies on a matched pair of legs, and until PoseKey.mirror_legs it did not: foot_drop had only ever been measured on the left foot, so the right one was free to drift. It was drifting by the width of the vendor base pose PoseKey.body freezes - Battle_Down02 f40 measures foot_drop 4.263 left against 3.544 right - and all eight flight clips inherited it, at 0.63-1.05. Mirroring the left hind limb onto the right takes that to 0.04-0.06: dive 0.04, hover 0.05, the other six 0.06. The band is signed and symmetric at +-0.15, 2.5x the measurement and 4x inside the 0.63 an unmirrored clip returns, so dropping the mirror from a recipe or reversing it fails here. foot_drop itself is deliberately unmoved - it watches the side the mirror holds fixed - so every limb-carriage band above still measures what it was derived from."
+        },
+        {
+          "channel": "toe_curl_deg.mean",
+          "min": 5,
+          "because": "Claws gathered for flight. toe_curl_deg reads the toe fan's local Z, the axis that actually opens and closes it; toe_deg reads local X, which swings +-40 deg for under 0.09 of change in outer-toe span and is why the claws could sit at range 0.00 in every flight clip without failing anything. Measured: cruise, banks and glide 9.79, scout 7.49, speed and dive 19.52 - all positive, against hover's -17.99."
+        },
+        {
+          "channel": "head_reach.vertical.mean",
+          "min": 0.4,
+          "max": 2.4,
+          "because": "An unpowered glide holds a settled head just above the hips, without cruise's beat-driven lift. Measured 1.24, and its head_reach.vertical range is 0.61 against cruise's 2.47."
+        }
+      ]
+    },
+    "air_gesture": {
+      "summary": "a short airborne strike that is allowed to reach below its flight origin",
+      "clips": [
+        "SKM_DaenerysDragon|DaenerysDragon_Battle_Attack04"
+      ],
+      "rules": [
+        {
+          "channel": "duration_s",
+          "max": 3.5,
+          "because": "A strike must read as one blow rather than an extended combat loop. Measured 3.333s."
+        },
+        {
+          "channel": "wingtip_L.stroke_arc_deg",
+          "min": 100,
+          "because": "The airborne attack needs a real committed wing sweep. Measured 121.6 degrees."
+        },
+        {
+          "channel": "ground_clearance.min",
+          "max": -5,
+          "because": "Unlike a grounded gesture, an aerial strike is expected to reach well below its origin. Measured -11.04."
+        }
+      ]
+    },
+    "dive": {
+      "summary": "a stoop: steeply nose-down with the wings held at their tightest fold",
+      "clips": [
+        "Sanct_Dive"
+      ],
+      "rules": [
+        {
+          "channel": "wing_elev_L.range",
+          "min": 3,
+          "max": 14,
+          "because": "This bound is exactly the statement 'this clip has no wingbeat'. CYCLE_MIN_RANGE_DEG in analyze-clips-blender.py is 15.0, so `cycle` measures null if and only if this stays under 15 — and that null is what makes the mode unpowered rather than a slowed cruise. The floor of 3 keeps it from being a statue. Cruise measures 103.17."
+        },
+        {
+          "channel": "wingtip_L.stroke_arc_deg",
+          "max": 25,
+          "because": "Cruise sweeps 107.7 and even the inside wing of a bank 102.2. A held wing that sweeps is a cruise."
+        },
+        {
+          "channel": "wing_extension_L.range",
+          "max": 2,
+          "because": "The wrist fold is a propulsion feature: the wing folds on the recovery stroke to cut drag and opens for the power stroke. Cruise travels 6.37 within one cycle. An unpowered wing does not fold."
+        },
+        {
+          "channel": "symmetry_error.mean",
+          "max": 2.0,
+          "because": "Battle_Up 1.25 and Battle_Down02 1.49 are what a symmetric pose measures on this rig."
+        },
+        {
+          "channel": "wing_elev_bias.mean",
+          "min": -4.5,
+          "max": 4.5,
+          "because": "Level flight, with a wider band than cruise's +-3.5 for a measured reason: the residual is the rig's own left/right rest difference (L-Hand z=-3.36 against R-Hand's +4.13), and holding the wing at a non-level elevation projects more of it than a stroke averaging through level does. Measured 3.34 gliding and 3.40 diving, against cruise's 2.76. The banks break it deliberately at -24 to +30."
+        },
+        {
+          "channel": "body_axis_deg.mean",
+          "max": -25,
+          "because": "The exact mirror of hover's >= 25, from the same measurement: hover ships 32.09 nose-up from a -30 trim of the flight root, and the dive +30 from the same cruise line. Cruise sits at 2.13 between them, so the three silhouettes are 30 degrees apart. Measured -27.82."
+        },
+        {
+          "channel": "body_axis_deg.max",
+          "max": -20,
+          "because": "Never level on any frame. Measured -27.11."
+        },
+        {
+          "channel": "wing_extension_L.mean",
+          "max": 12.5,
+          "because": "The folded end of the artist's own range. Battle_Down02 travels 8.06-19.97 and the cruise loop 11.18-17.55; a stoop holds the fold rather than passing through it. Measured 11.07."
+        },
+        {
+          "channel": "pelvis.path",
+          "max": 0.5,
+          "because": "Same origin contract as cruise: the simulation owns position, not the mixer."
+        },
+        {
+          "channel": "root_roll_delta_deg.range",
+          "max": 2,
+          "because": "Same channel and reason as cruise: it measures torso pitch, not roll, and a flight loop must not reintroduce the landing flare its pose was sampled from. Measured 0.0, as every clip built on the single-frame body is."
+        },
+        {
+          "channel": "loop.pose_mean",
+          "max": 0.05,
+          "because": "An authored loop closes on its own opening key and should be at zero."
+        },
+        {
+          "channel": "wingtip_L.lateral.min",
+          "min": 4,
+          "because": "The left wingtip must stay on the left of the pelvis (+x) on every frame."
+        },
+        {
+          "channel": "wingtip_R.lateral.max",
+          "max": -4,
+          "because": "Mirror of the left-side rule."
+        },
+        {
+          "channel": "foot_drop.mean",
+          "max": 2.6,
+          "because": "The stoop is the most streamlined silhouette in the family and carries the deepest tuck. Measured 2.20, the lowest of any flight clip."
+        },
+        {
+          "channel": "foot_asymmetry.max",
+          "min": -0.15,
+          "max": 0.15,
+          "because": "The flight family flies on a matched pair of legs, and until PoseKey.mirror_legs it did not: foot_drop had only ever been measured on the left foot, so the right one was free to drift. It was drifting by the width of the vendor base pose PoseKey.body freezes - Battle_Down02 f40 measures foot_drop 4.263 left against 3.544 right - and all eight flight clips inherited it, at 0.63-1.05. Mirroring the left hind limb onto the right takes that to 0.04-0.06: dive 0.04, hover 0.05, the other six 0.06. The band is signed and symmetric at +-0.15, 2.5x the measurement and 4x inside the 0.63 an unmirrored clip returns, so dropping the mirror from a recipe or reversing it fails here. foot_drop itself is deliberately unmoved - it watches the side the mirror holds fixed - so every limb-carriage band above still measures what it was derived from."
+        },
+        {
+          "channel": "toe_curl_deg.mean",
+          "min": 15,
+          "because": "The fastest silhouettes carry the tightest claw fold. Measured 19.52 in both, against cruise's 9.79. Claws gathered for flight. toe_curl_deg reads the toe fan's local Z, the axis that actually opens and closes it; toe_deg reads local X, which swings +-40 deg for under 0.09 of change in outer-toe span and is why the claws could sit at range 0.00 in every flight clip without failing anything. "
+        },
+        {
+          "channel": "head_reach.vertical.mean",
+          "max": -2.0,
+          "because": "The head leads the stoop below the hips. Measured -3.89, the only flight clip with a negative head carry apart from speed's near-level 0.06."
+        }
+      ]
+    }
+  }
+}

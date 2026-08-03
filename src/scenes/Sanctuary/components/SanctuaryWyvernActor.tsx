@@ -1,0 +1,176 @@
+'use client'
+
+import type { Group, Object3D } from 'three'
+import type { WyvernInstance } from '@/core/types'
+import { SPECIES } from '@/core/data/species'
+import { GameModel, type ModelActionRequest } from '@/render/assets/GameModel'
+import { DROGON_FIT, type ModelState } from '@/render/assets/manifest'
+import { PlaceholderWyvern } from '@/render/placeholders/PlaceholderWyvern'
+import { WorldLabel } from '@/render/labels/WorldLabel'
+
+/** The dragon lower-muzzle control; B_Face_Jaw belongs to the rider skeleton. */
+const JAW = 'Bip002-Ponytail1_016'
+const HEAD = 'Bip002-Head_015'
+const TRANSIT_ALTITUDE = 22
+const HIND_LEG_CHAINS = [
+  ['Bip002-L-Thigh_0186', 'Bip002-L-Calf_0187', 'Bip002-L-Foot_0188'],
+  ['Bip002-R-Thigh_0201', 'Bip002-R-Calf_00', 'Bip002-R-Foot_0202'],
+] as const
+/** Root to tip; the same six bones the authoring script's `TAIL` names. */
+const TAIL_CHAIN = [
+  'Bip002-Tail1_0215',
+  'Bip002-Tail2_0216',
+  'Bip002-Tail3_0217',
+  'Bip002-Tail4_0218',
+  'Bip002-Tail5_0219',
+  'Bip002-Tail6_01',
+] as const
+
+export interface VisualState {
+  state: ModelState
+  action: ModelActionRequest | null
+  showFood: boolean
+}
+
+export function stageScale(wyvern: WyvernInstance): number {
+  if (wyvern.stage === 'hatchling') return 0.28
+  if (wyvern.stage === 'juvenile') return 0.6
+  return 1
+}
+
+export function modelHeight(wyvern: WyvernInstance): number {
+  return stageScale(wyvern) * 11 * DROGON_FIT
+}
+
+function SelectionRing({ scale, airborne }: { scale: number; airborne: boolean }) {
+  return (
+    <mesh
+      rotation={[-Math.PI / 2, 0, 0]}
+      position={[0, airborne ? -TRANSIT_ALTITUDE + 0.2 : 0.08, 0]}
+    >
+      <ringGeometry args={[4.8 * scale, 5.4 * scale, 48]} />
+      <meshBasicMaterial color="#f0d9a8" transparent opacity={0.75} depthWrite={false} />
+    </mesh>
+  )
+}
+
+function FoodOffering({ scale }: { scale: number }) {
+  return (
+    <group position={[0, 0.45 * scale, 4.5 * scale]}>
+      <mesh castShadow>
+        <dodecahedronGeometry args={[0.55 * scale, 0]} />
+        <meshStandardMaterial color="#7a342c" roughness={0.9} />
+      </mesh>
+      <mesh position={[0, -0.35 * scale, 0]} castShadow>
+        <cylinderGeometry args={[0.75 * scale, 0.6 * scale, 0.25 * scale, 10]} />
+        <meshStandardMaterial color="#7b5a35" roughness={1} />
+      </mesh>
+    </group>
+  )
+}
+
+const setCursor = (cursor: 'pointer' | 'auto'): void => {
+  document.body.style.cursor = cursor
+}
+
+export interface SanctuaryWyvernActorProps {
+  wyvern: WyvernInstance
+  visual: VisualState
+  selected: boolean
+  airborne: boolean
+  onGroupReady: (group: Group) => void
+  onJawReady: (jaw: Object3D | null) => void
+  onHeadReady: (head: Object3D | null) => void
+  onNeckBonesReady?: (neckBones: Object3D[]) => void
+  onSpineBonesReady?: (spineBones: Object3D[]) => void
+  onLegBonesReady?: (legBones: Object3D[][]) => void
+  onTailBonesReady?: (tailBones: Object3D[]) => void
+  onActionFinished?: (request: ModelActionRequest) => void
+  onSelect: () => void
+}
+
+export function SanctuaryWyvernActor({
+  wyvern,
+  visual,
+  selected,
+  airborne,
+  onGroupReady,
+  onJawReady,
+  onHeadReady,
+  onNeckBonesReady,
+  onSpineBonesReady,
+  onLegBonesReady,
+  onTailBonesReady,
+  onActionFinished,
+  onSelect,
+}: SanctuaryWyvernActorProps) {
+  const species = SPECIES[wyvern.speciesId]
+  const scale = stageScale(wyvern)
+
+  return (
+    <group
+      ref={onGroupReady}
+      onClick={(event) => {
+        event.stopPropagation()
+        onSelect()
+      }}
+      onPointerOver={(event) => {
+        event.stopPropagation()
+        setCursor('pointer')
+      }}
+      onPointerOut={() => setCursor('auto')}
+    >
+      <GameModel
+        id={`wyvern.${wyvern.speciesId}`}
+        state={visual.state}
+        action={visual.action}
+        seed={wyvern.name.charCodeAt(0) ?? 0}
+        scale={scale}
+        onReady={(root) => {
+          onJawReady(root.getObjectByName(JAW) ?? null)
+          onHeadReady(root.getObjectByName(HEAD) ?? null)
+          const neckBones = [
+            root.getObjectByName('Bip002-Neck_012'),
+            root.getObjectByName('Bip002-Neck1_013'),
+            root.getObjectByName('Bip002-Neck2_014'),
+          ].filter((b): b is Object3D => b !== null && b !== undefined)
+          onNeckBonesReady?.(neckBones)
+          
+          const spineBones = [
+            root.getObjectByName('Bip002-Spine_08'),
+            root.getObjectByName('Bip002-Spine1_09'),
+            root.getObjectByName('Bip002-Spine2_010'),
+            root.getObjectByName('Bip002-Spine3_011'),
+            root.getObjectByName('Bip002-Pelvis_07'),
+          ].filter((b): b is Object3D => b !== null && b !== undefined)
+          onSpineBonesReady?.(spineBones)
+          
+          onLegBonesReady?.(
+            HIND_LEG_CHAINS.map((chain) =>
+              chain
+                .map((name) => root.getObjectByName(name))
+                .filter((bone): bone is Object3D => bone !== null && bone !== undefined),
+            ),
+          )
+
+          onTailBonesReady?.(
+            TAIL_CHAIN.map((name) => root.getObjectByName(name)).filter(
+              (bone): bone is Object3D => bone !== null && bone !== undefined,
+            ),
+          )
+        }}
+        onActionFinished={onActionFinished}
+        fallback={<PlaceholderWyvern color={species?.color} scale={scale} />}
+      />
+
+      <WorldLabel
+        position={[0, modelHeight(wyvern) + (airborne ? 4 : 2), 0]}
+        text={`${wyvern.name} (${species?.name ?? 'Wyvern'})`}
+        color={species?.color ?? '#d4af37'}
+      />
+
+      {selected && <SelectionRing scale={scale} airborne={airborne} />}
+      {visual.showFood && <FoodOffering scale={scale} />}
+    </group>
+  )
+}

@@ -1,0 +1,30 @@
+node_modules/
+.next/
+out/
+build/
+dist/
+
+*.tsbuildinfo
+next-env.d.ts
+
+.DS_Store
+*.log
+npm-debug.log*
+yarn-error.log*
+
+.env
+.env.*
+!.env.example
+
+.vscode/
+.idea/
+
+# Blender rolling backups are large and reproducible from the checked-in .blend.
+*.blend[0-9]*
+
+# Replays exported from the Help panel — useful locally, noise in the repo.
+wyvern3d-replay*.json
+
+# Vendor model sources fed to scripts/rebuild-drogon.py. The 121 MB source GLB
+# exceeds GitHub's 100 MB hard limit; only the built public/models/*.glb ship.
+.assets/

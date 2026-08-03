@@ -1,0 +1,392 @@
+{
+  "schema": "animation_contact_sheet_report.v1",
+  "frames": [
+    "Sanct_BankL__f000.png",
+    "Sanct_BankL__f036.png",
+    "Sanct_BankL__f072.png",
+    "Sanct_BankL__f108.png",
+    "Sanct_BankL__f144.png",
+    "Sanct_BankR__f000.png",
+    "Sanct_BankR__f036.png",
+    "Sanct_BankR__f072.png",
+    "Sanct_BankR__f108.png",
+    "Sanct_BankR__f144.png",
+    "Sanct_Calm__f000.png",
+    "Sanct_Calm__f030.png",
+    "Sanct_Calm__f060.png",
+    "Sanct_Calm__f090.png",
+    "Sanct_Calm__f120.png",
+    "Sanct_Drink__f000.png",
+    "Sanct_Drink__f036.png",
+    "Sanct_Drink__f072.png",
+    "Sanct_Drink__f108.png",
+    "Sanct_Drink__f144.png",
+    "Sanct_Eat__f000.png",
+    "Sanct_Eat__f036.png",
+    "Sanct_Eat__f072.png",
+    "Sanct_Eat__f108.png",
+    "Sanct_Eat__f144.png",
+    "Sanct_Glide__f000.png",
+    "Sanct_Glide__f036.png",
+    "Sanct_Glide__f072.png",
+    "Sanct_Glide__f108.png",
+    "Sanct_Glide__f144.png",
+    "Sanct_Groom__f000.png",
+    "Sanct_Groom__f048.png",
+    "Sanct_Groom__f096.png",
+    "Sanct_Groom__f144.png",
+    "Sanct_Groom__f192.png",
+    "Sanct_Nuzzle__f000.png",
+    "Sanct_Nuzzle__f024.png",
+    "Sanct_Nuzzle__f048.png",
+    "Sanct_Nuzzle__f072.png",
+    "Sanct_Nuzzle__f096.png",
+    "Sanct_PerchGrip__f000.png",
+    "Sanct_PerchGrip__f018.png",
+    "Sanct_PerchGrip__f036.png",
+    "Sanct_PerchGrip__f054.png",
+    "Sanct_PerchGrip__f072.png",
+    "Sanct_Rise__f000.png",
+    "Sanct_Rise__f012.png",
+    "Sanct_Rise__f024.png",
+    "Sanct_Rise__f036.png",
+    "Sanct_Rise__f048.png",
+    "Sanct_SitLoop__f000.png",
+    "Sanct_SitLoop__f024.png",
+    "Sanct_SitLoop__f048.png",
+    "Sanct_SitLoop__f072.png",
+    "Sanct_SitLoop__f096.png",
+    "Sanct_Sit__f000.png",
+    "Sanct_Sit__f012.png",
+    "Sanct_Sit__f024.png",
+    "Sanct_Sit__f036.png",
+    "Sanct_Sit__f048.png",
+    "Sanct_Sleep__f000.png",
+    "Sanct_Sleep__f030.png",
+    "Sanct_Sleep__f060.png",
+    "Sanct_Sleep__f090.png",
+    "Sanct_Sleep__f120.png"
+  ],
+  "frame_diff": [
+    {
+      "from": "Sanct_BankL__f000.png",
+      "to": "Sanct_BankL__f036.png",
+      "mean_rgb_diff": 3.7100848765432097
+    },
+    {
+      "from": "Sanct_BankL__f036.png",
+      "to": "Sanct_BankL__f072.png",
+      "mean_rgb_diff": 1.1933050411522634
+    },
+    {
+      "from": "Sanct_BankL__f072.png",
+      "to": "Sanct_BankL__f108.png",
+      "mean_rgb_diff": 4.796077674897119
+    },
+    {
+      "from": "Sanct_BankL__f108.png",
+      "to": "Sanct_BankL__f144.png",
+      "mean_rgb_diff": 3.703274176954732
+    },
+    {
+      "from": "Sanct_BankL__f144.png",
+      "to": "Sanct_BankR__f000.png",
+      "mean_rgb_diff": 4.888073559670782
+    },
+    {
+      "from": "Sanct_BankR__f000.png",
+      "to": "Sanct_BankR__f036.png",
+      "mean_rgb_diff": 4.837075617283951
+    },
+    {
+      "from": "Sanct_BankR__f036.png",
+      "to": "Sanct_BankR__f072.png",
+      "mean_rgb_diff": 1.6469701646090538
+    },
+    {
+      "from": "Sanct_BankR__f072.png",
+      "to": "Sanct_BankR__f108.png",
+      "mean_rgb_diff": 4.899326131687243
+    },
+    {
+      "from": "Sanct_BankR__f108.png",
+      "to": "Sanct_BankR__f144.png",
+      "mean_rgb_diff": 3.2707998971193413
+    },
+    {
+      "from": "Sanct_BankR__f144.png",
+      "to": "Sanct_Calm__f000.png",
+      "mean_rgb_diff": 5.487438271604938
+    },
+    {
+      "from": "Sanct_Calm__f000.png",
+      "to": "Sanct_Calm__f030.png",
+      "mean_rgb_diff": 3.0708564814814814
+    },
+    {
+      "from": "Sanct_Calm__f030.png",
+      "to": "Sanct_Calm__f060.png",
+      "mean_rgb_diff": 2.6204475308641975
+    },
+    {
+      "from": "Sanct_Calm__f060.png",
+      "to": "Sanct_Calm__f090.png",
+      "mean_rgb_diff": 3.2172736625514404
+    },
+    {
+      "from": "Sanct_Calm__f090.png",
+      "to": "Sanct_Calm__f120.png",
+      "mean_rgb_diff": 3.433305041152263
+    },
+    {
+      "from": "Sanct_Calm__f120.png",
+      "to": "Sanct_Drink__f000.png",
+      "mean_rgb_diff": 0.021309156378600824
+    },
+    {
+      "from": "Sanct_Drink__f000.png",
+      "to": "Sanct_Drink__f036.png",
+      "mean_rgb_diff": 2.8165689300411523
+    },
+    {
+      "from": "Sanct_Drink__f036.png",
+      "to": "Sanct_Drink__f072.png",
+      "mean_rgb_diff": 2.707481995884774
+    },
+    {
+      "from": "Sanct_Drink__f072.png",
+      "to": "Sanct_Drink__f108.png",
+      "mean_rgb_diff": 2.70181841563786
+    },
+    {
+      "from": "Sanct_Drink__f108.png",
+      "to": "Sanct_Drink__f144.png",
+      "mean_rgb_diff": 2.8224588477366255
+    },
+    {
+      "from": "Sanct_Drink__f144.png",
+      "to": "Sanct_Eat__f000.png",
+      "mean_rgb_diff": 0.011746399176954733
+    },
+    {
+      "from": "Sanct_Eat__f000.png",
+      "to": "Sanct_Eat__f036.png",
+      "mean_rgb_diff": 4.017026748971193
+    },
+    {
+      "from": "Sanct_Eat__f036.png",
+      "to": "Sanct_Eat__f072.png",
+      "mean_rgb_diff": 2.805205761316872
+    },
+    {
+      "from": "Sanct_Eat__f072.png",
+      "to": "Sanct_Eat__f108.png",
+      "mean_rgb_diff": 3.6938605967078186
+    },
+    {
+      "from": "Sanct_Eat__f108.png",
+      "to": "Sanct_Eat__f144.png",
+      "mean_rgb_diff": 2.0699305555555556
+    },
+    {
+      "from": "Sanct_Eat__f144.png",
+      "to": "Sanct_Glide__f000.png",
+      "mean_rgb_diff": 5.286743827160493
+    },
+    {
+      "from": "Sanct_Glide__f000.png",
+      "to": "Sanct_Glide__f036.png",
+      "mean_rgb_diff": 4.26420267489712
+    },
+    {
+      "from": "Sanct_Glide__f036.png",
+      "to": "Sanct_Glide__f072.png",
+      "mean_rgb_diff": 1.41883487654321
+    },
+    {
+      "from": "Sanct_Glide__f072.png",
+      "to": "Sanct_Glide__f108.png",
+      "mean_rgb_diff": 4.722937242798354
+    },
+    {
+      "from": "Sanct_Glide__f108.png",
+      "to": "Sanct_Glide__f144.png",
+      "mean_rgb_diff": 3.3549922839506174
+    },
+    {
+      "from": "Sanct_Glide__f144.png",
+      "to": "Sanct_Groom__f000.png",
+      "mean_rgb_diff": 5.277654320987654
+    },
+    {
+      "from": "Sanct_Groom__f000.png",
+      "to": "Sanct_Groom__f048.png",
+      "mean_rgb_diff": 3.3741923868312753
+    },
+    {
+      "from": "Sanct_Groom__f048.png",
+      "to": "Sanct_Groom__f096.png",
+      "mean_rgb_diff": 3.5155709876543213
+    },
+    {
+      "from": "Sanct_Groom__f096.png",
+      "to": "Sanct_Groom__f144.png",
+      "mean_rgb_diff": 2.501926440329218
+    },
+    {
+      "from": "Sanct_Groom__f144.png",
+      "to": "Sanct_Groom__f192.png",
+      "mean_rgb_diff": 2.839246399176955
+    },
+    {
+      "from": "Sanct_Groom__f192.png",
+      "to": "Sanct_Nuzzle__f000.png",
+      "mean_rgb_diff": 0.1964557613168724
+    },
+    {
+      "from": "Sanct_Nuzzle__f000.png",
+      "to": "Sanct_Nuzzle__f024.png",
+      "mean_rgb_diff": 2.793258744855967
+    },
+    {
+      "from": "Sanct_Nuzzle__f024.png",
+      "to": "Sanct_Nuzzle__f048.png",
+      "mean_rgb_diff": 2.4815123456790125
+    },
+    {
+      "from": "Sanct_Nuzzle__f048.png",
+      "to": "Sanct_Nuzzle__f072.png",
+      "mean_rgb_diff": 1.4155272633744858
+    },
+    {
+      "from": "Sanct_Nuzzle__f072.png",
+      "to": "Sanct_Nuzzle__f096.png",
+      "mean_rgb_diff": 3.4609567901234564
+    },
+    {
+      "from": "Sanct_Nuzzle__f096.png",
+      "to": "Sanct_PerchGrip__f000.png",
+      "mean_rgb_diff": 0.021309156378600824
+    },
+    {
+      "from": "Sanct_PerchGrip__f000.png",
+      "to": "Sanct_PerchGrip__f018.png",
+      "mean_rgb_diff": 1.043996913580247
+    },
+    {
+      "from": "Sanct_PerchGrip__f018.png",
+      "to": "Sanct_PerchGrip__f036.png",
+      "mean_rgb_diff": 0.9914737654320988
+    },
+    {
+      "from": "Sanct_PerchGrip__f036.png",
+      "to": "Sanct_PerchGrip__f054.png",
+      "mean_rgb_diff": 0.9649665637860082
+    },
+    {
+      "from": "Sanct_PerchGrip__f054.png",
+      "to": "Sanct_PerchGrip__f072.png",
+      "mean_rgb_diff": 0.8727314814814814
+    },
+    {
+      "from": "Sanct_PerchGrip__f072.png",
+      "to": "Sanct_Rise__f000.png",
+      "mean_rgb_diff": 3.1965174897119346
+    },
+    {
+      "from": "Sanct_Rise__f000.png",
+      "to": "Sanct_Rise__f012.png",
+      "mean_rgb_diff": 1.5979346707818929
+    },
+    {
+      "from": "Sanct_Rise__f012.png",
+      "to": "Sanct_Rise__f024.png",
+      "mean_rgb_diff": 2.085650720164609
+    },
+    {
+      "from": "Sanct_Rise__f024.png",
+      "to": "Sanct_Rise__f036.png",
+      "mean_rgb_diff": 2.1328472222222223
+    },
+    {
+      "from": "Sanct_Rise__f036.png",
+      "to": "Sanct_Rise__f048.png",
+      "mean_rgb_diff": 2.222631172839506
+    },
+    {
+      "from": "Sanct_Rise__f048.png",
+      "to": "Sanct_SitLoop__f000.png",
+      "mean_rgb_diff": 3.1965174897119346
+    },
+    {
+      "from": "Sanct_SitLoop__f000.png",
+      "to": "Sanct_SitLoop__f024.png",
+      "mean_rgb_diff": 1.4648739711934156
+    },
+    {
+      "from": "Sanct_SitLoop__f024.png",
+      "to": "Sanct_SitLoop__f048.png",
+      "mean_rgb_diff": 1.4648739711934156
+    },
+    {
+      "from": "Sanct_SitLoop__f048.png",
+      "to": "Sanct_SitLoop__f072.png",
+      "mean_rgb_diff": 1.8611574074074075
+    },
+    {
+      "from": "Sanct_SitLoop__f072.png",
+      "to": "Sanct_SitLoop__f096.png",
+      "mean_rgb_diff": 1.8611574074074075
+    },
+    {
+      "from": "Sanct_SitLoop__f096.png",
+      "to": "Sanct_Sit__f000.png",
+      "mean_rgb_diff": 3.1965174897119346
+    },
+    {
+      "from": "Sanct_Sit__f000.png",
+      "to": "Sanct_Sit__f012.png",
+      "mean_rgb_diff": 2.222605452674897
+    },
+    {
+      "from": "Sanct_Sit__f012.png",
+      "to": "Sanct_Sit__f024.png",
+      "mean_rgb_diff": 2.132854938271605
+    },
+    {
+      "from": "Sanct_Sit__f024.png",
+      "to": "Sanct_Sit__f036.png",
+      "mean_rgb_diff": 2.086003086419753
+    },
+    {
+      "from": "Sanct_Sit__f036.png",
+      "to": "Sanct_Sit__f048.png",
+      "mean_rgb_diff": 1.5979449588477366
+    },
+    {
+      "from": "Sanct_Sit__f048.png",
+      "to": "Sanct_Sleep__f000.png",
+      "mean_rgb_diff": 4.575861625514404
+    },
+    {
+      "from": "Sanct_Sleep__f000.png",
+      "to": "Sanct_Sleep__f030.png",
+      "mean_rgb_diff": 0.2314017489711934
+    },
+    {
+      "from": "Sanct_Sleep__f030.png",
+      "to": "Sanct_Sleep__f060.png",
+      "mean_rgb_diff": 0.2617335390946502
+    },
+    {
+      "from": "Sanct_Sleep__f060.png",
+      "to": "Sanct_Sleep__f090.png",
+      "mean_rgb_diff": 0.1949819958847737
+    },
+    {
+      "from": "Sanct_Sleep__f090.png",
+      "to": "Sanct_Sleep__f120.png",
+      "mean_rgb_diff": 0.22776234567901235
+    }
+  ]
+}

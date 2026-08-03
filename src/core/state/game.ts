@@ -1,0 +1,121 @@
+import type { BuildingId, GameState, LogEntry, RegionState, Resources, ResourceId } from '../types'
+import { BUILDINGS } from '../data/buildings'
+import { CONFIG, SAVE_VERSION } from '../data/config'
+import { REGIONS, REGION_LIST, STARTING_REGION } from '../data/regions'
+import { SPECIES } from '../data/species'
+import { createRng, type Rng } from '../math/rng'
+import { createWyvern, nameFor, rollSpeciesStats, rollSpeciesTraits } from '../entities/wyvern'
+
+export const RESOURCE_IDS: ResourceId[] = ['food', 'gold', 'ore', 'timber', 'arcane']
+
+export const emptyResources = (): Resources => ({ food: 0, gold: 0, ore: 0, timber: 0, arcane: 0 })
+
+/**
+ * Runs `fn` with an RNG resumed from the state's stored cursor, then writes the
+ * cursor back. Every random draw in the core must go through this — a stray
+ * `Math.random()` silently breaks replay and the balance harness.
+ */
+export function withRng<T>(state: GameState, fn: (rng: Rng) => T): T {
+  const rng = createRng(state.rngState)
+  const result = fn(rng)
+  state.rngState = rng.state()
+  return result
+}
+
+export function nextId(state: GameState, prefix: string): string {
+  state.nextId += 1
+  return `${prefix}_${state.nextId}`
+}
+
+export function log(state: GameState, kind: LogEntry['kind'], message: string): void {
+  state.log.push({ tick: state.tick, kind, message })
+  if (state.log.length > CONFIG.logLimit) state.log.splice(0, state.log.length - CONFIG.logLimit)
+}
+
+export const canAfford = (state: GameState, cost: Partial<Resources>): boolean =>
+  RESOURCE_IDS.every((id) => state.resources[id] >= (cost[id] ?? 0))
+
+export function spend(state: GameState, cost: Partial<Resources>): void {
+  for (const id of RESOURCE_IDS) state.resources[id] -= cost[id] ?? 0
+}
+
+export function gain(state: GameState, amount: Partial<Resources>): void {
+  for (const id of RESOURCE_IDS) state.resources[id] += amount[id] ?? 0
+}
+
+/** Slot capacity granted by a building at its current level. 0 when unbuilt. */
+export function capacityOf(state: GameState, id: BuildingId): number {
+  const level = state.buildings[id] ?? 0
+  if (level <= 0) return 0
+  const tiers = BUILDINGS[id]?.capacityPerLevel ?? []
+  return tiers[Math.min(level, tiers.length) - 1] ?? 0
+}
+
+export const ownedRegions = (state: GameState): RegionState[] =>
+  Object.values(state.regions).filter((r) => r.owner === 'player')
+
+/** A region is attackable when an adjacent region is already held. */
+export function isAttackable(state: GameState, regionId: string): boolean {
+  const region = state.regions[regionId]
+  const def = REGIONS[regionId]
+  if (!region || !def || region.owner === 'player') return false
+  return def.neighbors.some((n) => state.regions[n]?.owner === 'player')
+}
+
+import { createDefaultSanctuaryLayout } from './sanctuaryLayout'
+
+export function createInitialState(seed: number): GameState {
+  const state: GameState = {
+    saveVersion: SAVE_VERSION,
+    seed,
+    rngState: seed >>> 0,
+    tick: 0,
+    resources: { ...CONFIG.starting.resources },
+    wyverns: {},
+    eggs: {},
+    squads: {},
+    regions: {},
+    buildings: { hatchery: 1, trainingGrounds: 1, barracks: 1, infirmary: 0 },
+    sanctuaryLayout: createDefaultSanctuaryLayout(),
+    nextId: 0,
+    log: [],
+    pendingBattle: null,
+    lastBattle: null,
+  }
+
+  for (const def of REGION_LIST) {
+    state.regions[def.id] = {
+      id: def.id,
+      owner: def.starting ? 'player' : 'enemy',
+      unrest: 0,
+      garrison: def.garrison.map((g) => ({ ...g })),
+      eggsAvailable: def.starting ? 0 : CONFIG.region.eggsOnConquest,
+      conqueredAtTick: def.starting ? 0 : null,
+    }
+  }
+
+  withRng(state, (rng) => {
+    for (const speciesId of CONFIG.starting.wyverns) {
+      if (!SPECIES[speciesId]) continue
+      const id = nextId(state, 'wy')
+      state.wyverns[id] = createWyvern({
+        id,
+        speciesId,
+        name: nameFor(speciesId, state.nextId),
+        stats: rollSpeciesStats(speciesId, rng),
+        traits: rollSpeciesTraits(speciesId, rng),
+        stage: 'adult',
+        origin: 'starter',
+        bond: 60,
+      })
+    }
+  })
+
+  for (const s of CONFIG.starting.squads) {
+    const id = nextId(state, 'sq')
+    state.squads[id] = { id, unitId: s.unitId, strength: s.strength, stationedAt: null }
+  }
+
+  log(state, 'info', `The banners rise over ${REGIONS[STARTING_REGION]?.name ?? 'the valley'}.`)
+  return state
+}

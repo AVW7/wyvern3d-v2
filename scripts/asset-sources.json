@@ -1,0 +1,115 @@
+{
+  "_readme": [
+    "Which vendor prop backs each logical asset id. Consumed by extract-assets.py.",
+    "",
+    "`node` is the vendor mesh name minus its `nodeSuffix`. To find one:",
+    "  python3 scripts/extract-assets.py --list nature Fir_Tree",
+    "",
+    "Packs are Poly Perfect and share a byte-identical PP_Color_Palette, so props",
+    "from all three composite into one GLB with a single material and base-color texture.",
+    "Meshes are authored in centimetres, so each pack carries a 0.01 scale. Props",
+    "are re-anchored on extraction (centred in x/z, resting on y=0); `scale` and",
+    "`sink` here override that per prop. Run the script to print measured metres.",
+    "",
+    "Credit (CC-BY): Low Poly Nature - Flying Islands / Low Poly Mining, Cave &",
+    "Blacksmith Pack / Low Poly Lava World by Poly Perfect, via Sketchfab."
+  ],
+
+  "sourceRoot": "~/Documents/3Dassets",
+
+  "packs": {
+    "nature": {
+      "gltf": "Low Poly Nature - Flying Islands/Low Poly Nature - Flying Islands.gltf",
+      "palette": "Low Poly Nature - Flying Islands/textures/PP_Color_Palette.png",
+      "nodeSuffix": "_PP_Standard_Material_0",
+      "scale": 0.01
+    },
+    "mining": {
+      "gltf": "Low Poly Mining, Cave & Blacksmith Pack/Low Poly Mining, Cave & Blacksmith Pack.gltf",
+      "palette": "Low Poly Mining, Cave & Blacksmith Pack/textures/PP_Color_Palette.png",
+      "nodeSuffix": "_PP_Standard_Material_0",
+      "scale": 0.01
+    },
+    "lava": {
+      "gltf": "Low Poly Lava World/Low Poly Lava World.gltf",
+      "palette": "Low Poly Lava World/textures/PP_Color_Palette.png",
+      "nodeSuffix": "_PP_Standard_Material_0",
+      "scale": 0.01
+    }
+  },
+
+  "targets": [
+    {
+      "out": "sanctuary",
+      "palette": "nature",
+      "props": [
+        { "id": "prop.keep.wall", "pack": "mining", "node": "PP_Stone_Wall_Plain_01" },
+        { "id": "prop.keep.wallAlt", "pack": "mining", "node": "PP_Stone_Wall_Plain_02" },
+        { "id": "prop.keep.pillar", "pack": "mining", "node": "PP_Pillar_Stone_01" },
+        { "id": "prop.keep.gate", "pack": "nature", "node": "PP_Stone_Gate_01" },
+        { "id": "prop.keep.floorA", "pack": "nature", "node": "PP_Floor_Tile_01", "scale": 3.0 },
+        { "id": "prop.keep.floorB", "pack": "nature", "node": "PP_Floor_Tile_03", "scale": 3.0 },
+        { "id": "prop.keep.floorC", "pack": "nature", "node": "PP_Floor_Tile_05", "scale": 3.0 },
+        { "id": "prop.keep.stairs", "pack": "nature", "node": "PP_Stairs_Stone_Brown_03" },
+
+        { "id": "prop.warTable", "pack": "mining", "node": "PP_Wooden_Table_01" },
+        { "id": "prop.lectern", "pack": "mining", "node": "PP_Wooden_Table_02" },
+        { "id": "prop.chest", "pack": "mining", "node": "PP_Treasure_Chest_01_Iron" },
+        { "id": "prop.barrel", "pack": "mining", "node": "PP_Barrel_01" },
+        { "id": "prop.crate", "pack": "mining", "node": "PP_Crate_Wooden_01" },
+        { "id": "prop.torch", "pack": "mining", "node": "PP_Torch_Standing_01" },
+        { "id": "prop.signpost", "pack": "mining", "node": "PP_Signpost_01", "scale": 0.6 },
+        { "id": "prop.logPile", "pack": "mining", "node": "PP_Log_Pile_01" },
+        { "id": "prop.blockade", "pack": "mining", "node": "PP_Wooden_Blockade_01" },
+        { "id": "prop.campfire", "pack": "nature", "node": "PP_Campfire_01" },
+
+        { "id": "prop.hatchery.entrance", "pack": "mining", "node": "PP_Mountain_Cave_Entrance_01", "scale": 0.3 },
+        { "id": "prop.hatchery.cave", "pack": "mining", "node": "PP_Cave_Small_01", "scale": 0.16 },
+        { "id": "prop.hatchery.nest", "pack": "nature", "node": "PP_Stone_Plateau_Moss_Grown_01", "scale": 0.09 },
+
+        { "id": "prop.forge.furnace", "pack": "mining", "node": "PP_Furnace_01" },
+        { "id": "prop.forge.anvil", "pack": "mining", "node": "PP_Anvil_Used_01_Used_Iron", "scale": 0.55 },
+        { "id": "prop.forge.trough", "pack": "mining", "node": "PP_Quenching_Trough_01" },
+        { "id": "prop.forge.grindstone", "pack": "mining", "node": "PP_Grinding_Stone_01" },
+        { "id": "prop.forge.toolHolder", "pack": "mining", "node": "PP_Tool_Holder_01" },
+        { "id": "prop.forge.chimney", "pack": "mining", "node": "PP_Chimney_01", "scale": 0.6 },
+        { "id": "prop.forge.sign", "pack": "mining", "node": "PP_Blacksmithing_Sign_01" },
+
+        { "id": "prop.burn.lavaColumn", "pack": "lava", "node": "PP_Lava_Column_01" },
+        { "id": "prop.burn.lavaColumnAlt", "pack": "lava", "node": "PP_Lava_Column_03" },
+        { "id": "prop.burn.burnedTree", "pack": "lava", "node": "PP_Tree_Burned_01" },
+        { "id": "prop.burn.burnedTreeAlt", "pack": "lava", "node": "PP_Tree_Burned_03" },
+        { "id": "prop.burn.volcano", "pack": "lava", "node": "PP_Volcano_Dead_01", "scale": 0.45 },
+        { "id": "prop.burn.lavaStone", "pack": "lava", "node": "PP_Stone_Lava_01" },
+
+        { "id": "prop.ring.columnA", "pack": "nature", "node": "PP_Stone_Column_Mystic_01" },
+        { "id": "prop.ring.columnB", "pack": "nature", "node": "PP_Stone_Column_Mystic_03" },
+        { "id": "prop.ring.columnC", "pack": "nature", "node": "PP_Stone_Column_Mystic_05" },
+        { "id": "prop.ring.menhir", "pack": "nature", "node": "PP_Flying_Menhir_01" },
+        { "id": "prop.ring.menhirAlt", "pack": "nature", "node": "PP_Flying_Menhir_02" },
+
+        { "id": "prop.roost.plateau", "pack": "nature", "node": "PP_Stone_Plateau_Moss_Grown_03", "scale": 0.35 },
+        { "id": "prop.roost.runeStone", "pack": "mining", "node": "PP_Rune_Stone_01" },
+
+        { "id": "prop.fenceA", "pack": "nature", "node": "PP_Small_Fence_01" },
+        { "id": "prop.fenceB", "pack": "nature", "node": "PP_Small_Fence_02" },
+        { "id": "prop.pathA", "pack": "nature", "node": "PP_Stone_Path_01" },
+        { "id": "prop.pathB", "pack": "nature", "node": "PP_Stone_Path_02" },
+
+        { "id": "prop.perch.rockA", "pack": "nature", "node": "PP_Rock_Moss_Grown_02" },
+        { "id": "prop.perch.rockB", "pack": "nature", "node": "PP_Rock_Moss_Grown_04" },
+        { "id": "prop.perch.stump", "pack": "nature", "node": "PP_Tree_Stump_01" },
+        { "id": "prop.perch.trunk", "pack": "nature", "node": "PP_Tree_Trunk_11" },
+
+        { "id": "prop.scatter.firA", "pack": "nature", "node": "PP_Fir_Tree_11" },
+        { "id": "prop.scatter.firB", "pack": "nature", "node": "PP_Fir_Tree_13" },
+        { "id": "prop.scatter.firC", "pack": "nature", "node": "PP_Fir_Tree_17" },
+        { "id": "prop.scatter.deadTree", "pack": "nature", "node": "PP_Tree_Leafless_04" },
+        { "id": "prop.scatter.grassA", "pack": "nature", "node": "PP_Grass_16" },
+        { "id": "prop.scatter.grassB", "pack": "nature", "node": "PP_Grass_18" },
+        { "id": "prop.scatter.hill", "pack": "nature", "node": "PP_Hill_Moss_01" },
+        { "id": "prop.scatter.mysticStone", "pack": "nature", "node": "PP_Stone_Mystic_01" }
+      ]
+    }
+  ]
+}
