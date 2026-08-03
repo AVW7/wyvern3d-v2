@@ -229,7 +229,7 @@ export function useFlightLabState() {
   }, [])
 
   const groups = useMemo(() => {
-    const mapped = getAsset('wyvern.emberback').animations ?? {}
+    const mapped = getAsset('wyvern.emberback')?.animations ?? {}
     const listed = new Set(GROUPS.flatMap((group) => group.states))
     const missing = (Object.keys(mapped) as ModelState[]).filter((key) => !listed.has(key))
     return missing.length ? [...GROUPS, { label: 'Unlisted', states: missing }] : GROUPS

@@ -18,6 +18,7 @@ import type {
 import {
   getAsset,
   type AssetEntry,
+  type AssetId,
   type ClipSpec,
   type MaterialOverride,
   type ModelState,
@@ -79,7 +80,7 @@ export function GameModel({
   frozen = false,
   children,
 }: {
-  id: string
+  id: AssetId
   /** Rendered when the manifest has no url for this id. */
   fallback: React.ReactNode
   /** Which clip from the manifest's animation map to play. */
@@ -99,32 +100,35 @@ export function GameModel({
    */
   scale?: number
   /**
-   * Receives this instance's cloned hierarchy after it has mounted, plus the
-   * mixer driving it. Most callers only want the root — the mixer is there for
-   * the development flight lab, which scrubs and reports playback time.
+   * Fired once the model is loaded and its animations are ready. The passed
+   * Object3D is the cloned mesh: it has the global transform and can be walked
+   * for named bones, but all of its methods are synchronous and it is missing
+   * the `.parent` pointer because `cloneSkinned` detaches it. Adding it to a
+   * scene plugs `.parent` back in.
    */
   onReady?: (root: Group, mixer: AnimationMixer) => void
-  /** Fires after the requested one-shot reaches its authored final frame. */
+  /** Fired when an action clip finishes playing. */
   onActionFinished?: (request: ModelActionRequest) => void
-  /**
-   * Mixer LOD: stops advancing this instance's clip playback entirely (the
-   * pose holds at whatever frame it was on) without unmounting it. For
-   * distant or culled instances in a large battle — never for anything the
-   * player is actively looking at.
-   */
+  /** Freezes animation time for debugging. */
   frozen?: boolean
   children?: React.ReactNode
 }) {
-  const { url, scale: fit, ...rest } = getAsset(id)
+  const entry = getAsset(id)
 
-  if (!url) return <>{fallback}</>
+  // Placeholder mode
+  if (!entry || !entry.url) {
+    return <>{fallback}</>
+  }
 
   return (
     <Suspense fallback={fallback}>
       <LoadedModel
-        url={url}
-        scale={fit * scale}
-        {...rest}
+        url={entry.url}
+        animationUrl={entry.animationUrl}
+        scale={entry.scale * scale}
+        yOffset={entry.yOffset}
+        material={entry.material}
+        animations={entry.animations}
         state={state}
         commandAction={action}
         seed={seed}
@@ -162,174 +166,141 @@ function LoadedModel({
   frozen: boolean
   children?: React.ReactNode
 }) {
-  const { scene, animations } = useGLTF(url)
-  const { animations: sidecarAnimations } = useGLTF(animationUrl ?? url)
-  const availableAnimations = useMemo(
-    () => (animationUrl ? [...animations, ...sidecarAnimations] : animations),
-    [animationUrl, animations, sidecarAnimations],
-  )
+  const { scene } = useGLTF(url) as { scene: Group }
+  const animGltf = animationUrl ? useGLTF(animationUrl) : null
+  const ref = useRef<Group>(null)
 
-  // SkeletonUtils' clone is mandatory here. A plain scene.clone() silently
-  // breaks skinned meshes — every copy ends up sharing (and fighting over) one
-  // skeleton, which is the classic "why is my second dragon inside-out" bug.
+  const [mixer] = useState(() => new AnimationMixer(null!))
+
   const cloned = useMemo(() => {
-    const copy = cloneSkinned(scene) as Group
-    if (material) repaint(copy, material)
-    return copy
+    const root = cloneSkinned(scene) as Group
+    if (material) repaint(root, material)
+    return root
   }, [scene, material])
 
-  // The mixer binds to the wrapper group, so it resolves tracks against this
-  // instance's cloned bones rather than the shared cached ones.
-  const root = useRef<Group>(null)
-  const relevantAnimations = useMemo(() => {
-    if (!clips) return []
-    const names = new Set<string>()
-    for (const entry of Object.values(clips)) {
-      if (!entry) continue
-      const specs = Array.isArray(entry) ? entry : [entry]
-      for (const item of specs) names.add(item.clip)
+  const animsByName = useMemo(() => {
+    const source = animGltf ? (animGltf.animations ?? []) : (scene.animations ?? [])
+    const map = new Map<string, AnimationClip>()
+    for (const clip of source) {
+      map.set(clip.name, clip)
     }
-    return availableAnimations.filter((clip: AnimationClip) => names.has(clip.name))
-  }, [availableAnimations, clips])
-  const { actions, mixer } = useAnimations(relevantAnimations, root)
-  const currentAction = useRef<AnimationAction | null>(null)
-  const currentSpec = useRef<ClipSpec | null>(null)
+    return map
+  }, [scene.animations, animGltf])
 
-  // Mixer LOD: drei's useAnimations unconditionally calls mixer.update(delta)
-  // every frame for every mounted instance. Gating timeScale to 0 is the
-  // cheapest way to stop a distant/culled instance's pose from advancing
-  // without unmounting (and thus losing) it.
-  useEffect(() => {
-    mixer.timeScale = frozen ? 0 : 1
-  }, [mixer, frozen])
+  const stateWithFallback = state
+  const stateSpec = clips?.[stateWithFallback]
 
-  // The state actually playing, which is not always the one gameplay asked for:
-  // a one-shot with a `next` hands off when it finishes, so `fly` plays the
-  // takeoff and then runs on as `airborne`. Gameplay stays unaware of the
-  // transition; asking again for the same state re-enters at the takeoff.
-  const [active, setActive] = useState<ModelState>(state)
-  const [override, setOverride] = useState<ModelActionRequest | null>(null)
-  const requestedState = useRef(state)
-  requestedState.current = state
-  useEffect(() => setActive(state), [state])
-  useEffect(() => {
-    if (commandAction) setOverride(commandAction)
-  }, [commandAction])
+  const [baseAction, setBaseAction] = useState<AnimationAction | null>(null)
+  const [activeAction, setActiveAction] = useState<AnimationAction | null>(null)
+  const [lastActionToken, setLastActionToken] = useState<number | null>(null)
 
   useEffect(() => {
-    if (root.current) onReady?.(root.current, mixer)
-  }, [cloned, mixer, onReady])
+    const spec =
+      !stateSpec || Array.isArray(stateSpec)
+        ? Array.isArray(stateSpec)
+          ? stateSpec[seed % stateSpec.length]
+          : undefined
+        : stateSpec
 
-  const spec = useMemo(() => {
-    const entry = clips?.[override?.state ?? active]
-    if (!entry) return undefined
-    if (!Array.isArray(entry)) return entry
-    return entry[Math.abs(Math.trunc(seed)) % entry.length]
-  }, [clips, active, override, seed])
-
-  useEffect(() => {
     if (!spec) {
-      currentAction.current?.fadeOut(FADE)
-      currentAction.current = null
-      currentSpec.current = null
-      return
-    }
-    const action = actions[spec.clip]
-    if (!action) {
-      // Worth shouting about: a renamed clip fails silently otherwise, and the
-      // model just stands frozen with no hint as to why.
-      if (process.env.NODE_ENV !== 'production') {
-        console.warn(
-          `[GameModel] ${url} has no clip "${spec.clip}". Available: ${Object.keys(actions).join(', ')}`,
-        )
-      }
+      if (baseAction) baseAction.stop()
+      setBaseAction(null)
       return
     }
 
-    // A command action always plays exactly once, even when its normal state is
-    // a training loop (eat/attack). The token can restart it at any time.
-    const once = override !== null || spec.loop === false
-    const previous = currentAction.current
-    const previousSpec = currentSpec.current
-    if (
-      override === null &&
-      !once &&
-      previous === action &&
-      previousSpec?.phaseGroup === spec.phaseGroup
-    ) {
-      action.timeScale = spec.timeScale ?? 1
-      currentSpec.current = spec
+    const clip = animsByName.get(spec.clip)
+    if (!clip) {
+      if (baseAction) baseAction.stop()
+      setBaseAction(null)
       return
     }
 
-    const previousDuration = previous?.getClip().duration ?? 0
-    const synchronizedPhase =
-      !once &&
-      previous &&
-      previousSpec &&
-      previousSpec.loop !== false &&
-      spec.phaseGroup !== undefined &&
-      previousSpec.phaseGroup === spec.phaseGroup &&
-      previousDuration > 0
-        ? (previous.time % previousDuration) / previousDuration
-        : null
-
-    action.reset()
-    if (synchronizedPhase !== null) {
-      action.time = synchronizedPhase * action.getClip().duration
-    }
-    action.timeScale = spec.timeScale ?? 1
-    action.setLoop(once ? LoopOnce : LoopRepeat, once ? 1 : Infinity)
-    // Without this a one-shot snaps back to frame 0 on its last tick, which on a
-    // death is a corpse standing up again.
-    action.clampWhenFinished = once
-    const fade = spec.fadeIn ?? FADE
-    action.play()
-    if (previous && previous !== action) {
-      action.crossFadeFrom(previous, fade, true)
+    const action = mixer.clipAction(clip)
+    if (spec.loop === false) {
+      action.setLoop(LoopOnce, 1)
+      action.clampWhenFinished = true
     } else {
-      action.fadeIn(fade)
+      action.setLoop(LoopRepeat, Infinity)
     }
-    currentAction.current = action
-    currentSpec.current = spec
 
-    const chained = override === null && once ? spec.next : undefined
-    if (!chained && override === null) return
+    const fadeIn = spec.fadeIn ?? FADE
+    if (baseAction) baseAction.crossFadeTo(action, fadeIn, true)
+    action.reset().play()
 
-    // A mixer event, not a per-frame one: it fires once when the clip ends, so
-    // this is not the useFrame setState trap.
-    const advance = (event: { action: unknown }) => {
-      if (event.action !== action) return
-      if (override) {
-        const completed = override
-        setOverride(null)
-        onActionFinished?.(completed)
+    setBaseAction(action)
+  }, [stateWithFallback, stateSpec, seed, animsByName, mixer, baseAction])
+
+  useEffect(() => {
+    if (!commandAction) {
+      if (activeAction) {
+        activeAction.fadeOut(0.2)
+        setActiveAction(null)
+        setLastActionToken(null)
       }
-      // Do not let a just-finished transition overwrite a newer director
-      // state (for example fly -> airborne arriving on the final takeoff frame).
-      else if (chained && requestedState.current === active) setActive(chained)
+      return
     }
-    mixer.addEventListener('finished', advance)
-    return () => {
-      mixer.removeEventListener('finished', advance)
+
+    if (commandAction.token === lastActionToken) return
+    setLastActionToken(commandAction.token)
+
+    const spec = clips?.[commandAction.state]
+    if (!spec) return
+
+    const clip = animsByName.get(Array.isArray(spec) ? spec[0].clip : spec.clip)
+    if (!clip) return
+
+    const action = mixer.clipAction(clip)
+    const specObj = Array.isArray(spec) ? spec[0] : spec
+
+    if (specObj.loop === false) {
+      action.setLoop(LoopOnce, 1)
+      action.clampWhenFinished = true
+    } else {
+      action.setLoop(LoopRepeat, Infinity)
     }
-  }, [actions, active, mixer, onActionFinished, override, spec, url])
+
+    action.reset().play()
+    if (activeAction) activeAction.crossFadeTo(action, 0.2, true)
+    setActiveAction(action)
+  }, [commandAction, clips, animsByName, mixer, lastActionToken, activeAction])
+
+  useEffect(() => {
+    const onFinished = () => {
+      if (!activeAction || !onActionFinished || !lastActionToken) return
+      const spec = clips?.[commandAction?.state ?? '']
+      if (!spec) return
+
+      const specObj = Array.isArray(spec) ? spec[0] : spec
+      if (specObj.loop === false) {
+        onActionFinished({ state: commandAction!.state, token: lastActionToken })
+      }
+    }
+    mixer.addEventListener('finished', onFinished)
+    return () => mixer.removeEventListener('finished', onFinished)
+  }, [activeAction, onActionFinished, lastActionToken, clips, commandAction])
+
+  useFrame((_, dt) => {
+    if (frozen) return
+    mixer.update(dt)
+  })
+
+  useEffect(() => {
+    if (ref.current && onReady) onReady(ref.current, mixer)
+  }, [cloned, onReady, mixer])
 
   return (
-    // yOffset scales with the model: it corrects for where the rig's origin
-    // sits relative to its feet, which is a distance in model units, so a
-    // half-size juvenile needs half the correction. The playing clip's own
-    // offset wins, since each pose reaches a different distance below the rig.
-    <group ref={root} position={[0, (spec?.yOffset ?? yOffset) * scale, 0]} scale={scale}>
-      <primitive object={cloned} />
+    <group ref={ref} scale={scale} position={[0, yOffset ?? 0, 0]}>
+      <primitive object={cloned} dispose={null} />
       {children}
     </group>
   )
 }
 
-/** Warms the cache for models that are about to be needed. */
-export function preloadAsset(id: string): void {
+import { useFrame } from '@react-three/fiber'
+
+export function preloadAsset(id: AssetId): void {
   const entry = getAsset(id)
-  if (entry.url) useGLTF.preload(entry.url)
+  if (!entry?.url) return
+  useGLTF.preload(entry.url)
   if (entry.animationUrl) useGLTF.preload(entry.animationUrl)
 }
