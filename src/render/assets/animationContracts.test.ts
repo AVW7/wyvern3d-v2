@@ -20,6 +20,9 @@ import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { ASSETS, type ClipSpec, type ModelState } from './manifest'
 
+/** Union type for clip spec arrays or single specs */
+type StateClips = ClipSpec | ClipSpec[]
+
 /**
  * TEMPORARY: Tests disabled until new rig is built.
  * 

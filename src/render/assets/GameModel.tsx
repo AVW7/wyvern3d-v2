@@ -1,15 +1,14 @@
 'use client'
 
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
-import { useAnimations, useGLTF } from '@react-three/drei'
-import { LoopOnce, LoopRepeat } from 'three'
+import { useGLTF } from '@react-three/drei'
+import { AnimationMixer, LoopOnce, LoopRepeat } from 'three'
 // From `three` directly, not three-stdlib: pnpm's strict node_modules does not
 // hoist drei's transitive deps, so three-stdlib is not importable from here.
 import { clone as cloneSkinned } from 'three/examples/jsm/utils/SkeletonUtils.js'
 import type {
   AnimationAction,
   AnimationClip,
-  AnimationMixer,
   Group,
   Material,
   Mesh,
@@ -19,7 +18,6 @@ import {
   getAsset,
   type AssetEntry,
   type AssetId,
-  type ClipSpec,
   type MaterialOverride,
   type ModelState,
 } from './manifest'
@@ -246,11 +244,12 @@ function LoadedModel({
     const spec = clips?.[commandAction.state]
     if (!spec) return
 
-    const clip = animsByName.get(Array.isArray(spec) ? spec[0].clip : spec.clip)
+    const specResolved = (Array.isArray(spec) ? spec[0] : spec)!
+    const clip = animsByName.get(specResolved.clip)
     if (!clip) return
 
     const action = mixer.clipAction(clip)
-    const specObj = Array.isArray(spec) ? spec[0] : spec
+    const specObj = specResolved
 
     if (specObj.loop === false) {
       action.setLoop(LoopOnce, 1)
@@ -266,13 +265,13 @@ function LoadedModel({
 
   useEffect(() => {
     const onFinished = () => {
-      if (!activeAction || !onActionFinished || !lastActionToken) return
-      const spec = clips?.[commandAction?.state ?? '']
+      if (!activeAction || !onActionFinished || !lastActionToken || !commandAction) return
+      const spec = clips?.[commandAction.state]
       if (!spec) return
 
-      const specObj = Array.isArray(spec) ? spec[0] : spec
+      const specObj = (Array.isArray(spec) ? spec[0] : spec)!
       if (specObj.loop === false) {
-        onActionFinished({ state: commandAction!.state, token: lastActionToken })
+        onActionFinished({ state: commandAction.state, token: lastActionToken })
       }
     }
     mixer.addEventListener('finished', onFinished)

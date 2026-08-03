@@ -106,7 +106,7 @@ export const GROUPS: { label: string; states: ModelState[] }[] = [
   },
 ]
 
-export const SPECIES: { id: string; label: string; scale: number }[] = [
+export const SPECIES: { id: `wyvern.${string}`; label: string; scale: number }[] = [
   { id: 'wyvern.emberback', label: 'emberback 1.00', scale: 1 },
   { id: 'wyvern.mirefang', label: 'mirefang 1.05', scale: 1.05 },
   { id: 'wyvern.cragwing', label: 'cragwing 1.15', scale: 1.15 },

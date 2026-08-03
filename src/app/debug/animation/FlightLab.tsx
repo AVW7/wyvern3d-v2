@@ -1,7 +1,7 @@
 'use client'
 
 import type { RefObject } from 'react'
-import type { ModelState } from '@/render/assets/manifest'
+import type { AssetId, ModelState } from '@/render/assets/manifest'
 import { FlightLabCanvas } from './components/FlightLabCanvas'
 import { FlightLabRigContainer } from './components/FlightLabRigContainer'
 import { CAMERAS } from './constants'
@@ -25,7 +25,7 @@ export interface FlightLabPoseEdits {
 }
 
 export interface FlightLabProps {
-  speciesId: string
+  speciesId: AssetId
   requestedState: ModelState
   auto: boolean
   scale: number

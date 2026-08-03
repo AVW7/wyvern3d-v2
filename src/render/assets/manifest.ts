@@ -147,6 +147,7 @@ export type AssetId =
   | `unit.${string}`
   | `building.${string}`
   | `prop.${string}`
+  | `wildlife.${string}`
   | 'character.player'
 
 /**
@@ -250,6 +251,13 @@ export const ASSETS: Record<AssetId, AssetEntry> = {
     animations: {},
   },
   'prop.rock': {
+    url: null,
+    scale: 1,
+    animations: {},
+  },
+
+  /** Wildlife - placeholder ambient creatures */
+  'wildlife.deer': {
     url: null,
     scale: 1,
     animations: {},
