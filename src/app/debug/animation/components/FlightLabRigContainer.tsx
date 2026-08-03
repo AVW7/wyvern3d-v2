@@ -148,19 +148,17 @@ export function FlightLabRigContainer({
     }
     bones.current = found
     neckBones.current = [
-      root.getObjectByName('Bip002-Neck_012'),
-      root.getObjectByName('Bip002-Neck1_013'),
-      root.getObjectByName('Bip002-Neck2_014'),
+      root.getObjectByName('Neck1'),
+      root.getObjectByName('Neck2'),
     ].filter((b): b is Object3D => b !== null && b !== undefined)
-    headBone.current = root.getObjectByName('Bip002-Head_015') ?? null
+    headBone.current = root.getObjectByName('Head') ?? null
     spineBones.current = [
-      root.getObjectByName('Bip002-Spine_08'),
-      root.getObjectByName('Bip002-Spine1_09'),
-      root.getObjectByName('Bip002-Spine2_010'),
-      root.getObjectByName('Bip002-Spine3_011'),
-      root.getObjectByName('Bip002-Pelvis_07'),
+      root.getObjectByName('Spine1'),
+      root.getObjectByName('Spine2'),
+      root.getObjectByName('Spine3'),
+      root.getObjectByName('Body'),
     ].filter((b): b is Object3D => b !== null && b !== undefined)
-    jawBone.current = root.getObjectByName('Bip002-Ponytail1_016') ?? null
+    jawBone.current = root.getObjectByName('Jaw') ?? null
     closedJaw.current = captureClosedJawPose(jawBone.current, closedJaw.current)
     neckHeadChain.current = [
       ...neckBones.current,

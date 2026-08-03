@@ -1,45 +1,45 @@
 import type { ModelState } from '@/render/assets/manifest'
 import type { FlightLabPoseEdits, LabCamera, LabTheme } from './FlightLab'
 
-export const WYVERN_MODEL = '/models/drogon.glb'
-export const WYVERN_ANIMATIONS = '/models/drogon-sanctuary.glb'
+export const WYVERN_MODEL = '/models/wyvern.glb'
+export const WYVERN_ANIMATIONS = '/models/wyvern.glb'
 
 export const LEG_CHAIN = {
-  L: ['Bip002-L-Thigh_0186', 'Bip002-L-Calf_0187', 'Bip002-L-Foot_0188'],
-  R: ['Bip002-R-Thigh_0201', 'Bip002-R-Calf_00', 'Bip002-R-Foot_0202'],
+  L: ['L_Thigh', 'L_Calf', 'L_Foot'],
+  R: ['R_Thigh', 'R_Calf', 'R_Foot'],
 } as const
 
 export const TAIL_CHAIN = [
-  'Bip002-Tail1_0215',
-  'Bip002-Tail2_0216',
-  'Bip002-Tail3_0217',
-  'Bip002-Tail4_0218',
-  'Bip002-Tail5_0219',
-  'Bip002-Tail6_01',
+  'Tail1',
+  'Tail2',
+  'Tail3',
+  'Tail4',
+  'Tail5',
+  'Tail6',
 ] as const
 
 export const TAIL_WEIGHTS = [0.12, 0.18, 0.22, 0.2, 0.17, 0.11] as const
 
 export const MARKERS: { key: string; bone: string; color: string }[] = [
-  { key: 'head', bone: 'Bip002-Head_015', color: '#f0d9a8' },
-  { key: 'pelvis', bone: 'Bip002-Pelvis_07', color: '#7fd1c1' },
-  { key: 'tail', bone: 'Bip002-Tail6_01', color: '#c9773a' },
-  { key: 'footL', bone: 'Bip002-L-Foot_0188', color: '#8fa8d6' },
-  { key: 'footR', bone: 'Bip002-R-Foot_0202', color: '#8fa8d6' },
-  { key: 'wingL', bone: 'Bip002-L-Finger32_end_0243', color: '#d67f9a' },
-  { key: 'wingR', bone: 'Bip002-R-Finger32_end_0254', color: '#d67f9a' },
+  { key: 'head', bone: 'Head', color: '#f0d9a8' },
+  { key: 'pelvis', bone: 'Body', color: '#7fd1c1' },
+  { key: 'tail', bone: 'Tail6', color: '#c9773a' },
+  { key: 'footL', bone: 'L_Foot', color: '#8fa8d6' },
+  { key: 'footR', bone: 'R_Foot', color: '#8fa8d6' },
+  { key: 'wingL', bone: 'L_WingFinger3_end', color: '#d67f9a' },
+  { key: 'wingR', bone: 'R_WingFinger3_end', color: '#d67f9a' },
 ]
 
 export const CAMERAS: Record<
   LabCamera,
   { position: [number, number, number]; fov: number; target: [number, number, number] }
 > = {
-  side: { position: [250, 30, 0], fov: 35, target: [0, 25, 0] },
-  front: { position: [0, 30, 250], fov: 35, target: [0, 25, 0] },
-  top: { position: [0, 260, 0.01], fov: 35, target: [0, 0, 0] },
-  threeQuarter: { position: [170, 100, 170], fov: 40, target: [0, 20, 0] },
-  sanctuary: { position: [0, 26, 58], fov: 60, target: [0, 10, 0] },
-  battle: { position: [0, 18, 42], fov: 65, target: [0, 6, 0] },
+  side: { position: [45, 8, 0], fov: 35, target: [0, 6, 0] },
+  front: { position: [0, 8, 45], fov: 35, target: [0, 6, 0] },
+  top: { position: [0, 50, 0.01], fov: 35, target: [0, 0, 0] },
+  threeQuarter: { position: [32, 20, 32], fov: 40, target: [0, 5, 0] },
+  sanctuary: { position: [0, 8, 20], fov: 60, target: [0, 4, 0] },
+  battle: { position: [0, 6, 15], fov: 65, target: [0, 3, 0] },
 }
 
 export const CAMERA_KEYS: LabCamera[] = ['side', 'front', 'top', 'threeQuarter', 'sanctuary', 'battle']
@@ -107,11 +107,11 @@ export const GROUPS: { label: string; states: ModelState[] }[] = [
 ]
 
 export const SPECIES: { id: `wyvern.${string}`; label: string; scale: number }[] = [
-  { id: 'wyvern.emberback', label: 'emberback 1.00', scale: 1 },
-  { id: 'wyvern.mirefang', label: 'mirefang 1.05', scale: 1.05 },
-  { id: 'wyvern.cragwing', label: 'cragwing 1.15', scale: 1.15 },
-  { id: 'wyvern.frostmaw', label: 'frostmaw 1.25', scale: 1.25 },
-  { id: 'wyvern.duskwyrm', label: 'duskwyrm 1.40', scale: 1.4 },
+  { id: 'wyvern.drogon', label: 'drogon 1.00', scale: 1 },
+  { id: 'wyvern.rhaegal', label: 'rhaegal 0.90', scale: 0.9 },
+  { id: 'wyvern.viserion', label: 'viserion 0.85', scale: 0.85 },
+  { id: 'wyvern.sunfyre', label: 'sunfyre 1.10', scale: 1.1 },
+  { id: 'wyvern.meraxes', label: 'meraxes 1.05', scale: 1.05 },
 ]
 
 export const EXTRA_SCALES: { label: string; value: number }[] = [

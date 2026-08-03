@@ -10,8 +10,8 @@ import { PropManager } from '../systems/PropManager'
 import type { PropBase } from '../props/PropBase'
 
 export function useFlightLabState() {
-  const [speciesIndex, setSpeciesIndex] = useState(4)
-  const [extraScale, setExtraScale] = useState(1.6)
+  const [speciesIndex, setSpeciesIndex] = useState(0)
+  const [extraScale, setExtraScale] = useState(1)
   const [state, setState] = useState<ModelState>('cruise')
   const [auto, setAuto] = useState(false)
   const [horizontalSpeed, setHorizontalSpeed] = useState(18)

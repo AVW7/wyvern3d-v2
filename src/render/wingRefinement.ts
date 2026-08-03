@@ -359,13 +359,13 @@ export function dynamicWingController(
  */
 export function getLeftWingBoneNames(): string[] {
   return [
-    'Bip002-L-UpperArm_050',
-    'Bip002-L-Forearm_0231',
-    'Bip002-L-Hand_0234',
-    'Bip002-L-Finger1_0235',
-    'Bip002-L-Finger2_0238',
-    'Bip002-L-Finger31_0241',
-    'Bip002-L-Finger32_end_0243',
+    'L_WingShoulder',
+    'L_WingElbow',
+    'L_WingWrist',
+    'L_WingFinger1',
+    'L_WingFinger2',
+    'L_WingFinger3',
+    'L_WingFinger3_end',
   ]
 }
 
@@ -374,12 +374,12 @@ export function getLeftWingBoneNames(): string[] {
  */
 export function getRightWingBoneNames(): string[] {
   return [
-    'Bip002-R-UpperArm_087',
-    'Bip002-R-Forearm_0245',
-    'Bip002-R-Hand_0248',
-    'Bip002-R-Finger1_0249',
-    'Bip002-R-Finger2_0251',
-    'Bip002-R-Finger31_0244',
-    'Bip002-R-Finger32_end_0254',
+    'R_WingShoulder',
+    'R_WingElbow',
+    'R_WingWrist',
+    'R_WingFinger1',
+    'R_WingFinger2',
+    'R_WingFinger3',
+    'R_WingFinger3_end',
   ]
 }
