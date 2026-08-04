@@ -164,11 +164,9 @@ function LoadedModel({
   frozen: boolean
   children?: React.ReactNode
 }) {
-  const { scene } = useGLTF(url) as { scene: Group }
-  const animGltf = animationUrl ? useGLTF(animationUrl) : null
+  const { scene, animations } = useGLTF(url) as { scene: Group; animations: AnimationClip[] }
+  const animGltf = animationUrl ? (useGLTF(animationUrl) as { animations: AnimationClip[] }) : null
   const ref = useRef<Group>(null)
-
-  const [mixer] = useState(() => new AnimationMixer(null!))
 
   const cloned = useMemo(() => {
     const root = cloneSkinned(scene) as Group
@@ -176,17 +174,37 @@ function LoadedModel({
     return root
   }, [scene, material])
 
+  // The mixer must bind directly to this instance's SkeletonUtils clone. Binding
+  // to null makes clipAction throw in three.js; binding to the cached source
+  // would animate the shared GLTF rather than this mounted wyvern.
+  const mixer = useMemo(() => new AnimationMixer(cloned), [cloned])
+
   const animsByName = useMemo(() => {
-    const source = animGltf ? (animGltf.animations ?? []) : (scene.animations ?? [])
+    // GLTFLoader returns animations on the GLTF payload, never on `scene`.
+    const source = animGltf ? animGltf.animations : animations
     const map = new Map<string, AnimationClip>()
     for (const clip of source) {
       map.set(clip.name, clip)
     }
     return map
-  }, [scene.animations, animGltf])
+  }, [animations, animGltf])
 
   const stateWithFallback = state
   const stateSpec = clips?.[stateWithFallback]
+
+  /**
+   * The spec whose pose is actually on screen — a one-shot action overrides the
+   * base state for as long as it plays. Resolved here, rather than only inside
+   * the effects below, because the render needs its `yOffset`. The two branches
+   * mirror how each effect picks from a clip pool, so the offset always belongs
+   * to the clip the mixer is playing.
+   */
+  const playingSpec = useMemo(() => {
+    const override = commandAction ? clips?.[commandAction.state] : undefined
+    if (override) return Array.isArray(override) ? override[0] : override
+    if (!stateSpec) return undefined
+    return Array.isArray(stateSpec) ? stateSpec[seed % stateSpec.length] : stateSpec
+  }, [clips, commandAction, stateSpec, seed])
 
   const [baseAction, setBaseAction] = useState<AnimationAction | null>(null)
   const [activeAction, setActiveAction] = useState<AnimationAction | null>(null)
@@ -288,7 +306,13 @@ function LoadedModel({
   }, [cloned, onReady, mixer])
 
   return (
-    <group ref={ref} scale={scale} position={[0, yOffset ?? 0, 0]}>
+    // The offset is multiplied by `scale` because it corrects for where the
+    // rig's origin sits relative to its feet — a distance in model units, so a
+    // half-size juvenile needs half the correction. `position` is in the
+    // parent's space, so this group's own `scale` does not apply to it and the
+    // multiply has to be explicit. The playing clip's offset wins over the
+    // asset's, since each pose reaches a different distance below the origin.
+    <group ref={ref} scale={scale} position={[0, (playingSpec?.yOffset ?? yOffset ?? 0) * scale, 0]}>
       <primitive object={cloned} dispose={null} />
       {children}
     </group>

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { Object3D, Quaternion, Vector3 } from 'three'
+import { Object3D, Quaternion } from 'three'
+import { LOCAL_PITCH, LOCAL_YAW } from './boneOffsets'
 import {
   createTailState,
   calculateStiffness,
@@ -151,8 +152,6 @@ describe('calculateAnticipationOffset', () => {
  * These used to be asserted as raw Euler x/z arithmetic, which is local X for
  * lift (measured inert on this rig) and local Z for sway (the sagittal one).
  */
-const LOCAL_PITCH = new Vector3(0, 0, 1)
-const LOCAL_YAW = new Vector3(0, 1, 0)
 
 function expectSameRotation(actual: Quaternion, expected: Quaternion): void {
   expect(actual.angleTo(expected)).toBeLessThan(1e-6)

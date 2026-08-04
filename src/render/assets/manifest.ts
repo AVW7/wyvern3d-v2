@@ -108,11 +108,20 @@ export interface ClipSpec {
    */
   phaseGroup?: string
   /**
-   * Vertical offset from the model origin to its visual root when this clip is
-   * playing. Most non-loops have one; 'idle' supports an array of
-   * interchangeable variants, each carrying its own offset as well.
+   * How far this pose's lowest point falls below the rig origin, negated — the
+   * lift that plants the clip on the ground plane.
+   *
+   * In *rig* units, and multiplied by `scale` at the root (see GameModel), so a
+   * half-size juvenile needs half the correction. Overrides the entry's
+   * `yOffset` for as long as this clip is the one playing, which is what lets
+   * poses that reach different distances below the origin each sit flat. Ground
+   * loops and the one-shots that end on the ground need one; airborne clips are
+   * positioned by the scene rather than planted, so they stay at 0.
+   *
+   * A state with a pool of interchangeable clips carries one per pool entry,
+   * since the variants bottom out at different heights.
    */
-  yOffset?: number | number[]
+  yOffset?: number
 }
 
 export interface MaterialOverride {
@@ -129,7 +138,11 @@ export interface AssetEntry {
   animationUrl?: string
   /** Uniform scale factor applied at the root. */
   scale: number
-  /** Root vertical offset for cosmetic fitting to the ground plane. */
+  /**
+   * Root vertical offset for cosmetic fitting to the ground plane, in rig units
+   * and multiplied by `scale`. The default for any clip that carries no
+   * `ClipSpec.yOffset` of its own.
+   */
   yOffset?: number
   material?: MaterialOverride
   /** Each state maps to one clip (or a small pool to pick from). */
@@ -151,49 +164,104 @@ export type AssetId =
   | 'character.player'
 
 /**
- * Wyvern model wired with new clean rig (wyvern.glb).
- * 46 joints, wings parented to Spine3 (not Neck), RootMotion bone.
- * Animations pending — model renders in T-pose/rest for now.
+ * World metres per authored rig unit, for `public/models/wyvern.glb`.
+ *
+ * The rig is authored in centimetres, so a conversion is needed; the value is
+ * *not* the naive 0.01. Measured through three.js with skinning applied, the
+ * widest wing extension any clip reaches is 6538 units, and the vendor dragon
+ * this replaces spanned 65.1 units at a 0.72 fit — 46.9 m. Matching that gives
+ * 46.9 / 6538 = 0.00717.
+ *
+ * The earlier 0.01 came from measuring the *bind matrices* (4541 units wing
+ * tip to wing tip) and comparing them against the old model's *mesh* span. The
+ * drawn wing membrane reaches well past the wing-finger bone tips, so those two
+ * are not comparable, and 0.01 rendered the adult at 65 m — 40% oversized.
+ *
+ * One world unit is one metre (CharacterController's EYE_HEIGHT is 1.6).
+ */
+const WYVERN_FIT = 0.0072
+
+/**
+ * Clip map shared by every species — all five differ only by size, exactly as
+ * the vendor model's five did.
+ *
+ * `yOffset` is in *rig* units and is multiplied by `scale` at the root (see
+ * GameModel), so these are the measured drop below the origin for each pose,
+ * negated. Only the ground loops carry one: the airborne clips are positioned
+ * by the scene, not planted.
+ *
+ * The offsets on `walk`/`rest` are measured against the clips as they stand
+ * today, and those clips are known to be provisional — the wings never fold and
+ * `cruise` has no vertical stroke, so they will be re-authored. Re-run the
+ * measurement when they are: at this WYVERN_FIT they are live lifts of 2.26 m
+ * and 7.95 m, so a bad measurement is visible rather than harmless.
+ */
+const WYVERN_CLIPS: AssetEntry['animations'] = {
+  // Ground loops, planted on the measured low point of each pose.
+  //
+  // idle is re-authored — `pnpm assets:wyvern-idle` regenerates it, and
+  // scripts/author-wyvern-idle-blender.py carries the parameters and the rig's
+  // measured axis conventions. It needs no lift: its lowest skinned vertex is a
+  // toe at +0.10..+0.13 m above the rig origin through the whole 6 s loop. The
+  // clip it replaced sank its left wingtip 0.99 m BELOW the origin, because the
+  // fold was mirrored wrong and put that wing forward across the chest.
+  idle: { clip: 'idle', yOffset: 0 },
+  walk: { clip: 'walk', yOffset: 314 },
+  rest: { clip: 'rest', yOffset: 1104 },
+
+  // One-shots. `fly` is the takeoff and chains to the cruise loop, so gameplay
+  // only ever asks for `fly`.
+  fly: { clip: 'takeoff', loop: false, next: 'airborne', yOffset: 0 },
+  land: { clip: 'land', loop: false, next: 'idle', yOffset: 0 },
+  death: { clip: 'death', loop: false, yOffset: 0 },
+
+  // Flight loops. cruise and the two banks share a phase group so steering does
+  // not restart the wingbeat mid-stroke.
+  airborne: { clip: 'cruise', yOffset: 0, phaseGroup: 'flight' },
+  cruise: { clip: 'cruise', yOffset: 0, phaseGroup: 'flight' },
+  // Deliberately slower two-beat search loop; unlike cruise it does not share
+  // the phase group because its cadence is different.
+  scout: { clip: 'scout', yOffset: 0 },
+  bankLeft: { clip: 'bankLeft', yOffset: 0, phaseGroup: 'flight' },
+  bankRight: { clip: 'bankRight', yOffset: 0, phaseGroup: 'flight' },
+  hover: { clip: 'hover', yOffset: 0 },
+  glide: { clip: 'glide', yOffset: 0 },
+  dive: { clip: 'dive', yOffset: 0 },
+  speed: { clip: 'speed', yOffset: 0 },
+
+  // The rig has no separate air-attack clip; the ground one reads acceptably
+  // airborne because it is all forequarters.
+  attack: { clip: 'attack', yOffset: 0 },
+  attackAir: { clip: 'attack', loop: false, yOffset: 0, fadeIn: 0.16 },
+  breathe: { clip: 'breath', yOffset: 0 },
+}
+
+/** One species' entry. `size` is its relative bulk, ordered by tier. */
+function wyvernAsset(size: number): AssetEntry {
+  return {
+    url: '/models/wyvern.glb',
+    scale: WYVERN_FIT * size,
+    yOffset: 0,
+    animations: WYVERN_CLIPS,
+  }
+}
+
+/**
+ * Wyvern model wired to the clean rig (wyvern.glb): 46 joints, wings parented
+ * to Spine3 (not Neck), RootMotion bone.
+ *
+ * Keys must be `wyvern.<speciesId>` for the ids in `core/data/species` — the
+ * scenes build the asset id as `wyvern.${wyvern.speciesId}`. They previously
+ * carried the vendor model's names (drogon, rhaegal, …), which match no species
+ * this game defines, so every lookup missed and every wyvern rendered as the
+ * procedural placeholder.
  */
 export const ASSETS: Record<AssetId, AssetEntry> = {
-  /** Wyvern - new clean rig, no animations yet */
-  'wyvern.drogon': {
-    url: '/models/wyvern.glb',
-    scale: 0.01, // Mesh is in cm (~1000 units), scale down to meters
-    yOffset: 0,
-    animations: {
-      idle: { clip: 'idle', yOffset: 0 },
-      fly: { clip: 'fly', loop: false, next: 'airborne', yOffset: 0 },
-      airborne: { clip: 'cruise', yOffset: 0 },
-      attack: { clip: 'attack', yOffset: 0 },
-      attackAir: { clip: 'attackAir', loop: false, yOffset: 0, fadeIn: 0.16 },
-      death: { clip: 'death', loop: false, yOffset: 0 },
-      walk: { clip: 'walk', yOffset: 0 },
-      cruise: { clip: 'cruise', yOffset: 0 },
-      hover: { clip: 'hover', yOffset: 0 },
-      rest: { clip: 'rest', yOffset: 0 },
-    },
-  },
-  'wyvern.rhaegal': {
-    url: null,
-    scale: 0.9,
-    animations: {},
-  },
-  'wyvern.viserion': {
-    url: null,
-    scale: 0.85,
-    animations: {},
-  },
-  'wyvern.sunfyre': {
-    url: null,
-    scale: 1.1,
-    animations: {},
-  },
-  'wyvern.meraxes': {
-    url: null,
-    scale: 1.05,
-    animations: {},
-  },
+  'wyvern.emberback': wyvernAsset(0.85),
+  'wyvern.cragwing': wyvernAsset(0.9),
+  'wyvern.mirefang': wyvernAsset(1),
+  'wyvern.frostmaw': wyvernAsset(1.05),
+  'wyvern.duskwyrm': wyvernAsset(1.1),
 
   /** Units - placeholder army troops */
   'unit.soldier': {
@@ -276,15 +344,21 @@ export const ASSETS: Record<AssetId, AssetEntry> = {
   },
 }
 
-/** The vertical extent of a model at a given state, for camera framing. */
+/**
+ * The vertical extent of a model at a given state, for camera framing.
+ *
+ * Flat for now. 11 is close to the measured adult: the `idle` pose tops out
+ * 1492 rig units above the origin, which is 10.7 m at `WYVERN_FIT`. Worth
+ * making per-state once the clips settle — `hover` and `takeoff` reach roughly
+ * twice that.
+ */
 export function modelStateHeight(_state: ModelState, _seed: number): number {
-  // Placeholder: return a reasonable default
   return 11
 }
 
 /** How far from the model origin to look down to focus on a named bone. */
 export function boneOffset(_boneName: string): number {
-  // Placeholder: no bone offsets until new rig
+  // Flat: nothing reads a per-bone framing offset yet.
   return 0
 }
 
@@ -292,9 +366,6 @@ export function boneOffset(_boneName: string): number {
 export function getAsset(id: AssetId): AssetEntry | undefined {
   return ASSETS[id]
 }
-
-/** Hack: the DROGON_FIT constant is used in a few places for height calc. */
-export const DROGON_FIT = 1
 
 /**
  * Path to the scenery prop atlas. Using symlink to original for now.

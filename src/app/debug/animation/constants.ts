@@ -16,9 +16,21 @@ export const TAIL_CHAIN = [
   'Tail4',
   'Tail5',
   'Tail6',
+  'Tail7',
+  'Tail8',
+  'Tail9',
+  'Tail10',
 ] as const
 
-export const TAIL_WEIGHTS = [0.12, 0.18, 0.22, 0.2, 0.17, 0.11] as const
+/**
+ * Per-link share of a tail pose edit, root → tip, summing to 1.
+ *
+ * Ten entries since the chain was extended to cover the last 1205 units of
+ * mesh. `Tail1` carries no skin weight — it is the pelvis pivot — so its share
+ * is small; the hump sits mid-chain so a bend reads as a curve rather than a
+ * hinge at either end.
+ */
+export const TAIL_WEIGHTS = [0.06, 0.09, 0.12, 0.14, 0.14, 0.13, 0.11, 0.09, 0.07, 0.05] as const
 
 export const MARKERS: { key: string; bone: string; color: string }[] = [
   { key: 'head', bone: 'Head', color: '#f0d9a8' },
@@ -34,12 +46,12 @@ export const CAMERAS: Record<
   LabCamera,
   { position: [number, number, number]; fov: number; target: [number, number, number] }
 > = {
-  side: { position: [45, 8, 0], fov: 35, target: [0, 6, 0] },
-  front: { position: [0, 8, 45], fov: 35, target: [0, 6, 0] },
-  top: { position: [0, 50, 0.01], fov: 35, target: [0, 0, 0] },
-  threeQuarter: { position: [32, 20, 32], fov: 40, target: [0, 5, 0] },
-  sanctuary: { position: [0, 8, 20], fov: 60, target: [0, 4, 0] },
-  battle: { position: [0, 6, 15], fov: 65, target: [0, 3, 0] },
+  side: { position: [130, 16, 0], fov: 35, target: [0, 8, 0] },
+  front: { position: [0, 16, 130], fov: 35, target: [0, 8, 0] },
+  top: { position: [0, 125, 0.01], fov: 35, target: [0, 0, 0] },
+  threeQuarter: { position: [42, 28, 42], fov: 40, target: [0, 8, 0] },
+  sanctuary: { position: [0, 26, 58], fov: 60, target: [0, 10, 0] },
+  battle: { position: [0, 18, 42], fov: 65, target: [0, 6, 0] },
 }
 
 export const CAMERA_KEYS: LabCamera[] = ['side', 'front', 'top', 'threeQuarter', 'sanctuary', 'battle']
@@ -107,11 +119,11 @@ export const GROUPS: { label: string; states: ModelState[] }[] = [
 ]
 
 export const SPECIES: { id: `wyvern.${string}`; label: string; scale: number }[] = [
-  { id: 'wyvern.drogon', label: 'drogon 1.00', scale: 1 },
-  { id: 'wyvern.rhaegal', label: 'rhaegal 0.90', scale: 0.9 },
-  { id: 'wyvern.viserion', label: 'viserion 0.85', scale: 0.85 },
-  { id: 'wyvern.sunfyre', label: 'sunfyre 1.10', scale: 1.1 },
-  { id: 'wyvern.meraxes', label: 'meraxes 1.05', scale: 1.05 },
+  { id: 'wyvern.emberback', label: 'emberback 0.85', scale: 0.85 },
+  { id: 'wyvern.cragwing', label: 'cragwing 0.90', scale: 0.9 },
+  { id: 'wyvern.mirefang', label: 'mirefang 1.00', scale: 1 },
+  { id: 'wyvern.frostmaw', label: 'frostmaw 1.05', scale: 1.05 },
+  { id: 'wyvern.duskwyrm', label: 'duskwyrm 1.10', scale: 1.1 },
 ]
 
 export const EXTRA_SCALES: { label: string; value: number }[] = [

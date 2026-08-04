@@ -12,6 +12,15 @@ import { WorldLabel } from '@/render/labels/WorldLabel'
 import { consumeDrag, consumeWheel } from '@/render/controllers/input'
 import { readDirectWyvernFlightInput, stepDirectWyvernFlight } from '@/render/controllers/wyvernFlight'
 import { applyBoneOffset, applyLegTuck, applyNeckOffset } from '@/render/boneOffsets'
+import {
+  HEAD_BONE,
+  HIND_LEG_CHAINS,
+  JAW_BONE,
+  NECK_CHAIN,
+  TAIL_CHAIN,
+  findBone,
+  findChain,
+} from '@/render/rigBones'
 import { createTailState, dynamicTailController, type TailState } from '@/render/tailController'
 import { createLegsState, dynamicLegController, type LegsState } from '@/render/legPhysics'
 import { captureClosedJawPose, sealFlightJaw, shouldSealFlightJaw, type ClosedJawPose } from '@/render/flightMouth'
@@ -618,32 +627,12 @@ function HighlandsHuntDirector({
         seed={wyvern.name.charCodeAt(0) ?? 0}
         scale={1}
         onReady={(root) => {
-          agent.current.jaw = root.getObjectByName('Bip002-Ponytail1_016') ?? null
+          agent.current.jaw = findBone(root, JAW_BONE)
           agent.current.jawClosed = captureClosedJawPose(agent.current.jaw, agent.current.jawClosed)
-          agent.current.headBone = root.getObjectByName('Bip002-Head_015') ?? null
-          agent.current.neckBones = [
-            root.getObjectByName('Bip002-Neck_012'),
-            root.getObjectByName('Bip002-Neck1_013'),
-            root.getObjectByName('Bip002-Neck2_014'),
-          ].filter((bone): bone is Object3D => bone !== null && bone !== undefined)
-          agent.current.legBones = [
-            ['Bip002-L-Thigh_0186', 'Bip002-L-Calf_0187', 'Bip002-L-Foot_0188'],
-            ['Bip002-R-Thigh_0201', 'Bip002-R-Calf_00', 'Bip002-R-Foot_0202'],
-          ].map((chain) =>
-            chain
-              .map((name) => root.getObjectByName(name))
-              .filter((bone): bone is Object3D => bone !== null && bone !== undefined),
-          )
-          agent.current.tailBones = [
-            'Bip002-Tail1_0215',
-            'Bip002-Tail2_0216',
-            'Bip002-Tail3_0217',
-            'Bip002-Tail4_0218',
-            'Bip002-Tail5_0219',
-            'Bip002-Tail6_01',
-          ]
-            .map((name) => root.getObjectByName(name))
-            .filter((bone): bone is Object3D => bone !== null && bone !== undefined)
+          agent.current.headBone = findBone(root, HEAD_BONE)
+          agent.current.neckBones = findChain(root, NECK_CHAIN)
+          agent.current.legBones = HIND_LEG_CHAINS.map((chain) => findChain(root, chain))
+          agent.current.tailBones = findChain(root, TAIL_CHAIN)
         }}
         onActionFinished={handleActionFinished}
         fallback={<PlaceholderWyvern color={SPECIES[wyvern.speciesId]?.color} scale={1} />}

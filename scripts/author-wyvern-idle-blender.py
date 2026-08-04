@@ -1,0 +1,449 @@
+"""Author the wyvern `idle` action, inside Blender.
+
+`scripts/author-wyvern-idle.py` drives this. It replaces the `idle` action on
+`WyvernRig` wholesale, from the parameter table below, and leaves every other
+action untouched.
+
+Why a generator rather than hand-keyed curves
+---------------------------------------------
+An idle is a sum of slow oscillators, and the thing that makes one read as alive
+is that those oscillators do not share a phase: the chest leads, the neck
+follows, the wings settle on their own beat, the tail trails the whole thing.
+The previous clip moved five bones on one shared sine and read as a metronome.
+Expressing the clip as `(cycles, amplitude, phase)` per channel makes the
+phase relationships the editable surface, and makes the loop exact by
+construction — every harmonic completes a whole number of cycles per loop, so
+frame `PERIOD` reproduces frame 0 to floating-point.
+
+Axis conventions are MEASURED, not assumed
+------------------------------------------
+Probed on this armature at +0.2 rad, reading the world displacement of a
+chain-tip marker:
+
+    Spine*/Neck*/Head   local +X pitches the head DOWN;  +Z yaws toward -X
+    Tail1..Tail10       local +X lifts the tail UP  — the opposite sense to the
+                        spine, because the tail runs +Y and the neck runs -Y
+    Wing shoulder/elbow/wrist
+                        local +X raises BOTH wings      (symmetric)
+                        local +Z sweeps them APART      (antisymmetric)
+    Body.location       local +Z is world DOWN
+
+That last pair is what the previous clip got wrong: it gave both wings the same
+negative `Z`, which folded the left wing forward and the right wing back, 97.5
+degrees apart. Anything mirrored must negate `Z` on the right side; anything
+mirrored on `X` must not.
+"""
+
+from __future__ import annotations
+
+import argparse
+import math
+import sys
+
+import bpy
+
+ARMATURE = "WyvernRig"
+ACTION = "idle"
+
+# 144 frames at 24 fps = 6.0 s. Keys run 0..PERIOD with the last key equal to
+# the first, which is what makes the wrap seamless for three.js' LoopRepeat.
+#
+# Frame 0, not frame 1: the glTF exporter writes a key's time as frame/fps, so a
+# clip starting at frame 1 has no key before t=1/24 and three.js clamps to the
+# first pose for that opening frame — a 42 ms hitch on every loop. Starting at 0
+# puts the first key at t=0 and the last at exactly 6.0 s. The other 15 clips in
+# this GLB all still start at frame 1 and still carry that hitch.
+#
+# Longer than the v1 reference idle (5.04 s) so the repeat is harder to spot.
+PERIOD = 144
+FPS = 24
+
+# Harmonic cycle counts per loop. Both divide PERIOD exactly, so the composite
+# is exactly periodic. BREATH is the fast one (2 per 6 s = 20 breaths/minute,
+# a plausible resting rate for an animal this size); SWAY and SURVEY are the
+# slow carriers that keep the wings and neck from locking to the breath.
+BREATH, SWAY, TREMOR = 2, 1, 3
+
+DEG = math.pi / 180.0
+
+
+def wave(cycles: int, phase: float, frame_t: float, skew: float = 0.0) -> float:
+    """One exactly-periodic harmonic, optionally phase-warped.
+
+    `skew` bends the sine so the rise is quicker than the fall, which is what
+    separates a breath from a pendulum. It is applied inside the argument so
+    the result stays 2*pi periodic and the loop stays exact.
+    """
+    theta = 2.0 * math.pi * cycles * frame_t + phase
+    if skew:
+        theta = theta + skew * math.sin(theta)
+    return math.sin(theta)
+
+
+# ---------------------------------------------------------------------------
+# The clip.
+#
+# Each entry is  bone -> channel -> (static, [(cycles, amplitude, phase), ...])
+# Rotations are in DEGREES here and converted on the way in; `Body` location is
+# in rig units. Amplitudes were tuned against the measured signature until the
+# clip landed on the v1 `AA_DaenerysDragon_Battle_Stand` envelope — see
+# docs/WYVERN_ANIMATION_BASELINE.md for what each measured channel means.
+# ---------------------------------------------------------------------------
+
+# Ribcage. The breath lives here rather than in the pelvis: putting it in the
+# pelvis is what made the old clip lift both feet off the ground with every
+# cycle. Negative X arches the chest upward. Each spine segment lags the one
+# below it so the arch travels up the back instead of hinging in one place.
+# Spine1 carries no breath on purpose: L_LegRoot/R_LegRoot are parented to it,
+# so any rotation there swings both legs and unplants the feet. Spine2 and
+# Spine3 sit above the leg attachment, so the arch is invisible to the stance.
+SPINE = {
+    "Spine1": {"rx": (0.0, [])},
+    "Spine2": {"rx": (0.0, [(BREATH, -0.945, 0.15)])},
+    "Spine3": {"rx": (0.0, [(BREATH, -0.656, 0.30)])},
+}
+
+# Pelvis. Deliberately tiny — a few centimetres of displayed travel, enough to
+# carry the breath into the hips without unplanting the feet.
+BODY = {
+    "Body": {
+        "rx": (0.0, [(BREATH, -0.23, 0.10)]),
+        "rz": (0.0, [(SWAY, 0.23, 0.00)]),
+        "tz": (0.0, [(BREATH, -0.985, 0.10)]),  # local +Z is world DOWN
+        # Slow fore-and-aft weight shift. This, not the neck, is where an idle's
+        # head reach actually comes from: the neck on this rig is nearly
+        # straight at rest, so pitching it can only swing the skull up and down.
+        # The feet ride the pelvis rigidly, so this shift is also the clip's
+        # foot slide; it is held under 0.10 m, slightly less than the 0.11 m of
+        # hip slide v1's own reference idle carries. On a ~3.5 m foot that is
+        # about 3% of foot length and does not read at gameplay distance.
+        # Removing it entirely would need 3-DOF leg IK — more machinery than an
+        # idle earns, and a perfectly rigid pelvis is its own kind of stiff.
+        "ty": (0.0, [(SWAY, 3.0, 0.35)]),  # local +Y is world FORWARD
+    }
+}
+
+# Neck and head. Two jobs at once: the breath pushes the head up and forward on
+# the inhale, and a slower survey drifts it side to side. The head then counter-
+# rotates against the neck on both axes, which is how a real animal holds a
+# gaze while its body moves under it — without it the skull rides the neck like
+# a mast and the whole thing reads as a puppet.
+NECK = {
+    # The SWAY terms on Neck1/Neck2 are an opposed pair at the MEASURED
+    # vertical-cancelling ratio: per radian, Neck1 lifts the snout 659 units and
+    # Neck2 lifts it 482, so -0.73 : +1.00 nets to zero rise and leaves 61 units
+    # per radian of pure fore-and-aft. Any other ratio pumps the head up and
+    # down instead — a naive -1 : +1 measured 0.80 m of head rise against the
+    # 0.39 m reference. The pair is kept modest: this rig would need an 18.8 deg
+    # neck pump to reach v1's head travel on the neck alone, which reads as
+    # craning, so the body's weight shift supplies the rest.
+    "Neck1": {
+        "rx": (0.0, [(BREATH, -0.46, 0.45), (SWAY, -1.46, 1.10)]),
+        "rz": (0.0, [(SWAY, 0.200, 0.00)]),
+    },
+    "Neck2": {
+        "rx": (0.0, [(BREATH, -0.63, 0.60), (SWAY, 2.00, 1.10)]),
+        "rz": (0.0, [(SWAY, 0.336, 0.50)]),
+    },
+    "Head": {
+        "rx": (0.0, [(BREATH, 6.334, 0.90), (SWAY, -0.68, 1.80), (TREMOR, 0.09, 0.0)]),
+        "rz": (0.0, [(SWAY, -0.200, 0.90)]),
+    },
+}
+
+# Wings, folded. The static Z is the fold, and it is MIRRORED — this is the
+# defect the previous clip shipped. X is the settle, and it is NOT mirrored.
+#
+# Left and right run on the same slow carrier at slightly different amplitudes
+# and a 0.7 rad phase offset, so the two wings drift independently. v1's idle
+# does the same thing: its wing_elev_bias swings wider than either wing alone,
+# which only happens if the sides are not locked together.
+WING_FOLD_SHOULDER = 30.0
+WING_FOLD_ELBOW = 20.0
+
+# Static elevation on top of the fold, and it is load-bearing rather than
+# cosmetic. The lowest vertex of this model in an idle pose is not a foot — it
+# is `WingFinger1_end`, the wingtip, ~20 m behind the hips and already below the
+# foot plane, because the fold only sweeps the wing back and never folds the
+# wrist or finger spars (the "wings never fold" defect the manifest records).
+# A 21 m spar turns the 2.6 deg settle into ~2 m of tip travel, which sank the
+# tip to 2.08 m below the origin against the previous clip's 0.99 m. This lifts
+# it back clear: the measured lever is 0.374 m of tip rise per degree.
+WING_FOLD_LIFT = 3.5
+WINGS = {
+    "L_WingShoulder": {
+        "rz": (WING_FOLD_SHOULDER, []),
+        "rx": (WING_FOLD_LIFT, [(SWAY, 0.253, 0.00), (BREATH, 0.080, 0.20)]),
+    },
+    "R_WingShoulder": {
+        "rz": (-WING_FOLD_SHOULDER, []),
+        "rx": (WING_FOLD_LIFT, [(SWAY, 0.283, 0.70), (BREATH, 0.080, 0.20)]),
+    },
+    "L_WingElbow": {
+        "rz": (WING_FOLD_ELBOW, []),
+        "rx": (0.0, [(SWAY, 0.190, 0.35), (BREATH, 0.063, 0.50)]),
+    },
+    "R_WingElbow": {
+        "rz": (-WING_FOLD_ELBOW, []),
+        "rx": (0.0, [(SWAY, 0.204, 1.05), (BREATH, 0.063, 0.50)]),
+    },
+    "L_WingWrist": {"rx": (0.0, [(SWAY, 0.143, 0.70)])},
+    "R_WingWrist": {"rx": (0.0, [(SWAY, 0.157, 1.40)])},
+}
+
+# Tail, as a travelling wave rather than a hinge.
+#
+# The old clip rotated Tail1 and Tail2 only, which swung all ten bones as one
+# rigid spike and put 0.97 m of metronome wag on the tip. Here every bone gets a
+# share, amplitude grows toward the tip, and each bone lags the one before it —
+# so the shape moves down the tail and the tip trails the hips instead of
+# leading them. LAG is per bone, in radians.
+TAIL_LAG_LAT = 0.30
+TAIL_LAG_VERT = 0.22
+TAIL_LAT_DEG = [0.073, 0.095, 0.110, 0.125, 0.147, 0.162, 0.176, 0.191, 0.213, 0.213]
+TAIL_VERT_DEG = [0.112, 0.131, 0.150, 0.187, 0.206, 0.225, 0.244, 0.281, 0.300, 0.300]
+
+
+def tail_channels() -> dict:
+    out = {}
+    for i in range(10):
+        bone = f"Tail{i + 1}"
+        out[bone] = {
+            "rz": (0.0, [(SWAY, TAIL_LAT_DEG[i], i * TAIL_LAG_LAT)]),
+            "rx": (0.0, [(BREATH, TAIL_VERT_DEG[i], i * TAIL_LAG_VERT)]),
+        }
+    return out
+
+
+# Hind legs hold the stance and do not move: the feet are planted, and v1's
+# reference idle likewise measures zero toe motion. The -5 degree thigh pitch is
+# the stance itself, carried over from the previous clip.
+LEGS = {
+    "L_Thigh": {"rx": (-5.0, [])},
+    "R_Thigh": {"rx": (-5.0, [])},
+}
+
+
+# Per-group amplitude trims, applied on top of the tables above.
+#
+# These exist because the tables are written in whatever units read naturally
+# for the channel, but the clip is judged on the MEASURED signature — head
+# travel in metres, wing elevation in degrees. Tuning is therefore a sweep of
+# these eight numbers against `measure-wyvern-clip-blender.py` until the clip
+# lands on the v1 envelope, not an edit of thirty amplitudes by eye.
+GAINS = {
+    "breath_spine": 1.00,   # -> body_axis_deg range
+    "breath_neck": 1.00,    # -> neck's own share of the breath lift
+    # The head's counter-pitch against the chest arch, and the real lever on
+    # head_up: the spine has to arch hard enough to read as breathing
+    # (body_axis 2.3 deg), and that alone throws the skull 0.51 m. A resting
+    # animal keeps its head roughly level while its chest heaves, so the head
+    # pitches down as the chest lifts and the skull travel comes back to the
+    # reference. Raising this LOWERS head_up.
+    "head_level": 1.00,     # -> head_up range
+    # Held at a low fixed value rather than solved. The -0.73 : +1.00 pair only
+    # cancels vertical near zero; solving head_fwd on it alone drove it to a
+    # +/-10 deg neck pump, where the linearisation fails and head_up blew out to
+    # 0.67 m against a 0.39 m reference. Fore-and-aft is the body's job here.
+    # Not solved for either. `head_fwd` is measured relative to the pelvis, so
+    # no amount of body translation changes it, and this rig's neck is 98%
+    # straight at rest (704 units of bone spanning 691), leaving under 0.10 m of
+    # reach even fully extended. Rise and reach are geometrically locked on a
+    # straight neck, so v1's 0.288 m of head reach alongside only 0.389 m of
+    # rise is a property of ITS curved neck and does not port. Held low.
+    "neck_reach": 1.00,     # -> head_fwd range (secondary)
+    "neck_yaw": 1.00,       # -> head_lat range
+    "wing": 1.00,           # -> wing_elev_L/R range
+    "tail_lat": 1.00,       # -> tail_lat range
+    "tail_vert": 1.00,      # -> tail_up range
+    "body_lift": 1.00,      # -> foot_*_up range (must stay planted)
+    "body_shift": 1.00,     # -> foot_*_fwd range (must stay planted)
+}
+
+
+def _gain_for(group: str, channel: str, cycles: int, bone: str) -> float:
+    if group == "spine" and channel == "rx":
+        return GAINS["breath_spine"]
+    if group == "neck":
+        if channel == "rz":
+            return GAINS["neck_yaw"]
+        if channel == "rx":
+            if cycles == TREMOR:
+                return 1.0
+            if cycles == SWAY:
+                return GAINS["neck_reach"]
+            return GAINS["head_level"] if bone == "Head" else GAINS["breath_neck"]
+    if group == "wing" and channel == "rx":
+        return GAINS["wing"]
+    if group == "tail":
+        return GAINS["tail_lat"] if channel == "rz" else GAINS["tail_vert"]
+    if group == "body":
+        if channel == "tz":
+            return GAINS["body_lift"]
+        if channel == "ty":
+            return GAINS["body_shift"]
+    return 1.0
+
+
+def clip_definition() -> dict:
+    groups = (
+        ("spine", SPINE),
+        ("body", BODY),
+        ("neck", NECK),
+        ("wing", WINGS),
+        ("tail", tail_channels()),
+        ("legs", LEGS),
+    )
+    merged: dict = {}
+    for group, table in groups:
+        for bone, channels in table.items():
+            scaled = {}
+            for channel, (static, harmonics) in channels.items():
+                scaled[channel] = (
+                    static,
+                    [
+                        (cycles, amp * _gain_for(group, channel, cycles, bone), phase)
+                        for cycles, amp, phase in harmonics
+                    ],
+                )
+            merged.setdefault(bone, {}).update(scaled)
+    return merged
+
+
+CHANNEL_PATH = {
+    "rx": ("rotation_euler", 0),
+    "ry": ("rotation_euler", 1),
+    "rz": ("rotation_euler", 2),
+    "tx": ("location", 0),
+    "ty": ("location", 1),
+    "tz": ("location", 2),
+}
+
+
+def evaluate(spec, frame_index: int) -> float:
+    """Value of one channel at `frame_index` in 0..PERIOD."""
+    static, harmonics = spec
+    frame_t = frame_index / PERIOD
+    total = static
+    for cycles, amplitude, phase in harmonics:
+        skew = 0.35 if cycles == BREATH else 0.0
+        total += amplitude * wave(cycles, phase, frame_t, skew)
+    return total
+
+
+def armature() -> bpy.types.Object:
+    obj = bpy.data.objects.get(ARMATURE)
+    if obj is None or obj.type != "ARMATURE":
+        raise SystemExit(f"armature {ARMATURE!r} not found")
+    return obj
+
+
+def build(arm: bpy.types.Object) -> bpy.types.Action:
+    definition = clip_definition()
+    missing = [b for b in definition if b not in arm.pose.bones]
+    if missing:
+        raise SystemExit(f"bones not on the rig: {missing}")
+
+    old = bpy.data.actions.get(ACTION)
+    if old is not None:
+        bpy.data.actions.remove(old)
+    action = bpy.data.actions.new(ACTION)
+
+    if arm.animation_data is None:
+        arm.animation_data_create()
+    arm.animation_data.action = action
+    slot = action.slots.new(id_type="OBJECT", name=ARMATURE)
+    arm.animation_data.action_slot = slot
+    layer = action.layers.new("idle")
+    strip = layer.strips.new(type="KEYFRAME")
+    bag = strip.channelbags.new(slot)
+
+    for bone, channels in sorted(definition.items()):
+        # Every animated bone gets all three rotation components keyed, so a
+        # stale non-zero axis from a previous pose cannot leak into the clip.
+        wanted = dict(channels)
+        for axis in ("rx", "ry", "rz"):
+            wanted.setdefault(axis, (0.0, []))
+        for key, spec in sorted(wanted.items()):
+            prop, index = CHANNEL_PATH[key]
+            scale = DEG if prop == "rotation_euler" else 1.0
+            fcurve = bag.fcurves.new(
+                f'pose.bones["{bone}"].{prop}', index=index
+            )
+            fcurve.keyframe_points.add(PERIOD + 1)
+            for i, point in enumerate(fcurve.keyframe_points):
+                point.co = (float(i), evaluate(spec, i) * scale)
+                point.interpolation = "BEZIER"
+                point.handle_left_type = "AUTO_CLAMPED"
+                point.handle_right_type = "AUTO_CLAMPED"
+            fcurve.update()
+
+    action.use_frame_range = True
+    action.frame_start, action.frame_end = 0.0, float(PERIOD)
+    return action
+
+
+def export(path: str) -> None:
+    """Write the GLB. Only the wyvern rig and its mesh — the file also holds the
+    old 291-bone vendor armature and two scratch armatures, and exporting those
+    would change the joint set the manifest and `rigBones.ts` are written to."""
+    for obj in bpy.context.scene.objects:
+        obj.select_set(obj.name in (ARMATURE, "WyvernMesh"))
+    bpy.context.view_layer.objects.active = armature()
+    bpy.ops.export_scene.gltf(
+        filepath=path,
+        export_format="GLB",
+        use_selection=True,
+        export_animations=True,
+        export_animation_mode="ACTIONS",
+        export_skins=True,
+        export_apply=False,
+        export_yup=True,
+        # Off to match how wyvern.glb was originally written. Left on, Blender
+        # collapses every constant channel to two keys — harmless at runtime,
+        # but it rewrites all 16 clips and buries the one that actually changed.
+        export_optimize_animation_size=False,
+    )
+    print(f"exported {path}")
+
+
+def main() -> None:
+    argv = sys.argv[sys.argv.index("--") + 1 :] if "--" in sys.argv else []
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--save", action="store_true", help="write the .blend back")
+    parser.add_argument("--export", default="", metavar="PATH", help="write a GLB")
+    parser.add_argument(
+        "--gain",
+        action="append",
+        default=[],
+        metavar="NAME=VALUE",
+        help=f"override an entry in GAINS ({', '.join(GAINS)}). Repeatable.",
+    )
+    # Tolerant: Blender hands the same `--` argv to every -P script in the run,
+    # so this one also sees the measurement script's flags.
+    args, _ = parser.parse_known_args(argv)
+    for override in args.gain:
+        name, _, value = override.partition("=")
+        if name not in GAINS:
+            raise SystemExit(f"unknown gain {name!r}; expected one of {list(GAINS)}")
+        GAINS[name] = float(value)
+
+    scene = bpy.context.scene
+    scene.render.fps = FPS
+    arm = armature()
+    action = build(arm)
+    scene.frame_start, scene.frame_end = 0, PERIOD
+
+    print(
+        f"authored {ACTION}: {PERIOD + 1} frames, "
+        f"{(PERIOD) / FPS:.2f}s, {len(clip_definition())} bones"
+    )
+    if args.export:
+        export(args.export)
+    if args.save:
+        bpy.ops.wm.save_mainfile()
+        print(f"saved {bpy.data.filepath}")
+
+
+if __name__ == "__main__":
+    main()

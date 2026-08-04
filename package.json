@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "assets:wyvern-idle": "python3 scripts/author-wyvern-idle.py"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",

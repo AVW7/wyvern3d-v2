@@ -7,11 +7,10 @@ import {
   applyLegTuck,
   holdStreamlinedHeadPose,
   LEG_TUCK_WEIGHTS,
+  LOCAL_PITCH,
+  LOCAL_ROLL,
+  LOCAL_YAW,
 } from './boneOffsets'
-
-const LOCAL_PITCH = new Vector3(0, 0, 1)
-const LOCAL_YAW = new Vector3(0, 1, 0)
-const LOCAL_ROLL = new Vector3(1, 0, 0)
 
 function expectSameRotation(actual: Quaternion, expected: Quaternion): void {
   expect(actual.angleTo(expected)).toBeLessThan(1e-6)
@@ -51,6 +50,8 @@ describe('bone offsets', () => {
   })
 
   it('straightens each tail link toward the current body line without a world-space reset', () => {
+    // Bones run along local +Y, as they do on the clean rig, and the kink is in
+    // Z — the plane a sagittal (local X) rotation can actually resolve.
     const pelvis = new Object3D()
     const tail1 = new Object3D()
     const tail2 = new Object3D()
@@ -58,9 +59,9 @@ describe('bone offsets', () => {
     pelvis.add(tail1)
     tail1.add(tail2)
     tail2.add(tail3)
-    tail1.position.set(-1, 0, 0)
-    tail2.position.set(-1, 1, 0)
-    tail3.position.set(-1, 1, 0)
+    tail1.position.set(0, -1, 0)
+    tail2.position.set(0, -1, 1)
+    tail3.position.set(0, -1, 1)
     pelvis.updateWorldMatrix(true, true)
 
     alignTailToBody([tail1, tail2, tail3], pelvis, 1)
@@ -68,9 +69,11 @@ describe('bone offsets', () => {
     const root = tail1.getWorldPosition(new Vector3())
     const middle = tail2.getWorldPosition(new Vector3())
     const tip = tail3.getWorldPosition(new Vector3())
-    expect(middle.y).toBeCloseTo(root.y, 6)
-    expect(tip.y).toBeCloseTo(root.y, 6)
-    expect(tip.x).toBeLessThan(middle.x)
+    // Fully aligned, the chain lies on the pelvis → tail-root line, which here
+    // is straight down, so the kink in Z is gone and each link keeps falling.
+    expect(middle.z).toBeCloseTo(root.z, 6)
+    expect(tip.z).toBeCloseTo(root.z, 6)
+    expect(tip.y).toBeLessThan(middle.y)
   })
 
   it('keeps the aligned neck on the body line and holds the skull at its measured forward pose', () => {
@@ -83,10 +86,10 @@ describe('bone offsets', () => {
     neck.add(neck1)
     neck1.add(neck2)
     neck2.add(head)
-    neck.position.set(1, 0, 0)
-    neck1.position.set(1, 1, 0)
-    neck2.position.set(1, 0, 0)
-    head.position.set(1, 0, 0)
+    neck.position.set(0, 1, 0)
+    neck1.position.set(0, 1, 1)
+    neck2.position.set(0, 1, 0)
+    head.position.set(0, 1, 0)
     head.quaternion.setFromAxisAngle(LOCAL_YAW, 0.4)
     pelvis.updateWorldMatrix(true, true)
 
@@ -95,7 +98,7 @@ describe('bone offsets', () => {
 
     const neckRoot = neck.getWorldPosition(new Vector3())
     const headPosition = head.getWorldPosition(new Vector3())
-    expect(headPosition.y).toBeCloseTo(neckRoot.y, 6)
+    expect(headPosition.z).toBeCloseTo(neckRoot.z, 6)
     expect(
       head.quaternion.angleTo(new Quaternion(-0.0007635, 0.0000137, 0.0411221, 0.9991539)),
     ).toBeLessThan(1e-6)

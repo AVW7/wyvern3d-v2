@@ -6,7 +6,7 @@ describe('wyvern quick level and stat percentages', () => {
   const dummyWyvern = () =>
     createWyvern({
       id: 'w1',
-      speciesId: 'drogon',
+      speciesId: 'emberback',
       name: 'Test Wyvern',
       stats: { power: 10, speed: 10, stamina: 10, firepower: 10, armor: 10 },
       traits: [],

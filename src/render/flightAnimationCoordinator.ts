@@ -13,6 +13,18 @@
  */
 
 import { Object3D, Vector3 } from 'three'
+import {
+  HEAD_BONE,
+  LEFT_LEG_CHAIN,
+  LEFT_WING_CHAIN,
+  NECK_CHAIN,
+  RIGHT_LEG_CHAIN,
+  RIGHT_WING_CHAIN,
+  SPINE_CHAIN,
+  TAIL_CHAIN,
+  findBone,
+  findChain,
+} from './rigBones'
 import { propagateFullBodyWave } from './spineWave'
 import {
   intelligentHeadNeckController,
@@ -334,66 +346,15 @@ export function updateFlightAnimation(
  * Convenience function to create skeleton refs from a model root.
  */
 export function createSkeletonRefs(root: Object3D): SkeletonRefs {
-  // Spine bones (typical biped hierarchy)
-  const spineBoneNames = [
-    'Bip002-Spine_006',
-    'Bip002-Spine1_007',
-    'Bip002-Spine2_008',
-  ]
-  
-  // Neck bones
-  const neckBoneNames = [
-    'Bip002-Neck_009',
-    'Bip002-Head_015',
-  ]
-  
-  // Tail bones
-  const tailBoneNames = [
-    'Bip002-Tail1_0215',
-    'Bip002-Tail2_0216',
-    'Bip002-Tail3_0217',
-    'Bip002-Tail4_0218',
-    'Bip002-Tail5_0219',
-    'Bip002-Tail6_01',
-  ]
-  
-  // Leg bones
-  const leftLegNames = ['Bip002-L-Thigh_0186', 'Bip002-L-Calf_0187', 'Bip002-L-Foot_0188']
-  const rightLegNames = ['Bip002-R-Thigh_0201', 'Bip002-R-Calf_00', 'Bip002-R-Foot_0202']
-  
-  // Wing bones
-  const leftWingNames = [
-    'Bip002-L-UpperArm_050',
-    'Bip002-L-Forearm_0231',
-    'Bip002-L-Hand_0234',
-    'Bip002-L-Finger1_0235',
-    'Bip002-L-Finger2_0238',
-    'Bip002-L-Finger31_0241',
-    'Bip002-L-Finger32_end_0243',
-  ]
-  const rightWingNames = [
-    'Bip002-R-UpperArm_087',
-    'Bip002-R-Forearm_0245',
-    'Bip002-R-Hand_0248',
-    'Bip002-R-Finger1_0249',
-    'Bip002-R-Finger2_0251',
-    'Bip002-R-Finger31_0244',
-    'Bip002-R-Finger32_end_0254',
-  ]
-  
-  const findBone = (name: string): Object3D | null => root.getObjectByName(name) ?? null
-  const findBones = (names: readonly string[]): Object3D[] =>
-    names.map(findBone).filter((b): b is Object3D => b !== null)
-  
   return {
-    spineBones: findBones(spineBoneNames),
-    neckBones: findBones(neckBoneNames),
-    headBone: findBone('Bip002-Head_015'),
-    tailBones: findBones(tailBoneNames),
-    leftLegBones: findBones(leftLegNames),
-    rightLegBones: findBones(rightLegNames),
-    leftWingBones: findBones(leftWingNames),
-    rightWingBones: findBones(rightWingNames),
+    spineBones: findChain(root, SPINE_CHAIN),
+    neckBones: findChain(root, NECK_CHAIN),
+    headBone: findBone(root, HEAD_BONE),
+    tailBones: findChain(root, TAIL_CHAIN),
+    leftLegBones: findChain(root, LEFT_LEG_CHAIN),
+    rightLegBones: findChain(root, RIGHT_LEG_CHAIN),
+    leftWingBones: findChain(root, LEFT_WING_CHAIN),
+    rightWingBones: findChain(root, RIGHT_WING_CHAIN),
   }
 }
 

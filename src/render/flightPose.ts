@@ -332,18 +332,17 @@ export function headNeckTargets(
   // Head leads into turns more prominently at speed
   const turnLeadBase = 0.35
   const turnLeadEnhanced = turnLeadBase + (clamp(speedRatio, 0.5, 1.5) - 0.5) * 0.25
-  // Sign measured, not assumed, and it was inverted here for as long as this
-  // existed. Positive yaw on the neck's local Y turns the head toward the rig's
-  // *right* (probed: 0.055 rad moves the head -0.13 in x, and +x is the rig's
-  // left). `flightPoseTargets` banks left on a negative `yawRate`, so a left
-  // turn needs a negative offset to reach the inside of it — and `-yawRate`
-  // produced a positive one, sending the head to the outside. The authored
-  // `neck_bank` carried the identical inversion; see `neck_lean` in
-  // `scripts/author-drogon-sanctuary.py`.
+  // The head must lead to the *inside* of a turn. `flightPoseTargets` banks
+  // left on a negative `yawRate`, so a left turn needs whichever sign puts the
+  // skull inboard — on the vendor rig that was measured as `+yawRate`, and it
+  // had been inverted here for as long as this existed.
+  //
+  // The clean rig moved yaw off local Y onto local Z (see `boneOffsets`), so
+  // that measurement no longer transfers. Sign unverified on this rig; confirm
+  // it on the first live turn and flip if the head leans outboard.
   const turnLeadYaw = clamp(yawRate * turnLeadEnhanced, -0.45, 0.45)
 
-  // Split to match `NECK_LEAN_WEIGHTS` in the authoring script, because the
-  // runtime lean and the authored bank lean are one gesture: both put the
+  // The runtime lean and the authored bank lean are one gesture: both put the
   // majority on the last neck bone and the rest on the skull.
   const neckYaw = turnLeadYaw * 0.55
   const headYaw = turnLeadYaw * 0.45

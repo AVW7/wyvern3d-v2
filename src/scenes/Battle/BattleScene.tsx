@@ -23,6 +23,15 @@ import { PlaceholderWyvern } from '@/render/placeholders/PlaceholderWyvern'
 import { BreathVFX } from '@/render/vfx/BreathVFX'
 import { GameModel, type ModelActionRequest } from '@/render/assets/GameModel'
 import type { ModelState } from '@/render/assets/manifest'
+import {
+  HEAD_BONE,
+  HIND_LEG_CHAINS,
+  JAW_BONE,
+  NECK_CHAIN,
+  TAIL_CHAIN,
+  findBone,
+  findChain,
+} from '@/render/rigBones'
 import { applyBoneOffset, applyLegTuck, applyNeckOffset } from '@/render/boneOffsets'
 import { createTailState, dynamicTailController, type TailState } from '@/render/tailController'
 import { createLegsState, dynamicLegController, type LegsState } from '@/render/legPhysics'
@@ -328,32 +337,12 @@ function WyvernActorView({ actor, index, piloted }: { actor: Actor; index: numbe
   const flashElapsed = useRef<number | null>(null)
   const handleReady = useCallback((root: Group) => {
     materials.current = collectMaterials(root)
-    neckBones.current = [
-      root.getObjectByName('Bip002-Neck_012'),
-      root.getObjectByName('Bip002-Neck1_013'),
-      root.getObjectByName('Bip002-Neck2_014'),
-    ].filter((b): b is Object3D => b !== null && b !== undefined)
-    headBone.current = root.getObjectByName('Bip002-Head_015') ?? null
-    jawBone.current = root.getObjectByName('Bip002-Ponytail1_016') ?? null
+    neckBones.current = findChain(root, NECK_CHAIN)
+    headBone.current = findBone(root, HEAD_BONE)
+    jawBone.current = findBone(root, JAW_BONE)
     closedJaw.current = captureClosedJawPose(jawBone.current, closedJaw.current)
-    legBones.current = [
-      ['Bip002-L-Thigh_0186', 'Bip002-L-Calf_0187', 'Bip002-L-Foot_0188'],
-      ['Bip002-R-Thigh_0201', 'Bip002-R-Calf_00', 'Bip002-R-Foot_0202'],
-    ].map((chain) =>
-      chain
-        .map((name) => root.getObjectByName(name))
-        .filter((bone): bone is Object3D => bone !== null && bone !== undefined),
-    )
-    tailBones.current = [
-      'Bip002-Tail1_0215',
-      'Bip002-Tail2_0216',
-      'Bip002-Tail3_0217',
-      'Bip002-Tail4_0218',
-      'Bip002-Tail5_0219',
-      'Bip002-Tail6_01',
-    ]
-      .map((name) => root.getObjectByName(name))
-      .filter((bone): bone is Object3D => bone !== null && bone !== undefined)
+    legBones.current = HIND_LEG_CHAINS.map((chain) => findChain(root, chain))
+    tailBones.current = findChain(root, TAIL_CHAIN)
   }, [])
 
   useFrame((state, rawDelta) => {

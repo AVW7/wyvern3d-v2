@@ -1,8 +1,16 @@
 # Migration Status
 
 **Date:** August 3, 2026
-**Phase:** Foundation Complete → Rig Build Pending
+**Phase:** Clean rig exported → Scale normalization and animation authoring pending
 **Project:** `~/wyvern3d-v2`
+
+> **Current source of truth for scale/debugging:**
+> [`docs/MIGRATION_SCALE_AND_RIG_DEBUG.md`](docs/MIGRATION_SCALE_AND_RIG_DEBUG.md).
+> The clean 46-bone `wyvern.glb` has been exported and weight transfer completed.
+> Its measured export size is 5395.04 cm across X, so `scale: 0.01` renders it
+> at ~53.95 m rather than the old Flight Lab's ~45.4 m adult reference. Use
+> `scale: 0.0084` as the measured compatibility starting point; do not copy
+> vendor-rig yOffsets to the new rig.
 
 ---
 
@@ -182,24 +190,27 @@ public/models/drogon-sanctuary.glb → wyvern-animations.glb (sidecar)
 
 ## Next Steps
 
-### Phase 3: Build New Rig in Blender (Week 1)
+### Phase 3: Build New Rig in Blender ✅ Completed
 
-**Owner:** Blender artist / Claude Code with Blender MCP
+**Completed:** August 3, 2026
 
-1. Create new `.blend` file
-2. Import `drogon.glb` mesh (geometry only)
-3. Build new armature per `NEW_RIG_SPEC.md`
-4. Transfer weight painting (Data Transfer modifier)
-5. Verify T-pose renders correctly
-6. Export test GLB, verify in three.js
+1. Created `public/models/wyvern-rig.blend`
+2. Built the clean 46-bone armature with `RootMotion`
+3. Re-parented both wings to `Spine3`
+4. Transferred all mesh weights with full vertex coverage
+5. Exported `public/models/wyvern.glb`
+6. Inspected the actual GLB bounds instead of relying on the source-scale assumption
 
-**Verification:**
-- Mesh identical to original in T-pose
-- No unweighted vertices
-- Bone count ~50
-- All bones under 40-char names
+**Measured export result:** `wyvern.glb` is authored in centimetres and is
+`5395.04 × 1803.48 × 6139.24` across its raw X/Y/Z bounds. See
+[`docs/MIGRATION_SCALE_AND_RIG_DEBUG.md`](docs/MIGRATION_SCALE_AND_RIG_DEBUG.md)
+for the scale calculation, hierarchy validation, and repeatable debugging procedure.
 
-### Phase 4: Author Essential Clips (Week 2-3)
+**Remaining Phase 3 gate:** set the manifest compatibility scale to the measured
+initial value (`0.0084`) and validate the bind pose in the old-compatible Flight
+Lab camera before treating scale as locked.
+
+### Phase 4: Author Essential Clips (Next)
 
 **Owner:** Animator / Blender MCP
 

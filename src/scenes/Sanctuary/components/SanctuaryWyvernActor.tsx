@@ -4,27 +4,14 @@ import type { Group, Object3D } from 'three'
 import type { WyvernInstance } from '@/core/types'
 import { SPECIES } from '@/core/data/species'
 import { GameModel, type ModelActionRequest } from '@/render/assets/GameModel'
-import { DROGON_FIT, type ModelState } from '@/render/assets/manifest'
+import { type ModelState } from '@/render/assets/manifest'
+import { HEAD_BONE, HIND_LEG_CHAINS, JAW_BONE, TAIL_CHAIN } from '@/render/rigBones'
 import { PlaceholderWyvern } from '@/render/placeholders/PlaceholderWyvern'
 import { WorldLabel } from '@/render/labels/WorldLabel'
 
-/** The dragon lower-muzzle control; B_Face_Jaw belongs to the rider skeleton. */
-const JAW = 'Bip002-Ponytail1_016'
-const HEAD = 'Bip002-Head_015'
+const JAW = JAW_BONE
+const HEAD = HEAD_BONE
 const TRANSIT_ALTITUDE = 22
-const HIND_LEG_CHAINS = [
-  ['Bip002-L-Thigh_0186', 'Bip002-L-Calf_0187', 'Bip002-L-Foot_0188'],
-  ['Bip002-R-Thigh_0201', 'Bip002-R-Calf_00', 'Bip002-R-Foot_0202'],
-] as const
-/** Root to tip; the same six bones the authoring script's `TAIL` names. */
-const TAIL_CHAIN = [
-  'Bip002-Tail1_0215',
-  'Bip002-Tail2_0216',
-  'Bip002-Tail3_0217',
-  'Bip002-Tail4_0218',
-  'Bip002-Tail5_0219',
-  'Bip002-Tail6_01',
-] as const
 
 export interface VisualState {
   state: ModelState
@@ -38,8 +25,11 @@ export function stageScale(wyvern: WyvernInstance): number {
   return 1
 }
 
+/** Adult crown height in metres: the `idle` pose measures 10.7 at manifest fit. */
+const ADULT_HEIGHT = 11
+
 export function modelHeight(wyvern: WyvernInstance): number {
-  return stageScale(wyvern) * 11 * DROGON_FIT
+  return stageScale(wyvern) * ADULT_HEIGHT
 }
 
 function SelectionRing({ scale, airborne }: { scale: number; airborne: boolean }) {
