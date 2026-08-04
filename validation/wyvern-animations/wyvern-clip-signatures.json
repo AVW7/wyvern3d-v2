@@ -1,0 +1,3921 @@
+{
+  "about": "measured on public/models/wyvern-rig.blend; regenerate with pnpm assets:wyvern-clips --measure",
+  "chain_seams": {
+    "land->idle": 0.0,
+    "takeoff->cruise": 0.0
+  },
+  "clips": {
+    "attack": {
+      "action": "attack",
+      "channels": {
+        "body_axis_deg": {
+          "max": 25.048,
+          "min": 1.9741,
+          "range": 23.0739
+        },
+        "foot_L_fwd": {
+          "max": -2.4212,
+          "min": -3.9175,
+          "range": 1.4963
+        },
+        "foot_L_lat": {
+          "max": 2.1146,
+          "min": 1.8983,
+          "range": 0.2163
+        },
+        "foot_L_up": {
+          "max": 1.8024,
+          "min": 1.5857,
+          "range": 0.2167
+        },
+        "foot_R_fwd": {
+          "max": -2.4212,
+          "min": -3.9175,
+          "range": 1.4963
+        },
+        "foot_R_lat": {
+          "max": -1.8983,
+          "min": -2.1146,
+          "range": 0.2163
+        },
+        "foot_R_up": {
+          "max": 1.8024,
+          "min": 1.5857,
+          "range": 0.2167
+        },
+        "foot_symmetry_error": {
+          "max": 0.0,
+          "min": 0.0,
+          "range": 0.0
+        },
+        "head_fwd": {
+          "max": 9.5682,
+          "min": 7.1684,
+          "range": 2.3998
+        },
+        "head_lat": {
+          "max": 0.0001,
+          "min": -0.0,
+          "range": 0.0001
+        },
+        "head_pitch_deg": {
+          "max": 57.5173,
+          "min": -69.3751,
+          "range": 126.8923
+        },
+        "head_up": {
+          "max": 5.811,
+          "min": -3.6488,
+          "range": 9.4598
+        },
+        "knuckle_L_fwd": {
+          "max": -2.6644,
+          "min": -3.406,
+          "range": 0.7416
+        },
+        "knuckle_L_up": {
+          "max": 7.0466,
+          "min": 5.9842,
+          "range": 1.0624
+        },
+        "knuckle_R_fwd": {
+          "max": -2.6726,
+          "min": -3.1789,
+          "range": 0.5063
+        },
+        "knuckle_R_up": {
+          "max": 7.471,
+          "min": 5.47,
+          "range": 2.001
+        },
+        "knuckle_above_toe": {
+          "max": 4.9624,
+          "min": 3.7163,
+          "range": 1.2461
+        },
+        "lowest_bone_up": {
+          "max": 0.0,
+          "min": 0.0,
+          "range": 0.0
+        },
+        "pelvis_up": {
+          "max": 5.125,
+          "min": 5.1217,
+          "range": 0.0033
+        },
+        "tail_back": {
+          "max": 19.9709,
+          "min": 14.7874,
+          "range": 5.1835
+        },
+        "tail_lat": {
+          "max": 0.0,
+          "min": -0.0,
+          "range": 0.0001
+        },
+        "tail_up": {
+          "max": 10.1389,
+          "min": 2.3094,
+          "range": 7.8295
+        },
+        "wing_azim_L": {
+          "max": 18.2002,
+          "min": 15.7804,
+          "range": 2.4198
+        },
+        "wing_azim_R": {
+          "max": 17.431,
+          "min": 15.9347,
+          "range": 1.4962
+        },
+        "wing_azim_bias": {
+          "max": 1.9005,
+          "min": -0.6473,
+          "range": 2.5478
+        },
+        "wing_elev_L": {
+          "max": 5.0502,
+          "min": -2.2562,
+          "range": 7.3064
+        },
+        "wing_elev_R": {
+          "max": 9.0954,
+          "min": -4.1532,
+          "range": 13.2486
+        },
+        "wing_elev_bias": {
+          "max": 4.5742,
+          "min": -4.8638,
+          "range": 9.4379
+        },
+        "wing_span_L": {
+          "max": 23.2705,
+          "min": 23.24,
+          "range": 0.0305
+        },
+        "wing_span_R": {
+          "max": 23.2705,
+          "min": 23.24,
+          "range": 0.0305
+        },
+        "wing_symmetry_error": {
+          "max": 0.1205,
+          "min": 0.0116,
+          "range": 0.1089
+        },
+        "wrist_L_up": {
+          "max": 5.6753,
+          "min": 4.9504,
+          "range": 0.7249
+        },
+        "wrist_R_up": {
+          "max": 5.4981,
+          "min": 5.1144,
+          "range": 0.3837
+        }
+      },
+      "cycle": {
+        "beats": 1,
+        "cadence_hz": 1.0,
+        "stroke_deg": 7.31
+      },
+      "distal_wing_bone_count": 2,
+      "distal_wing_bones": [
+        "L_WingWrist",
+        "R_WingWrist"
+      ],
+      "duration_s": 1.0,
+      "fps": 24,
+      "frames": 25,
+      "gait_mirror": {
+        "error": 0.0326,
+        "foot": {
+          "error": 0.0,
+          "shift": 0.0
+        },
+        "knuckle": {
+          "error": 0.0326,
+          "shift": 0.6
+        }
+      },
+      "head_path": 21.5828,
+      "loop_seam_max": 0.0,
+      "lowest_bones": [
+        "Root"
+      ],
+      "lowest_vertex_frame": 12,
+      "lowest_vertex_up": -1.4993,
+      "moving_bone_count": 27,
+      "moving_bones": {
+        "Body": 9.96,
+        "Head": 22.75,
+        "Jaw": 18.0,
+        "L_Calf": 9.98,
+        "L_Thigh": 15.93,
+        "L_WingElbow": 2.0,
+        "L_WingShoulder": 1.2,
+        "L_WingWrist": 2.79,
+        "Neck1": 36.7,
+        "Neck2": 33.64,
+        "R_Calf": 9.98,
+        "R_Thigh": 15.93,
+        "R_WingElbow": 2.0,
+        "R_WingShoulder": 1.2,
+        "R_WingWrist": 2.79,
+        "Spine2": 11.16,
+        "Spine3": 13.63,
+        "Tail1": 3.48,
+        "Tail10": 11.94,
+        "Tail2": 4.42,
+        "Tail3": 5.36,
+        "Tail4": 6.3,
+        "Tail5": 7.24,
+        "Tail6": 8.18,
+        "Tail7": 9.12,
+        "Tail8": 10.06,
+        "Tail9": 11.0
+      },
+      "plant_offset_units": 208,
+      "tail_tip_path": 19.3065
+    },
+    "bankLeft": {
+      "action": "bankLeft",
+      "channels": {
+        "body_axis_deg": {
+          "max": 10.6707,
+          "min": 10.6707,
+          "range": 0.0
+        },
+        "foot_L_fwd": {
+          "max": -6.022,
+          "min": -6.023,
+          "range": 0.001
+        },
+        "foot_L_lat": {
+          "max": 1.8368,
+          "min": 1.8368,
+          "range": 0.0
+        },
+        "foot_L_up": {
+          "max": 4.6579,
+          "min": 4.6451,
+          "range": 0.0128
+        },
+        "foot_R_fwd": {
+          "max": -6.022,
+          "min": -6.023,
+          "range": 0.001
+        },
+        "foot_R_lat": {
+          "max": -1.8368,
+          "min": -1.8368,
+          "range": 0.0
+        },
+        "foot_R_up": {
+          "max": 4.6579,
+          "min": 4.6451,
+          "range": 0.0128
+        },
+        "foot_symmetry_error": {
+          "max": 0.0,
+          "min": 0.0,
+          "range": 0.0
+        },
+        "head_fwd": {
+          "max": 9.3655,
+          "min": 9.3655,
+          "range": 0.0
+        },
+        "head_lat": {
+          "max": -1.0092,
+          "min": -1.0092,
+          "range": 0.0
+        },
+        "head_pitch_deg": {
+          "max": -17.3212,
+          "min": -17.3212,
+          "range": 0.0
+        },
+        "head_up": {
+          "max": -0.0149,
+          "min": -0.0149,
+          "range": 0.0
+        },
+        "knuckle_L_fwd": {
+          "max": 5.8652,
+          "min": 2.3696,
+          "range": 3.4956
+        },
+        "knuckle_L_up": {
+          "max": 8.9148,
+          "min": -1.2635,
+          "range": 10.1783
+        },
+        "knuckle_R_fwd": {
+          "max": 7.7541,
+          "min": 1.6402,
+          "range": 6.1139
+        },
+        "knuckle_R_up": {
+          "max": 15.1048,
+          "min": -4.1513,
+          "range": 19.256
+        },
+        "knuckle_above_toe": {
+          "max": 4.2593,
+          "min": -8.801,
+          "range": 13.0603
+        },
+        "lowest_bone_up": {
+          "max": 0.0,
+          "min": -9.3944,
+          "range": 9.3944
+        },
+        "pelvis_up": {
+          "max": 5.1303,
+          "min": 5.1174,
+          "range": 0.0128
+        },
+        "tail_back": {
+          "max": 18.2629,
+          "min": 15.676,
+          "range": 2.5869
+        },
+        "tail_lat": {
+          "max": 9.2984,
+          "min": 7.0568,
+          "range": 2.2416
+        },
+        "tail_up": {
+          "max": 0.9527,
+          "min": -5.3923,
+          "range": 6.345
+        },
+        "wing_azim_L": {
+          "max": -6.3463,
+          "min": -23.1544,
+          "range": 16.8081
+        },
+        "wing_azim_R": {
+          "max": -3.7261,
+          "min": -39.1417,
+          "range": 35.4156
+        },
+        "wing_azim_bias": {
+          "max": 15.9873,
+          "min": -2.694,
+          "range": 18.6813
+        },
+        "wing_elev_L": {
+          "max": 7.0399,
+          "min": -30.7654,
+          "range": 37.8053
+        },
+        "wing_elev_R": {
+          "max": 31.0642,
+          "min": -43.3052,
+          "range": 74.3694
+        },
+        "wing_elev_bias": {
+          "max": 12.5399,
+          "min": -24.0242,
+          "range": 36.5641
+        },
+        "wing_span_L": {
+          "max": 23.6366,
+          "min": 23.107,
+          "range": 0.5296
+        },
+        "wing_span_R": {
+          "max": 23.7307,
+          "min": 22.7455,
+          "range": 0.9852
+        },
+        "wing_symmetry_error": {
+          "max": 0.6331,
+          "min": 0.0904,
+          "range": 0.5427
+        },
+        "wrist_L_up": {
+          "max": 8.5333,
+          "min": 2.9498,
+          "range": 5.5835
+        },
+        "wrist_R_up": {
+          "max": 11.6447,
+          "min": 1.0918,
+          "range": 10.5529
+        }
+      },
+      "cycle": {
+        "beats": 3,
+        "cadence_hz": 1.5,
+        "stroke_deg": 37.81
+      },
+      "distal_wing_bone_count": 12,
+      "distal_wing_bones": [
+        "L_WingFinger1",
+        "L_WingFinger2",
+        "L_WingFinger3",
+        "L_WingMembrane1",
+        "L_WingMembrane2",
+        "L_WingWrist",
+        "R_WingFinger1",
+        "R_WingFinger2",
+        "R_WingFinger3",
+        "R_WingMembrane1",
+        "R_WingMembrane2",
+        "R_WingWrist"
+      ],
+      "duration_s": 2.0,
+      "fps": 24,
+      "frames": 49,
+      "gait_mirror": {
+        "error": 0.225,
+        "foot": {
+          "error": 0.0,
+          "shift": 0.0
+        },
+        "knuckle": {
+          "error": 0.225,
+          "shift": 0.0
+        }
+      },
+      "head_path": 0.0,
+      "loop_seam_max": 0.0,
+      "lowest_bones": [
+        "R_WingFinger1_end",
+        "Root",
+        "Tail10"
+      ],
+      "lowest_vertex_frame": 45,
+      "lowest_vertex_up": -12.5808,
+      "moving_bone_count": 27,
+      "moving_bones": {
+        "Body": 1.79,
+        "L_WingElbow": 12.48,
+        "L_WingFinger1": 6.48,
+        "L_WingFinger2": 5.51,
+        "L_WingFinger3": 4.53,
+        "L_WingMembrane1": 4.88,
+        "L_WingMembrane2": 3.91,
+        "L_WingShoulder": 27.1,
+        "L_WingWrist": 9.18,
+        "R_WingElbow": 24.96,
+        "R_WingFinger1": 12.96,
+        "R_WingFinger2": 11.01,
+        "R_WingFinger3": 9.07,
+        "R_WingMembrane1": 9.77,
+        "R_WingMembrane2": 7.81,
+        "R_WingShoulder": 54.2,
+        "R_WingWrist": 18.36,
+        "Tail1": 2.24,
+        "Tail10": 7.68,
+        "Tail2": 2.8,
+        "Tail3": 3.45,
+        "Tail4": 4.02,
+        "Tail5": 4.64,
+        "Tail6": 5.25,
+        "Tail7": 5.81,
+        "Tail8": 6.47,
+        "Tail9": 6.95
+      },
+      "plant_offset_units": 1747,
+      "tail_tip_path": 44.0144
+    },
+    "bankRight": {
+      "action": "bankRight",
+      "channels": {
+        "body_axis_deg": {
+          "max": 10.6707,
+          "min": 10.6707,
+          "range": 0.0
+        },
+        "foot_L_fwd": {
+          "max": -6.022,
+          "min": -6.023,
+          "range": 0.001
+        },
+        "foot_L_lat": {
+          "max": 1.8368,
+          "min": 1.8368,
+          "range": 0.0
+        },
+        "foot_L_up": {
+          "max": 4.6579,
+          "min": 4.6451,
+          "range": 0.0128
+        },
+        "foot_R_fwd": {
+          "max": -6.022,
+          "min": -6.023,
+          "range": 0.001
+        },
+        "foot_R_lat": {
+          "max": -1.8368,
+          "min": -1.8368,
+          "range": 0.0
+        },
+        "foot_R_up": {
+          "max": 4.6579,
+          "min": 4.6451,
+          "range": 0.0128
+        },
+        "foot_symmetry_error": {
+          "max": 0.0,
+          "min": 0.0,
+          "range": 0.0
+        },
+        "head_fwd": {
+          "max": 9.3655,
+          "min": 9.3655,
+          "range": 0.0
+        },
+        "head_lat": {
+          "max": 1.0092,
+          "min": 1.0092,
+          "range": 0.0
+        },
+        "head_pitch_deg": {
+          "max": -17.3211,
+          "min": -17.3211,
+          "range": 0.0
+        },
+        "head_up": {
+          "max": -0.0149,
+          "min": -0.0149,
+          "range": 0.0
+        },
+        "knuckle_L_fwd": {
+          "max": 7.7541,
+          "min": 1.6402,
+          "range": 6.1139
+        },
+        "knuckle_L_up": {
+          "max": 15.1048,
+          "min": -4.1513,
+          "range": 19.256
+        },
+        "knuckle_R_fwd": {
+          "max": 5.8652,
+          "min": 2.3695,
+          "range": 3.4956
+        },
+        "knuckle_R_up": {
+          "max": 8.9148,
+          "min": -1.2635,
+          "range": 10.1783
+        },
+        "knuckle_above_toe": {
+          "max": 4.2593,
+          "min": -8.801,
+          "range": 13.0603
+        },
+        "lowest_bone_up": {
+          "max": 0.0,
+          "min": -9.3944,
+          "range": 9.3944
+        },
+        "pelvis_up": {
+          "max": 5.1303,
+          "min": 5.1174,
+          "range": 0.0128
+        },
+        "tail_back": {
+          "max": 17.6353,
+          "min": 16.5338,
+          "range": 1.1015
+        },
+        "tail_lat": {
+          "max": -6.9025,
+          "min": -9.499,
+          "range": 2.5964
+        },
+        "tail_up": {
+          "max": 1.0665,
+          "min": -5.6693,
+          "range": 6.7358
+        },
+        "wing_azim_L": {
+          "max": -3.7263,
+          "min": -39.1417,
+          "range": 35.4154
+        },
+        "wing_azim_R": {
+          "max": -6.3462,
+          "min": -23.1544,
+          "range": 16.8082
+        },
+        "wing_azim_bias": {
+          "max": 2.6938,
+          "min": -15.9872,
+          "range": 18.681
+        },
+        "wing_elev_L": {
+          "max": 31.0641,
+          "min": -43.3052,
+          "range": 74.3694
+        },
+        "wing_elev_R": {
+          "max": 7.0399,
+          "min": -30.7653,
+          "range": 37.8053
+        },
+        "wing_elev_bias": {
+          "max": 24.0242,
+          "min": -12.5399,
+          "range": 36.5641
+        },
+        "wing_span_L": {
+          "max": 23.7307,
+          "min": 22.7455,
+          "range": 0.9852
+        },
+        "wing_span_R": {
+          "max": 23.6366,
+          "min": 23.107,
+          "range": 0.5296
+        },
+        "wing_symmetry_error": {
+          "max": 0.6331,
+          "min": 0.0904,
+          "range": 0.5427
+        },
+        "wrist_L_up": {
+          "max": 11.6447,
+          "min": 1.0918,
+          "range": 10.5529
+        },
+        "wrist_R_up": {
+          "max": 8.5333,
+          "min": 2.9498,
+          "range": 5.5835
+        }
+      },
+      "cycle": {
+        "beats": 3,
+        "cadence_hz": 1.5,
+        "stroke_deg": 74.37
+      },
+      "distal_wing_bone_count": 12,
+      "distal_wing_bones": [
+        "L_WingFinger1",
+        "L_WingFinger2",
+        "L_WingFinger3",
+        "L_WingMembrane1",
+        "L_WingMembrane2",
+        "L_WingWrist",
+        "R_WingFinger1",
+        "R_WingFinger2",
+        "R_WingFinger3",
+        "R_WingMembrane1",
+        "R_WingMembrane2",
+        "R_WingWrist"
+      ],
+      "duration_s": 2.0,
+      "fps": 24,
+      "frames": 49,
+      "gait_mirror": {
+        "error": 0.2263,
+        "foot": {
+          "error": 0.0,
+          "shift": 0.0
+        },
+        "knuckle": {
+          "error": 0.2263,
+          "shift": 0.0
+        }
+      },
+      "head_path": 0.0,
+      "loop_seam_max": 0.0,
+      "lowest_bones": [
+        "L_WingFinger1_end",
+        "Root",
+        "Tail10"
+      ],
+      "lowest_vertex_frame": 45,
+      "lowest_vertex_up": -12.5808,
+      "moving_bone_count": 27,
+      "moving_bones": {
+        "Body": 1.79,
+        "L_WingElbow": 24.96,
+        "L_WingFinger1": 12.96,
+        "L_WingFinger2": 11.01,
+        "L_WingFinger3": 9.07,
+        "L_WingMembrane1": 9.77,
+        "L_WingMembrane2": 7.81,
+        "L_WingShoulder": 54.2,
+        "L_WingWrist": 18.36,
+        "R_WingElbow": 12.48,
+        "R_WingFinger1": 6.48,
+        "R_WingFinger2": 5.51,
+        "R_WingFinger3": 4.53,
+        "R_WingMembrane1": 4.88,
+        "R_WingMembrane2": 3.91,
+        "R_WingShoulder": 27.1,
+        "R_WingWrist": 9.18,
+        "Tail1": 2.24,
+        "Tail10": 7.68,
+        "Tail2": 2.8,
+        "Tail3": 3.45,
+        "Tail4": 4.02,
+        "Tail5": 4.64,
+        "Tail6": 5.25,
+        "Tail7": 5.81,
+        "Tail8": 6.47,
+        "Tail9": 6.95
+      },
+      "plant_offset_units": 1747,
+      "tail_tip_path": 44.5649
+    },
+    "breath": {
+      "action": "breath",
+      "channels": {
+        "body_axis_deg": {
+          "max": 20.1934,
+          "min": 15.525,
+          "range": 4.6683
+        },
+        "foot_L_fwd": {
+          "max": -2.5491,
+          "min": -2.5569,
+          "range": 0.0078
+        },
+        "foot_L_lat": {
+          "max": 1.9406,
+          "min": 1.9406,
+          "range": 0.0
+        },
+        "foot_L_up": {
+          "max": 1.6193,
+          "min": 1.6074,
+          "range": 0.0119
+        },
+        "foot_R_fwd": {
+          "max": -2.5491,
+          "min": -2.5568,
+          "range": 0.0078
+        },
+        "foot_R_lat": {
+          "max": -1.9406,
+          "min": -1.9406,
+          "range": 0.0
+        },
+        "foot_R_up": {
+          "max": 1.6193,
+          "min": 1.6074,
+          "range": 0.0119
+        },
+        "foot_symmetry_error": {
+          "max": 0.0,
+          "min": 0.0,
+          "range": 0.0
+        },
+        "head_fwd": {
+          "max": 9.2995,
+          "min": 9.1514,
+          "range": 0.1482
+        },
+        "head_lat": {
+          "max": 0.1623,
+          "min": -0.1622,
+          "range": 0.3245
+        },
+        "head_pitch_deg": {
+          "max": 2.3474,
+          "min": -4.7414,
+          "range": 7.0888
+        },
+        "head_up": {
+          "max": 2.52,
+          "min": 2.2372,
+          "range": 0.2828
+        },
+        "knuckle_L_fwd": {
+          "max": -2.7645,
+          "min": -3.3962,
+          "range": 0.6317
+        },
+        "knuckle_L_up": {
+          "max": 6.4097,
+          "min": 5.1306,
+          "range": 1.2792
+        },
+        "knuckle_R_fwd": {
+          "max": -2.7644,
+          "min": -3.3961,
+          "range": 0.6317
+        },
+        "knuckle_R_up": {
+          "max": 6.4097,
+          "min": 5.1306,
+          "range": 1.2792
+        },
+        "knuckle_above_toe": {
+          "max": 4.7923,
+          "min": 3.5115,
+          "range": 1.2808
+        },
+        "lowest_bone_up": {
+          "max": 0.0,
+          "min": 0.0,
+          "range": 0.0
+        },
+        "pelvis_up": {
+          "max": 5.1292,
+          "min": 5.1172,
+          "range": 0.0119
+        },
+        "tail_back": {
+          "max": 18.9306,
+          "min": 16.661,
+          "range": 2.2695
+        },
+        "tail_lat": {
+          "max": 4.0853,
+          "min": -3.7819,
+          "range": 7.8673
+        },
+        "tail_up": {
+          "max": 8.0314,
+          "min": 4.1647,
+          "range": 3.8667
+        },
+        "wing_azim_L": {
+          "max": 18.1889,
+          "min": 15.7062,
+          "range": 2.4828
+        },
+        "wing_azim_R": {
+          "max": 18.1886,
+          "min": 15.7058,
+          "range": 2.4828
+        },
+        "wing_azim_bias": {
+          "max": 0.0004,
+          "min": 0.0002,
+          "range": 0.0001
+        },
+        "wing_elev_L": {
+          "max": 0.8926,
+          "min": -4.4606,
+          "range": 5.3531
+        },
+        "wing_elev_R": {
+          "max": 0.8926,
+          "min": -4.4606,
+          "range": 5.3531
+        },
+        "wing_elev_bias": {
+          "max": 0.0,
+          "min": -0.0,
+          "range": 0.0
+        },
+        "wing_span_L": {
+          "max": 23.2717,
+          "min": 23.2381,
+          "range": 0.0336
+        },
+        "wing_span_R": {
+          "max": 23.2717,
+          "min": 23.2381,
+          "range": 0.0336
+        },
+        "wing_symmetry_error": {
+          "max": 0.0,
+          "min": 0.0,
+          "range": 0.0
+        },
+        "wrist_L_up": {
+          "max": 5.5423,
+          "min": 5.0125,
+          "range": 0.5298
+        },
+        "wrist_R_up": {
+          "max": 5.5423,
+          "min": 5.0125,
+          "range": 0.5298
+        }
+      },
+      "cycle": {
+        "beats": 2,
+        "cadence_hz": 1.0,
+        "stroke_deg": 5.35
+      },
+      "distal_wing_bone_count": 2,
+      "distal_wing_bones": [
+        "L_WingWrist",
+        "R_WingWrist"
+      ],
+      "duration_s": 2.0,
+      "fps": 24,
+      "frames": 49,
+      "gait_mirror": {
+        "error": 0.0,
+        "foot": {
+          "error": 0.0,
+          "shift": 0.0
+        },
+        "knuckle": {
+          "error": 0.0,
+          "shift": 0.0
+        }
+      },
+      "head_path": 3.3302,
+      "loop_seam_max": 0.0,
+      "lowest_bones": [
+        "Root"
+      ],
+      "lowest_vertex_frame": 9,
+      "lowest_vertex_up": 0.5152,
+      "moving_bone_count": 23,
+      "moving_bones": {
+        "Body": 1.57,
+        "Head": 5.85,
+        "Jaw": 5.82,
+        "L_WingElbow": 2.2,
+        "L_WingShoulder": 1.32,
+        "L_WingWrist": 3.07,
+        "Neck1": 3.91,
+        "Neck2": 4.7,
+        "R_WingElbow": 2.2,
+        "R_WingShoulder": 1.32,
+        "R_WingWrist": 3.07,
+        "Spine2": 4.75,
+        "Spine3": 3.35,
+        "Tail1": 3.15,
+        "Tail10": 10.76,
+        "Tail2": 4.0,
+        "Tail3": 4.84,
+        "Tail4": 5.66,
+        "Tail5": 6.51,
+        "Tail6": 7.38,
+        "Tail7": 8.25,
+        "Tail8": 9.1,
+        "Tail9": 9.94
+      },
+      "plant_offset_units": -72,
+      "tail_tip_path": 37.4026
+    },
+    "cruise": {
+      "action": "cruise",
+      "channels": {
+        "body_axis_deg": {
+          "max": 10.6707,
+          "min": 10.6707,
+          "range": 0.0
+        },
+        "foot_L_fwd": {
+          "max": -6.022,
+          "min": -6.023,
+          "range": 0.001
+        },
+        "foot_L_lat": {
+          "max": 1.8368,
+          "min": 1.8368,
+          "range": 0.0
+        },
+        "foot_L_up": {
+          "max": 4.6579,
+          "min": 4.6451,
+          "range": 0.0128
+        },
+        "foot_R_fwd": {
+          "max": -6.022,
+          "min": -6.023,
+          "range": 0.001
+        },
+        "foot_R_lat": {
+          "max": -1.8368,
+          "min": -1.8368,
+          "range": 0.0
+        },
+        "foot_R_up": {
+          "max": 4.6579,
+          "min": 4.6451,
+          "range": 0.0128
+        },
+        "foot_symmetry_error": {
+          "max": 0.0,
+          "min": 0.0,
+          "range": 0.0
+        },
+        "head_fwd": {
+          "max": 9.4807,
+          "min": 9.4807,
+          "range": 0.0
+        },
+        "head_lat": {
+          "max": 0.0,
+          "min": 0.0,
+          "range": 0.0
+        },
+        "head_pitch_deg": {
+          "max": -17.2771,
+          "min": -17.2771,
+          "range": 0.0
+        },
+        "head_up": {
+          "max": -0.0111,
+          "min": -0.0111,
+          "range": 0.0
+        },
+        "knuckle_L_fwd": {
+          "max": 7.0845,
+          "min": 1.8481,
+          "range": 5.2364
+        },
+        "knuckle_L_up": {
+          "max": 12.8213,
+          "min": -3.1459,
+          "range": 15.9672
+        },
+        "knuckle_R_fwd": {
+          "max": 7.0845,
+          "min": 1.8481,
+          "range": 5.2364
+        },
+        "knuckle_R_up": {
+          "max": 12.8213,
+          "min": -3.1459,
+          "range": 15.9672
+        },
+        "knuckle_above_toe": {
+          "max": 8.1658,
+          "min": -7.7956,
+          "range": 15.9614
+        },
+        "lowest_bone_up": {
+          "max": 0.0,
+          "min": -8.0582,
+          "range": 8.0582
+        },
+        "pelvis_up": {
+          "max": 5.1303,
+          "min": 5.1174,
+          "range": 0.0128
+        },
+        "tail_back": {
+          "max": 20.1144,
+          "min": 18.9725,
+          "range": 1.1418
+        },
+        "tail_lat": {
+          "max": 1.4701,
+          "min": -1.529,
+          "range": 2.9992
+        },
+        "tail_up": {
+          "max": 0.9102,
+          "min": -6.0745,
+          "range": 6.9847
+        },
+        "wing_azim_L": {
+          "max": -4.5404,
+          "min": -32.2636,
+          "range": 27.7232
+        },
+        "wing_azim_R": {
+          "max": -4.5403,
+          "min": -32.2636,
+          "range": 27.7233
+        },
+        "wing_azim_bias": {
+          "max": 0.0,
+          "min": -0.0001,
+          "range": 0.0001
+        },
+        "wing_elev_L": {
+          "max": 21.7278,
+          "min": -38.737,
+          "range": 60.4648
+        },
+        "wing_elev_R": {
+          "max": 21.7278,
+          "min": -38.737,
+          "range": 60.4648
+        },
+        "wing_elev_bias": {
+          "max": -0.0,
+          "min": -0.0,
+          "range": 0.0
+        },
+        "wing_span_L": {
+          "max": 23.7118,
+          "min": 22.8937,
+          "range": 0.8181
+        },
+        "wing_span_R": {
+          "max": 23.7118,
+          "min": 22.8937,
+          "range": 0.8181
+        },
+        "wing_symmetry_error": {
+          "max": 0.0,
+          "min": 0.0,
+          "range": 0.0
+        },
+        "wrist_L_up": {
+          "max": 10.5125,
+          "min": 1.7664,
+          "range": 8.7461
+        },
+        "wrist_R_up": {
+          "max": 10.5125,
+          "min": 1.7664,
+          "range": 8.7461
+        }
+      },
+      "cycle": {
+        "beats": 3,
+        "cadence_hz": 1.5,
+        "stroke_deg": 60.46
+      },
+      "distal_wing_bone_count": 12,
+      "distal_wing_bones": [
+        "L_WingFinger1",
+        "L_WingFinger2",
+        "L_WingFinger3",
+        "L_WingMembrane1",
+        "L_WingMembrane2",
+        "L_WingWrist",
+        "R_WingFinger1",
+        "R_WingFinger2",
+        "R_WingFinger3",
+        "R_WingMembrane1",
+        "R_WingMembrane2",
+        "R_WingWrist"
+      ],
+      "duration_s": 2.0,
+      "fps": 24,
+      "frames": 49,
+      "gait_mirror": {
+        "error": 0.0,
+        "foot": {
+          "error": 0.0,
+          "shift": 0.0
+        },
+        "knuckle": {
+          "error": 0.0,
+          "shift": 0.0
+        }
+      },
+      "head_path": 0.0,
+      "loop_seam_max": 0.0,
+      "lowest_bones": [
+        "L_WingFinger1_end",
+        "R_WingFinger1_end",
+        "Root",
+        "Tail10"
+      ],
+      "lowest_vertex_frame": 45,
+      "lowest_vertex_up": -11.6824,
+      "moving_bone_count": 27,
+      "moving_bones": {
+        "Body": 1.79,
+        "L_WingElbow": 20.13,
+        "L_WingFinger1": 10.45,
+        "L_WingFinger2": 8.88,
+        "L_WingFinger3": 7.31,
+        "L_WingMembrane1": 7.88,
+        "L_WingMembrane2": 6.3,
+        "L_WingShoulder": 43.71,
+        "L_WingWrist": 14.8,
+        "R_WingElbow": 20.13,
+        "R_WingFinger1": 10.45,
+        "R_WingFinger2": 8.88,
+        "R_WingFinger3": 7.31,
+        "R_WingMembrane1": 7.88,
+        "R_WingMembrane2": 6.3,
+        "R_WingShoulder": 43.71,
+        "R_WingWrist": 14.8,
+        "Tail1": 2.24,
+        "Tail10": 7.68,
+        "Tail2": 2.8,
+        "Tail3": 3.45,
+        "Tail4": 4.02,
+        "Tail5": 4.64,
+        "Tail6": 5.25,
+        "Tail7": 5.81,
+        "Tail8": 6.47,
+        "Tail9": 6.95
+      },
+      "plant_offset_units": 1623,
+      "tail_tip_path": 46.8598
+    },
+    "death": {
+      "action": "death",
+      "channels": {
+        "body_axis_deg": {
+          "max": 32.1887,
+          "min": -24.1975,
+          "range": 56.3862
+        },
+        "foot_L_fwd": {
+          "max": -1.1441,
+          "min": -3.6042,
+          "range": 2.4601
+        },
+        "foot_L_lat": {
+          "max": 3.2843,
+          "min": 1.5201,
+          "range": 1.7641
+        },
+        "foot_L_up": {
+          "max": 4.5868,
+          "min": 1.5857,
+          "range": 3.0011
+        },
+        "foot_R_fwd": {
+          "max": -1.5634,
+          "min": -5.8568,
+          "range": 4.2935
+        },
+        "foot_R_lat": {
+          "max": 2.4033,
+          "min": -1.9906,
+          "range": 4.3939
+        },
+        "foot_R_up": {
+          "max": 4.5054,
+          "min": 1.5857,
+          "range": 2.9196
+        },
+        "foot_symmetry_error": {
+          "max": 8.7996,
+          "min": 0.0,
+          "range": 8.7996
+        },
+        "head_fwd": {
+          "max": 9.5128,
+          "min": 0.3253,
+          "range": 9.1875
+        },
+        "head_lat": {
+          "max": 0.3157,
+          "min": -3.9511,
+          "range": 4.2668
+        },
+        "head_pitch_deg": {
+          "max": 70.7639,
+          "min": -88.3477,
+          "range": 159.1116
+        },
+        "head_up": {
+          "max": 6.7764,
+          "min": -5.5784,
+          "range": 12.3548
+        },
+        "knuckle_L_fwd": {
+          "max": 8.678,
+          "min": -5.0305,
+          "range": 13.7085
+        },
+        "knuckle_L_up": {
+          "max": 20.893,
+          "min": -6.6681,
+          "range": 27.5611
+        },
+        "knuckle_R_fwd": {
+          "max": 0.5942,
+          "min": -14.0267,
+          "range": 14.6208
+        },
+        "knuckle_R_up": {
+          "max": 20.0807,
+          "min": -6.4504,
+          "range": 26.5311
+        },
+        "knuckle_above_toe": {
+          "max": 17.9686,
+          "min": -10.9558,
+          "range": 28.9244
+        },
+        "lowest_bone_up": {
+          "max": 0.0,
+          "min": -12.6637,
+          "range": 12.6637
+        },
+        "pelvis_up": {
+          "max": 5.2243,
+          "min": 4.4203,
+          "range": 0.804
+        },
+        "tail_back": {
+          "max": 20.1512,
+          "min": 11.5048,
+          "range": 8.6464
+        },
+        "tail_lat": {
+          "max": 7.6751,
+          "min": -6.214,
+          "range": 13.8891
+        },
+        "tail_up": {
+          "max": 11.2678,
+          "min": -6.2059,
+          "range": 17.4737
+        },
+        "wing_azim_L": {
+          "max": 30.4634,
+          "min": -41.8319,
+          "range": 72.2953
+        },
+        "wing_azim_R": {
+          "max": 87.4128,
+          "min": -38.0398,
+          "range": 125.4526
+        },
+        "wing_azim_bias": {
+          "max": 30.2316,
+          "min": -122.0087,
+          "range": 152.2403
+        },
+        "wing_elev_L": {
+          "max": 56.3622,
+          "min": -45.6641,
+          "range": 102.0264
+        },
+        "wing_elev_R": {
+          "max": 51.6462,
+          "min": -49.0071,
+          "range": 100.6533
+        },
+        "wing_elev_bias": {
+          "max": 6.5613,
+          "min": -6.5775,
+          "range": 13.1388
+        },
+        "wing_span_L": {
+          "max": 23.8092,
+          "min": 21.242,
+          "range": 2.5672
+        },
+        "wing_span_R": {
+          "max": 23.8092,
+          "min": 21.242,
+          "range": 2.5672
+        },
+        "wing_symmetry_error": {
+          "max": 5.07,
+          "min": 0.0,
+          "range": 5.07
+        },
+        "wrist_L_up": {
+          "max": 14.3547,
+          "min": -1.2555,
+          "range": 15.6101
+        },
+        "wrist_R_up": {
+          "max": 13.8433,
+          "min": -0.2372,
+          "range": 14.0805
+        }
+      },
+      "cycle": {
+        "beats": 0,
+        "cadence_hz": 0.0,
+        "stroke_deg": 102.03
+      },
+      "distal_wing_bone_count": 14,
+      "distal_wing_bones": [
+        "L_WingClaw",
+        "L_WingFinger1",
+        "L_WingFinger2",
+        "L_WingFinger3",
+        "L_WingMembrane1",
+        "L_WingMembrane2",
+        "L_WingWrist",
+        "R_WingClaw",
+        "R_WingFinger1",
+        "R_WingFinger2",
+        "R_WingFinger3",
+        "R_WingMembrane1",
+        "R_WingMembrane2",
+        "R_WingWrist"
+      ],
+      "duration_s": 4.0,
+      "fps": 24,
+      "frames": 97,
+      "gait_mirror": {
+        "error": 1.0089,
+        "foot": {
+          "error": 1.0089,
+          "shift": 0.99
+        },
+        "knuckle": {
+          "error": 0.6784,
+          "shift": 0.0
+        }
+      },
+      "head_path": 31.8419,
+      "loop_seam_max": 98.0,
+      "lowest_bones": [
+        "L_WingFinger1_end",
+        "R_WingFinger1_end",
+        "Root"
+      ],
+      "lowest_vertex_frame": 48,
+      "lowest_vertex_up": -17.8723,
+      "moving_bone_count": 43,
+      "moving_bones": {
+        "Body": 112.0,
+        "Head": 39.99,
+        "L_Calf": 70.0,
+        "L_Foot": 28.0,
+        "L_Thigh": 74.0,
+        "L_Toes": 24.0,
+        "L_WingClaw": 8.0,
+        "L_WingElbow": 68.0,
+        "L_WingFinger1": 58.0,
+        "L_WingFinger2": 52.48,
+        "L_WingFinger3": 46.96,
+        "L_WingMembrane1": 25.6,
+        "L_WingMembrane2": 20.2,
+        "L_WingShoulder": 73.98,
+        "L_WingWrist": 48.0,
+        "Neck1": 65.96,
+        "Neck2": 63.98,
+        "R_Calf": 70.0,
+        "R_Foot": 28.0,
+        "R_Thigh": 74.0,
+        "R_Toes": 24.0,
+        "R_WingClaw": 8.0,
+        "R_WingElbow": 68.0,
+        "R_WingFinger1": 58.0,
+        "R_WingFinger2": 52.48,
+        "R_WingFinger3": 46.96,
+        "R_WingMembrane1": 25.6,
+        "R_WingMembrane2": 20.2,
+        "R_WingShoulder": 73.98,
+        "R_WingWrist": 48.0,
+        "Spine1": 16.0,
+        "Spine2": 21.58,
+        "Spine3": 26.38,
+        "Tail1": 8.4,
+        "Tail10": 28.79,
+        "Tail2": 10.66,
+        "Tail3": 12.93,
+        "Tail4": 15.2,
+        "Tail5": 17.46,
+        "Tail6": 19.73,
+        "Tail7": 21.99,
+        "Tail8": 24.26,
+        "Tail9": 26.53
+      },
+      "plant_offset_units": 2482,
+      "tail_tip_path": 49.8421
+    },
+    "dive": {
+      "action": "dive",
+      "channels": {
+        "body_axis_deg": {
+          "max": -13.326,
+          "min": -13.326,
+          "range": 0.0
+        },
+        "foot_L_fwd": {
+          "max": -5.5863,
+          "min": -5.5866,
+          "range": 0.0003
+        },
+        "foot_L_lat": {
+          "max": 1.5031,
+          "min": 1.5031,
+          "range": 0.0
+        },
+        "foot_L_up": {
+          "max": 6.1587,
+          "min": 6.1544,
+          "range": 0.0043
+        },
+        "foot_R_fwd": {
+          "max": -5.5863,
+          "min": -5.5866,
+          "range": 0.0003
+        },
+        "foot_R_lat": {
+          "max": -1.5031,
+          "min": -1.5031,
+          "range": 0.0
+        },
+        "foot_R_up": {
+          "max": 6.1587,
+          "min": 6.1544,
+          "range": 0.0043
+        },
+        "foot_symmetry_error": {
+          "max": 0.0,
+          "min": 0.0,
+          "range": 0.0
+        },
+        "head_fwd": {
+          "max": 8.6482,
+          "min": 8.6482,
+          "range": 0.0
+        },
+        "head_lat": {
+          "max": -0.0001,
+          "min": -0.0001,
+          "range": 0.0
+        },
+        "head_pitch_deg": {
+          "max": -35.2771,
+          "min": -35.2771,
+          "range": 0.0
+        },
+        "head_up": {
+          "max": -3.5854,
+          "min": -3.5854,
+          "range": 0.0
+        },
+        "knuckle_L_fwd": {
+          "max": -11.1434,
+          "min": -12.4699,
+          "range": 1.3265
+        },
+        "knuckle_L_up": {
+          "max": 1.0869,
+          "min": -2.8702,
+          "range": 3.9571
+        },
+        "knuckle_R_fwd": {
+          "max": -11.1435,
+          "min": -12.4701,
+          "range": 1.3265
+        },
+        "knuckle_R_up": {
+          "max": 1.087,
+          "min": -2.8702,
+          "range": 3.9571
+        },
+        "knuckle_above_toe": {
+          "max": -5.0717,
+          "min": -9.0248,
+          "range": 3.9531
+        },
+        "lowest_bone_up": {
+          "max": -5.7253,
+          "min": -8.2104,
+          "range": 2.485
+        },
+        "pelvis_up": {
+          "max": 5.126,
+          "min": 5.1217,
+          "range": 0.0043
+        },
+        "tail_back": {
+          "max": 15.0373,
+          "min": 13.4221,
+          "range": 1.6152
+        },
+        "tail_lat": {
+          "max": 0.4876,
+          "min": -0.5304,
+          "range": 1.018
+        },
+        "tail_up": {
+          "max": -10.8507,
+          "min": -12.0535,
+          "range": 1.2028
+        },
+        "wing_azim_L": {
+          "max": 75.4509,
+          "min": 70.5362,
+          "range": 4.9146
+        },
+        "wing_azim_R": {
+          "max": 75.4518,
+          "min": 70.5372,
+          "range": 4.9146
+        },
+        "wing_azim_bias": {
+          "max": -0.001,
+          "min": -0.001,
+          "range": 0.0
+        },
+        "wing_elev_L": {
+          "max": -18.0174,
+          "min": -34.5877,
+          "range": 16.5703
+        },
+        "wing_elev_R": {
+          "max": -18.0173,
+          "min": -34.5876,
+          "range": 16.5702
+        },
+        "wing_elev_bias": {
+          "max": -0.0001,
+          "min": -0.0001,
+          "range": 0.0
+        },
+        "wing_span_L": {
+          "max": 23.021,
+          "min": 22.7167,
+          "range": 0.3043
+        },
+        "wing_span_R": {
+          "max": 23.021,
+          "min": 22.7167,
+          "range": 0.3043
+        },
+        "wing_symmetry_error": {
+          "max": 0.0001,
+          "min": 0.0001,
+          "range": 0.0
+        },
+        "wrist_L_up": {
+          "max": 4.5935,
+          "min": 2.4609,
+          "range": 2.1326
+        },
+        "wrist_R_up": {
+          "max": 4.5935,
+          "min": 2.4609,
+          "range": 2.1326
+        }
+      },
+      "cycle": {
+        "beats": 2,
+        "cadence_hz": 1.0,
+        "stroke_deg": 16.57
+      },
+      "distal_wing_bone_count": 12,
+      "distal_wing_bones": [
+        "L_WingFinger1",
+        "L_WingFinger2",
+        "L_WingFinger3",
+        "L_WingMembrane1",
+        "L_WingMembrane2",
+        "L_WingWrist",
+        "R_WingFinger1",
+        "R_WingFinger2",
+        "R_WingFinger3",
+        "R_WingMembrane1",
+        "R_WingMembrane2",
+        "R_WingWrist"
+      ],
+      "duration_s": 2.0,
+      "fps": 24,
+      "frames": 49,
+      "gait_mirror": {
+        "error": 0.0,
+        "foot": {
+          "error": 0.0,
+          "shift": 0.0
+        },
+        "knuckle": {
+          "error": 0.0,
+          "shift": 0.0
+        }
+      },
+      "head_path": 0.0,
+      "loop_seam_max": 0.0,
+      "lowest_bones": [
+        "L_WingFinger1_end",
+        "Tail10"
+      ],
+      "lowest_vertex_frame": 18,
+      "lowest_vertex_up": -4.0745,
+      "moving_bone_count": 27,
+      "moving_bones": {
+        "Body": 0.6,
+        "L_WingElbow": 4.58,
+        "L_WingFinger1": 2.4,
+        "L_WingFinger2": 2.04,
+        "L_WingFinger3": 1.68,
+        "L_WingMembrane1": 1.79,
+        "L_WingMembrane2": 1.43,
+        "L_WingShoulder": 10.0,
+        "L_WingWrist": 3.38,
+        "R_WingElbow": 4.58,
+        "R_WingFinger1": 2.4,
+        "R_WingFinger2": 2.04,
+        "R_WingFinger3": 1.68,
+        "R_WingMembrane1": 1.79,
+        "R_WingMembrane2": 1.43,
+        "R_WingShoulder": 10.0,
+        "R_WingWrist": 3.38,
+        "Tail1": 0.7,
+        "Tail10": 2.38,
+        "Tail2": 0.89,
+        "Tail3": 1.07,
+        "Tail4": 1.26,
+        "Tail5": 1.45,
+        "Tail6": 1.64,
+        "Tail7": 1.83,
+        "Tail8": 2.02,
+        "Tail9": 2.21
+      },
+      "plant_offset_units": 566,
+      "tail_tip_path": 9.2953
+    },
+    "glide": {
+      "action": "glide",
+      "channels": {
+        "body_axis_deg": {
+          "max": 11.1306,
+          "min": 10.1535,
+          "range": 0.9771
+        },
+        "foot_L_fwd": {
+          "max": -6.0549,
+          "min": -6.0554,
+          "range": 0.0004
+        },
+        "foot_L_lat": {
+          "max": 1.8861,
+          "min": 1.8861,
+          "range": 0.0
+        },
+        "foot_L_up": {
+          "max": 4.2355,
+          "min": 4.2298,
+          "range": 0.0057
+        },
+        "foot_R_fwd": {
+          "max": -6.0549,
+          "min": -6.0554,
+          "range": 0.0004
+        },
+        "foot_R_lat": {
+          "max": -1.8861,
+          "min": -1.8861,
+          "range": 0.0
+        },
+        "foot_R_up": {
+          "max": 4.2355,
+          "min": 4.2297,
+          "range": 0.0057
+        },
+        "foot_symmetry_error": {
+          "max": 0.0,
+          "min": 0.0,
+          "range": 0.0
+        },
+        "head_fwd": {
+          "max": 9.4742,
+          "min": 9.4582,
+          "range": 0.016
+        },
+        "head_lat": {
+          "max": 0.2499,
+          "min": -0.2499,
+          "range": 0.4998
+        },
+        "head_pitch_deg": {
+          "max": -16.9349,
+          "min": -18.6291,
+          "range": 1.6941
+        },
+        "head_up": {
+          "max": 0.0241,
+          "min": -0.1787,
+          "range": 0.2028
+        },
+        "knuckle_L_fwd": {
+          "max": 5.0607,
+          "min": 4.8923,
+          "range": 0.1684
+        },
+        "knuckle_L_up": {
+          "max": 5.1964,
+          "min": 3.5181,
+          "range": 1.6783
+        },
+        "knuckle_R_fwd": {
+          "max": 5.0607,
+          "min": 4.8923,
+          "range": 0.1684
+        },
+        "knuckle_R_up": {
+          "max": 5.1964,
+          "min": 3.5181,
+          "range": 1.6783
+        },
+        "knuckle_above_toe": {
+          "max": 0.9612,
+          "min": -0.7119,
+          "range": 1.6731
+        },
+        "lowest_bone_up": {
+          "max": 0.0,
+          "min": -0.4458,
+          "range": 0.4458
+        },
+        "pelvis_up": {
+          "max": 5.1267,
+          "min": 5.121,
+          "range": 0.0057
+        },
+        "tail_back": {
+          "max": 19.8418,
+          "min": 19.0326,
+          "range": 0.8092
+        },
+        "tail_lat": {
+          "max": 2.4065,
+          "min": -2.471,
+          "range": 4.8775
+        },
+        "tail_up": {
+          "max": -2.5591,
+          "min": -5.5678,
+          "range": 3.0087
+        },
+        "wing_azim_L": {
+          "max": -15.7954,
+          "min": -16.7681,
+          "range": 0.9727
+        },
+        "wing_azim_R": {
+          "max": -15.7954,
+          "min": -16.7681,
+          "range": 0.9727
+        },
+        "wing_azim_bias": {
+          "max": -0.0,
+          "min": -0.0,
+          "range": 0.0
+        },
+        "wing_elev_L": {
+          "max": -6.5455,
+          "min": -12.8003,
+          "range": 6.2548
+        },
+        "wing_elev_R": {
+          "max": -6.5455,
+          "min": -12.8003,
+          "range": 6.2548
+        },
+        "wing_elev_bias": {
+          "max": -0.0,
+          "min": -0.0,
+          "range": 0.0
+        },
+        "wing_span_L": {
+          "max": 23.4312,
+          "min": 23.3234,
+          "range": 0.1078
+        },
+        "wing_span_R": {
+          "max": 23.4312,
+          "min": 23.3234,
+          "range": 0.1078
+        },
+        "wing_symmetry_error": {
+          "max": 0.0,
+          "min": 0.0,
+          "range": 0.0
+        },
+        "wrist_L_up": {
+          "max": 6.6199,
+          "min": 5.811,
+          "range": 0.809
+        },
+        "wrist_R_up": {
+          "max": 6.6199,
+          "min": 5.811,
+          "range": 0.809
+        }
+      },
+      "cycle": {
+        "beats": 1,
+        "cadence_hz": 0.25,
+        "stroke_deg": 6.25
+      },
+      "distal_wing_bone_count": 12,
+      "distal_wing_bones": [
+        "L_WingFinger1",
+        "L_WingFinger2",
+        "L_WingFinger3",
+        "L_WingMembrane1",
+        "L_WingMembrane2",
+        "L_WingWrist",
+        "R_WingFinger1",
+        "R_WingFinger2",
+        "R_WingFinger3",
+        "R_WingMembrane1",
+        "R_WingMembrane2",
+        "R_WingWrist"
+      ],
+      "duration_s": 4.0,
+      "fps": 24,
+      "frames": 97,
+      "gait_mirror": {
+        "error": 0.0,
+        "foot": {
+          "error": 0.0,
+          "shift": 0.0
+        },
+        "knuckle": {
+          "error": 0.0,
+          "shift": 0.0
+        }
+      },
+      "head_path": 1.0937,
+      "loop_seam_max": 0.0,
+      "lowest_bones": [
+        "Root",
+        "Tail10"
+      ],
+      "lowest_vertex_frame": 60,
+      "lowest_vertex_up": -4.3272,
+      "moving_bone_count": 32,
+      "moving_bones": {
+        "Body": 0.8,
+        "Head": 2.8,
+        "L_WingElbow": 2.0,
+        "L_WingFinger1": 1.6,
+        "L_WingFinger2": 1.4,
+        "L_WingFinger3": 1.2,
+        "L_WingMembrane1": 2.2,
+        "L_WingMembrane2": 2.0,
+        "L_WingShoulder": 2.8,
+        "L_WingWrist": 1.8,
+        "Neck1": 3.5,
+        "Neck2": 4.9,
+        "R_WingElbow": 2.0,
+        "R_WingFinger1": 1.6,
+        "R_WingFinger2": 1.4,
+        "R_WingFinger3": 1.2,
+        "R_WingMembrane1": 2.2,
+        "R_WingMembrane2": 2.0,
+        "R_WingShoulder": 2.8,
+        "R_WingWrist": 1.8,
+        "Spine2": 1.0,
+        "Spine3": 0.7,
+        "Tail1": 1.82,
+        "Tail10": 6.24,
+        "Tail2": 2.31,
+        "Tail3": 2.8,
+        "Tail4": 3.29,
+        "Tail5": 3.78,
+        "Tail6": 4.28,
+        "Tail7": 4.76,
+        "Tail8": 5.26,
+        "Tail9": 5.75
+      },
+      "plant_offset_units": 601,
+      "tail_tip_path": 11.8318
+    },
+    "hover": {
+      "action": "hover",
+      "channels": {
+        "body_axis_deg": {
+          "max": 35.0973,
+          "min": 33.918,
+          "range": 1.1793
+        },
+        "foot_L_fwd": {
+          "max": -3.4653,
+          "min": -3.4668,
+          "range": 0.0015
+        },
+        "foot_L_lat": {
+          "max": 2.015,
+          "min": 2.015,
+          "range": 0.0
+        },
+        "foot_L_up": {
+          "max": 1.9751,
+          "min": 1.9552,
+          "range": 0.02
+        },
+        "foot_R_fwd": {
+          "max": -3.4653,
+          "min": -3.4668,
+          "range": 0.0015
+        },
+        "foot_R_lat": {
+          "max": -2.015,
+          "min": -2.015,
+          "range": 0.0
+        },
+        "foot_R_up": {
+          "max": 1.9751,
+          "min": 1.9552,
+          "range": 0.02
+        },
+        "foot_symmetry_error": {
+          "max": 0.0,
+          "min": 0.0,
+          "range": 0.0
+        },
+        "head_fwd": {
+          "max": 8.7298,
+          "min": 8.6332,
+          "range": 0.0966
+        },
+        "head_lat": {
+          "max": 0.0001,
+          "min": 0.0001,
+          "range": 0.0
+        },
+        "head_pitch_deg": {
+          "max": 11.7394,
+          "min": 9.7065,
+          "range": 2.0329
+        },
+        "head_up": {
+          "max": 3.6503,
+          "min": 3.4304,
+          "range": 0.22
+        },
+        "knuckle_L_fwd": {
+          "max": 14.8309,
+          "min": -8.5193,
+          "range": 23.3503
+        },
+        "knuckle_L_up": {
+          "max": 15.7249,
+          "min": 4.1789,
+          "range": 11.5459
+        },
+        "knuckle_R_fwd": {
+          "max": 14.831,
+          "min": -8.5192,
+          "range": 23.3502
+        },
+        "knuckle_R_up": {
+          "max": 15.7249,
+          "min": 4.179,
+          "range": 11.5459
+        },
+        "knuckle_above_toe": {
+          "max": 13.7543,
+          "min": 2.2131,
+          "range": 11.5412
+        },
+        "lowest_bone_up": {
+          "max": 0.0,
+          "min": -2.0669,
+          "range": 2.0669
+        },
+        "pelvis_up": {
+          "max": 5.1338,
+          "min": 5.1138,
+          "range": 0.02
+        },
+        "tail_back": {
+          "max": 16.1758,
+          "min": 7.3132,
+          "range": 8.8626
+        },
+        "tail_lat": {
+          "max": 1.7725,
+          "min": -1.1338,
+          "range": 2.9063
+        },
+        "tail_up": {
+          "max": 13.1553,
+          "min": 8.5425,
+          "range": 4.6128
+        },
+        "wing_azim_L": {
+          "max": 35.8777,
+          "min": -74.1779,
+          "range": 110.0557
+        },
+        "wing_azim_R": {
+          "max": 35.877,
+          "min": -74.1788,
+          "range": 110.0558
+        },
+        "wing_azim_bias": {
+          "max": 0.0009,
+          "min": 0.0007,
+          "range": 0.0002
+        },
+        "wing_elev_L": {
+          "max": 30.0928,
+          "min": -11.2741,
+          "range": 41.3669
+        },
+        "wing_elev_R": {
+          "max": 30.0929,
+          "min": -11.2739,
+          "range": 41.3669
+        },
+        "wing_elev_bias": {
+          "max": -0.0001,
+          "min": -0.0004,
+          "range": 0.0002
+        },
+        "wing_span_L": {
+          "max": 23.7905,
+          "min": 22.258,
+          "range": 1.5325
+        },
+        "wing_span_R": {
+          "max": 23.7905,
+          "min": 22.258,
+          "range": 1.5325
+        },
+        "wing_symmetry_error": {
+          "max": 0.0001,
+          "min": 0.0,
+          "range": 0.0001
+        },
+        "wrist_L_up": {
+          "max": 11.8253,
+          "min": 4.9731,
+          "range": 6.8522
+        },
+        "wrist_R_up": {
+          "max": 11.8253,
+          "min": 4.9731,
+          "range": 6.8522
+        }
+      },
+      "cycle": {
+        "beats": 4,
+        "cadence_hz": 1.6,
+        "stroke_deg": 41.37
+      },
+      "distal_wing_bone_count": 12,
+      "distal_wing_bones": [
+        "L_WingFinger1",
+        "L_WingFinger2",
+        "L_WingFinger3",
+        "L_WingMembrane1",
+        "L_WingMembrane2",
+        "L_WingWrist",
+        "R_WingFinger1",
+        "R_WingFinger2",
+        "R_WingFinger3",
+        "R_WingMembrane1",
+        "R_WingMembrane2",
+        "R_WingWrist"
+      ],
+      "duration_s": 2.5,
+      "fps": 24,
+      "frames": 61,
+      "gait_mirror": {
+        "error": 0.0,
+        "foot": {
+          "error": 0.0,
+          "shift": 0.0
+        },
+        "knuckle": {
+          "error": 0.0,
+          "shift": 0.0
+        }
+      },
+      "head_path": 0.961,
+      "loop_seam_max": 0.0,
+      "lowest_bones": [
+        "L_WingMembrane2",
+        "Root"
+      ],
+      "lowest_vertex_frame": 0,
+      "lowest_vertex_up": -3.428,
+      "moving_bone_count": 29,
+      "moving_bones": {
+        "Body": 2.78,
+        "L_WingElbow": 34.3,
+        "L_WingFinger1": 18.0,
+        "L_WingFinger2": 15.3,
+        "L_WingFinger3": 12.6,
+        "L_WingMembrane1": 13.61,
+        "L_WingMembrane2": 10.89,
+        "L_WingShoulder": 75.97,
+        "L_WingWrist": 25.8,
+        "R_WingElbow": 34.3,
+        "R_WingFinger1": 18.0,
+        "R_WingFinger2": 15.3,
+        "R_WingFinger3": 12.6,
+        "R_WingMembrane1": 13.61,
+        "R_WingMembrane2": 10.89,
+        "R_WingShoulder": 75.97,
+        "R_WingWrist": 25.8,
+        "Spine2": 1.2,
+        "Spine3": 0.84,
+        "Tail1": 3.48,
+        "Tail10": 11.88,
+        "Tail2": 4.42,
+        "Tail3": 5.36,
+        "Tail4": 6.3,
+        "Tail5": 7.23,
+        "Tail6": 8.17,
+        "Tail7": 9.1,
+        "Tail8": 10.03,
+        "Tail9": 10.96
+      },
+      "plant_offset_units": 476,
+      "tail_tip_path": 87.2542
+    },
+    "idle": {
+      "action": "idle",
+      "channels": {
+        "body_axis_deg": {
+          "max": 11.7634,
+          "min": 9.4633,
+          "range": 2.3001
+        },
+        "foot_L_fwd": {
+          "max": -2.8744,
+          "min": -2.9431,
+          "range": 0.0687
+        },
+        "foot_L_lat": {
+          "max": 1.9909,
+          "min": 1.9903,
+          "range": 0.0006
+        },
+        "foot_L_up": {
+          "max": 1.5953,
+          "min": 1.577,
+          "range": 0.0184
+        },
+        "foot_R_fwd": {
+          "max": -2.8852,
+          "min": -2.9292,
+          "range": 0.0439
+        },
+        "foot_R_lat": {
+          "max": -1.9903,
+          "min": -1.9909,
+          "range": 0.0006
+        },
+        "foot_R_up": {
+          "max": 1.5946,
+          "min": 1.5777,
+          "range": 0.0169
+        },
+        "foot_symmetry_error": {
+          "max": 0.0177,
+          "min": 0.0,
+          "range": 0.0177
+        },
+        "head_fwd": {
+          "max": 9.4983,
+          "min": 9.3607,
+          "range": 0.1376
+        },
+        "head_lat": {
+          "max": 0.0687,
+          "min": -0.0685,
+          "range": 0.1372
+        },
+        "head_pitch_deg": {
+          "max": -14.7828,
+          "min": -24.1508,
+          "range": 9.368
+        },
+        "head_up": {
+          "max": -0.1022,
+          "min": -0.5082,
+          "range": 0.406
+        },
+        "knuckle_L_fwd": {
+          "max": -2.4752,
+          "min": -2.7575,
+          "range": 0.2823
+        },
+        "knuckle_L_up": {
+          "max": 2.2875,
+          "min": 2.09,
+          "range": 0.1975
+        },
+        "knuckle_R_fwd": {
+          "max": -2.4807,
+          "min": -2.7401,
+          "range": 0.2594
+        },
+        "knuckle_R_up": {
+          "max": 2.2846,
+          "min": 2.0926,
+          "range": 0.192
+        },
+        "knuckle_above_toe": {
+          "max": 0.6912,
+          "min": 0.498,
+          "range": 0.1933
+        },
+        "lowest_bone_up": {
+          "max": 0.0,
+          "min": 0.0,
+          "range": 0.0
+        },
+        "pelvis_up": {
+          "max": 5.1323,
+          "min": 5.1162,
+          "range": 0.016
+        },
+        "tail_back": {
+          "max": 20.1585,
+          "min": 20.1423,
+          "range": 0.0162
+        },
+        "tail_lat": {
+          "max": 0.1751,
+          "min": -0.1751,
+          "range": 0.3502
+        },
+        "tail_up": {
+          "max": -0.1404,
+          "min": -0.6583,
+          "range": 0.5179
+        },
+        "wing_azim_L": {
+          "max": 16.8674,
+          "min": 15.8792,
+          "range": 0.9882
+        },
+        "wing_azim_R": {
+          "max": 16.8675,
+          "min": 15.8792,
+          "range": 0.9883
+        },
+        "wing_azim_bias": {
+          "max": 0.4044,
+          "min": -0.4044,
+          "range": 0.8088
+        },
+        "wing_elev_L": {
+          "max": -12.024,
+          "min": -13.4141,
+          "range": 1.3901
+        },
+        "wing_elev_R": {
+          "max": -12.024,
+          "min": -13.4142,
+          "range": 1.3901
+        },
+        "wing_elev_bias": {
+          "max": 0.6551,
+          "min": -0.655,
+          "range": 1.3102
+        },
+        "wing_span_L": {
+          "max": 23.259,
+          "min": 23.2549,
+          "range": 0.0041
+        },
+        "wing_span_R": {
+          "max": 23.259,
+          "min": 23.2549,
+          "range": 0.0041
+        },
+        "wing_symmetry_error": {
+          "max": 0.0169,
+          "min": 0.0073,
+          "range": 0.0097
+        },
+        "wrist_L_up": {
+          "max": 3.1388,
+          "min": 3.0522,
+          "range": 0.0867
+        },
+        "wrist_R_up": {
+          "max": 3.1361,
+          "min": 3.0539,
+          "range": 0.0822
+        }
+      },
+      "cycle": {
+        "beats": 2,
+        "cadence_hz": 0.333,
+        "stroke_deg": 1.39
+      },
+      "distal_wing_bone_count": 2,
+      "distal_wing_bones": [
+        "L_WingWrist",
+        "R_WingWrist"
+      ],
+      "duration_s": 6.0,
+      "fps": 24,
+      "frames": 145,
+      "gait_mirror": {
+        "error": 0.005,
+        "foot": {
+          "error": 0.005,
+          "shift": 0.993
+        },
+        "knuckle": {
+          "error": 0.0019,
+          "shift": 0.503
+        }
+      },
+      "head_path": 1.6655,
+      "loop_seam_max": 0.0,
+      "lowest_bones": [
+        "Root"
+      ],
+      "lowest_vertex_frame": 81,
+      "lowest_vertex_up": 0.0743,
+      "moving_bone_count": 22,
+      "moving_bones": {
+        "Body": 6.0,
+        "Head": 13.7,
+        "L_WingElbow": 0.27,
+        "L_WingShoulder": 0.16,
+        "L_WingWrist": 0.38,
+        "Neck1": 3.07,
+        "Neck2": 4.13,
+        "R_WingElbow": 0.27,
+        "R_WingShoulder": 0.16,
+        "R_WingWrist": 0.38,
+        "Spine2": 1.89,
+        "Spine3": 1.31,
+        "Tail1": 0.22,
+        "Tail10": 0.6,
+        "Tail2": 0.26,
+        "Tail3": 0.3,
+        "Tail4": 0.37,
+        "Tail5": 0.41,
+        "Tail6": 0.45,
+        "Tail7": 0.49,
+        "Tail8": 0.56,
+        "Tail9": 0.6
+      },
+      "plant_offset_units": -10,
+      "tail_tip_path": 2.2525
+    },
+    "land": {
+      "action": "land",
+      "channels": {
+        "body_axis_deg": {
+          "max": 44.6278,
+          "min": 9.6394,
+          "range": 34.9884
+        },
+        "foot_L_fwd": {
+          "max": -1.3684,
+          "min": -6.0237,
+          "range": 4.6553
+        },
+        "foot_L_lat": {
+          "max": 2.11,
+          "min": 1.351,
+          "range": 0.7589
+        },
+        "foot_L_up": {
+          "max": 4.73,
+          "min": 1.5874,
+          "range": 3.1426
+        },
+        "foot_R_fwd": {
+          "max": -1.3684,
+          "min": -6.0237,
+          "range": 4.6553
+        },
+        "foot_R_lat": {
+          "max": -1.351,
+          "min": -2.1099,
+          "range": 0.7589
+        },
+        "foot_R_up": {
+          "max": 4.73,
+          "min": 1.5874,
+          "range": 3.1426
+        },
+        "foot_symmetry_error": {
+          "max": 0.0001,
+          "min": 0.0,
+          "range": 0.0
+        },
+        "head_fwd": {
+          "max": 9.4902,
+          "min": 7.7534,
+          "range": 1.7368
+        },
+        "head_lat": {
+          "max": 0.0001,
+          "min": -0.0036,
+          "range": 0.0037
+        },
+        "head_pitch_deg": {
+          "max": 26.228,
+          "min": -23.7485,
+          "range": 49.9766
+        },
+        "head_up": {
+          "max": 5.3036,
+          "min": -0.474,
+          "range": 5.7776
+        },
+        "knuckle_L_fwd": {
+          "max": 13.4567,
+          "min": -4.9777,
+          "range": 18.4344
+        },
+        "knuckle_L_up": {
+          "max": 22.5401,
+          "min": 2.2605,
+          "range": 20.2796
+        },
+        "knuckle_R_fwd": {
+          "max": 13.4569,
+          "min": -4.9777,
+          "range": 18.4345
+        },
+        "knuckle_R_up": {
+          "max": 22.5401,
+          "min": 2.1442,
+          "range": 20.3959
+        },
+        "knuckle_above_toe": {
+          "max": 20.4337,
+          "min": 0.1745,
+          "range": 20.2592
+        },
+        "lowest_bone_up": {
+          "max": 0.0,
+          "min": -3.9504,
+          "range": 3.9504
+        },
+        "pelvis_up": {
+          "max": 5.3104,
+          "min": 5.081,
+          "range": 0.2294
+        },
+        "tail_back": {
+          "max": 20.1491,
+          "min": 11.4651,
+          "range": 8.6841
+        },
+        "tail_lat": {
+          "max": -0.0,
+          "min": -0.1751,
+          "range": 0.1751
+        },
+        "tail_up": {
+          "max": 10.9227,
+          "min": -9.0314,
+          "range": 19.954
+        },
+        "wing_azim_L": {
+          "max": 47.2471,
+          "min": -59.3377,
+          "range": 106.5848
+        },
+        "wing_azim_R": {
+          "max": 47.2471,
+          "min": -59.3387,
+          "range": 106.5858
+        },
+        "wing_azim_bias": {
+          "max": 0.157,
+          "min": -0.0001,
+          "range": 0.1571
+        },
+        "wing_elev_L": {
+          "max": 69.3631,
+          "min": -15.4587,
+          "range": 84.8218
+        },
+        "wing_elev_R": {
+          "max": 69.3632,
+          "min": -15.4585,
+          "range": 84.8218
+        },
+        "wing_elev_bias": {
+          "max": 0.4739,
+          "min": -0.0005,
+          "range": 0.4744
+        },
+        "wing_span_L": {
+          "max": 23.6495,
+          "min": 22.7946,
+          "range": 0.8549
+        },
+        "wing_span_R": {
+          "max": 23.6495,
+          "min": 22.7946,
+          "range": 0.8549
+        },
+        "wing_symmetry_error": {
+          "max": 0.0125,
+          "min": 0.0,
+          "range": 0.0125
+        },
+        "wrist_L_up": {
+          "max": 15.1724,
+          "min": 3.1062,
+          "range": 12.0662
+        },
+        "wrist_R_up": {
+          "max": 15.1724,
+          "min": 3.062,
+          "range": 12.1105
+        }
+      },
+      "cycle": {
+        "beats": 2,
+        "cadence_hz": 0.667,
+        "stroke_deg": 84.82
+      },
+      "distal_wing_bone_count": 14,
+      "distal_wing_bones": [
+        "L_WingClaw",
+        "L_WingFinger1",
+        "L_WingFinger2",
+        "L_WingFinger3",
+        "L_WingMembrane1",
+        "L_WingMembrane2",
+        "L_WingWrist",
+        "R_WingClaw",
+        "R_WingFinger1",
+        "R_WingFinger2",
+        "R_WingFinger3",
+        "R_WingMembrane1",
+        "R_WingMembrane2",
+        "R_WingWrist"
+      ],
+      "duration_s": 3.0,
+      "fps": 24,
+      "frames": 73,
+      "gait_mirror": {
+        "error": 0.0007,
+        "foot": {
+          "error": 0.0,
+          "shift": 0.0
+        },
+        "knuckle": {
+          "error": 0.0007,
+          "shift": 0.0
+        }
+      },
+      "head_path": 11.3693,
+      "loop_seam_max": 17.86749,
+      "lowest_bones": [
+        "L_WingFinger3_end",
+        "L_WingMembrane2",
+        "Root",
+        "Tail10"
+      ],
+      "lowest_vertex_frame": 40,
+      "lowest_vertex_up": -7.5176,
+      "moving_bone_count": 42,
+      "moving_bones": {
+        "Body": 31.95,
+        "Head": 17.99,
+        "L_Calf": 55.0,
+        "L_Foot": 42.95,
+        "L_Thigh": 67.98,
+        "L_Toes": 44.0,
+        "L_WingClaw": 12.0,
+        "L_WingElbow": 60.0,
+        "L_WingFinger1": 43.0,
+        "L_WingFinger2": 39.58,
+        "L_WingFinger3": 36.26,
+        "L_WingMembrane1": 16.8,
+        "L_WingMembrane2": 12.5,
+        "L_WingShoulder": 77.74,
+        "L_WingWrist": 51.81,
+        "Neck1": 9.89,
+        "Neck2": 12.09,
+        "R_Calf": 55.0,
+        "R_Foot": 42.95,
+        "R_Thigh": 67.98,
+        "R_Toes": 44.0,
+        "R_WingClaw": 12.0,
+        "R_WingElbow": 59.82,
+        "R_WingFinger1": 43.0,
+        "R_WingFinger2": 39.58,
+        "R_WingFinger3": 36.26,
+        "R_WingMembrane1": 16.8,
+        "R_WingMembrane2": 12.5,
+        "R_WingShoulder": 77.79,
+        "R_WingWrist": 52.17,
+        "Spine2": 17.99,
+        "Spine3": 21.99,
+        "Tail1": 7.69,
+        "Tail10": 26.37,
+        "Tail2": 9.77,
+        "Tail3": 11.84,
+        "Tail4": 13.92,
+        "Tail5": 15.99,
+        "Tail6": 18.07,
+        "Tail7": 20.15,
+        "Tail8": 22.22,
+        "Tail9": 24.3
+      },
+      "plant_offset_units": 1044,
+      "tail_tip_path": 51.4669
+    },
+    "rest": {
+      "action": "rest",
+      "channels": {
+        "body_axis_deg": {
+          "max": 0.9075,
+          "min": -2.0208,
+          "range": 2.9282
+        },
+        "foot_L_fwd": {
+          "max": -4.5956,
+          "min": -4.5969,
+          "range": 0.0013
+        },
+        "foot_L_lat": {
+          "max": 1.6571,
+          "min": 1.6571,
+          "range": 0.0
+        },
+        "foot_L_up": {
+          "max": 4.7984,
+          "min": 4.7812,
+          "range": 0.0172
+        },
+        "foot_R_fwd": {
+          "max": -4.5956,
+          "min": -4.5969,
+          "range": 0.0013
+        },
+        "foot_R_lat": {
+          "max": -1.6571,
+          "min": -1.6571,
+          "range": 0.0
+        },
+        "foot_R_up": {
+          "max": 4.7984,
+          "min": 4.7811,
+          "range": 0.0172
+        },
+        "foot_symmetry_error": {
+          "max": 0.0,
+          "min": 0.0,
+          "range": 0.0
+        },
+        "head_fwd": {
+          "max": 8.5102,
+          "min": 8.1709,
+          "range": 0.3393
+        },
+        "head_lat": {
+          "max": -0.0,
+          "min": -0.0,
+          "range": 0.0
+        },
+        "head_pitch_deg": {
+          "max": -42.706,
+          "min": -48.3433,
+          "range": 5.6373
+        },
+        "head_up": {
+          "max": -3.0448,
+          "min": -3.6006,
+          "range": 0.5558
+        },
+        "knuckle_L_fwd": {
+          "max": -2.594,
+          "min": -2.8368,
+          "range": 0.2428
+        },
+        "knuckle_L_up": {
+          "max": 1.8688,
+          "min": 1.6705,
+          "range": 0.1983
+        },
+        "knuckle_R_fwd": {
+          "max": -2.5941,
+          "min": -2.837,
+          "range": 0.2429
+        },
+        "knuckle_R_up": {
+          "max": 1.8688,
+          "min": 1.6704,
+          "range": 0.1983
+        },
+        "knuckle_above_toe": {
+          "max": -2.9196,
+          "min": -3.1158,
+          "range": 0.1963
+        },
+        "lowest_bone_up": {
+          "max": 0.0,
+          "min": 0.0,
+          "range": 0.0
+        },
+        "pelvis_up": {
+          "max": 4.6587,
+          "min": 4.6414,
+          "range": 0.0172
+        },
+        "tail_back": {
+          "max": 19.0846,
+          "min": 15.6517,
+          "range": 3.4329
+        },
+        "tail_lat": {
+          "max": -4.7141,
+          "min": -9.4115,
+          "range": 4.6974
+        },
+        "tail_up": {
+          "max": 5.2734,
+          "min": 2.9286,
+          "range": 2.3448
+        },
+        "wing_azim_L": {
+          "max": 16.0363,
+          "min": 15.1045,
+          "range": 0.9319
+        },
+        "wing_azim_R": {
+          "max": 16.0369,
+          "min": 15.105,
+          "range": 0.932
+        },
+        "wing_azim_bias": {
+          "max": -0.0005,
+          "min": -0.0006,
+          "range": 0.0001
+        },
+        "wing_elev_L": {
+          "max": -10.0353,
+          "min": -10.9209,
+          "range": 0.8855
+        },
+        "wing_elev_R": {
+          "max": -10.0354,
+          "min": -10.9209,
+          "range": 0.8855
+        },
+        "wing_elev_bias": {
+          "max": 0.0,
+          "min": 0.0,
+          "range": 0.0
+        },
+        "wing_span_L": {
+          "max": 23.6362,
+          "min": 23.6342,
+          "range": 0.002
+        },
+        "wing_span_R": {
+          "max": 23.6362,
+          "min": 23.6342,
+          "range": 0.002
+        },
+        "wing_symmetry_error": {
+          "max": 0.0,
+          "min": 0.0,
+          "range": 0.0
+        },
+        "wrist_L_up": {
+          "max": 2.866,
+          "min": 2.7562,
+          "range": 0.1099
+        },
+        "wrist_R_up": {
+          "max": 2.866,
+          "min": 2.7562,
+          "range": 0.1099
+        }
+      },
+      "cycle": {
+        "beats": 2,
+        "cadence_hz": 0.4,
+        "stroke_deg": 0.89
+      },
+      "distal_wing_bone_count": 2,
+      "distal_wing_bones": [
+        "L_WingWrist",
+        "R_WingWrist"
+      ],
+      "duration_s": 5.0,
+      "fps": 24,
+      "frames": 121,
+      "gait_mirror": {
+        "error": 0.0,
+        "foot": {
+          "error": 0.0,
+          "shift": 0.0
+        },
+        "knuckle": {
+          "error": 0.0,
+          "shift": 0.0
+        }
+      },
+      "head_path": 2.6067,
+      "loop_seam_max": 0.0,
+      "lowest_bones": [
+        "Root"
+      ],
+      "lowest_vertex_frame": 105,
+      "lowest_vertex_up": -3.7102,
+      "moving_bone_count": 22,
+      "moving_bones": {
+        "Body": 2.4,
+        "Head": 3.36,
+        "L_WingElbow": 0.5,
+        "L_WingShoulder": 0.3,
+        "L_WingWrist": 0.7,
+        "Neck1": 0.98,
+        "Neck2": 1.4,
+        "R_WingElbow": 0.5,
+        "R_WingShoulder": 0.3,
+        "R_WingWrist": 0.7,
+        "Spine2": 3.0,
+        "Spine3": 2.1,
+        "Tail1": 2.1,
+        "Tail10": 7.2,
+        "Tail2": 2.67,
+        "Tail3": 3.23,
+        "Tail4": 3.8,
+        "Tail5": 4.37,
+        "Tail6": 4.93,
+        "Tail7": 5.5,
+        "Tail8": 6.07,
+        "Tail9": 6.63
+      },
+      "plant_offset_units": 515,
+      "tail_tip_path": 12.9573
+    },
+    "scout": {
+      "action": "scout",
+      "channels": {
+        "body_axis_deg": {
+          "max": 10.142,
+          "min": 10.142,
+          "range": 0.0
+        },
+        "foot_L_fwd": {
+          "max": -6.0549,
+          "min": -6.0556,
+          "range": 0.0008
+        },
+        "foot_L_lat": {
+          "max": 1.9066,
+          "min": 1.9066,
+          "range": 0.0
+        },
+        "foot_L_up": {
+          "max": 4.081,
+          "min": 4.071,
+          "range": 0.01
+        },
+        "foot_R_fwd": {
+          "max": -6.0549,
+          "min": -6.0556,
+          "range": 0.0008
+        },
+        "foot_R_lat": {
+          "max": -1.9066,
+          "min": -1.9066,
+          "range": 0.0
+        },
+        "foot_R_up": {
+          "max": 4.081,
+          "min": 4.071,
+          "range": 0.01
+        },
+        "foot_symmetry_error": {
+          "max": 0.0,
+          "min": 0.0,
+          "range": 0.0
+        },
+        "head_fwd": {
+          "max": 9.3888,
+          "min": 9.3445,
+          "range": 0.0443
+        },
+        "head_lat": {
+          "max": 0.6297,
+          "min": -0.6297,
+          "range": 1.2594
+        },
+        "head_pitch_deg": {
+          "max": -23.2719,
+          "min": -23.312,
+          "range": 0.0401
+        },
+        "head_up": {
+          "max": -0.3968,
+          "min": -0.4,
+          "range": 0.0032
+        },
+        "knuckle_L_fwd": {
+          "max": 7.7201,
+          "min": 2.0788,
+          "range": 5.6413
+        },
+        "knuckle_L_up": {
+          "max": 15.1116,
+          "min": -4.2384,
+          "range": 19.35
+        },
+        "knuckle_R_fwd": {
+          "max": 7.7201,
+          "min": 2.0788,
+          "range": 5.6413
+        },
+        "knuckle_R_up": {
+          "max": 15.1116,
+          "min": -4.2384,
+          "range": 19.35
+        },
+        "knuckle_above_toe": {
+          "max": 11.033,
+          "min": -8.3137,
+          "range": 19.3467
+        },
+        "lowest_bone_up": {
+          "max": 0.0,
+          "min": -9.5645,
+          "range": 9.5645
+        },
+        "pelvis_up": {
+          "max": 5.1289,
+          "min": 5.1188,
+          "range": 0.01
+        },
+        "tail_back": {
+          "max": 20.0169,
+          "min": 18.9451,
+          "range": 1.0718
+        },
+        "tail_lat": {
+          "max": 3.1312,
+          "min": -3.2324,
+          "range": 6.3636
+        },
+        "tail_up": {
+          "max": 0.2669,
+          "min": -5.4122,
+          "range": 5.6791
+        },
+        "wing_azim_L": {
+          "max": -5.5881,
+          "min": -39.0244,
+          "range": 33.4362
+        },
+        "wing_azim_R": {
+          "max": -5.588,
+          "min": -39.0244,
+          "range": 33.4364
+        },
+        "wing_azim_bias": {
+          "max": 0.0,
+          "min": -0.0002,
+          "range": 0.0002
+        },
+        "wing_elev_L": {
+          "max": 31.3939,
+          "min": -43.9393,
+          "range": 75.3333
+        },
+        "wing_elev_R": {
+          "max": 31.394,
+          "min": -43.9393,
+          "range": 75.3333
+        },
+        "wing_elev_bias": {
+          "max": 0.0,
+          "min": -0.0,
+          "range": 0.0
+        },
+        "wing_span_L": {
+          "max": 23.7211,
+          "min": 22.7389,
+          "range": 0.9822
+        },
+        "wing_span_R": {
+          "max": 23.7211,
+          "min": 22.739,
+          "range": 0.9822
+        },
+        "wing_symmetry_error": {
+          "max": 0.0,
+          "min": 0.0,
+          "range": 0.0
+        },
+        "wrist_L_up": {
+          "max": 11.599,
+          "min": 1.0876,
+          "range": 10.5114
+        },
+        "wrist_R_up": {
+          "max": 11.599,
+          "min": 1.0876,
+          "range": 10.5114
+        }
+      },
+      "cycle": {
+        "beats": 2,
+        "cadence_hz": 0.5,
+        "stroke_deg": 75.33
+      },
+      "distal_wing_bone_count": 12,
+      "distal_wing_bones": [
+        "L_WingFinger1",
+        "L_WingFinger2",
+        "L_WingFinger3",
+        "L_WingMembrane1",
+        "L_WingMembrane2",
+        "L_WingWrist",
+        "R_WingFinger1",
+        "R_WingFinger2",
+        "R_WingFinger3",
+        "R_WingMembrane1",
+        "R_WingMembrane2",
+        "R_WingWrist"
+      ],
+      "duration_s": 4.0,
+      "fps": 24,
+      "frames": 97,
+      "gait_mirror": {
+        "error": 0.0,
+        "foot": {
+          "error": 0.0,
+          "shift": 0.0
+        },
+        "knuckle": {
+          "error": 0.0,
+          "shift": 0.0
+        }
+      },
+      "head_path": 2.5272,
+      "loop_seam_max": 0.0,
+      "lowest_bones": [
+        "L_WingFinger1_end",
+        "Root",
+        "Tail10"
+      ],
+      "lowest_vertex_frame": 42,
+      "lowest_vertex_up": -12.558,
+      "moving_bone_count": 30,
+      "moving_bones": {
+        "Body": 1.4,
+        "Head": 7.2,
+        "L_WingElbow": 24.82,
+        "L_WingFinger1": 12.95,
+        "L_WingFinger2": 11.0,
+        "L_WingFinger3": 9.06,
+        "L_WingMembrane1": 9.71,
+        "L_WingMembrane2": 7.77,
+        "L_WingShoulder": 53.98,
+        "L_WingWrist": 18.34,
+        "Neck1": 9.0,
+        "Neck2": 12.6,
+        "R_WingElbow": 24.82,
+        "R_WingFinger1": 12.95,
+        "R_WingFinger2": 11.0,
+        "R_WingFinger3": 9.06,
+        "R_WingMembrane1": 9.71,
+        "R_WingMembrane2": 7.77,
+        "R_WingShoulder": 53.98,
+        "R_WingWrist": 18.34,
+        "Tail1": 2.38,
+        "Tail10": 8.15,
+        "Tail2": 3.02,
+        "Tail3": 3.66,
+        "Tail4": 4.31,
+        "Tail5": 4.95,
+        "Tail6": 5.58,
+        "Tail7": 6.23,
+        "Tail8": 6.88,
+        "Tail9": 7.51
+      },
+      "plant_offset_units": 1744,
+      "tail_tip_path": 35.4031
+    },
+    "speed": {
+      "action": "speed",
+      "channels": {
+        "body_axis_deg": {
+          "max": 5.4426,
+          "min": 5.4426,
+          "range": 0.0
+        },
+        "foot_L_fwd": {
+          "max": -5.8756,
+          "min": -5.8761,
+          "range": 0.0005
+        },
+        "foot_L_lat": {
+          "max": 1.6932,
+          "min": 1.6932,
+          "range": 0.0
+        },
+        "foot_L_up": {
+          "max": 5.4009,
+          "min": 5.3938,
+          "range": 0.0071
+        },
+        "foot_R_fwd": {
+          "max": -5.8756,
+          "min": -5.8762,
+          "range": 0.0005
+        },
+        "foot_R_lat": {
+          "max": -1.6932,
+          "min": -1.6932,
+          "range": 0.0
+        },
+        "foot_R_up": {
+          "max": 5.4009,
+          "min": 5.3938,
+          "range": 0.0071
+        },
+        "foot_symmetry_error": {
+          "max": 0.0,
+          "min": 0.0,
+          "range": 0.0
+        },
+        "head_fwd": {
+          "max": 9.3209,
+          "min": 9.3209,
+          "range": 0.0
+        },
+        "head_lat": {
+          "max": -0.0,
+          "min": -0.0,
+          "range": 0.0
+        },
+        "head_pitch_deg": {
+          "max": -25.2771,
+          "min": -25.2771,
+          "range": 0.0
+        },
+        "head_up": {
+          "max": -1.2472,
+          "min": -1.2472,
+          "range": 0.0
+        },
+        "knuckle_L_fwd": {
+          "max": -1.3959,
+          "min": -4.8243,
+          "range": 3.4284
+        },
+        "knuckle_L_up": {
+          "max": 9.6925,
+          "min": -3.1855,
+          "range": 12.878
+        },
+        "knuckle_R_fwd": {
+          "max": -1.3959,
+          "min": -4.8244,
+          "range": 3.4285
+        },
+        "knuckle_R_up": {
+          "max": 9.6925,
+          "min": -3.1855,
+          "range": 12.878
+        },
+        "knuckle_above_toe": {
+          "max": 4.2929,
+          "min": -8.5823,
+          "range": 12.8752
+        },
+        "lowest_bone_up": {
+          "max": -0.3158,
+          "min": -8.6423,
+          "range": 8.3265
+        },
+        "pelvis_up": {
+          "max": 5.1274,
+          "min": 5.1203,
+          "range": 0.0071
+        },
+        "tail_back": {
+          "max": 19.1955,
+          "min": 17.3742,
+          "range": 1.8213
+        },
+        "tail_lat": {
+          "max": 0.7753,
+          "min": -0.8298,
+          "range": 1.605
+        },
+        "tail_up": {
+          "max": -5.4432,
+          "min": -8.8042,
+          "range": 3.361
+        },
+        "wing_azim_L": {
+          "max": 22.3923,
+          "min": 10.3348,
+          "range": 12.0575
+        },
+        "wing_azim_R": {
+          "max": 22.3925,
+          "min": 10.335,
+          "range": 12.0576
+        },
+        "wing_azim_bias": {
+          "max": -0.0002,
+          "min": -0.0003,
+          "range": 0.0001
+        },
+        "wing_elev_L": {
+          "max": 10.8955,
+          "min": -39.1555,
+          "range": 50.051
+        },
+        "wing_elev_R": {
+          "max": 10.8955,
+          "min": -39.1555,
+          "range": 50.051
+        },
+        "wing_elev_bias": {
+          "max": 0.0001,
+          "min": 0.0,
+          "range": 0.0
+        },
+        "wing_span_L": {
+          "max": 23.7907,
+          "min": 23.2186,
+          "range": 0.572
+        },
+        "wing_span_R": {
+          "max": 23.7907,
+          "min": 23.2186,
+          "range": 0.572
+        },
+        "wing_symmetry_error": {
+          "max": 0.0,
+          "min": 0.0,
+          "range": 0.0
+        },
+        "wrist_L_up": {
+          "max": 8.8376,
+          "min": 2.2713,
+          "range": 6.5663
+        },
+        "wrist_R_up": {
+          "max": 8.8376,
+          "min": 2.2713,
+          "range": 6.5663
+        }
+      },
+      "cycle": {
+        "beats": 3,
+        "cadence_hz": 2.0,
+        "stroke_deg": 50.05
+      },
+      "distal_wing_bone_count": 12,
+      "distal_wing_bones": [
+        "L_WingFinger1",
+        "L_WingFinger2",
+        "L_WingFinger3",
+        "L_WingMembrane1",
+        "L_WingMembrane2",
+        "L_WingWrist",
+        "R_WingFinger1",
+        "R_WingFinger2",
+        "R_WingFinger3",
+        "R_WingMembrane1",
+        "R_WingMembrane2",
+        "R_WingWrist"
+      ],
+      "duration_s": 1.5,
+      "fps": 24,
+      "frames": 37,
+      "gait_mirror": {
+        "error": 0.0,
+        "foot": {
+          "error": 0.0,
+          "shift": 0.0
+        },
+        "knuckle": {
+          "error": 0.0,
+          "shift": 0.0
+        }
+      },
+      "head_path": 0.0,
+      "loop_seam_max": 0.0,
+      "lowest_bones": [
+        "R_WingFinger1_end",
+        "Tail10"
+      ],
+      "lowest_vertex_frame": 10,
+      "lowest_vertex_up": -13.1204,
+      "moving_bone_count": 27,
+      "moving_bones": {
+        "Body": 0.99,
+        "L_WingElbow": 13.64,
+        "L_WingFinger1": 7.15,
+        "L_WingFinger2": 6.08,
+        "L_WingFinger3": 5.0,
+        "L_WingMembrane1": 5.23,
+        "L_WingMembrane2": 4.18,
+        "L_WingShoulder": 28.96,
+        "L_WingWrist": 10.19,
+        "R_WingElbow": 13.64,
+        "R_WingFinger1": 7.15,
+        "R_WingFinger2": 6.08,
+        "R_WingFinger3": 5.0,
+        "R_WingMembrane1": 5.23,
+        "R_WingMembrane2": 4.18,
+        "R_WingShoulder": 28.96,
+        "R_WingWrist": 10.19,
+        "Tail1": 1.26,
+        "Tail10": 4.29,
+        "Tail2": 1.56,
+        "Tail3": 1.93,
+        "Tail4": 2.26,
+        "Tail5": 2.58,
+        "Tail6": 2.96,
+        "Tail7": 3.2,
+        "Tail8": 3.64,
+        "Tail9": 3.91
+      },
+      "plant_offset_units": 1822,
+      "tail_tip_path": 25.5377
+    },
+    "takeoff": {
+      "action": "takeoff",
+      "channels": {
+        "body_axis_deg": {
+          "max": 38.3571,
+          "min": -4.7814,
+          "range": 43.1385
+        },
+        "foot_L_fwd": {
+          "max": -1.1112,
+          "min": -6.0335,
+          "range": 4.9223
+        },
+        "foot_L_lat": {
+          "max": 2.1009,
+          "min": 1.6861,
+          "range": 0.4148
+        },
+        "foot_L_up": {
+          "max": 4.6566,
+          "min": 1.3928,
+          "range": 3.2637
+        },
+        "foot_R_fwd": {
+          "max": -1.1112,
+          "min": -6.0335,
+          "range": 4.9224
+        },
+        "foot_R_lat": {
+          "max": -1.686,
+          "min": -2.1008,
+          "range": 0.4148
+        },
+        "foot_R_up": {
+          "max": 4.6566,
+          "min": 1.3928,
+          "range": 3.2637
+        },
+        "foot_symmetry_error": {
+          "max": 0.0001,
+          "min": 0.0,
+          "range": 0.0001
+        },
+        "head_fwd": {
+          "max": 9.4879,
+          "min": 7.5847,
+          "range": 1.9032
+        },
+        "head_lat": {
+          "max": 0.0001,
+          "min": -0.0,
+          "range": 0.0001
+        },
+        "head_pitch_deg": {
+          "max": 31.0456,
+          "min": -45.4168,
+          "range": 76.4624
+        },
+        "head_up": {
+          "max": 5.7009,
+          "min": -3.4829,
+          "range": 9.1838
+        },
+        "knuckle_L_fwd": {
+          "max": 11.3414,
+          "min": -2.92,
+          "range": 14.2613
+        },
+        "knuckle_L_up": {
+          "max": 18.6759,
+          "min": -3.638,
+          "range": 22.3139
+        },
+        "knuckle_R_fwd": {
+          "max": 11.3416,
+          "min": -2.92,
+          "range": 14.2616
+        },
+        "knuckle_R_up": {
+          "max": 18.676,
+          "min": -3.6379,
+          "range": 22.3139
+        },
+        "knuckle_above_toe": {
+          "max": 15.2921,
+          "min": -6.919,
+          "range": 22.2111
+        },
+        "lowest_bone_up": {
+          "max": 0.0,
+          "min": -10.6984,
+          "range": 10.6984
+        },
+        "pelvis_up": {
+          "max": 5.3105,
+          "min": 4.8798,
+          "range": 0.4307
+        },
+        "tail_back": {
+          "max": 20.1529,
+          "min": 7.333,
+          "range": 12.8199
+        },
+        "tail_lat": {
+          "max": 0.0001,
+          "min": -1.4218,
+          "range": 1.4218
+        },
+        "tail_up": {
+          "max": 12.8488,
+          "min": -16.0078,
+          "range": 28.8566
+        },
+        "wing_azim_L": {
+          "max": 17.4964,
+          "min": -57.6675,
+          "range": 75.1639
+        },
+        "wing_azim_R": {
+          "max": 17.4966,
+          "min": -57.6685,
+          "range": 75.1651
+        },
+        "wing_azim_bias": {
+          "max": 0.001,
+          "min": -0.0009,
+          "range": 0.0019
+        },
+        "wing_elev_L": {
+          "max": 57.5607,
+          "min": -44.4027,
+          "range": 101.9635
+        },
+        "wing_elev_R": {
+          "max": 57.5609,
+          "min": -44.4027,
+          "range": 101.9636
+        },
+        "wing_elev_bias": {
+          "max": 0.0001,
+          "min": -0.0003,
+          "range": 0.0004
+        },
+        "wing_span_L": {
+          "max": 23.7731,
+          "min": 22.6322,
+          "range": 1.141
+        },
+        "wing_span_R": {
+          "max": 23.7732,
+          "min": 22.6322,
+          "range": 1.141
+        },
+        "wing_symmetry_error": {
+          "max": 0.0001,
+          "min": 0.0,
+          "range": 0.0001
+        },
+        "wrist_L_up": {
+          "max": 13.4159,
+          "min": 1.57,
+          "range": 11.8459
+        },
+        "wrist_R_up": {
+          "max": 13.416,
+          "min": 1.5701,
+          "range": 11.8459
+        }
+      },
+      "cycle": {
+        "beats": 3,
+        "cadence_hz": 1.2,
+        "stroke_deg": 101.96
+      },
+      "distal_wing_bone_count": 14,
+      "distal_wing_bones": [
+        "L_WingClaw",
+        "L_WingFinger1",
+        "L_WingFinger2",
+        "L_WingFinger3",
+        "L_WingMembrane1",
+        "L_WingMembrane2",
+        "L_WingWrist",
+        "R_WingClaw",
+        "R_WingFinger1",
+        "R_WingFinger2",
+        "R_WingFinger3",
+        "R_WingMembrane1",
+        "R_WingMembrane2",
+        "R_WingWrist"
+      ],
+      "duration_s": 2.5,
+      "fps": 24,
+      "frames": 61,
+      "gait_mirror": {
+        "error": 0.0,
+        "foot": {
+          "error": 0.0,
+          "shift": 0.0
+        },
+        "knuckle": {
+          "error": 0.0,
+          "shift": 0.0
+        }
+      },
+      "head_path": 18.4272,
+      "loop_seam_max": 0.95993,
+      "lowest_bones": [
+        "L_WingFinger1_end",
+        "L_WingFinger2_end",
+        "Root",
+        "Tail10"
+      ],
+      "lowest_vertex_frame": 42,
+      "lowest_vertex_up": -10.1587,
+      "moving_bone_count": 42,
+      "moving_bones": {
+        "Body": 60.0,
+        "Head": 15.98,
+        "L_Calf": 60.8,
+        "L_Foot": 53.0,
+        "L_Thigh": 59.79,
+        "L_Toes": 45.99,
+        "L_WingClaw": 12.0,
+        "L_WingElbow": 61.96,
+        "L_WingFinger1": 52.0,
+        "L_WingFinger2": 47.48,
+        "L_WingFinger3": 42.96,
+        "L_WingMembrane1": 19.43,
+        "L_WingMembrane2": 14.66,
+        "L_WingShoulder": 79.9,
+        "L_WingWrist": 49.86,
+        "Neck1": 12.6,
+        "Neck2": 15.4,
+        "R_Calf": 60.8,
+        "R_Foot": 53.0,
+        "R_Thigh": 59.79,
+        "R_Toes": 45.99,
+        "R_WingClaw": 12.0,
+        "R_WingElbow": 61.96,
+        "R_WingFinger1": 52.0,
+        "R_WingFinger2": 47.48,
+        "R_WingFinger3": 42.96,
+        "R_WingMembrane1": 19.43,
+        "R_WingMembrane2": 14.66,
+        "R_WingShoulder": 79.9,
+        "R_WingWrist": 49.86,
+        "Spine2": 17.98,
+        "Spine3": 21.98,
+        "Tail1": 8.39,
+        "Tail10": 28.78,
+        "Tail2": 10.66,
+        "Tail3": 12.92,
+        "Tail4": 15.19,
+        "Tail5": 17.45,
+        "Tail6": 19.72,
+        "Tail7": 21.99,
+        "Tail8": 24.25,
+        "Tail9": 26.52
+      },
+      "plant_offset_units": 1411,
+      "tail_tip_path": 75.1894
+    },
+    "walk": {
+      "action": "walk",
+      "channels": {
+        "body_axis_deg": {
+          "max": 8.5422,
+          "min": 7.5657,
+          "range": 0.9765
+        },
+        "foot_L_fwd": {
+          "max": -3.0086,
+          "min": -5.4564,
+          "range": 2.4478
+        },
+        "foot_L_lat": {
+          "max": 2.2982,
+          "min": 1.9524,
+          "range": 0.3458
+        },
+        "foot_L_up": {
+          "max": 3.0693,
+          "min": 1.4807,
+          "range": 1.5887
+        },
+        "foot_R_fwd": {
+          "max": -2.9649,
+          "min": -5.5114,
+          "range": 2.5465
+        },
+        "foot_R_lat": {
+          "max": -1.9137,
+          "min": -2.3402,
+          "range": 0.4265
+        },
+        "foot_R_up": {
+          "max": 3.1041,
+          "min": 1.4641,
+          "range": 1.6399
+        },
+        "foot_symmetry_error": {
+          "max": 4.1244,
+          "min": 0.1737,
+          "range": 3.9507
+        },
+        "head_fwd": {
+          "max": 9.3801,
+          "min": 9.3424,
+          "range": 0.0377
+        },
+        "head_lat": {
+          "max": 0.3123,
+          "min": -0.3123,
+          "range": 0.6246
+        },
+        "head_pitch_deg": {
+          "max": -23.9478,
+          "min": -25.8853,
+          "range": 1.9375
+        },
+        "head_up": {
+          "max": -0.658,
+          "min": -0.8972,
+          "range": 0.2391
+        },
+        "knuckle_L_fwd": {
+          "max": 0.127,
+          "min": -5.3125,
+          "range": 5.4395
+        },
+        "knuckle_L_up": {
+          "max": 14.6685,
+          "min": 3.019,
+          "range": 11.6495
+        },
+        "knuckle_R_fwd": {
+          "max": 0.4255,
+          "min": -5.6413,
+          "range": 6.0669
+        },
+        "knuckle_R_up": {
+          "max": 14.7375,
+          "min": 2.7958,
+          "range": 11.9417
+        },
+        "knuckle_above_toe": {
+          "max": 9.2641,
+          "min": 1.3152,
+          "range": 7.949
+        },
+        "lowest_bone_up": {
+          "max": 0.0,
+          "min": 0.0,
+          "range": 0.0
+        },
+        "pelvis_up": {
+          "max": 5.1339,
+          "min": 5.1138,
+          "range": 0.0201
+        },
+        "tail_back": {
+          "max": 19.4046,
+          "min": 16.9102,
+          "range": 2.4945
+        },
+        "tail_lat": {
+          "max": 5.7888,
+          "min": -5.4277,
+          "range": 11.2165
+        },
+        "tail_up": {
+          "max": 7.3946,
+          "min": 2.9038,
+          "range": 4.4908
+        },
+        "wing_azim_L": {
+          "max": 33.4835,
+          "min": 5.7604,
+          "range": 27.7231
+        },
+        "wing_azim_R": {
+          "max": 35.3789,
+          "min": 4.6611,
+          "range": 30.7178
+        },
+        "wing_azim_bias": {
+          "max": 26.5071,
+          "min": -26.72,
+          "range": 53.2271
+        },
+        "wing_elev_L": {
+          "max": 38.1166,
+          "min": -8.7434,
+          "range": 46.86
+        },
+        "wing_elev_R": {
+          "max": 38.3602,
+          "min": -9.5841,
+          "range": 47.9443
+        },
+        "wing_elev_bias": {
+          "max": 42.7936,
+          "min": -42.8743,
+          "range": 85.6679
+        },
+        "wing_span_L": {
+          "max": 23.229,
+          "min": 22.7605,
+          "range": 0.4686
+        },
+        "wing_span_R": {
+          "max": 23.229,
+          "min": 22.7603,
+          "range": 0.4687
+        },
+        "wing_symmetry_error": {
+          "max": 1.3211,
+          "min": 0.0234,
+          "range": 1.2977
+        },
+        "wrist_L_up": {
+          "max": 9.0879,
+          "min": 3.3296,
+          "range": 5.7583
+        },
+        "wrist_R_up": {
+          "max": 9.1488,
+          "min": 3.223,
+          "range": 5.9259
+        }
+      },
+      "cycle": {
+        "beats": 1,
+        "cadence_hz": 0.667,
+        "stroke_deg": 46.86
+      },
+      "distal_wing_bone_count": 2,
+      "distal_wing_bones": [
+        "L_WingWrist",
+        "R_WingWrist"
+      ],
+      "duration_s": 1.5,
+      "fps": 24,
+      "frames": 37,
+      "gait_mirror": {
+        "error": 0.0467,
+        "foot": {
+          "error": 0.0467,
+          "shift": 0.351
+        },
+        "knuckle": {
+          "error": 0.0368,
+          "shift": 0.649
+        }
+      },
+      "head_path": 1.6562,
+      "loop_seam_max": 0.0,
+      "lowest_bones": [
+        "Root"
+      ],
+      "lowest_vertex_frame": 2,
+      "lowest_vertex_up": -0.6065,
+      "moving_bone_count": 30,
+      "moving_bones": {
+        "Body": 4.4,
+        "Head": 2.14,
+        "L_Calf": 27.99,
+        "L_Foot": 19.97,
+        "L_Thigh": 40.0,
+        "L_Toes": 15.98,
+        "L_WingElbow": 12.45,
+        "L_WingShoulder": 25.8,
+        "L_WingWrist": 16.98,
+        "Neck1": 2.0,
+        "Neck2": 2.8,
+        "R_Calf": 27.98,
+        "R_Foot": 19.96,
+        "R_Thigh": 40.0,
+        "R_Toes": 15.99,
+        "R_WingElbow": 12.45,
+        "R_WingShoulder": 25.81,
+        "R_WingWrist": 16.97,
+        "Spine2": 1.0,
+        "Spine3": 0.69,
+        "Tail1": 3.85,
+        "Tail10": 13.16,
+        "Tail2": 4.88,
+        "Tail3": 5.91,
+        "Tail4": 6.96,
+        "Tail5": 8.0,
+        "Tail6": 9.02,
+        "Tail7": 10.07,
+        "Tail8": 11.12,
+        "Tail9": 12.15
+      },
+      "plant_offset_units": 84,
+      "tail_tip_path": 25.4586
+    }
+  },
+  "fit_metres_per_unit": 0.0072,
+  "schema": "wyvern_clip_signature.v2"
+}

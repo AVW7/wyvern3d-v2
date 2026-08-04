@@ -1,0 +1,246 @@
+{
+  "schema": "wyvern_clip_contract.v2",
+  "about": [
+    "Per-mode thresholds for the 16 clips on the clean wyvern rig, asserted by",
+    "src/render/assets/animationContracts.test.ts against",
+    "wyvern-clip-signatures.json (regenerate with `pnpm assets:wyvern-clips --measure`).",
+    "",
+    "Every rule names the defect it exists to catch. All of them are real: each",
+    "was measured in the clip set this replaces, and none was caught, because the",
+    "gate was `describe.skip` and the signature file still described the vendor rig."
+  ],
+  "modes": {
+    "symmetry": {
+      "summary": "left and right agree \u2014 the defect that shipped in seven of sixteen clips",
+      "clips": [
+        "idle",
+        "rest",
+        "cruise",
+        "scout",
+        "hover",
+        "speed",
+        "glide",
+        "dive",
+        "takeoff",
+        "land",
+        "attack",
+        "breath"
+      ],
+      "rules": [
+        {
+          "channel": "channels.wing_symmetry_error.max",
+          "max": 0.35,
+          "because": "reflected wingtip distance over semispan. The old walk held its left tip 1879 units fore of its right (126% of semispan); rest measured 264%, death 220%, takeoff 124%, land 103%, attack 63%, breath 43%. Cause was unkeyed bones baking a stale asymmetric viewport pose at export, not authoring. `walk` is exempt and checked by `gait` instead: an alternating gait is asymmetric at every instant by design."
+        },
+        {
+          "channel": "channels.foot_symmetry_error.max",
+          "max": 5.0,
+          "because": "the stale pose that caused the above was L_Thigh -20 deg against R_Thigh +15 deg. A leg mismatch is how it announced itself, so it is gated directly rather than only through the wingtips."
+        }
+      ]
+    },
+    "articulation": {
+      "summary": "the clip drives the rig it was given, not four bones of it",
+      "clips": [
+        "idle",
+        "walk",
+        "rest",
+        "cruise",
+        "scout",
+        "bankLeft",
+        "bankRight",
+        "hover",
+        "speed",
+        "glide",
+        "dive",
+        "takeoff",
+        "land",
+        "attack",
+        "breath",
+        "death"
+      ],
+      "rules": [
+        {
+          "channel": "moving_bone_count",
+          "min": 18,
+          "because": "the rig has 56 bones and the old clips moved 1 to 9 of them. breath moved exactly one bone five degrees; walk and rest moved their wings not at all. Below ~18 a clip is a held pose with a wiggle."
+        }
+      ]
+    },
+    "wing_beyond_the_elbow": {
+      "summary": "the wing is a jointed spar, not a two-segment paddle",
+      "clips": [
+        "cruise",
+        "scout",
+        "bankLeft",
+        "bankRight",
+        "hover",
+        "speed",
+        "glide",
+        "dive",
+        "takeoff",
+        "land",
+        "death"
+      ],
+      "rules": [
+        {
+          "channel": "distal_wing_bone_count",
+          "min": 8,
+          "because": "wrist, three finger spars, two membranes and the claw \u2014 14 of the 20 wing bones \u2014 never moved in ANY of the 16 old clips. Without them there is no camber on the downstroke and no flick at the top, and the fold cannot close, which is what forced rest to need a 7.95 m lift to plant."
+        }
+      ]
+    },
+    "flight_cadence": {
+      "summary": "flight modes are distinguishable by their wingbeat, which is what makes them modes",
+      "clips": [
+        "cruise",
+        "scout",
+        "bankLeft",
+        "bankRight",
+        "hover",
+        "speed"
+      ],
+      "rules": [
+        {
+          "channel": "cycle.cadence_hz",
+          "min": 0.4,
+          "max": 2.2,
+          "because": "the old cruise ran at 0.49 Hz against a 3-beats-in-2.0 s spec, while speed ran at 3.33 Hz against a 0.8 Hz spec \u2014 the two were, if anything, the wrong way round. This band brackets every authored mode; the per-mode ordering is asserted separately in the test."
+        },
+        {
+          "channel": "cycle.stroke_deg",
+          "min": 12.0,
+          "because": "a cruise loop with a 27.3 degree stroke and no detectable wingbeat shipped past a reviewed contact sheet once already."
+        }
+      ]
+    },
+    "grounded_plant": {
+      "summary": "clips that carry yOffset 0 do not stand inside the floor",
+      "clips": [
+        "idle",
+        "breath"
+      ],
+      "rules": [
+        {
+          "channel": "lowest_vertex_up",
+          "min": -0.35,
+          "because": "manifest.ts gives idle and breathe yOffset 0, so the lowest skinned vertex is where the model meets the ground. idle measures +0.114 m, matching the manifest's own documented +0.10..+0.13 m. An earlier pass had breath at -7.25 m because the tail's base pitch was negative and +X lifts the tail on this rig."
+        }
+      ]
+    },
+    "loops": {
+      "summary": "a looping clip returns to its opening pose",
+      "clips": [
+        "idle",
+        "walk",
+        "rest",
+        "cruise",
+        "scout",
+        "bankLeft",
+        "bankRight",
+        "hover",
+        "speed",
+        "glide",
+        "dive",
+        "breath",
+        "attack"
+      ],
+      "rules": [
+        {
+          "channel": "loop_seam_max",
+          "max": 0.05,
+          "because": "docs/WYVERN_ANIMATIONS.md calls a clip loopable under 0.05. Every loop here is built from whole-number harmonic cycles, so the seam is exact by construction rather than by tolerance \u2014 a non-zero value means someone added a term that does not complete."
+        }
+      ]
+    },
+    "tail_is_not_cargo": {
+      "summary": "ten tail bones do something",
+      "clips": [
+        "idle",
+        "walk",
+        "rest",
+        "cruise",
+        "scout",
+        "hover",
+        "speed",
+        "glide",
+        "dive",
+        "takeoff",
+        "land",
+        "breath",
+        "death"
+      ],
+      "rules": [
+        {
+          "channel": "tail_tip_path",
+          "min": 0.05,
+          "because": "twelve of the sixteen old clips left the tail completely still, and the four that moved it rotated Tail1/Tail2 only, swinging all ten bones as one rigid spike. The tail is the counterweight; a flight clip without one reads as a model on a stick."
+        }
+      ]
+    },
+    "gait": {
+      "summary": "an alternating gait: the right limbs trace the left ones, delayed",
+      "clips": [
+        "walk",
+        "idle",
+        "rest",
+        "breath"
+      ],
+      "rules": [
+        {
+          "channel": "gait_mirror.error",
+          "max": 0.09,
+          "because": "Instantaneous left/right symmetry cannot judge a gait \u2014 a correct walk reads 1.32 on `wing_symmetry_error` and so would a dislocated one. This searches for the phase shift that makes the mirrored left limb match the right, per contact pair, and reports the residual. A dislocated limb has no shift that works. Measured 0.047 (feet) and 0.037 (knuckles) on the authored walk."
+        }
+      ]
+    },
+    "quadrupedal": {
+      "summary": "the wings are forelimbs and carry weight on the ground",
+      "clips": [
+        "idle",
+        "walk"
+      ],
+      "rules": [
+        {
+          "channel": "channels.knuckle_above_toe.min",
+          "min": -0.6,
+          "max": 2.1,
+          "because": "This creature walks on its wing knuckles. Measured on v1: `Battle_Stand` puts the knuckle BELOW the toe (1.86 vs 1.99) and `Battle_Walk` plants it at 0.64 against a foot floor of 0.15. An earlier pass authored the grounded clips as a biped with the wings folded over the back, which reads as a bird \u2014 the single most visible thing about the model at ground level. The band brackets the authored idle (0.50) and walk (1.32); above it the forelimbs are not carrying."
+        }
+      ]
+    }
+  },
+  "cadence_order": {
+    "about": "Relative cadence, which is what actually separates the flight modes. Asserted as an ordering rather than as absolute numbers so retuning one mode does not require retuning the table.",
+    "faster_than": [
+      [
+        "speed",
+        "cruise"
+      ],
+      [
+        "hover",
+        "cruise"
+      ],
+      [
+        "cruise",
+        "scout"
+      ],
+      [
+        "scout",
+        "glide"
+      ]
+    ]
+  },
+  "chain_seams": {
+    "about": "One-shots the manifest chains via `next` must end on the pose the target starts in.",
+    "max": 0.02,
+    "because": "fly -> airborne fires on every launch and land -> idle on every homecoming, so a mismatch is a pop the player sees constantly. An earlier pass measured land -> idle at 0.46 rad because idle never folded its wrist and finger spars while every other grounded clip did."
+  },
+  "gait_couplets": {
+    "about": "Diagonal couplets, measured off v1's Battle_Walk at frame resolution: each hind foot plants with the OPPOSITE wing knuckle, the two couplets 0.36 of a cycle apart \u2014 an overlapping walk, not a trot. The feet and knuckles therefore mirror at OPPOSITE shifts, which is why gait_mirror searches each pair separately.",
+    "clip": "walk",
+    "foot_shift": 0.36,
+    "knuckle_shift": 0.64,
+    "tolerance": 0.06
+  }
+}

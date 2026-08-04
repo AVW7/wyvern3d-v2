@@ -8,13 +8,20 @@
  * 22-degree body axis and its two wings 38 units apart shipped and had to be
  * found by eye.
  *
- * `validation/wyvern-animations/clip-contracts.json` restates those contracts as
- * thresholds against measured channels, every one carrying the vendor clip it
- * was derived from. This file asserts them.
+ * `validation/wyvern-animations/wyvern-clip-contracts.json` restates those
+ * contracts as thresholds against measured channels, every one naming the defect
+ * it exists to catch. This file asserts them.
  *
- * Blender is needed only to regenerate `clip-signatures.json`
- * (`pnpm assets:analyze-clips`). The gate itself is pure data and runs in
- * `pnpm test` on every change.
+ * This suite was `describe.skip` for the whole of the rig rebuild, with a comment
+ * saying placeholders were in use — but `manifest.ts` had been wired to the real
+ * `wyvern.glb` in the meantime, and the signature file it read still described
+ * the 78 vendor clips of the model that was replaced. So the gate was dark while
+ * seven of sixteen clips shipped a dislocated wing. Do not skip it again: if a
+ * clip is not ready, leave it out of `clips` in the contract with a reason.
+ *
+ * Blender is needed only to regenerate the signatures
+ * (`pnpm assets:wyvern-clips --measure`). The gate itself is pure data and runs
+ * in `pnpm test` on every change.
  */
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
@@ -23,30 +30,27 @@ import { ASSETS, type ClipSpec, type ModelState } from './manifest'
 /** Union type for clip spec arrays or single specs */
 type StateClips = ClipSpec | ClipSpec[]
 
-/**
- * TEMPORARY: Tests disabled until new rig is built.
- * 
- * The animation contracts test suite validates that the manifest maps to clips
- * that actually exist in the GLB and satisfy motion-quality thresholds. These
- * tests require a real GLB with measured clip signatures.
- * 
- * During the rebuild, we're using placeholders (url: null) exclusively, so these
- * tests are skipped. They will be re-enabled once the new rig is wired up.
- */
-
-describe.skip('animation contracts (placeholder mode)', () => {
-  // Tests will be re-enabled once the new rig is built
-
 interface Signature {
-  source: 'vendor' | 'sidecar'
-  blender_action: string
-  frames: [number, number]
-  frame_count: number
+  action: string
+  frames: number
   duration_s: number
-  cycle: { beats: number; cadence_hz: number; beat_frames: number } | null
-  loop: { pose_mean: number; pose_max: number; basis_max: number; loops: boolean }
-  ground_clearance: { min: number | null; max: number | null }
-  [channel: string]: unknown
+  fps: number
+  channels: Record<string, { min: number; max: number; range: number }>
+  cycle: { beats: number; cadence_hz: number; stroke_deg: number }
+  gait_mirror: {
+    error: number
+    foot: { error: number; shift: number }
+    knuckle: { error: number; shift: number }
+  }
+  head_path: number
+  tail_tip_path: number
+  loop_seam_max: number
+  lowest_vertex_up: number | null
+  plant_offset_units: number | null
+  moving_bones: Record<string, number>
+  moving_bone_count: number
+  distal_wing_bones: string[]
+  distal_wing_bone_count: number
 }
 
 interface Rule {
@@ -65,14 +69,26 @@ interface Mode {
 const load = <T>(relative: string): T =>
   JSON.parse(readFileSync(new URL(relative, import.meta.url), 'utf8')) as T
 
-const signatures = load<{ schema: string; clips: Record<string, Signature> }>(
-  '../../../validation/wyvern-animations/clip-signatures.json',
-)
-const contracts = load<{ schema: string; modes: Record<string, Mode> }>(
-  '../../../validation/wyvern-animations/clip-contracts.json',
-)
+const signatures = load<{
+  schema: string
+  chain_seams: Record<string, number>
+  clips: Record<string, Signature>
+}>('../../../validation/wyvern-animations/wyvern-clip-signatures.json')
 
-/** Resolve a dotted channel path such as `wingtip_L.stroke_arc_deg`. */
+const contracts = load<{
+  schema: string
+  modes: Record<string, Mode>
+  cadence_order: { faster_than: [string, string][] }
+  chain_seams: { max: number; because: string }
+  gait_couplets: {
+    clip: string
+    foot_shift: number
+    knuckle_shift: number
+    tolerance: number
+  }
+}>('../../../validation/wyvern-animations/wyvern-clip-contracts.json')
+
+/** Resolve a dotted channel path such as `channels.wing_symmetry_error.max`. */
 function channel(signature: Signature, path: string): number | null {
   let node: unknown = signature
   for (const key of path.split('.')) {
@@ -103,7 +119,12 @@ function violations(clip: string, signature: Signature, rules: Rule[]): string[]
 
 const asSpecs = (clips: StateClips): ClipSpec[] => (Array.isArray(clips) ? clips : [clips])
 
-/** Every wyvern clip the manifest can ask a mixer to play, with where it came from. */
+/**
+ * Every wyvern clip the manifest can ask a mixer to play, with where it came
+ * from. The asset's own clip map is carried along rather than looked up again
+ * by id, because resolving a `next` means reading a sibling state off the same
+ * asset.
+ */
 const wired = Object.entries(ASSETS)
   .filter(([assetId]) => assetId.startsWith('wyvern.'))
   .flatMap(([assetId, asset]) =>
@@ -112,19 +133,24 @@ const wired = Object.entries(ASSETS)
         assetId,
         state: state as ModelState,
         spec,
+        siblings: (asset.animations ?? {}) as Partial<Record<ModelState, StateClips>>,
       })),
     ),
   )
 
 describe('measured clip signatures', () => {
   it('is the schema the gate was written against', () => {
-    expect(signatures.schema).toBe('wyvern_clip_signature.v1')
-    expect(contracts.schema).toBe('wyvern_clip_contract.v1')
+    expect(signatures.schema).toBe('wyvern_clip_signature.v2')
+    expect(contracts.schema).toBe('wyvern_clip_contract.v2')
   })
 
-  it('covers both the vendor file and the authored sidecar', () => {
-    const sources = new Set(Object.values(signatures.clips).map((clip) => clip.source))
-    expect(sources).toEqual(new Set(['vendor', 'sidecar']))
+  it('describes the clean rig, not the vendor model it replaced', () => {
+    // The stale signature file was the reason the old gate could not have
+    // caught anything even had it run: it listed `SKM_DaenerysDragon|…` clips
+    // that no longer exist in the GLB the manifest loads.
+    const names = Object.keys(signatures.clips)
+    expect(names).toContain('cruise')
+    expect(names.filter((name) => name.includes('DaenerysDragon'))).toEqual([])
   })
 })
 
@@ -134,12 +160,69 @@ describe('mode contracts', () => {
       for (const clip of contract.clips) {
         it(clip, () => {
           const signature = signatures.clips[clip]
-          if (!signature) throw new Error(`${clip} · absent from clip-signatures.json`)
+          if (!signature) throw new Error(`${clip} · absent from wyvern-clip-signatures.json`)
           expect(violations(clip, signature, contract.rules)).toEqual([])
         })
       }
     })
   }
+})
+
+describe('flight modes are distinguishable', () => {
+  /**
+   * Absolute cadence numbers are a tuning choice; the *ordering* is the design.
+   * A speed loop slower than cruise is not a slightly mistuned clip, it is the
+   * wrong clip — and that is what shipped, with cruise at 0.49 Hz and speed at
+   * 3.33 Hz against specs asking for very nearly the reverse.
+   */
+  for (const [faster, slower] of contracts.cadence_order.faster_than) {
+    it(`${faster} beats faster than ${slower}`, () => {
+      const a = signatures.clips[faster]?.cycle.cadence_hz
+      const b = signatures.clips[slower]?.cycle.cadence_hz
+      expect(a, `${faster} missing from the signatures`).toBeDefined()
+      expect(b, `${slower} missing from the signatures`).toBeDefined()
+      expect(
+        `${faster} ${a}Hz vs ${slower} ${b}Hz`,
+        'cadence ordering',
+      ).toBe(`${faster} ${a}Hz vs ${slower} ${b}Hz`)
+      expect(a!).toBeGreaterThan(b!)
+    })
+  }
+})
+
+describe('the wyvern walks on its wings', () => {
+  /**
+   * This creature is a quadruped: the wings are forelimbs and carry the
+   * forequarters on the ground. v1 plants the wing knuckles in `Battle_Walk`
+   * *and* in `Battle_Stand`, and an earlier pass here authored the grounded
+   * clips as a biped with the wings folded over the back — which reads as a
+   * bird and is the most visible thing about the model at ground level.
+   *
+   * The couplet offset is the design, not an accident of tuning: each hind foot
+   * plants with the OPPOSITE wing knuckle, and because the couplets are 0.36 of
+   * a cycle apart rather than 0.5, the feet and the knuckles mirror at opposite
+   * shifts. Asserting both is what distinguishes a real gait from four limbs
+   * oscillating in step.
+   */
+  const { clip, foot_shift, knuckle_shift, tolerance } = contracts.gait_couplets
+
+  it(`${clip} plants its hind feet with the opposite wing knuckle`, () => {
+    const gait = signatures.clips[clip]?.gait_mirror
+    if (!gait) throw new Error(`${clip} · absent from wyvern-clip-signatures.json`)
+    expect(
+      `foot ${gait.foot.shift} knuckle ${gait.knuckle.shift}`,
+      'diagonal couplets mirror at opposite shifts',
+    ).toBeTruthy()
+    expect(Math.abs(gait.foot.shift - foot_shift)).toBeLessThanOrEqual(tolerance)
+    expect(Math.abs(gait.knuckle.shift - knuckle_shift)).toBeLessThanOrEqual(tolerance)
+  })
+
+  it('the fore and hind pairs are genuinely out of phase with each other', () => {
+    const gait = signatures.clips[clip]!.gait_mirror
+    // If both pairs mirrored at the same shift the animal would be hopping, not
+    // walking. Opposite shifts about 0.5 is what a diagonal couplet looks like.
+    expect(Math.abs(gait.foot.shift - gait.knuckle.shift)).toBeGreaterThan(0.15)
+  })
 })
 
 describe('manifest and signatures agree', () => {
@@ -190,7 +273,10 @@ describe('manifest and signatures agree', () => {
       if (durations.size > 1 || beats.size > 1) {
         mismatched.push(
           `phaseGroup ${name} · ${members
-            .map((m) => `${m.clip} ${m.signature?.duration_s}s/${m.signature?.cycle?.beats ?? '?'} beats`)
+            .map(
+              (m) =>
+                `${m.clip} ${m.signature?.duration_s}s/${m.signature?.cycle?.beats ?? '?'} beats`,
+            )
             .join(' vs ')}`,
         )
       }
@@ -207,11 +293,50 @@ describe('manifest and signatures agree', () => {
     const snapping = wired
       .filter(({ spec }) => spec.loop !== false)
       .flatMap(({ assetId, state, spec }) => {
-        const loop = signatures.clips[spec.clip]?.loop
-        if (!loop || loop.loops) return []
-        return [`${assetId} · ${state} · ${spec.clip} · loop error ${loop.pose_mean}`]
+        const seam = signatures.clips[spec.clip]?.loop_seam_max
+        if (seam === undefined || seam <= 0.05) return []
+        return [`${assetId} · ${state} · ${spec.clip} · loop seam ${seam}`]
       })
     expect(snapping).toEqual([])
   })
+
+  /**
+   * A one-shot with `next` hands straight over to another clip. If it does not
+   * end where that clip begins, the handoff pops — every launch, every landing.
+   */
+  it('chained one-shots end on the pose they hand off to', () => {
+    const chained = wired.filter(({ spec }) => spec.next)
+    expect(chained.length).toBeGreaterThan(0)
+
+    const popping = chained.flatMap(({ assetId, state, spec, siblings }) => {
+      const next = siblings[spec.next as ModelState]
+      if (!next) return [`${assetId} · ${state} · ${spec.next} · no such state`]
+      const key = `${spec.clip}->${asSpecs(next)[0]!.clip}`
+      const seam = signatures.chain_seams[key]
+      if (seam === undefined) return [`${assetId} · ${state} · ${key} · not measured`]
+      if (seam <= contracts.chain_seams.max) return []
+      return [`${assetId} · ${state} · ${key} · seam ${seam} > ${contracts.chain_seams.max}`]
+    })
+    expect(popping).toEqual([])
+  })
+
+  /**
+   * `yOffset` plants a ground clip on its lowest skinned vertex. It is measured,
+   * so it goes stale the moment a clip is re-authored — and the manifest's own
+   * note warns these are "live lifts of 2.26 m and 7.95 m, so a bad measurement
+   * is visible rather than harmless".
+   */
+  it('ground-loop yOffsets match the measured plant depth', () => {
+    const drifted = (['idle', 'walk', 'rest'] as const).flatMap((state) => {
+      const spec = asSpecs(ASSETS['wyvern.emberback']!.animations![state] as StateClips)[0]!
+      const measured = signatures.clips[spec.clip]?.plant_offset_units
+      if (measured === null || measured === undefined) return []
+      // Below the origin the clip must be lifted; above it, 0 is correct — the
+      // model simply stands a few centimetres clear rather than being sunk.
+      const expected = Math.max(0, measured)
+      if (Math.abs((spec.yOffset ?? 0) - expected) <= 8) return []
+      return [`${state} · ${spec.clip} · yOffset ${spec.yOffset} · measured ${expected}`]
+    })
+    expect(drifted).toEqual([])
+  })
 })
-}) // End of describe.skip

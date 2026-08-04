@@ -17,7 +17,8 @@ wired.
 | Change how battles play out | `src/core/combat/encounter.ts` (+ `ai.ts`) |
 | Wire up a real 3D model | `src/render/assets/manifest.ts` — one line, nothing else |
 | Develop or review wyvern flight animation | `docs/WYVERN_ANIMATION_BASELINE.md`, then `docs/FLIGHT_ANIMATION_DEVELOPMENT.md` |
-| Know what an animation actually measures | `validation/wyvern-animations/clip-signatures.json`; regenerate with `pnpm assets:analyze-clips` |
+| Know what an animation actually measures | `validation/wyvern-animations/wyvern-clip-signatures.json`; regenerate with `pnpm assets:wyvern-clips --measure` |
+| Re-author a wyvern clip | `scripts/author-wyvern-clips-blender.py` — read its docstring first |
 | Add/swap a static scenery prop | `scripts/asset-sources.json`, then run `scripts/extract-assets.py` |
 | Make a prop placeable in the sanctuary editor | `PROP_CATALOG` in `src/core/state/sanctuaryLayout.ts` |
 | Change how sanctuary wyverns move or behave | `src/scenes/Sanctuary/director/wyvernDirector.ts` |
@@ -231,15 +232,29 @@ camera response. Procedural attitude must not compensate for the wrong base
 posture, and bank clips must not bake a second whole-body roll. Compatible
 cruise loops share `phaseGroup: "flight"` so steering preserves wingbeat phase.
 
-**Review is numeric, not visual.** `pnpm assets:analyze-clips` measures all 74
-clips in Blender, headless, in ~20 s, into the committed
-`validation/wyvern-animations/clip-signatures.json`; `pnpm test` asserts it
-against `clip-contracts.json`, whose per-mode thresholds each name the vendor
-clip they were derived from. A change to a clip therefore lands as a readable
+**Review is numeric, not visual.** `pnpm assets:wyvern-clips --measure` rebuilds
+and measures all 16 clips in Blender, headless, into the committed
+`validation/wyvern-animations/wyvern-clip-signatures.json`; `pnpm test` asserts
+it against `wyvern-clip-contracts.json`, whose per-mode thresholds each name the
+defect they exist to catch. A change to a clip therefore lands as a readable
 per-channel diff. Contact sheets remain available and are not the gate — a
 near-black dragon hides pose in a render, and two sheets cannot be compared,
 which is how a cruise loop with a 27.3° stroke, 37.7 left/right asymmetry and no
 detectable wingbeat shipped past a reviewed sheet.
+
+**Never let a clip leave a bone unkeyed.** Blender's `export_animation_mode=
+"ACTIONS"` samples every bone on every frame, so a bone a clip does not key bakes
+whatever pose the .blend happened to be sitting in. That is how seven of sixteen
+clips shipped a dislocated wing off a single stale viewport stance (`L_Thigh
+-20°` against `R_Thigh +15°`) — the eight clips that keyed all 46 bones were
+clean and the seven that keyed 7–17 were not, with no exceptions.
+`author-wyvern-clips-blender.py` resets the pose and keys every bone on every
+clip; `wing_symmetry_error` in the gate is the backstop.
+
+**`pnpm test` is the gate and must not be skipped.** It was `describe.skip` for
+the whole rig rebuild while the manifest was already serving the real GLB, which
+is why none of the above was caught. If a clip is not ready, drop it from `clips`
+in the contract with a reason rather than skipping the suite.
 
 Any primary posture or bounds change still requires battle/sanctuary live checks
 at actual runtime scale. If a body, wing, or tail extends farther from the
@@ -254,7 +269,7 @@ work as self-contained work orders. If you are picking up animation or sanctuary
 read the development contract first, then take the first stage in the plan ledger not marked DONE.
 Do only that stage, then update its ledger row with the code. Close the plan per its own instructions
 once every stage is DONE; durable process belongs in the development contract, measured asset facts
-belong in `clip-signatures.json` and `docs/WYVERN_ANIMATION_BASELINE.md`, and the plan remains the
+belong in `wyvern-clip-signatures.json` and `docs/WYVERN_ANIMATION_BASELINE.md`, and the plan remains the
 historical work-order record.
 
 Landed since the plan opened: sanctuary placement, travel and landing, the sidecar clip pipeline,

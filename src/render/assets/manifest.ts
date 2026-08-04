@@ -190,11 +190,16 @@ const WYVERN_FIT = 0.0072
  * negated. Only the ground loops carry one: the airborne clips are positioned
  * by the scene, not planted.
  *
- * The offsets on `walk`/`rest` are measured against the clips as they stand
- * today, and those clips are known to be provisional — the wings never fold and
- * `cruise` has no vertical stroke, so they will be re-authored. Re-run the
- * measurement when they are: at this WYVERN_FIT they are live lifts of 2.26 m
- * and 7.95 m, so a bad measurement is visible rather than harmless.
+ * The offsets are measured, not guessed: `plant_offset_units` in
+ * `validation/wyvern-animations/wyvern-clip-signatures.json` is the lowest
+ * skinned vertex of each clip, and `animationContracts.test.ts` fails if these
+ * drift from it. Regenerate both with `pnpm assets:wyvern-clips --measure`.
+ *
+ * They dropped sharply when the clips were re-authored — walk from 314 to 72 and
+ * rest from 1104 to 515 — because the wings now actually fold. The old fold
+ * swept the shoulder back and left the wrist and finger spars spread, so a 21 m
+ * spar hung below the foot plane and every ground clip had to be lifted out of
+ * the floor by it.
  */
 const WYVERN_CLIPS: AssetEntry['animations'] = {
   // Ground loops, planted on the measured low point of each pose.
@@ -206,8 +211,8 @@ const WYVERN_CLIPS: AssetEntry['animations'] = {
   // clip it replaced sank its left wingtip 0.99 m BELOW the origin, because the
   // fold was mirrored wrong and put that wing forward across the chest.
   idle: { clip: 'idle', yOffset: 0 },
-  walk: { clip: 'walk', yOffset: 314 },
-  rest: { clip: 'rest', yOffset: 1104 },
+  walk: { clip: 'walk', yOffset: 84 },
+  rest: { clip: 'rest', yOffset: 515 },
 
   // One-shots. `fly` is the takeoff and chains to the cruise loop, so gameplay
   // only ever asks for `fly`.
