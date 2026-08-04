@@ -683,14 +683,17 @@ frames 0/144 and 3.4° closed at frame 72. Its evaluated skin low point is
 
 The exported model gate, v1 source-catalogue gate, source-scene audit,
 TypeScript check, focused lint, and 370 runtime tests all pass. Flight Lab's
-sanctuary camera now has a durable gate as well:
-`pnpm assets:review-flightlab-rest` evaluates the seven v1 landmarks at the
-actual Lab scale and camera, with the largest silhouette at frame 72 contained
-within 50.0% width and 39.2% height of a 1440×900 viewport. Grounded Lab
-states now use their manifest lift at ground level, while airborne states retain
-the Lab's 4 m inspection altitude; this makes the rest result a real contact
-review rather than a floating specimen. The source capture and numeric record
-live in `WYVERN_V1_CORE_CAPTURE_RECORDS.md`.
+camera review now has durable gates as well. `pnpm assets:review-flightlab-rest`
+evaluates the seven rest landmarks through every Lab camera, while
+`pnpm assets:review-flightlab` sweeps all 16 shipped clips through all six
+presets (96 clip/camera rows; 48 samples per non-rest clip). Every envelope is
+contained at the actual Lab scale in a 1440×900 viewport. The three-quarter,
+sanctuary, and battle presets were moved back after that sweep exposed cropping
+in wide-bank and death poses. Grounded Lab states now use their manifest lift at
+ground level, while airborne states retain the Lab's 4 m inspection altitude;
+this makes the rest result a real contact review rather than a floating
+specimen. The source capture and numeric record live in
+`WYVERN_V1_CORE_CAPTURE_RECORDS.md`.
 
 ---
 

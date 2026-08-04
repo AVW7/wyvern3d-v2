@@ -17,7 +17,8 @@
     "assets:wyvern-walk": "python3 scripts/author-wyvern-walk.py",
     "assets:wyvern-wing-surfaces": "python3 scripts/author-wyvern-wing-surfaces.py",
     "assets:validate-v1-catalog": "node scripts/validate-v1-action-catalog.mjs",
-    "assets:review-flightlab-rest": "node scripts/review-flightlab-rest.mjs"
+    "assets:review-flightlab-rest": "node scripts/review-flightlab-rest.mjs",
+    "assets:review-flightlab": "node scripts/review-flightlab-rest.mjs --all"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",

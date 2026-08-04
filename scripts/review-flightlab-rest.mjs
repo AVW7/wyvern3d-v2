@@ -1,19 +1,21 @@
 #!/usr/bin/env node
 /**
- * Measure the rebuilt `rest` loop in Flight Lab's sanctuary camera.
+ * Measure any shipped wyvern clip in every Flight Lab camera.
  *
  * This uses the exact fixed camera, altitude, asset fit, species scale and
  * per-clip ground lift that `FlightLabCanvas`, `FlightLabRigContainer`, and
  * `GameModel` apply at runtime. It reports the visible screen envelope at the
- * v1 landmark phases, so the lab camera cannot silently crop a pose after an
- * animation or scale change.
+ * v1 landmark phases for `rest` and 48 evenly spaced samples for every other
+ * clip, so a Lab camera cannot silently crop a pose after an animation or
+ * scale change.
  *
- * Usage: node scripts/review-flightlab-rest.mjs
+ * Usage: node scripts/review-flightlab-rest.mjs [state ... | --all]
  */
 
 import { Buffer } from 'node:buffer'
 import console from 'node:console'
 import fs from 'node:fs'
+import process from 'node:process'
 import { fileURLToPath, URL } from 'node:url'
 import {
   AnimationMixer,
@@ -25,22 +27,53 @@ import {
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
 const MODEL = fileURLToPath(new URL('../public/models/wyvern.glb', import.meta.url))
-const CLIP = 'rest'
-const LANDMARKS = [0, 18, 36, 72, 108, 126, 144]
+const REST_LANDMARKS = [0, 18, 36, 72, 108, 126, 144]
+const SAMPLES_PER_CLIP = 48
 const FPS = 24
 
-// `CAMERAS.sanctuary` and the grounded-state altitude in the Flight Lab.
-const CAMERA_POSITION = [0, 26, 58]
-const CAMERA_TARGET = [0, 10, 0]
-const CAMERA_FOV = 60
+// `CAMERAS` in the Flight Lab. Every one is a review surface, so no clip may
+// silently crop when the artist changes preset.
+const CAMERAS = {
+  side: { position: [130, 16, 0], fov: 35, target: [0, 8, 0] },
+  front: { position: [0, 16, 130], fov: 35, target: [0, 8, 0] },
+  top: { position: [0, 125, 0.01], fov: 35, target: [0, 0, 0] },
+  threeQuarter: { position: [104, 58, 104], fov: 40, target: [0, 8, 0] },
+  sanctuary: { position: [0, 36, 93], fov: 60, target: [0, 10, 0] },
+  battle: { position: [0, 31, 88], fov: 65, target: [0, 6, 0] },
+}
 const CAMERA_ASPECT = 16 / 10 // 1440 × 900 review viewport
-const FLIGHT_LAB_ALTITUDE = 0
+const FLIGHT_LAB_ALTITUDE = 4
 
-// `wyvern.emberback` uses `WYVERN_FIT * 0.85`; `rest.yOffset` is 331.
+// Every mapped clip in `WYVERN_CLIPS`, plus the matching Flight Lab state.
+// Keep the altitude classification aligned with `AIRBORNE_STATES` in
+// FlightLabRigContainer.tsx.
+const STATES = {
+  idle: { clip: 'idle', yOffset: 0, airborne: false },
+  walk: { clip: 'walk', yOffset: 7.5, airborne: false },
+  rest: { clip: 'rest', yOffset: 331, airborne: false },
+  fly: { clip: 'takeoff', yOffset: 0, airborne: true },
+  land: { clip: 'land', yOffset: 0, airborne: true },
+  cruise: { clip: 'cruise', yOffset: 0, airborne: true },
+  scout: { clip: 'scout', yOffset: 0, airborne: true },
+  bankLeft: { clip: 'bankLeft', yOffset: 0, airborne: true },
+  bankRight: { clip: 'bankRight', yOffset: 0, airborne: true },
+  hover: { clip: 'hover', yOffset: 0, airborne: true },
+  glide: { clip: 'glide', yOffset: 0, airborne: true },
+  dive: { clip: 'dive', yOffset: 0, airborne: true },
+  speed: { clip: 'speed', yOffset: 0, airborne: true },
+  attack: { clip: 'attack', yOffset: 0, airborne: false },
+  breathe: { clip: 'breath', yOffset: 0, airborne: false },
+  death: { clip: 'death', yOffset: 0, airborne: false },
+}
 const FIT = 0.0072
 const SPECIES_SIZE = 0.85
-const REST_Y_OFFSET = 331
-const MAX_SCREEN_COVERAGE = 0.9
+const MAX_SCREEN_FRACTION = 0.95
+
+const requested = process.argv.slice(2)
+const stateNames = requested.includes('--all') ? Object.keys(STATES) : requested.length ? requested : ['rest']
+for (const state of stateNames) {
+  if (!STATES[state]) throw new Error(`unknown Flight Lab state ${state}`)
+}
 
 function stripTextures(data) {
   let offset = 12
@@ -95,32 +128,31 @@ const gltf = await new Promise((resolve, reject) => {
     reject,
   )
 })
-const clip = gltf.animations.find(({ name }) => name === CLIP)
-if (!clip) throw new Error(`missing ${CLIP} clip`)
-
 const scale = FIT * SPECIES_SIZE
 gltf.scene.scale.setScalar(scale)
-gltf.scene.position.y = FLIGHT_LAB_ALTITUDE + REST_Y_OFFSET * scale
-
 const mixer = new AnimationMixer(gltf.scene)
-const camera = new PerspectiveCamera(CAMERA_FOV, CAMERA_ASPECT, 1, 2000)
-camera.position.fromArray(CAMERA_POSITION)
-camera.lookAt(...CAMERA_TARGET)
-camera.updateProjectionMatrix()
-camera.updateMatrixWorld(true)
 
-function poseAt(frame) {
+function cameraFor(spec) {
+  const camera = new PerspectiveCamera(spec.fov, CAMERA_ASPECT, 1, 2000)
+  camera.position.fromArray(spec.position)
+  camera.lookAt(...spec.target)
+  camera.updateProjectionMatrix()
+  camera.updateMatrixWorld(true)
+  return camera
+}
+
+function poseAt(clip, time) {
   mixer.stopAllAction()
   const action = mixer.clipAction(clip)
   action.setLoop(LoopOnce, 1)
   action.clampWhenFinished = true
   action.reset().play()
-  action.time = frame / FPS
+  action.time = time
   mixer.update(0)
   gltf.scene.updateMatrixWorld(true)
 }
 
-function screenEnvelope() {
+function screenEnvelope(camera) {
   const box = new Box3().setFromObject(gltf.scene, true)
   const corners = [
     [box.min.x, box.min.y, box.min.z], [box.min.x, box.min.y, box.max.z],
@@ -142,8 +174,12 @@ function screenEnvelope() {
       z: [minZ, maxZ],
     },
     coverage: {
-      width: maxX - minX,
-      height: maxY - minY,
+      width_ndc: maxX - minX,
+      height_ndc: maxY - minY,
+      // NDC spans −1…+1, so divide the NDC range by two to express the
+      // silhouette as a fraction of the visible viewport.
+      width_fraction: (maxX - minX) / 2,
+      height_fraction: (maxY - minY) / 2,
     },
     bounds_m: {
       width: box.max.x - box.min.x,
@@ -154,41 +190,56 @@ function screenEnvelope() {
   }
 }
 
-const samples = LANDMARKS.map((frame) => {
-  poseAt(frame)
-  return { frame, ...screenEnvelope() }
-})
-const widest = samples.reduce((best, sample) => sample.coverage.width > best.coverage.width ? sample : best)
-const tallest = samples.reduce((best, sample) => sample.coverage.height > best.coverage.height ? sample : best)
-const failed = samples.filter((sample) => !sample.contains).map((sample) => sample.frame)
-const coverageFailure = widest.coverage.width > MAX_SCREEN_COVERAGE || tallest.coverage.height > MAX_SCREEN_COVERAGE
+function sampleTimes(state, clip) {
+  if (state === 'rest') return REST_LANDMARKS.map((frame) => frame / FPS)
+  return Array.from({ length: SAMPLES_PER_CLIP + 1 }, (_, index) => (index / SAMPLES_PER_CLIP) * clip.duration)
+}
+
+const rows = []
+const failures = []
+for (const state of stateNames) {
+  const spec = STATES[state]
+  const clip = gltf.animations.find(({ name }) => name === spec.clip)
+  if (!clip) throw new Error(`missing ${spec.clip} clip for ${state}`)
+  gltf.scene.position.y = (spec.airborne ? FLIGHT_LAB_ALTITUDE : 0) + spec.yOffset * scale
+  const times = sampleTimes(state, clip)
+
+  for (const [cameraName, cameraSpec] of Object.entries(CAMERAS)) {
+    const camera = cameraFor(cameraSpec)
+    const samples = times.map((time) => {
+      poseAt(clip, time)
+      return screenEnvelope(camera)
+    })
+    const widest = samples.reduce((best, sample) => sample.coverage.width_fraction > best.coverage.width_fraction ? sample : best)
+    const tallest = samples.reduce((best, sample) => sample.coverage.height_fraction > best.coverage.height_fraction ? sample : best)
+    const contains = samples.every((sample) => sample.contains)
+    const coverageFailure = widest.coverage.width_fraction > MAX_SCREEN_FRACTION || tallest.coverage.height_fraction > MAX_SCREEN_FRACTION
+    const row = {
+      state,
+      clip: spec.clip,
+      camera: cameraName,
+      samples: samples.length,
+      widest_viewport_pct: Number((widest.coverage.width_fraction * 100).toFixed(2)),
+      tallest_viewport_pct: Number((tallest.coverage.height_fraction * 100).toFixed(2)),
+      contains,
+    }
+    rows.push(row)
+    if (!contains || coverageFailure) failures.push(row)
+  }
+}
 
 console.log(JSON.stringify({
   context: {
-    clip: CLIP,
-    landmark_frames: LANDMARKS,
-    camera: {
-      preset: 'sanctuary',
-      position: CAMERA_POSITION,
-      target: CAMERA_TARGET,
-      fov_deg: CAMERA_FOV,
-      viewport: '1440x900',
-    },
-    runtime: {
-      flight_lab_altitude_m: FLIGHT_LAB_ALTITUDE,
-      emberback_scale: scale,
-      rest_y_offset_rig_units: REST_Y_OFFSET,
-    },
+    states: stateNames,
+    cameras: Object.keys(CAMERAS),
+    viewport: '1440x900',
+    emberback_scale: scale,
+    max_screen_fraction: MAX_SCREEN_FRACTION,
   },
-  samples,
-  widest,
-  tallest,
-  failed_frames: failed,
+  rows,
+  failures,
 }, null, 2))
 
-if (failed.length || coverageFailure) {
-  throw new Error(
-    `Flight Lab sanctuary camera crops rest: frames=${failed.join(',') || 'none'} ` +
-    `width=${widest.coverage.width.toFixed(3)} height=${tallest.coverage.height.toFixed(3)}`,
-  )
+if (failures.length) {
+  throw new Error(`Flight Lab framing failed for ${failures.map((row) => `${row.state}/${row.camera}`).join(', ')}`)
 }

@@ -60,7 +60,9 @@ six-second loop and keys 8.6° open at frame 0/144 and 3.4° closed at frame 72
 (5.2° range). Its evaluated skin low point is −331.00 rig units at frame 32,
 so the runtime manifest uses `yOffset: 331`. The exported clip has an exact
 frame-zero seam. `pnpm assets:review-flightlab-rest` evaluates all seven v1
-landmarks through Flight Lab's sanctuary camera at 1440×900: every silhouette
-is contained, and the widest/tallest frame (72) occupies 50.0%/39.2% of the
-viewport. This is the Batch A camera approval; keep subsequent review in
-Flight Lab unless the action's gameplay wiring changes.
+landmarks through all six Flight Lab cameras at 1440×900: every silhouette is
+contained; the sanctuary view's largest rest envelope occupies 15.3% width and
+12.5% height of the viewport. `pnpm assets:review-flightlab` extends the same
+gate to all 16 shipped clips (96 clip/camera rows, 48 samples per non-rest
+clip). This is the Batch A camera approval; keep subsequent review in Flight
+Lab unless the action's gameplay wiring changes.

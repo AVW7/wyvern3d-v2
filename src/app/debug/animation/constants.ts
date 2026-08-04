@@ -49,9 +49,11 @@ export const CAMERAS: Record<
   side: { position: [130, 16, 0], fov: 35, target: [0, 8, 0] },
   front: { position: [0, 16, 130], fov: 35, target: [0, 8, 0] },
   top: { position: [0, 125, 0.01], fov: 35, target: [0, 0, 0] },
-  threeQuarter: { position: [42, 28, 42], fov: 40, target: [0, 8, 0] },
-  sanctuary: { position: [0, 26, 58], fov: 60, target: [0, 10, 0] },
-  battle: { position: [0, 18, 42], fov: 65, target: [0, 6, 0] },
+  // Sized against the largest current clip envelope, not a convenient idle
+  // frame. The close predecessors cropped bank and death poses in the Lab.
+  threeQuarter: { position: [104, 58, 104], fov: 40, target: [0, 8, 0] },
+  sanctuary: { position: [0, 36, 93], fov: 60, target: [0, 10, 0] },
+  battle: { position: [0, 31, 88], fov: 65, target: [0, 6, 0] },
 }
 
 export const CAMERA_KEYS: LabCamera[] = ['side', 'front', 'top', 'threeQuarter', 'sanctuary', 'battle']
