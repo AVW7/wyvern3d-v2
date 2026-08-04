@@ -18,6 +18,7 @@ wired.
 | Wire up a real 3D model | `src/render/assets/manifest.ts` — one line, nothing else |
 | Develop or review wyvern flight animation | `docs/WYVERN_ANIMATION_BASELINE.md`, then `docs/FLIGHT_ANIMATION_DEVELOPMENT.md` |
 | Know what an animation actually measures | `validation/wyvern-animations/clip-signatures.json`; regenerate with `pnpm assets:analyze-clips` |
+| Edit a clip on the new `WyvernRig` (wing axes, loop seams) | `docs/WYVERN_CLIP_AUDIT.md`; check with `pnpm assets:wyvern-audit` and `pnpm assets:validate-wyvern` |
 | Add/swap a static scenery prop | `scripts/asset-sources.json`, then run `scripts/extract-assets.py` |
 | Make a prop placeable in the sanctuary editor | `PROP_CATALOG` in `src/core/state/sanctuaryLayout.ts` |
 | Change how sanctuary wyverns move or behave | `src/scenes/Sanctuary/director/wyvernDirector.ts` |
@@ -128,6 +129,17 @@ already placed.
   the falling edge of `actor.alive`. The one exception is `Actor.hitThisTick`, which is explicitly
   presentation-only and never read by the sim. Keep it that way — an event queue in the encounter
   would have to be replay-stable.
+- **Every clip the action channel plays must be `loop: false`.** `GameModel` emits
+  `onActionFinished` for one-shots only, and that callback is the sole way a tell gets cleared, so a
+  looping spec there plays forever and pins the base locomotion state under it. Both `attack` and
+  `breathe` shipped defaulting to looping; `breathe` was the worse one, because `BreathVFX` restarts
+  its burst for as long as `action?.state === 'breathe'`, so one breath attack left the fire running
+  permanently. `manifest.action-channel.test.ts` locks it.
+- **Wing bones mirror on `Z`, not on `X`.** Local +X raises *both* wings (symmetric); local +Z sweeps
+  them in *opposite* directions, so a mirrored pose must negate `Z` on the right side. Giving both
+  wings the same `Z` folds one forward across the chest and the other back, and it is nearly
+  invisible on a near-black model — seven of the sixteen clips shipped that way, `rest` at 116.8
+  degrees apart. See `docs/WYVERN_CLIP_AUDIT.md`; `pnpm assets:validate-wyvern` catches it.
 - **The home region must never be losable.** Attacking requires an adjacent owned region, so losing
   it is an unrecoverable soft-lock. It is exempt from unrest, with a test guarding it.
 
@@ -261,15 +273,20 @@ Landed since the plan opened: sanctuary placement, travel and landing, the sidec
 head gaze, the ambient idle scheduler (sleep/sit/groom/eat/drink/perch, weighted by hunger, injury
 and bond), the flight-mode selector — `flightAnimationState` picks
 dive/glide/hover/bank/scout/speed/cruise from measured motion, each on its own hysteresis band — and most of battle
-readability — hit flash, a reachable death, attack and breath tells through the action channel, and
-a mixer-LOD `frozen` prop that stops distant wyverns advancing their pose. `GameModel`'s `onReady`
-callback hands back the cloned root, which is the seam for reaching one instance's materials or
-bones without going through the manifest.
+readability — hit flash, a reachable death, attack and breath tells through the action channel,
+fire-breath VFX, and a mixer-LOD `frozen` prop that stops distant wyverns advancing their pose.
+`GameModel`'s `onReady` callback hands back the cloned root, which is the seam for reaching one
+instance's materials or bones without going through the manifest.
 
 Gaps the ledger still records, in case you trip over them first:
 
-- **Fire breath renders nothing.** `tryBreath` does a cone test and applies damage with no visuals;
-  there is no particle, decal, sound or postprocessing system anywhere in the project.
+- **Fire breath's impact point is a placeholder.** It does render now —
+  `render/vfx/BreathVFX.tsx` is a skull-following, range-matched scaffold of layered procedural
+  flame sheets, deterministic ember/smoke pools and one mouth light, wired into battle and the
+  Flight Lab. What it cannot do is show where the fire actually *lands*: `core/combat` stays the
+  only hit authority and exposes no impact positions, so the range-end burst sits at
+  `breathRange` rather than on whatever it hit. A combat-event stream would be the fix, and it
+  would have to be replay-stable.
 - **`Actor.flying` is assigned once and never mutated**, so battle wyverns can never land and the
   `walk` / landing clips are unreachable there. Landing *is* reachable in the sanctuary, which has no
   `Actor` at all.

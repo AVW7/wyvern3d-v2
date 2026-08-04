@@ -10,6 +10,11 @@ Source: Drogon — Game of Thrones Dragon by CoreMesh 3D, CC-BY-4.0 (see
 `CREDITS.md`). Rebuild the runtime file with `python3 scripts/rebuild-drogon.py`.
 Clip names are wired to gameplay states in `src/render/assets/manifest.ts`.
 
+For a v1-to-repaired-rig rebuild, use
+`docs/WYVERN_V1_REAUTHORING_SOURCE_OF_TRUTH.md` first. It pins the source
+hashes, covers all 78 actions, and assigns each one a distinct target action and
+rebuild card. This document remains the detailed vendor-rig narrative.
+
 ## The rig
 
 | | |
@@ -37,12 +42,12 @@ consequences:
 
 ## How the numbers were measured
 
-> **This table is now generated evidence, not the source of truth.**
-> `pnpm assets:analyze-clips` measures all 74 clips — these 52 plus the authored
-> sidecar — into `validation/wyvern-animations/clip-signatures.json`, on one rig,
-> with fourteen channels rather than two. The Ground-Y column below is its
-> original 13-frame sampling; the signature file samples 48 and finds lower
-> minima on 56 of the 65 clips measured at the time. See `docs/WYVERN_ANIMATION_BASELINE.md`.
+> **This table is generated evidence, not the re-authoring authority.**
+> `validation/wyvern-animations/clip-signatures.json` measures all 78 clips —
+> these 52 plus 26 Sanctuary actions — on one rig. The Ground-Y column below is
+> its original 13-frame sampling; the signature file samples 48. See
+> `docs/WYVERN_V1_REAUTHORING_SOURCE_OF_TRUTH.md` for the pinned sources and
+> `docs/WYVERN_ANIMATION_BASELINE.md` for the numeric review contract.
 >
 > The catalogue is kept because it is the readable narrative of what each vendor
 > clip *depicts*, which no channel measures.

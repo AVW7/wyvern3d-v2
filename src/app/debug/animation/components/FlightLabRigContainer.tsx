@@ -67,10 +67,18 @@ import type { FlightLabProps } from '../FlightLab'
 import { LEG_CHAIN, TAIL_CHAIN, TAIL_WEIGHTS, MARKERS, CAMERAS } from '../constants'
 
 // The clean flight rig's swept wing membrane reaches ~2.94 world units below
-// its origin at the downstroke. Keep the lab specimen airborne by default; the
-// Pose Composer's bodyY remains a relative offset for deliberate floor/contact
-// tests rather than being the model's absolute altitude.
+// its origin at the downstroke. Keep only airborne states clear of the floor;
+// grounded clips must use their manifest yOffset directly so the Lab can review
+// their actual contacts. The Pose Composer's bodyY remains a relative offset.
 const FLIGHT_LAB_ALTITUDE = 4
+const AIRBORNE_STATES = new Set<ModelState>([
+  'fly', 'airborne', 'attackAir', 'breatheAir', 'huntCarry', 'cruise', 'scout',
+  'speed', 'glide', 'dive', 'bankLeft', 'bankRight', 'hover', 'land',
+])
+
+function flightLabAltitude(state: ModelState): number {
+  return AIRBORNE_STATES.has(state) ? FLIGHT_LAB_ALTITUDE : 0
+}
 
 export function FlightLabRigContainer({
   speciesId,
@@ -354,7 +362,7 @@ export function FlightLabRigContainer({
     )
     group.position.set(
       poseComposer ? poseEdits.bodyX : 0,
-      FLIGHT_LAB_ALTITUDE + (poseComposer ? poseEdits.bodyY : 0),
+      flightLabAltitude(state) + (poseComposer ? poseEdits.bodyY : 0),
       poseComposer ? poseEdits.bodyZ : 0,
     )
 

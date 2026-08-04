@@ -11,7 +11,13 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "assets:wyvern-idle": "python3 scripts/author-wyvern-idle.py"
+    "assets:wyvern-idle": "python3 scripts/author-wyvern-idle.py",
+    "assets:wyvern-audit": "python3 scripts/audit-wyvern-clips.py",
+    "assets:validate-wyvern": "node scripts/validate-wyvern-clips.mjs",
+    "assets:wyvern-walk": "python3 scripts/author-wyvern-walk.py",
+    "assets:wyvern-wing-surfaces": "python3 scripts/author-wyvern-wing-surfaces.py",
+    "assets:validate-v1-catalog": "node scripts/validate-v1-action-catalog.mjs",
+    "assets:review-flightlab-rest": "node scripts/review-flightlab-rest.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",

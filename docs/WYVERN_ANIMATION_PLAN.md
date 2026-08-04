@@ -487,10 +487,16 @@ transitioning between hover, cruise, and banking maintains smooth wingbeat conti
 
 **Status:** IN PROGRESS · **Depends on:** Stage 0 · **Independent of 1–4**
 
-**Items 1-4, 6, 7 landed 2026-07-30** (damage flash, death reachable, attack/breath tells, mixer LOD,
-bone sockets, hit flash — see each item below). **Items 5, 8-12 remain**: fire-breath VFX, death
-dissolve, `actor.flying` mutation, the game-feel juice layer, the broader shadow/count-based LOD
-strategy, and ground-dust VFX. `pnpm typecheck && pnpm lint && pnpm test && pnpm sim:battle` all pass
+**Items 1-7 landed** (damage flash, death reachable, attack/breath tells, mixer LOD, bone sockets,
+hit flash on 2026-07-30; fire-breath VFX after — see the ledger row for stage 5 and each item below).
+**Items 8-12 remain**: death dissolve, `actor.flying` mutation, the game-feel juice layer, the
+broader shadow/count-based LOD strategy, and ground-dust VFX.
+
+The attack/breath tells of item 3 needed one follow-up: both `attack` and `breathe` were left
+looping in the manifest, and `GameModel` reports only `loop: false` specs finished, so neither tell
+could ever be cleared — the breath one also pinned `BreathVFX` on permanently. Both are one-shots
+now, guarded by `src/render/assets/manifest.action-channel.test.ts`. See
+`docs/WYVERN_CLIP_AUDIT.md`. `pnpm typecheck && pnpm lint && pnpm test && pnpm sim:battle` all pass
 against what landed — the balance harness's curve is unchanged (still the same near-binary pattern
 recorded elsewhere in this repo's docs), confirming the new `Actor.hitThisTick` field is genuinely
 presentation-only.

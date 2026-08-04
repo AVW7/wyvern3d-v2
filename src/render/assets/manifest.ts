@@ -190,11 +190,9 @@ const WYVERN_FIT = 0.0072
  * negated. Only the ground loops carry one: the airborne clips are positioned
  * by the scene, not planted.
  *
- * The offsets on `walk`/`rest` are measured against the clips as they stand
- * today, and those clips are known to be provisional — the wings never fold and
- * `cruise` has no vertical stroke, so they will be re-authored. Re-run the
- * measurement when they are: at this WYVERN_FIT they are live lifts of 2.26 m
- * and 7.95 m, so a bad measurement is visible rather than harmless.
+ * The grounded offsets are measured against the exported clips. Re-run the
+ * measurement whenever their pose changes: a lift that is correct for a wingtip
+ * touching the floor can leave an otherwise planted walk visibly floating.
  */
 const WYVERN_CLIPS: AssetEntry['animations'] = {
   // Ground loops, planted on the measured low point of each pose.
@@ -206,8 +204,13 @@ const WYVERN_CLIPS: AssetEntry['animations'] = {
   // clip it replaced sank its left wingtip 0.99 m BELOW the origin, because the
   // fold was mirrored wrong and put that wing forward across the chest.
   idle: { clip: 'idle', yOffset: 0 },
-  walk: { clip: 'walk', yOffset: 314 },
-  rest: { clip: 'rest', yOffset: 1104 },
+  // The relaxed carrier clears its leading spar; a toe is now the low point
+  // (-7.31 rig units), so this small lift plants the gait rather than floating
+  // the whole animal on the old, wingtip-based 314-unit offset.
+  walk: { clip: 'walk', yOffset: 7.5 },
+  // Rebuilt after the jaw-hinge repair: the folded, planted rest loop reaches
+  // -331.00 rig units at f32, rather than the old spread-wing clip's -1104.
+  rest: { clip: 'rest', yOffset: 331 },
 
   // One-shots. `fly` is the takeoff and chains to the cruise loop, so gameplay
   // only ever asks for `fly`.
@@ -231,9 +234,23 @@ const WYVERN_CLIPS: AssetEntry['animations'] = {
 
   // The rig has no separate air-attack clip; the ground one reads acceptably
   // airborne because it is all forequarters.
-  attack: { clip: 'attack', yOffset: 0 },
+  //
+  // All three are one-shots, and they have to be: these are the only states the
+  // action channel plays, and GameModel emits `onActionFinished` — the single
+  // signal that clears a tell — for `loop: false` alone. A looping entry here
+  // can therefore never end. `attack` and `breathe` both used to default to
+  // looping, which left a ground attacker stuck in the attack tell (snapping 45
+  // degrees back to the wind-up on every wrap) and a breather stuck exhaling:
+  // BreathVFX reads `action?.state === 'breathe'` and restarts its 0.85 s burst
+  // for as long as that holds, so the fire never stopped either. The clips are
+  // authored for it — `attack` opens on a wound-up pose and resolves every
+  // channel to neutral on its last frame.
+  //
+  // manifest.action-channel.test.ts locks this: every action-channel state
+  // must carry `loop: false`.
+  attack: { clip: 'attack', loop: false, yOffset: 0 },
   attackAir: { clip: 'attack', loop: false, yOffset: 0, fadeIn: 0.16 },
-  breathe: { clip: 'breath', yOffset: 0 },
+  breathe: { clip: 'breath', loop: false, yOffset: 0 },
 }
 
 /** One species' entry. `size` is its relative bulk, ordered by tier. */

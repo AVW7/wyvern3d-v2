@@ -1,0 +1,322 @@
+#!/usr/bin/env node
+/**
+ * Validate public/models/wyvern.glb the way three.js will actually play it.
+ *
+ * The Blender-side audit (`scripts/audit-wyvern-clips.py`) checks the authored
+ * F-curves; this checks the exported result, so an export-stage regression --
+ * a dropped track, a resampled curve, a clip that starts late -- cannot pass
+ * unnoticed. It measures three things per clip:
+ *
+ *   mirror   worst left-vs-right wingtip mismatch, in the Body bone's own
+ *            frame. Body-local rather than world because `death` rolls the
+ *            whole rig 90 degrees, and a world comparison of a tumbling body
+ *            reports a large mismatch on a pose that is exactly symmetric.
+ *   seam     worst per-bone rotation difference between t=0 and t=duration.
+ *            Only meaningful for the clips the manifest loops.
+ *   start    the first keyframe time. Anything above zero means three.js
+ *            clamps to the first pose for that opening slice of the clip.
+ */
+
+// Imported rather than taken as ambient globals, matching
+// scripts/validate-sidecar-runtime.mjs — the eslint config gives this directory
+// no Node environment.
+import { Buffer } from 'node:buffer'
+import console from 'node:console'
+import fs from 'node:fs'
+import process from 'node:process'
+import { URL } from 'node:url'
+import { AnimationMixer, LoopOnce, Matrix4, Quaternion, Vector3 } from 'three'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+
+// Defaults to the shipped model; takes a path so the gate can be pointed at a
+// candidate export, or at a known-bad one to confirm it still fails.
+const MODEL = process.argv[2]
+  ? new URL(process.argv[2], `file://${process.cwd()}/`)
+  : new URL('../public/models/wyvern.glb', import.meta.url)
+
+// Mirrors LOOPING / ASYMMETRIC_BY_DESIGN in scripts/audit-wyvern-clips-blender.py,
+// which in turn mirror src/render/assets/manifest.ts. `loop` defaults to true
+// there, so anything not played as a one-shot has to close.
+//
+// `attack` and `breath` are absent because they are the action-channel tells,
+// which must be one-shots for GameModel to report them finished — see
+// manifest.action-channel.test.ts.
+const LOOPING = new Set([
+  'idle', 'walk', 'rest', 'cruise', 'scout',
+  'bankLeft', 'bankRight', 'hover', 'glide', 'dive', 'speed',
+])
+// A bank beats the outboard wing deeper than the inboard one; walk alternates
+// its wing-knuckle contacts like the vendor's quadrupedal gait. Neither should
+// be held to a static left/right mirror. The banks are checked as a pair below;
+// walk has a positive lower bound so an accidental locked carrier cannot ship.
+const ASYMMETRIC_BY_DESIGN = new Set(['bankLeft', 'bankRight', 'walk'])
+const WALK_GAIT_MIN_ASYMMETRY = 0.1
+// These actions deliberately use the wing's surface rig.  `rest` is excluded:
+// a resting animal's folded membrane should be still, not continually twitch.
+// Checking local quaternion tracks (rather than evaluated world transforms)
+// avoids counting the shoulder's inherited movement as membrane animation.
+const SURFACE_RESPONSE_REQUIRED = new Set([
+  'idle', 'walk', 'cruise', 'scout', 'bankLeft', 'bankRight', 'hover',
+  'glide', 'dive', 'speed', 'attack', 'breath', 'takeoff', 'land', 'death',
+])
+const MEMBRANE_BONES = [
+  'L_WingMembrane1', 'L_WingMembrane2', 'R_WingMembrane1', 'R_WingMembrane2',
+]
+const MEMBRANE_MOTION_MIN = 0.005 // rad, safely below the subtle walk response
+
+const FIT = 0.0072 // metres per rig unit; WYVERN_FIT in manifest.ts
+const MIRROR_LIMIT = 0.25 // m. The correct `idle` measures 0.15.
+const SEAM_LIMIT = 0.05 // rad, the threshold docs/WYVERN_ANIMATIONS.md uses
+const SAMPLES = 48
+
+/**
+ * Re-pack the GLB without its images, textures or materials.
+ *
+ * GLTFLoader decodes textures through `self.URL`, which does not exist in Node,
+ * so loading the file as shipped throws before any clip is parsed. Only the
+ * node tree, the skin and the animations matter here, and none of them
+ * reference a material -- so dropping the two textures costs nothing and keeps
+ * this runnable as a plain `node` script. The BIN chunk is passed through
+ * untouched, which leaves the image bufferViews orphaned but valid.
+ */
+function stripTextures(data) {
+  let offset = 12
+  let json = null
+  let bin = null
+  while (offset < data.length) {
+    const size = data.readUInt32LE(offset)
+    const kind = data.readUInt32LE(offset + 4)
+    const body = data.subarray(offset + 8, offset + 8 + size)
+    if (kind === 0x4e4f534a) json = JSON.parse(body.toString('utf8'))
+    else if (kind === 0x004e4942) bin = body
+    offset += 8 + size
+  }
+  if (!json) throw new Error('no JSON chunk')
+
+  delete json.images
+  delete json.textures
+  delete json.samplers
+  delete json.materials
+  for (const mesh of json.meshes ?? []) {
+    for (const primitive of mesh.primitives ?? []) delete primitive.material
+  }
+
+  const jsonChunk = Buffer.from(JSON.stringify(json), 'utf8')
+  const jsonPad = (4 - (jsonChunk.length % 4)) % 4
+  const binPad = bin ? (4 - (bin.length % 4)) % 4 : 0
+  const total =
+    12 + 8 + jsonChunk.length + jsonPad + (bin ? 8 + bin.length + binPad : 0)
+  const out = Buffer.alloc(total)
+  out.write('glTF', 0, 'ascii')
+  out.writeUInt32LE(2, 4)
+  out.writeUInt32LE(total, 8)
+  let cursor = 12
+  out.writeUInt32LE(jsonChunk.length + jsonPad, cursor)
+  out.writeUInt32LE(0x4e4f534a, cursor + 4)
+  jsonChunk.copy(out, cursor + 8)
+  out.fill(0x20, cursor + 8 + jsonChunk.length, cursor + 8 + jsonChunk.length + jsonPad)
+  cursor += 8 + jsonChunk.length + jsonPad
+  if (bin) {
+    out.writeUInt32LE(bin.length + binPad, cursor)
+    out.writeUInt32LE(0x004e4942, cursor + 4)
+    bin.copy(out, cursor + 8)
+  }
+  return out
+}
+
+const stripped = stripTextures(fs.readFileSync(MODEL))
+const gltf = await new Promise((resolve, reject) => {
+  new GLTFLoader().parse(
+    stripped.buffer.slice(stripped.byteOffset, stripped.byteOffset + stripped.byteLength),
+    '',
+    resolve,
+    reject,
+  )
+})
+
+const scene = gltf.scene
+const bones = new Map()
+scene.traverse((object) => {
+  if (object.isBone) bones.set(object.name, object)
+})
+for (const name of ['Body', 'L_WingFinger1_end', 'R_WingFinger1_end']) {
+  if (!bones.get(name)) throw new Error(`bone ${name} missing from the GLB`)
+}
+const body = bones.get('Body')
+const leftTip = bones.get('L_WingFinger1_end')
+const rightTip = bones.get('R_WingFinger1_end')
+const skeleton = [...bones.values()]
+
+const mixer = new AnimationMixer(scene)
+
+/**
+ * Evaluate `clip` at `time` and refresh the world matrices.
+ *
+ * Two traps, both of which silently pin every sample to frame 0 and make the
+ * whole file report success on a known-broken model:
+ *
+ *   - `mixer.setTime(t)` resets every action's own `time` to zero before
+ *     advancing, so it cannot be used to seek a specific action.
+ *   - `action.paused = true` makes the mixer skip the action entirely, so a
+ *     hand-assigned `action.time` is never applied.
+ *
+ * Seeking by assigning `action.time` and then stepping the mixer by a zero
+ * delta evaluates at exactly that time without advancing it. LoopOnce keeps a
+ * request for exactly `duration` from wrapping back to the start.
+ */
+function poseAt(clip, time) {
+  mixer.stopAllAction()
+  const action = mixer.clipAction(clip)
+  action.setLoop(LoopOnce, 1)
+  action.clampWhenFinished = true
+  action.reset().play()
+  action.time = time
+  mixer.update(0)
+  scene.updateMatrixWorld(true)
+}
+
+/** Worst L/R wingtip mismatch over the clip, in displayed metres. */
+function mirrorResidual(clip) {
+  const inverse = new Matrix4()
+  const left = new Vector3()
+  const right = new Vector3()
+  let worst = 0
+  for (let i = 0; i <= SAMPLES; i += 1) {
+    poseAt(clip, (i / SAMPLES) * clip.duration)
+    inverse.copy(body.matrixWorld).invert()
+    left.setFromMatrixPosition(leftTip.matrixWorld).applyMatrix4(inverse)
+    right.setFromMatrixPosition(rightTip.matrixWorld).applyMatrix4(inverse)
+    left.x *= -1 // reflect through the body's own sagittal plane
+    worst = Math.max(worst, left.distanceTo(right) * FIT)
+  }
+  return worst
+}
+
+/**
+ * Worst per-bone difference between the two ends of the clip, over rotation
+ * AND position.
+ *
+ * Position matters as much as rotation here: all three seams this validator
+ * was written to catch -- `speed` at 5.500, `walk` at 0.928, `rest` at 0.419 --
+ * were on `Body.location`, the body bob, and a rotation-only check scores every
+ * one of them a clean zero. Radians and rig units are compared against the same
+ * threshold, which is the mixed-unit convention the Blender-side audit uses.
+ */
+function loopSeam(clip) {
+  poseAt(clip, 0)
+  const start = skeleton.map((bone) => ({
+    quaternion: bone.quaternion.clone(),
+    position: bone.position.clone(),
+  }))
+  poseAt(clip, clip.duration)
+  let worst = 0
+  skeleton.forEach((bone, index) => {
+    const dot = Math.min(1, Math.abs(start[index].quaternion.dot(bone.quaternion)))
+    worst = Math.max(
+      worst,
+      2 * Math.acos(dot),
+      start[index].position.distanceTo(bone.position),
+    )
+  })
+  return worst
+}
+
+function firstKeyTime(clip) {
+  return Math.min(...clip.tracks.map((track) => track.times[0]))
+}
+
+/** Greatest local quaternion change on a named glTF bone track. */
+function localRotationRange(clip, boneName) {
+  const track = clip.tracks.find(
+    (candidate) => candidate.name === `${boneName}.quaternion`,
+  )
+  if (!track) return null
+  const initial = new Quaternion(
+    track.values[0], track.values[1], track.values[2], track.values[3],
+  ).normalize()
+  let maximum = 0
+  for (let offset = 4; offset < track.values.length; offset += 4) {
+    const sample = new Quaternion(
+      track.values[offset], track.values[offset + 1],
+      track.values[offset + 2], track.values[offset + 3],
+    ).normalize()
+    const dot = Math.min(1, Math.abs(initial.dot(sample)))
+    maximum = Math.max(maximum, 2 * Math.acos(dot))
+  }
+  return maximum
+}
+
+const rows = []
+const problems = []
+for (const clip of [...gltf.animations].sort((a, b) => a.name.localeCompare(b.name))) {
+  const mirror = mirrorResidual(clip)
+  const seam = loopSeam(clip)
+  const start = firstKeyTime(clip)
+  const loops = LOOPING.has(clip.name)
+  rows.push({ name: clip.name, mirror, seam, start, loops, duration: clip.duration })
+
+  if (!ASYMMETRIC_BY_DESIGN.has(clip.name) && mirror > MIRROR_LIMIT) {
+    problems.push(`${clip.name}: wings asymmetric by ${mirror.toFixed(3)} m`)
+  }
+  if (clip.name === 'walk' && mirror < WALK_GAIT_MIN_ASYMMETRY) {
+    problems.push(
+      `${clip.name}: wing knuckles are locked together (${mirror.toFixed(3)} m)`
+    )
+  }
+  if (loops && seam > SEAM_LIMIT) {
+    problems.push(`${clip.name}: loop seam ${seam.toFixed(3)} rad > ${SEAM_LIMIT}`)
+  }
+  if (start > 1e-6) {
+    problems.push(`${clip.name}: first key at t=${start.toFixed(5)}s, not 0`)
+  }
+  if (SURFACE_RESPONSE_REQUIRED.has(clip.name)) {
+    for (const boneName of MEMBRANE_BONES) {
+      const range = localRotationRange(clip, boneName)
+      if (range === null) {
+        problems.push(`${clip.name}: ${boneName} has no local quaternion track`)
+      } else if (range < MEMBRANE_MOTION_MIN) {
+        problems.push(
+          `${clip.name}: ${boneName} is static (${range.toFixed(4)} rad)`,
+        )
+      }
+    }
+  }
+}
+
+// The two banks are asymmetric on purpose, but they must be each other's
+// mirror: same magnitude of asymmetry, opposite sense. Compared relatively,
+// not absolutely -- the rig's own bind pose is asymmetric by 0.00089 m, and a
+// bank holds its wingtips ~9 m apart, so that floor scales up to a couple of
+// millimetres here. A real regression (a wrong amplitude on one side) moves
+// this by metres, not by 0.02%.
+const left = rows.find((row) => row.name === 'bankLeft')
+const right = rows.find((row) => row.name === 'bankRight')
+if (left && right) {
+  const drift = Math.abs(left.mirror - right.mirror) / Math.max(left.mirror, right.mirror)
+  if (drift > 0.005) {
+    problems.push(
+      `bankLeft/bankRight are not mirrors: ${left.mirror.toFixed(4)} vs ` +
+        `${right.mirror.toFixed(4)} m (${(drift * 100).toFixed(2)}% apart)`,
+    )
+  }
+}
+
+const width = Math.max(...rows.map((row) => row.name.length))
+console.log(
+  `${'clip'.padEnd(width)}  ${'mirror(m)'.padStart(9)}  ${'seam(rad)'.padStart(9)}` +
+    `  ${'start(s)'.padStart(8)}  ${'dur(s)'.padStart(6)}  loops`,
+)
+for (const row of rows) {
+  console.log(
+    `${row.name.padEnd(width)}  ${row.mirror.toFixed(4).padStart(9)}` +
+      `  ${row.seam.toFixed(4).padStart(9)}  ${row.start.toFixed(5).padStart(8)}` +
+      `  ${row.duration.toFixed(3).padStart(6)}  ${row.loops ? 'yes' : 'no'}`,
+  )
+}
+
+if (problems.length) {
+  console.error(`\n${problems.length} problem(s):`)
+  for (const problem of problems) console.error(`  - ${problem}`)
+  process.exit(1)
+}
+console.log('\nwyvern.glb clean: wings mirrored, loops closed, every clip starts at t=0')

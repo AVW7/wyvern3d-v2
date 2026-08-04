@@ -14,6 +14,11 @@ relative to its origin, or put the gameplay camera inside a wing.
 
 ## Sources of truth
 
+- `docs/WYVERN_V1_REAUTHORING_SOURCE_OF_TRUTH.md` — the complete 78-action v1
+  catalogue, pinned source identities, repaired-rig target names, and
+  re-authoring protocol. Read this first when rebuilding or expanding an action.
+- `docs/WYVERN_V1_ANIMATION_SOURCES.json` — the machine-readable source hashes,
+  action counts, and canonical/noncanonical asset distinction.
 - `docs/WYVERN_ANIMATION_BASELINE.md` — the measured capability envelope, how the
   authored clips were built from it, and the numeric review loop. Read this
   first; it is what makes the rest of this document enforceable.

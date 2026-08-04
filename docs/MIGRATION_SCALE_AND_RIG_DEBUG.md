@@ -536,9 +536,12 @@ which is the needle that was visible from across the scene.
 - Residual stretch peaks at `(−98, −161, 482)` on the throat/chest underside,
   which is 317 units from the nearest bone. Thin skeletal coverage rather than a
   binding error; the absolute displacement is under 0.8 m.
-- Wing-membrane clip work is still outstanding: `idle`/`walk`/`rest` key no wing
-  channels, so a grounded wyvern holds the spread bind pose and its wingtips
-  reach the floor. The wing folds now, so this is clip authoring.
+- Grounded wing carriers remain to be completed for `idle` and `rest`. `walk`
+  was re-authored on 2026-08-04 as a relaxed quadruped: the wing knuckles stay
+  near the foot plane and settle on alternating steps, matching the vendor walk
+  rather than staying locked in the spread bind pose. Its manifest lift is
+  `7.5`, measured from the exported skin's −7.31-unit `R_Toes` low point, never
+  copied from the old wingtip-based 314.
 
 ---
 
@@ -615,6 +618,79 @@ That means the immediate “does not move” fault is fixed, but the new rig wil
 not yet have the richness of the old Flight Lab until those clips are authored,
 measured, and promoted through the numeric animation-contract pipeline. Do not
 mistake restored playback for completion of the animation migration.
+
+### 2026-08-04 — State-specific wing surface response
+
+**Finding.** The carrier-wing fix was incomplete: all four membrane joints and
+all six wing spar joints had zero **local** rotation in every clip. Their world
+transforms changed only because they inherited the shoulder, so a wingbeat read
+as a rigid card. This was initially obscured by a world-space survey, which
+reported inherited shoulder travel on every child; the audit now measures each
+pose bone's `matrix_basis` instead.
+
+**Axis probe.** A +0.1 rad pose nudge was measured against the skinned surface,
+not a bone gizmo. On both sides, local +X billows the surface together; local
+Z sweeps it, with the sign negated on the right for a mirrored response. The
+largest 0.1-rad skin displacement was 141.8 rig units for `WingMembrane1` and
+207.6 for `WingFinger1`; this made 0.2–5.5° state-specific deflections safe
+and visible without folding the sheet through itself.
+
+**Correction.** `author-wyvern-wing-surfaces-blender.py` now layers delayed
+wrist, spar, and membrane rotations over the existing full-density carrier
+tracks. Its profiles are state-specific rather than a universal flutter:
+
+- powered `cruise`, `hover`, `speed`, `scout`, and banks flex with their
+  existing cadence;
+- `glide` has a slow, low-load surface ripple and `dive` a faster, tauter one;
+- `takeoff`, `land`, `attack`, and `breath` brace and release as one-shots;
+- `idle` and the quadrupedal `walk` only settle subtly; `rest` remains still by
+  design; and `death` ends with a held membrane sag.
+
+The reusable entry point is `pnpm assets:wyvern-wing-surfaces`. It writes the
+ignored `public/models/wyvern-rig.blend` source and exports `wyvern.glb`.
+Each action stores its last applied profile in that source; a repeat run removes
+the recorded layer before applying the current one, so it is safe to tune and
+re-export without compounding the flex.
+
+**Re-verification.** Local membrane rotation now ranges from 0.40/0.64° on the
+walk carrier, through 1.25/1.97° in glide and 2.75/4.22° in cruise, to
+3.56/5.49° in hover (inner/outer membrane). The candidate retained every
+existing loop seam (worst 0.0007 rad), start-at-zero key, wing mirror, and the
+intentional 0.4484 m alternating walk-contact asymmetry.
+
+`validate-wyvern-clips.mjs` now requires an independent local quaternion track
+with at least 0.005 rad of motion on each membrane in all fifteen active
+surface states. It rejects the preceding asset for all 60 static membrane
+channels; `rest` is deliberately excluded from that rule.
+
+### 2026-08-04 — Jaw hinge restored; sanctuary rest rebuilt
+
+The earlier jaw finding is now resolved. `Jaw` had pointed from the snout tip
+back into the skull, so mouth keys revolved around the wrong end of the lower
+muzzle. Its rest bone now runs skull → snout: head `(3.623, -583.728, 867.768)`
+to tail `(0.002, -878.982, 677.302)` in rig units. A local +X jaw turn moves
+the weighted lower muzzle forward and down, which is the measured opening
+direction.
+
+This was a hinge migration rather than a destructive reweight. Before reversing
+the rest bone, every evaluated `Jaw` pose in all 16 runtime actions was
+captured and baked back after the reversal. The maximum matrix difference was
+0.00019 rig units. `rest` was then deliberately re-authored from the canonical
+`Sanct_Rest` timing: 0–144 at 24 fps, exact six-second loop, 8.6° open at
+frames 0/144 and 3.4° closed at frame 72. Its evaluated skin low point is
+−331.00 rig units at frame 32, so the runtime manifest now uses
+`yOffset: 331` instead of the former spread-wing offset of 1104.
+
+The exported model gate, v1 source-catalogue gate, source-scene audit,
+TypeScript check, focused lint, and 370 runtime tests all pass. Flight Lab's
+sanctuary camera now has a durable gate as well:
+`pnpm assets:review-flightlab-rest` evaluates the seven v1 landmarks at the
+actual Lab scale and camera, with the largest silhouette at frame 72 contained
+within 50.0% width and 39.2% height of a 1440×900 viewport. Grounded Lab
+states now use their manifest lift at ground level, while airborne states retain
+the Lab's 4 m inspection altitude; this makes the rest result a real contact
+review rather than a floating specimen. The source capture and numeric record
+live in `WYVERN_V1_CORE_CAPTURE_RECORDS.md`.
 
 ---
 
