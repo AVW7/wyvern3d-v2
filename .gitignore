@@ -15,4 +15,5 @@ public/models/drogon*.glb
 public/models/drogon-sanctuary.glb
 validation/drogon-uncompressed.glb
 *.blend
+*.blend1
 *.fbx
