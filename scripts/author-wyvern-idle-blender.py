@@ -41,6 +41,7 @@ import math
 import sys
 
 import bpy
+from mathutils import Euler, Quaternion
 
 ARMATURE = "WyvernRig"
 ACTION = "idle"
@@ -158,47 +159,47 @@ NECK = {
 # and a 0.7 rad phase offset, so the two wings drift independently. v1's idle
 # does the same thing: its wing_elev_bias swings wider than either wing alone,
 # which only happens if the sides are not locked together.
-WING_FOLD_SHOULDER = 30.0
+WING_FOLD_SHOULDER = 35.0
 WING_FOLD_ELBOW = 45.0
 WING_FOLD_ARCH = 35.0
 
 WINGS = {
     "L_WingShoulder": {
-        "rx": (10.6, [(SWAY, 0.253, 0.00), (BREATH, 0.080, 0.20)]),
-        "ry": (31.5, []),
-        "rz": (21.3, []),
+        "rx": (35.0, [(BREATH, 0.040, 0.00)]),
+        "ry": (0.0, []),
+        "rz": (30.0, []),
     },
     "R_WingShoulder": {
-        "rx": (10.6, [(SWAY, 0.283, 0.70), (BREATH, 0.080, 0.20)]),
-        "ry": (-31.5, []),
-        "rz": (-21.3, []),
+        "rx": (35.0, [(BREATH, 0.040, 0.00)]),
+        "ry": (0.0, []),
+        "rz": (-30.0, []),
     },
     "L_WingElbow": {
-        "rx": (0.0, []),
+        "rx": (45.0, []),
         "ry": (0.0, []),
-        "rz": (-54.1, [(SWAY, 0.190, 0.35), (BREATH, 0.063, 0.50)]),
+        "rz": (0.0, []),
     },
     "R_WingElbow": {
-        "rx": (0.0, []),
+        "rx": (45.0, []),
         "ry": (0.0, []),
-        "rz": (54.1, [(SWAY, 0.204, 1.05), (BREATH, 0.063, 0.50)]),
+        "rz": (0.0, []),
     },
     "L_WingWrist": {
-        "rx": (-40.6, [(SWAY, 0.143, 0.70)]),
-        "ry": (-45.4, []),
-        "rz": (61.8, []),
+        "rx": (-25.0, []),
+        "ry": (0.0, []),
+        "rz": (-18.0, []),
     },
     "R_WingWrist": {
-        "rx": (-40.6, [(SWAY, 0.157, 1.40)]),
-        "ry": (45.4, []),
-        "rz": (-61.8, []),
+        "rx": (-25.0, []),
+        "ry": (0.0, []),
+        "rz": (18.0, []),
     },
-    "L_WingFinger1": {"rx": (-25.2, []), "ry": (-35.3, []), "rz": (39.2, [])},
-    "R_WingFinger1": {"rx": (-25.2, []), "ry": (35.3, []), "rz": (-39.2, [])},
-    "L_WingFinger2": {"rx": (-20.6, []), "ry": (-22.8, []), "rz": (35.6, [])},
-    "R_WingFinger2": {"rx": (-20.6, []), "ry": (22.8, []), "rz": (-35.6, [])},
-    "L_WingFinger3": {"rx": (-12.8, []), "ry": (-4.6, []), "rz": (28.3, [])},
-    "R_WingFinger3": {"rx": (-12.8, []), "ry": (4.6, []), "rz": (-28.3, [])},
+    "L_WingFinger1": {"rx": (-48.0, []), "ry": (0.0, []), "rz": (14.0, [])},
+    "R_WingFinger1": {"rx": (-48.0, []), "ry": (0.0, []), "rz": (-14.0, [])},
+    "L_WingFinger2": {"rx": (-36.0, []), "ry": (0.0, []), "rz": (11.0, [])},
+    "R_WingFinger2": {"rx": (-36.0, []), "ry": (0.0, []), "rz": (-11.0, [])},
+    "L_WingFinger3": {"rx": (-24.0, []), "ry": (0.0, []), "rz": (8.0, [])},
+    "R_WingFinger3": {"rx": (-24.0, []), "ry": (0.0, []), "rz": (-8.0, [])},
 }
 
 # Tail, as a travelling wave rather than a hinge.
@@ -368,28 +369,37 @@ def build(arm: bpy.types.Object) -> bpy.types.Action:
     strip = layer.strips.new(type="KEYFRAME")
     bag = strip.channelbags.new(slot)
 
-    for bone, channels in sorted(definition.items()):
+    for bone in sorted(definition):
         pb = arm.pose.bones.get(bone)
         if pb:
-            pb.rotation_mode = 'XYZ'
-        # Every animated bone gets all three rotation components keyed, so a
-        # stale non-zero axis from a previous pose cannot leak into the clip.
-        wanted = dict(channels)
-        for axis in ("rx", "ry", "rz"):
-            wanted.setdefault(axis, (0.0, []))
-        for key, spec in sorted(wanted.items()):
-            prop, index = CHANNEL_PATH[key]
-            scale = DEG if prop == "rotation_euler" else 1.0
-            fcurve = bag.fcurves.new(
-                f'pose.bones["{bone}"].{prop}', index=index
-            )
-            fcurve.keyframe_points.add(PERIOD + 1)
-            for i, point in enumerate(fcurve.keyframe_points):
-                point.co = (float(i), evaluate(spec, i) * scale)
-                point.interpolation = "BEZIER"
-                point.handle_left_type = "AUTO_CLAMPED"
-                point.handle_right_type = "AUTO_CLAMPED"
-            fcurve.update()
+            pb.rotation_mode = 'QUATERNION'
+
+    # Build evaluation tracks
+    for f in range(PERIOD + 1):
+        frame_t = f / PERIOD
+        for bone, channels in sorted(definition.items()):
+            pb = arm.pose.bones.get(bone)
+            if not pb:
+                continue
+            
+            # Evaluate location and rotation
+            loc = [0.0, 0.0, 0.0]
+            rot_euler = [0.0, 0.0, 0.0]
+            
+            for key, spec in channels.items():
+                val = evaluate(spec, f)
+                if key == "tx": loc[0] = val
+                elif key == "ty": loc[1] = val
+                elif key == "tz": loc[2] = val
+                elif key == "rx": rot_euler[0] = math.radians(val)
+                elif key == "ry": rot_euler[1] = math.radians(val)
+                elif key == "rz": rot_euler[2] = math.radians(val)
+            
+            q = Euler(rot_euler, 'XYZ').to_quaternion()
+            pb.rotation_quaternion = q
+            pb.location = loc
+            pb.keyframe_insert(data_path="rotation_quaternion", frame=f)
+            pb.keyframe_insert(data_path="location", frame=f)
 
     action.use_frame_range = True
     action.frame_start, action.frame_end = 0.0, float(PERIOD)
