@@ -251,6 +251,25 @@ const WYVERN_CLIPS: AssetEntry['animations'] = {
   attack: { clip: 'attack', loop: false, yOffset: 0 },
   attackAir: { clip: 'attack', loop: false, yOffset: 0, fadeIn: 0.16 },
   breathe: { clip: 'breath', loop: false, yOffset: 0 },
+  breatheAir: { clip: 'breath', loop: false, yOffset: 0 },
+
+  // Grounded and hunting behavior fallbacks (prevent T-pose fallback)
+  sleep: { clip: 'rest', yOffset: 331 },
+  sit: { clip: 'rest', yOffset: 331 },
+  eat: { clip: 'rest', yOffset: 331 },
+  drink: { clip: 'rest', yOffset: 331 },
+  groom: { clip: 'rest', yOffset: 331 },
+  nuzzle: { clip: 'idle', yOffset: 0 },
+  calm: { clip: 'idle', yOffset: 0 },
+  perch: { clip: 'idle', yOffset: 0 },
+  hop: { clip: 'walk', yOffset: 7.5 },
+  seated: { clip: 'rest', yOffset: 331 },
+  rise: { clip: 'takeoff', loop: false, next: 'idle', yOffset: 0 },
+  pickUp: { clip: 'attack', loop: false, yOffset: 0 },
+  huntGrip: { clip: 'attack', loop: false, yOffset: 0 },
+  huntCarry: { clip: 'cruise', yOffset: 0, phaseGroup: 'flight' },
+  drop: { clip: 'attack', loop: false, yOffset: 0 },
+  huntFinish: { clip: 'attack', loop: false, yOffset: 0 },
 }
 
 /** One species' entry. `size` is its relative bulk, ordered by tier. */

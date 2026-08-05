@@ -36,6 +36,8 @@ import { applyBoneOffset, applyLegTuck, applyNeckOffset } from '@/render/boneOff
 import { createTailState, dynamicTailController, type TailState } from '@/render/tailController'
 import { createLegsState, dynamicLegController, type LegsState } from '@/render/legPhysics'
 import { captureClosedJawPose, sealFlightJaw, shouldSealFlightJaw, type ClosedJawPose } from '@/render/flightMouth'
+import { GroundDustVFX } from '@/render/vfx/GroundDustVFX'
+import { CameraShake } from '@/render/cameraShake'
 import { CONTROLS, axis, isDown, pointer } from '@/render/controllers/input'
 import { useCameraStore } from '@/state/cameraStore'
 import {
@@ -214,8 +216,9 @@ function BattleCamera({ sim }: { sim: React.RefObject<EncounterSim | null> }) {
   const camera = useThree((s) => s.camera)
   const desired = useRef(new Vector3())
   const look = useRef(new Vector3())
+  const shake = useRef(new CameraShake())
 
-  useFrame((_, rawDelta) => {
+  useFrame((state, rawDelta) => {
     const dt = Math.min(rawDelta, 0.05)
     const piloted = sim.current?.piloted
     const camSettings = useCameraStore.getState()
@@ -223,6 +226,10 @@ function BattleCamera({ sim }: { sim: React.RefObject<EncounterSim | null> }) {
     if ('fov' in camera && typeof camera.fov === 'number' && camera.fov !== camSettings.fov) {
       camera.fov = camSettings.fov
       camera.updateProjectionMatrix()
+    }
+
+    if (piloted?.hitThisTick) {
+      shake.current.addTrauma(0.35)
     }
 
     if (!piloted?.alive) {
@@ -246,7 +253,9 @@ function BattleCamera({ sim }: { sim: React.RefObject<EncounterSim | null> }) {
       )
     }
 
-    camera.position.lerp(desired.current, 1 - Math.exp(-camSettings.smoothing * dt))
+    const shakeOffset = shake.current.update(dt, state.clock.elapsedTime)
+    const targetCamPos = desired.current.clone().add(shakeOffset)
+    camera.position.lerp(targetCamPos, 1 - Math.exp(-camSettings.smoothing * dt))
     camera.lookAt(look.current)
   })
 
@@ -328,6 +337,7 @@ function WyvernActorView({ actor, index, piloted }: { actor: Actor; index: numbe
   // opening of every battle read like a broken animation.
   const [anim, setAnim] = useState<ModelState>(actor.flying ? 'cruise' : 'idle')
   const wasAlive = useRef(true)
+  const dissolveProgress = useRef(0)
   const lastCooldown = useRef(actor.cooldown)
   const lastBreathCooldown = useRef(actor.breathCooldown)
   const actionToken = useRef(0)
@@ -350,18 +360,23 @@ function WyvernActorView({ actor, index, piloted }: { actor: Actor; index: numbe
     if (!g) return
     const dt = Math.min(rawDelta, 0.05)
 
-    // Death is a discrete transition, fired once on the falling edge — the
-    // same pattern this component already uses for anim switching below, not
-    // a continuous per-frame value, so it doesn't fight the
-    // never-setState-in-useFrame rule.
-    if (wasAlive.current && !actor.alive) {
-      wasAlive.current = false
-      setAnim('death')
+    // Death is a discrete transition, accompanied by a gradual dissolve
+    if (!actor.alive) {
+      if (wasAlive.current) {
+        wasAlive.current = false
+        setAnim('death')
+      }
+      dissolveProgress.current = Math.min(1.0, dissolveProgress.current + dt * 0.5)
+      const opacity = 1.0 - dissolveProgress.current
+      for (const mat of materials.current) {
+        mat.transparent = true
+        mat.opacity = opacity
+      }
+      g.visible = dissolveProgress.current < 1.0
+      return
     }
-    // Direct mutation — the R3F rule. Never setState with these values.
-    g.visible = actor.alive || anim === 'death'
+    g.visible = true
 
-    if (!actor.alive) return
     g.position.set(actor.position.x, actor.position.y, actor.position.z)
     // Finite-difference the position rather than reading actor.velocity.
     // `applyMotion` clamps y into [3, 60] and the arena radius without zeroing
@@ -557,6 +572,10 @@ function WyvernActorView({ actor, index, piloted }: { actor: Actor; index: numbe
           socketRef={headBone}
           neckRef={neckBones}
           seed={index}
+        />
+        <GroundDustVFX
+          active={actor.alive && (anim === 'land' || anim === 'fly' || (actor.position.y < 5 && actor.flying))}
+          position={[actor.position.x, actor.position.y, actor.position.z]}
         />
       </GameModel>
       {!piloted && (

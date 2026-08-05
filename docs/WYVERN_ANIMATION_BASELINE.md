@@ -589,3 +589,23 @@ pnpm test
 The signature file is committed on purpose. A regenerated measurement lands as a
 per-channel diff, so a change to one clip's wingbeat is visible as the numbers
 that moved — which is the review artifact a contact sheet was never able to be.
+
+## Historical traps and root-cause analysis
+
+For future agents and contributors, this section catalogs the 10 major technical traps discovered during the V1 model probe and why visual-only reviews missed them:
+
+1. **Wing Bone Assumption**: Assuming bones named `wing_*` existed. The rig actually uses front arm/hand chains (`Bip002-{L,R}-Clavicle → UpperArm → Forearm → Hand → Finger0..5`).
+2. **Membrane Tearing**: Mirroring finger bones without mirroring the sibling `Bone040_056`..`Bone069_0119` membrane helper chains, stretching 278 triangles past 5× their length.
+3. **Jaw Bone Identity**: Mapping jaw motion to `B_Face_Jaw` (which belongs to the human rider `Bip001`) instead of **`Bip002-Ponytail1_016`** (which controls 4,220 vertices on Drogon's lower muzzle).
+4. **Reversed Neck Axes**: `down` driving local X (an inert axis) while `side` drove local Z (head down/up). Every preen, groom, and drink pose had its neck layers swapped with one axis completely dead.
+5. **Body Pitch Axis**: Assuming local X pitched the body when local X actually yawed it; local Y is the real pitch axis.
+6. **Banking Sign Rules**: Assuming opposite signs banked the wings. Because the rig is mirrored across X, **equal signs bank** (`wing_elev_bias`), while opposite signs raise/lower both wings together.
+7. **Frozen Cruise Flap Defect**: The shipped cruise loop had **0 detectable wingbeats**, a 27.3° stroke arc, and a 37.7 symmetry error because the `.blend` predated the recipe rewrite.
+8. **Baking Landing Flare into Cruise**: Sampling full body poses from `Battle_Down02` (a landing clip) baked a -50° to -88° pelvis pitch flare into forward flight, snapping the body line every loop.
+9. **Asymmetric Hind-Limb Carriage**: Every flight clip inherited a 0.63–1.05 unit foot asymmetry (`foot_drop` left vs right) from the vendor base pose.
+10. **Sparse Keyframe Re-bezierization**: Sampling 4 landmarks per beat caused Blender's `AUTO_CLAMPED` Bezier solver to invent smooth arcs that flattened stroke azimuth (from 53.9° to 40.5°) and erased the wrist fold.
+
+### Why They Were Missed
+- **Visual & Prose Review**: Prose ("*cruise keeps a horizontal body line*") cannot fail a CI build, and contact sheets of near-black dragons hide pose errors and pitch offsets.
+- **Unprobed Rig Geometry**: Intuitions about rotation signs and bone names contradicted actual rig transforms until numerically measured via `pnpm assets:analyze-clips`.
+

@@ -27,7 +27,7 @@ import math
 import sys
 
 import bpy
-from mathutils import Euler
+from mathutils import Euler, Quaternion
 
 
 ARMATURE = "WyvernRig"
@@ -35,6 +35,10 @@ FPS = 24
 SIDES = ("L", "R")
 PARTS = ("Wrist", "Finger1", "Finger2", "Finger3", "Membrane1", "Membrane2")
 PROFILE_PROPERTY = "wyvern_surface_response_profile"
+WALK_KNUCKLE_PROPERTY = "wyvern_walk_knuckle_response"
+WALK_KNUCKLE_SWAY_DEG = 1.2
+GROUND_ELBOW_REVERSAL_PROPERTY = "wyvern_ground_elbow_direction_reversed"
+GROUND_ELBOW_REVERSAL_ACTIONS = ("idle", "walk", "rest")
 
 # Degrees.  The configuration is deliberately about distinct flight states,
 # not a single flutter copied over every clip:
@@ -198,6 +202,101 @@ def author_action(armature, action, profile):
     print(f"authored {action.name}: wing surface response on {len(targets)} bones")
 
 
+def author_walk_knuckles(armature, action):
+    """Keep the fully folded walk wings as alternating front-limb supports.
+
+    The closed-wing pose is intentionally not a strict mirror during walking:
+    the two knuckles alternate contact.  This only adds a tiny local-X carrier
+    offset to the already-authored shoulder pose, preserving its tailward fold
+    and the finger/membrane response written above.
+    """
+    first, last = (round(value) for value in action.frame_range)
+    names = ("L_WingShoulder", "R_WingShoulder")
+    previous_sway = float(action.get(WALK_KNUCKLE_PROPERTY, 0.0))
+    bases = {}
+    for frame in range(first, last + 1):
+        bpy.context.scene.frame_set(frame)
+        bpy.context.view_layer.update()
+        time = (frame - first) / (last - first)
+        phase = math.sin(math.tau * time)
+        bases[frame] = {}
+        for name in names:
+            side = 1.0 if name.startswith("L_") else -1.0
+            rotation = armature.pose.bones[name].rotation_quaternion.copy()
+            if previous_sway:
+                rotation = rotation @ Euler(
+                    (math.radians(-side * previous_sway * phase), 0.0, 0.0), "XYZ",
+                ).to_quaternion()
+            bases[frame][name] = rotation
+
+    previous = {}
+    for frame in range(first, last + 1):
+        bpy.context.scene.frame_set(frame)
+        time = (frame - first) / (last - first)
+        phase = math.sin(math.tau * time)
+        for name in names:
+            side = 1.0 if name.startswith("L_") else -1.0
+            rotation = bases[frame][name] @ Euler(
+                (math.radians(side * WALK_KNUCKLE_SWAY_DEG * phase), 0.0, 0.0), "XYZ",
+            ).to_quaternion()
+            if name in previous:
+                rotation.make_compatible(previous[name])
+            bone = armature.pose.bones[name]
+            bone.rotation_mode = "QUATERNION"
+            bone.rotation_quaternion = rotation
+            bone.keyframe_insert(data_path="rotation_quaternion", frame=frame, group=name)
+            previous[name] = rotation.copy()
+
+    set_linear_interpolation(action, names)
+    action[WALK_KNUCKLE_PROPERTY] = WALK_KNUCKLE_SWAY_DEG
+    print(f"authored walk: {WALK_KNUCKLE_SWAY_DEG:.1f}° alternating wing-knuckle carrier")
+
+
+def reverse_ground_elbow_direction(armature, action):
+    """Turn each grounded wing forward while keeping it on its own side.
+
+    The existing fold is bilaterally symmetric but points tailward and crosses
+    the torso: left reaches negative X / positive Y, right the inverse.  The
+    measured elbow local-Y/Z reversal moves the left spar to positive X and
+    negative Y (forward) without changing its lift axis.  The right elbow is
+    then authored as the direct local quaternion mirror, never rebuilt through
+    Euler angles.
+    """
+    bind(armature, action)
+    if action.get(GROUND_ELBOW_REVERSAL_PROPERTY) == "v1":
+        return
+
+    first, last = (round(value) for value in action.frame_range)
+    previous = {"L": None, "R": None}
+    for frame in range(first, last + 1):
+        bpy.context.scene.frame_set(frame)
+        bpy.context.view_layer.update()
+        left = armature.pose.bones["L_WingElbow"]
+        right = armature.pose.bones["R_WingElbow"]
+        source = left.rotation_quaternion.normalized()
+        left_rotation = Quaternion((source.w, source.x, -source.y, -source.z))
+        right_rotation = Quaternion((
+            left_rotation.w,
+            left_rotation.x,
+            -left_rotation.y,
+            -left_rotation.z,
+        ))
+        for side, bone, rotation in (
+            ("L", left, left_rotation),
+            ("R", right, right_rotation),
+        ):
+            if previous[side] is not None:
+                rotation.make_compatible(previous[side])
+            bone.rotation_mode = "QUATERNION"
+            bone.rotation_quaternion = rotation
+            bone.keyframe_insert(data_path="rotation_quaternion", frame=frame, group=bone.name)
+            previous[side] = rotation.copy()
+
+    set_linear_interpolation(action, ("L_WingElbow", "R_WingElbow"))
+    action[GROUND_ELBOW_REVERSAL_PROPERTY] = "v1"
+    print(f"authored {action.name}: corrected backward grounded wing direction")
+
+
 def author():
     armature = bpy.data.objects.get(ARMATURE)
     if armature is None or armature.type != "ARMATURE":
@@ -207,6 +306,13 @@ def author():
         if action is None:
             raise SystemExit(f"action {name!r} not found")
         author_action(armature, action, profile)
+        if name == "walk":
+            author_walk_knuckles(armature, action)
+    for name in GROUND_ELBOW_REVERSAL_ACTIONS:
+        action = bpy.data.actions.get(name)
+        if action is None:
+            raise SystemExit(f"action {name!r} not found")
+        reverse_ground_elbow_direction(armature, action)
 
 
 def export(path):

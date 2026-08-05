@@ -421,7 +421,16 @@ function tryBreath(actor: Actor, actors: readonly Actor[], rng: Rng): void {
 
 function regenStamina(actor: Actor, dt: number): void {
   if (actor.maxStamina <= 0) return
-  actor.stamina = clamp(actor.stamina + 6 * dt, 0, actor.maxStamina)
+  const regenRate = actor.flying ? 6 : 18
+  actor.stamina = clamp(actor.stamina + regenRate * dt, 0, actor.maxStamina)
+
+  if (actor.kind === 'wyvern') {
+    if (actor.flying && actor.stamina <= 5) {
+      actor.flying = false
+    } else if (!actor.flying && actor.stamina >= actor.maxStamina * 0.65) {
+      actor.flying = true
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------

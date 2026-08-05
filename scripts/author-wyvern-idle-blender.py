@@ -159,36 +159,46 @@ NECK = {
 # does the same thing: its wing_elev_bias swings wider than either wing alone,
 # which only happens if the sides are not locked together.
 WING_FOLD_SHOULDER = 30.0
-WING_FOLD_ELBOW = 20.0
+WING_FOLD_ELBOW = 45.0
+WING_FOLD_ARCH = 35.0
 
-# Static elevation on top of the fold, and it is load-bearing rather than
-# cosmetic. The lowest vertex of this model in an idle pose is not a foot — it
-# is `WingFinger1_end`, the wingtip, ~20 m behind the hips and already below the
-# foot plane, because the fold only sweeps the wing back and never folds the
-# wrist or finger spars (the "wings never fold" defect the manifest records).
-# A 21 m spar turns the 2.6 deg settle into ~2 m of tip travel, which sank the
-# tip to 2.08 m below the origin against the previous clip's 0.99 m. This lifts
-# it back clear: the measured lever is 0.374 m of tip rise per degree.
-WING_FOLD_LIFT = 3.5
 WINGS = {
     "L_WingShoulder": {
-        "rz": (WING_FOLD_SHOULDER, []),
-        "rx": (WING_FOLD_LIFT, [(SWAY, 0.253, 0.00), (BREATH, 0.080, 0.20)]),
+        "rx": (10.6, [(SWAY, 0.253, 0.00), (BREATH, 0.080, 0.20)]),
+        "ry": (31.5, []),
+        "rz": (21.3, []),
     },
     "R_WingShoulder": {
-        "rz": (-WING_FOLD_SHOULDER, []),
-        "rx": (WING_FOLD_LIFT, [(SWAY, 0.283, 0.70), (BREATH, 0.080, 0.20)]),
+        "rx": (10.6, [(SWAY, 0.283, 0.70), (BREATH, 0.080, 0.20)]),
+        "ry": (-31.5, []),
+        "rz": (-21.3, []),
     },
     "L_WingElbow": {
-        "rz": (WING_FOLD_ELBOW, []),
-        "rx": (0.0, [(SWAY, 0.190, 0.35), (BREATH, 0.063, 0.50)]),
+        "rx": (0.0, []),
+        "ry": (0.0, []),
+        "rz": (-54.1, [(SWAY, 0.190, 0.35), (BREATH, 0.063, 0.50)]),
     },
     "R_WingElbow": {
-        "rz": (-WING_FOLD_ELBOW, []),
-        "rx": (0.0, [(SWAY, 0.204, 1.05), (BREATH, 0.063, 0.50)]),
+        "rx": (0.0, []),
+        "ry": (0.0, []),
+        "rz": (54.1, [(SWAY, 0.204, 1.05), (BREATH, 0.063, 0.50)]),
     },
-    "L_WingWrist": {"rx": (0.0, [(SWAY, 0.143, 0.70)])},
-    "R_WingWrist": {"rx": (0.0, [(SWAY, 0.157, 1.40)])},
+    "L_WingWrist": {
+        "rx": (-40.6, [(SWAY, 0.143, 0.70)]),
+        "ry": (-45.4, []),
+        "rz": (61.8, []),
+    },
+    "R_WingWrist": {
+        "rx": (-40.6, [(SWAY, 0.157, 1.40)]),
+        "ry": (45.4, []),
+        "rz": (-61.8, []),
+    },
+    "L_WingFinger1": {"rx": (-25.2, []), "ry": (-35.3, []), "rz": (39.2, [])},
+    "R_WingFinger1": {"rx": (-25.2, []), "ry": (35.3, []), "rz": (-39.2, [])},
+    "L_WingFinger2": {"rx": (-20.6, []), "ry": (-22.8, []), "rz": (35.6, [])},
+    "R_WingFinger2": {"rx": (-20.6, []), "ry": (22.8, []), "rz": (-35.6, [])},
+    "L_WingFinger3": {"rx": (-12.8, []), "ry": (-4.6, []), "rz": (28.3, [])},
+    "R_WingFinger3": {"rx": (-12.8, []), "ry": (4.6, []), "rz": (-28.3, [])},
 }
 
 # Tail, as a travelling wave rather than a hinge.
@@ -359,6 +369,9 @@ def build(arm: bpy.types.Object) -> bpy.types.Action:
     bag = strip.channelbags.new(slot)
 
     for bone, channels in sorted(definition.items()):
+        pb = arm.pose.bones.get(bone)
+        if pb:
+            pb.rotation_mode = 'XYZ'
         # Every animated bone gets all three rotation components keyed, so a
         # stale non-zero axis from a previous pose cannot leak into the clip.
         wanted = dict(channels)

@@ -419,3 +419,17 @@ Status:
   tail satisfy the mode contract.
 - Animation, runtime transforms, and camera framing are one visual system and
   must be reviewed together.
+
+## Why previous documentation was wrong & How to maintain truth
+
+### The 4 Root Causes of Documentation Drift
+1. **Unchecked Prose Standards**: Rules were written in prose ("*cruise keeps a long body line*") instead of automated assertions (`pnpm test`). Prose does not fail CI builds.
+2. **Contact Sheet Optical Illusions**: Renders of near-black dragons hide pose errors, wingbeat amplitude, and pitch offsets. Approval was visual rather than numeric.
+3. **Inferred vs. Measured Axes**: Signs and axes were reasoned about mathematically instead of being probed directly on the rig in Blender (e.g. assuming local X pitched the body when it yawed it, or assuming opposite signs banked wings when equal signs did).
+4. **Desynchronized Code & Assets**: Hand-written documentation in `BUILD_NOTES.md` claimed "three 83-degree wingbeats" while the underlying `.blend` export held 0 wingbeats because the bake script was not executed after the recipe edit.
+
+### The Mandatory Animation Workflow
+* **Rule 1**: Always execute `pnpm assets:analyze-clips` after modifying any clip to regenerate `clip-signatures.json`.
+* **Rule 2**: Run `pnpm test` to validate signatures against `clip-contracts.json`.
+* **Rule 3**: Probe any new bone transform via the live Blender socket (`127.0.0.1:9876`) before writing procedural runtime offsets or authoring scripts.
+

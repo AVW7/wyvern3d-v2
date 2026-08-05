@@ -209,6 +209,7 @@ function LoadedModel({
   const [baseAction, setBaseAction] = useState<AnimationAction | null>(null)
   const [activeAction, setActiveAction] = useState<AnimationAction | null>(null)
   const [lastActionToken, setLastActionToken] = useState<number | null>(null)
+  const prevActionRef = useRef<AnimationAction | null>(null)
 
   useEffect(() => {
     const spec =
@@ -219,14 +220,16 @@ function LoadedModel({
         : stateSpec
 
     if (!spec) {
-      if (baseAction) baseAction.stop()
+      if (prevActionRef.current) prevActionRef.current.stop()
+      prevActionRef.current = null
       setBaseAction(null)
       return
     }
 
     const clip = animsByName.get(spec.clip)
     if (!clip) {
-      if (baseAction) baseAction.stop()
+      if (prevActionRef.current) prevActionRef.current.stop()
+      prevActionRef.current = null
       setBaseAction(null)
       return
     }
@@ -240,11 +243,15 @@ function LoadedModel({
     }
 
     const fadeIn = spec.fadeIn ?? FADE
-    if (baseAction) baseAction.crossFadeTo(action, fadeIn, true)
+    const prev = prevActionRef.current
+    if (prev && prev !== action) {
+      prev.crossFadeTo(action, fadeIn, true)
+    }
     action.reset().play()
 
+    prevActionRef.current = action
     setBaseAction(action)
-  }, [stateWithFallback, stateSpec, seed, animsByName, mixer, baseAction])
+  }, [stateWithFallback, stateSpec, seed, animsByName, mixer])
 
   useEffect(() => {
     if (!commandAction) {
