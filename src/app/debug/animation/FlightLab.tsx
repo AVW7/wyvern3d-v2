@@ -14,6 +14,8 @@ export interface FlightLabPoseEdits {
   bodyY: number
   bodyZ: number
   bodyPitch: number
+  bodyYaw: number
+  bodyRoll: number
   neckPitch: number
   neckYaw: number
   neckAlignment: number
@@ -22,6 +24,19 @@ export interface FlightLabPoseEdits {
   tailAlignment: number
   legTuck: number
   footTuck: number
+  leftWingPitch: number
+  leftWingYaw: number
+  leftWingRoll: number
+  rightWingPitch: number
+  rightWingYaw: number
+  rightWingRoll: number
+  wingFold: number
+  wingHeight: number
+  membraneBillow: number
+  leftLegPitch: number
+  leftLegYaw: number
+  rightLegPitch: number
+  rightLegYaw: number
 }
 
 export interface FlightLabProps {

@@ -140,6 +140,8 @@ export const NEUTRAL_POSE_EDITS: FlightLabPoseEdits = {
   bodyY: 0,
   bodyZ: 0,
   bodyPitch: 0,
+  bodyYaw: 0,
+  bodyRoll: 0,
   neckPitch: 0,
   neckYaw: 0,
   neckAlignment: 1,
@@ -148,6 +150,19 @@ export const NEUTRAL_POSE_EDITS: FlightLabPoseEdits = {
   tailAlignment: 1,
   legTuck: 0,
   footTuck: 0,
+  leftWingPitch: 0,
+  leftWingYaw: 0,
+  leftWingRoll: 0,
+  rightWingPitch: 0,
+  rightWingYaw: 0,
+  rightWingRoll: 0,
+  wingFold: 0,
+  wingHeight: 0,
+  membraneBillow: 0,
+  leftLegPitch: 0,
+  leftLegYaw: 0,
+  rightLegPitch: 0,
+  rightLegYaw: 0,
 }
 
 export const THEME_STYLES: Record<LabTheme, ThemeStyle> = {

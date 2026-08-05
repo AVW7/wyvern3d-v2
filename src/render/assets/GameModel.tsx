@@ -76,6 +76,7 @@ export function GameModel({
   onReady,
   onActionFinished,
   frozen = false,
+  manualMixer = false,
   children,
 }: {
   id: AssetId
@@ -109,6 +110,8 @@ export function GameModel({
   onActionFinished?: (request: ModelActionRequest) => void
   /** Freezes animation time for debugging. */
   frozen?: boolean
+  /** When true, parent container updates mixer manually before applying bone offsets. */
+  manualMixer?: boolean
   children?: React.ReactNode
 }) {
   const entry = getAsset(id)
@@ -133,6 +136,7 @@ export function GameModel({
         onReady={onReady}
         onActionFinished={onActionFinished}
         frozen={frozen}
+        manualMixer={manualMixer}
       >
         {children}
       </LoadedModel>
@@ -153,6 +157,7 @@ function LoadedModel({
   onReady,
   onActionFinished,
   frozen,
+  manualMixer,
   children,
 }: Omit<AssetEntry, 'url'> & {
   url: string
@@ -162,6 +167,7 @@ function LoadedModel({
   onReady?: (root: Group, mixer: AnimationMixer) => void
   onActionFinished?: (request: ModelActionRequest) => void
   frozen: boolean
+  manualMixer?: boolean
   children?: React.ReactNode
 }) {
   const { scene, animations } = useGLTF(url) as { scene: Group; animations: AnimationClip[] }
@@ -206,7 +212,7 @@ function LoadedModel({
     return Array.isArray(stateSpec) ? stateSpec[seed % stateSpec.length] : stateSpec
   }, [clips, commandAction, stateSpec, seed])
 
-  const [baseAction, setBaseAction] = useState<AnimationAction | null>(null)
+  const [, setBaseAction] = useState<AnimationAction | null>(null)
   const [activeAction, setActiveAction] = useState<AnimationAction | null>(null)
   const [lastActionToken, setLastActionToken] = useState<number | null>(null)
   const prevActionRef = useRef<AnimationAction | null>(null)
@@ -304,7 +310,7 @@ function LoadedModel({
   }, [activeAction, onActionFinished, lastActionToken, clips, commandAction])
 
   useFrame((_, dt) => {
-    if (frozen) return
+    if (frozen || manualMixer) return
     mixer.update(dt)
   })
 

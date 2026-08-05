@@ -13,7 +13,6 @@ import {
   applyBoneOffset,
   applyLegTuck,
   applyNeckOffset,
-  holdStreamlinedHeadPose,
 } from '@/render/boneOffsets'
 import { captureClosedJawPose, sealFlightJaw, shouldSealFlightJaw, type ClosedJawPose } from '@/render/flightMouth'
 import {
@@ -138,6 +137,13 @@ export function FlightLabRigContainer({
   const footBones = useRef<Object3D[]>([])
   const tailBones = useRef<Object3D[]>([])
   const markerRefs = useRef<Map<string, Object3D>>(new Map())
+  // ── Anti-flicker: stash frequently-changing pose props in refs so that
+  //    slider drags don't re-render the R3F subtree (which would flash the
+  //    raw clip pose for one frame before useFrame re-applies the edits).
+  const poseEditsRef = useRef(poseEdits)
+  poseEditsRef.current = poseEdits
+  const poseComposerRef = useRef(poseComposer)
+  poseComposerRef.current = poseComposer
   const scene = useThree((s) => s.scene)
   const threeCamera = useThree((s) => s.camera)
   const threeControls = useThree((s) => s.controls)
@@ -195,6 +201,13 @@ export function FlightLabRigContainer({
     wingBonesR.current = getRightWingBoneNames()
       .map((name: string) => root.getObjectByName(name))
       .filter((b: Object3D | null | undefined): b is Object3D => b !== null && b !== undefined)
+
+    // Store all rig bone names directly in bones map
+    root.traverse((obj) => {
+      if (obj.name) {
+        found.set(obj.name, obj)
+      }
+    })
   }, [])
 
   const bounds = useRef(0)
@@ -330,6 +343,50 @@ export function FlightLabRigContainer({
     const group = attitude.current
     if (!group) return
 
+    // Read from refs to avoid closure over stale props / re-render triggers
+    const pe = poseEditsRef.current
+    const pc = poseComposerRef.current
+
+    // ── Phase 1: Advance Animation Mixer FIRST ──────────────────────────────
+    // Base clip keyframes must be evaluated into bone transforms before any
+    // procedural layers or Pose Composer offsets are applied. If the mixer
+    // updates after bone offsets are set, it overwrites them causing flicker.
+    const mixer = mixerRef.current
+    const root = modelRoot.current
+    let clipName = '—'
+    let clipTime = 0
+    let duration = 0
+    if (mixer) {
+      let best: { name: string; time: number; duration: number; weight: number } | null = null
+      const actions = (mixer as unknown as { _actions?: unknown[] })._actions ?? []
+      for (const entry of actions) {
+        const action = entry as {
+          getEffectiveWeight(): number
+          time: number
+          getClip(): { name: string; duration: number }
+        }
+        const weight = action.getEffectiveWeight()
+        if (!best || weight > best.weight) {
+          const clip = action.getClip()
+          best = { name: clip.name, time: action.time, duration: clip.duration, weight }
+        }
+        if (frozen && scrub !== null && weight > 0) {
+          action.time = scrub * action.getClip().duration
+        }
+      }
+      if (best) {
+        clipName = best.name
+        clipTime = best.time
+        duration = best.duration
+      }
+      if (frozen) {
+        mixer.update(0)
+      } else {
+        mixer.update(dt)
+      }
+    }
+
+    // ── Phase 2: Compute Target Pose Dynamics ──────────────────────────────
     const target = flightPoseTargets(
       verticalSpeed,
       horizontalSpeed,
@@ -356,14 +413,14 @@ export function FlightLabRigContainer({
 
     group.rotation.order = 'YXZ'
     group.rotation.set(
-      (procedural ? pose.current.pitch : 0) + (poseComposer ? poseEdits.bodyPitch : 0),
-      0,
-      procedural ? pose.current.bank : 0,
+      (procedural ? pose.current.pitch : 0) + (pc ? pe.bodyPitch : 0),
+      pc ? pe.bodyYaw : 0,
+      (procedural ? pose.current.bank : 0) + (pc ? pe.bodyRoll : 0),
     )
     group.position.set(
-      poseComposer ? poseEdits.bodyX : 0,
-      flightLabAltitude(state) + (poseComposer ? poseEdits.bodyY : 0),
-      poseComposer ? poseEdits.bodyZ : 0,
+      pc ? pe.bodyX : 0,
+      flightLabAltitude(state) + (pc ? pe.bodyY : 0),
+      pc ? pe.bodyZ : 0,
     )
 
     if (auto) {
@@ -395,38 +452,7 @@ export function FlightLabRigContainer({
       }
     }
 
-    const mixer = mixerRef.current
-    const root = modelRoot.current
-    let clipName = '—'
-    let clipTime = 0
-    let duration = 0
-    if (mixer && root) {
-      let best: { name: string; time: number; duration: number; weight: number } | null = null
-      const actions = (mixer as unknown as { _actions?: unknown[] })._actions ?? []
-      for (const entry of actions) {
-        const action = entry as {
-          getEffectiveWeight(): number
-          time: number
-          getClip(): { name: string; duration: number }
-        }
-        const weight = action.getEffectiveWeight()
-        if (!best || weight > best.weight) {
-          const clip = action.getClip()
-          best = { name: clip.name, time: action.time, duration: clip.duration, weight }
-        }
-        if (frozen && scrub !== null && weight > 0) {
-          action.time = scrub * action.getClip().duration
-        }
-      }
-      if (best) {
-        clipName = best.name
-        clipTime = best.time
-        duration = best.duration
-      }
-      if (frozen) mixer.update(0)
-    }
-
-    if (procedural && AIRBORNE_STATES.has(state)) {
+    if (procedural && AIRBORNE_STATES.has(state) && !pc) {
       const phase = calculatePhase(labTime.current)
       propagateFullBodyWave(
         { spine: spineBones.current, neck: neckBones.current },
@@ -545,28 +571,77 @@ export function FlightLabRigContainer({
         dt
       )
     }
-    }
 
-    if (poseComposer) {
+    if (pc) {
       for (const bone of neckBones.current) {
-        applyBoneOffset(bone, poseEdits.neckPitch, poseEdits.neckYaw)
+        applyBoneOffset(bone, pe.neckPitch, pe.neckYaw)
       }
-      alignChainToBody(neckHeadChain.current, bones.current.get('pelvis'), poseEdits.neckAlignment)
-      holdStreamlinedHeadPose(headBone.current, poseEdits.neckAlignment)
-      for (let index = 0; index < tailBones.current.length; index += 1) {
-        const weight = TAIL_WEIGHTS[index] ?? 0
-        applyBoneOffset(
-          tailBones.current[index],
-          poseEdits.tailPitch * weight,
-          poseEdits.tailYaw * weight,
-        )
+      alignChainToBody(neckHeadChain.current, bones.current.get('pelvis'), pe.neckAlignment)
+      if (pe.tailPitch !== 0 || pe.tailYaw !== 0) {
+        for (let index = 0; index < tailBones.current.length; index += 1) {
+          const weight = TAIL_WEIGHTS[index] ?? 0
+          applyBoneOffset(
+            tailBones.current[index],
+            pe.tailPitch * weight,
+            pe.tailYaw * weight,
+          )
+        }
       }
-      alignTailToBody(tailBones.current, bones.current.get('pelvis'), poseEdits.tailAlignment)
+      if (pe.tailAlignment !== 1) {
+        alignTailToBody(tailBones.current, bones.current.get('pelvis'), pe.tailAlignment)
+      }
       for (const chain of legBones.current) {
-        applyLegTuck(chain, poseEdits.legTuck)
+        applyLegTuck(chain, pe.legTuck)
       }
       for (const foot of footBones.current) {
-        applyBoneOffset(foot, poseEdits.footTuck)
+        applyBoneOffset(foot, pe.footTuck)
+      }
+
+      // Wing Height & Wing Fold Master Adjustments
+      const wingShoulderL = bones.current.get('L_WingShoulder') ?? bones.current.get('wingL1')
+      const wingElbowL = bones.current.get('L_WingElbow') ?? bones.current.get('wingL2')
+      const wingWristL = bones.current.get('L_WingWrist')
+
+      const wingShoulderR = bones.current.get('R_WingShoulder') ?? bones.current.get('wingR1')
+      const wingElbowR = bones.current.get('R_WingElbow') ?? bones.current.get('wingR2')
+      const wingWristR = bones.current.get('R_WingWrist')
+
+      // 1. Wing Height (Up / Down) -> Local X pitch
+      applyBoneOffset(wingShoulderL, pe.wingHeight + pe.leftWingPitch, pe.leftWingYaw, pe.leftWingRoll)
+      applyBoneOffset(wingShoulderR, pe.wingHeight + pe.rightWingPitch, pe.rightWingYaw, pe.rightWingRoll)
+
+      // 2. Wing Fold / Unfold -> Local Z yaw sweeps
+      applyBoneOffset(wingShoulderL, 0, pe.wingFold * 0.8, 0)
+      applyBoneOffset(wingElbowL, 0, -pe.wingFold * 1.2, 0)
+      applyBoneOffset(wingWristL, 0, pe.wingFold * 0.6, 0)
+
+      applyBoneOffset(wingShoulderR, 0, -pe.wingFold * 0.8, 0)
+      applyBoneOffset(wingElbowR, 0, pe.wingFold * 1.2, 0)
+      applyBoneOffset(wingWristR, 0, -pe.wingFold * 0.6, 0)
+
+      // 3. Membrane Billow & Finger Fan Spread -> Local Y/Z rotation on wing fingers
+      const fingerNames = ['L_WingFinger1', 'L_WingFinger2', 'L_WingFinger3', 'R_WingFinger1', 'R_WingFinger2', 'R_WingFinger3']
+      fingerNames.forEach((fname) => {
+        const fingerBone = bones.current.get(fname)
+        if (fingerBone) {
+          applyBoneOffset(
+            fingerBone,
+            0,
+            pe.membraneBillow * (fname.startsWith('R_') ? -0.5 : 0.5),
+            pe.membraneBillow * 0.3
+          )
+        }
+      })
+
+      // Left & Right Leg Rotations
+      const legL = bones.current.get('L_Thigh') ?? bones.current.get('legL')
+      if (legL) {
+        applyBoneOffset(legL, 0, pe.leftLegYaw, pe.leftLegPitch)
+      }
+
+      const legR = bones.current.get('R_Thigh') ?? bones.current.get('legR')
+      if (legR) {
+        applyBoneOffset(legR, 0, pe.rightLegYaw, pe.rightLegPitch)
       }
     }
     if (shouldSealFlightJaw(state)) {
@@ -639,8 +714,8 @@ export function FlightLabRigContainer({
       } below pelvis (${legTuck.current < -0.02 ? 'letting down' : legTuck.current > 0.02 ? 'tucking' : 'at mode base'})`,
       `leg tuck    ${legTuck.current > 0 ? '+' : ''}${legTuck.current.toFixed(3)} rad of airspeed offset`,
       `pose lab    ${
-        poseComposer
-          ? `ON  body ${poseEdits.bodyX.toFixed(1)}, ${poseEdits.bodyY.toFixed(1)}, ${poseEdits.bodyZ.toFixed(1)}  climb ${poseEdits.bodyPitch.toFixed(2)}  neck ${poseEdits.neckPitch.toFixed(2)}/${poseEdits.neckYaw.toFixed(2)} align ${poseEdits.neckAlignment.toFixed(2)}  tail ${poseEdits.tailPitch.toFixed(2)}/${poseEdits.tailYaw.toFixed(2)} align ${poseEdits.tailAlignment.toFixed(2)}  legs ${poseEdits.legTuck.toFixed(2)}  feet ${poseEdits.footTuck.toFixed(2)}`
+        pc
+          ? `ON  body ${pe.bodyX.toFixed(1)}, ${pe.bodyY.toFixed(1)}, ${pe.bodyZ.toFixed(1)}  climb ${pe.bodyPitch.toFixed(2)}  neck ${pe.neckPitch.toFixed(2)}/${pe.neckYaw.toFixed(2)} align ${pe.neckAlignment.toFixed(2)}  tail ${pe.tailPitch.toFixed(2)}/${pe.tailYaw.toFixed(2)} align ${pe.tailAlignment.toFixed(2)}  legs ${pe.legTuck.toFixed(2)}  feet ${pe.footTuck.toFixed(2)}`
           : 'off (authored clip plus selected runtime layers only)'
       }`,
       `bounds      w ${size.x.toFixed(1)}  h ${size.y.toFixed(1)}  d ${size.z.toFixed(1)}`,
@@ -658,6 +733,7 @@ export function FlightLabRigContainer({
           state={state}
           scale={scale}
           frozen={frozen}
+          manualMixer={true}
           onReady={handleReady}
           fallback={null}
         >

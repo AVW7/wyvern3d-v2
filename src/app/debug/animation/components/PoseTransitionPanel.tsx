@@ -139,6 +139,30 @@ export function PoseTransitionPanel({
             onChange={(val) => onChangePoseEdit('bodyPitch', val)}
           />
           <Slider
+            label="body yaw"
+            value={poseEdits.bodyYaw}
+            min={-1.5}
+            max={1.5}
+            step={0.01}
+            disabled={!poseComposer}
+            textColor={t.text}
+            mutedColor={t.muted}
+            accentColor={t.accentColor}
+            onChange={(val) => onChangePoseEdit('bodyYaw', val)}
+          />
+          <Slider
+            label="body roll"
+            value={poseEdits.bodyRoll}
+            min={-1.5}
+            max={1.5}
+            step={0.01}
+            disabled={!poseComposer}
+            textColor={t.text}
+            mutedColor={t.muted}
+            accentColor={t.accentColor}
+            onChange={(val) => onChangePoseEdit('bodyRoll', val)}
+          />
+          <Slider
             label="neck pitch"
             value={poseEdits.neckPitch}
             min={-0.6}
@@ -186,27 +210,218 @@ export function PoseTransitionPanel({
             accentColor={t.accentColor}
             onChange={(val) => onChangePoseEdit('tailYaw', val)}
           />
-          <Slider
-            label="hind-leg tuck"
-            value={poseEdits.legTuck}
-            min={-1}
-            max={1}
-            step={0.01}
-            disabled={!poseComposer}
-            textColor={t.text}
-            mutedColor={t.muted}
-            accentColor={t.accentColor}
-            onChange={(val) => onChangePoseEdit('legTuck', val)}
-          />
 
-          <LabButton
-            disabled={!isEdited || !poseComposer}
-            themeStyle={t}
-            onClick={onResetPoseEdits}
-            style={{ marginTop: 6, width: '100%' }}
-          >
-            Reset pose offsets
-          </LabButton>
+          <div style={{ marginTop: 8, paddingTop: 8, borderTop: `1px solid ${t.border}` }}>
+            <div style={{ fontSize: 11, fontWeight: 600, color: t.accentColor, marginBottom: 4 }}>WING & MEMBRANE CONFIG</div>
+            <Slider
+              label="Wing Fold (Closed <-> Open)"
+              value={poseEdits.wingFold}
+              min={-1.0}
+              max={1.5}
+              step={0.01}
+              disabled={!poseComposer}
+              textColor={t.text}
+              mutedColor={t.muted}
+              accentColor={t.accentColor}
+              onChange={(val) => onChangePoseEdit('wingFold', val)}
+            />
+            <Slider
+              label="Wing Height (Down <-> Up)"
+              value={poseEdits.wingHeight}
+              min={-1.5}
+              max={1.5}
+              step={0.01}
+              disabled={!poseComposer}
+              textColor={t.text}
+              mutedColor={t.muted}
+              accentColor={t.accentColor}
+              onChange={(val) => onChangePoseEdit('wingHeight', val)}
+            />
+            <Slider
+              label="Membrane Billow / Spread"
+              value={poseEdits.membraneBillow}
+              min={-1.0}
+              max={1.0}
+              step={0.01}
+              disabled={!poseComposer}
+              textColor={t.text}
+              mutedColor={t.muted}
+              accentColor={t.accentColor}
+              onChange={(val) => onChangePoseEdit('membraneBillow', val)}
+            />
+          </div>
+
+          <div style={{ marginTop: 8, paddingTop: 8, borderTop: `1px solid ${t.border}` }}>
+            <div style={{ fontSize: 11, fontWeight: 600, color: t.accentColor, marginBottom: 4 }}>LEFT WING POINT</div>
+            <Slider
+              label="L Wing Pitch"
+              value={poseEdits.leftWingPitch}
+              min={-1.5}
+              max={1.5}
+              step={0.01}
+              disabled={!poseComposer}
+              textColor={t.text}
+              mutedColor={t.muted}
+              accentColor={t.accentColor}
+              onChange={(val) => onChangePoseEdit('leftWingPitch', val)}
+            />
+            <Slider
+              label="L Wing Yaw"
+              value={poseEdits.leftWingYaw}
+              min={-1.5}
+              max={1.5}
+              step={0.01}
+              disabled={!poseComposer}
+              textColor={t.text}
+              mutedColor={t.muted}
+              accentColor={t.accentColor}
+              onChange={(val) => onChangePoseEdit('leftWingYaw', val)}
+            />
+            <Slider
+              label="L Wing Roll"
+              value={poseEdits.leftWingRoll}
+              min={-1.5}
+              max={1.5}
+              step={0.01}
+              disabled={!poseComposer}
+              textColor={t.text}
+              mutedColor={t.muted}
+              accentColor={t.accentColor}
+              onChange={(val) => onChangePoseEdit('leftWingRoll', val)}
+            />
+          </div>
+
+          <div style={{ marginTop: 8, paddingTop: 8, borderTop: `1px solid ${t.border}` }}>
+            <div style={{ fontSize: 11, fontWeight: 600, color: t.accentColor, marginBottom: 4 }}>RIGHT WING POINT</div>
+            <Slider
+              label="R Wing Pitch"
+              value={poseEdits.rightWingPitch}
+              min={-1.5}
+              max={1.5}
+              step={0.01}
+              disabled={!poseComposer}
+              textColor={t.text}
+              mutedColor={t.muted}
+              accentColor={t.accentColor}
+              onChange={(val) => onChangePoseEdit('rightWingPitch', val)}
+            />
+            <Slider
+              label="R Wing Yaw"
+              value={poseEdits.rightWingYaw}
+              min={-1.5}
+              max={1.5}
+              step={0.01}
+              disabled={!poseComposer}
+              textColor={t.text}
+              mutedColor={t.muted}
+              accentColor={t.accentColor}
+              onChange={(val) => onChangePoseEdit('rightWingYaw', val)}
+            />
+            <Slider
+              label="R Wing Roll"
+              value={poseEdits.rightWingRoll}
+              min={-1.5}
+              max={1.5}
+              step={0.01}
+              disabled={!poseComposer}
+              textColor={t.text}
+              mutedColor={t.muted}
+              accentColor={t.accentColor}
+              onChange={(val) => onChangePoseEdit('rightWingRoll', val)}
+            />
+          </div>
+
+          <div style={{ marginTop: 8, paddingTop: 8, borderTop: `1px solid ${t.border}` }}>
+            <div style={{ fontSize: 11, fontWeight: 600, color: t.accentColor, marginBottom: 4 }}>LIMBS & LEGS</div>
+            <Slider
+              label="L Leg Pitch"
+              value={poseEdits.leftLegPitch}
+              min={-1.5}
+              max={1.5}
+              step={0.01}
+              disabled={!poseComposer}
+              textColor={t.text}
+              mutedColor={t.muted}
+              accentColor={t.accentColor}
+              onChange={(val) => onChangePoseEdit('leftLegPitch', val)}
+            />
+            <Slider
+              label="L Leg Yaw"
+              value={poseEdits.leftLegYaw}
+              min={-1.5}
+              max={1.5}
+              step={0.01}
+              disabled={!poseComposer}
+              textColor={t.text}
+              mutedColor={t.muted}
+              accentColor={t.accentColor}
+              onChange={(val) => onChangePoseEdit('leftLegYaw', val)}
+            />
+            <Slider
+              label="R Leg Pitch"
+              value={poseEdits.rightLegPitch}
+              min={-1.5}
+              max={1.5}
+              step={0.01}
+              disabled={!poseComposer}
+              textColor={t.text}
+              mutedColor={t.muted}
+              accentColor={t.accentColor}
+              onChange={(val) => onChangePoseEdit('rightLegPitch', val)}
+            />
+            <Slider
+              label="R Leg Yaw"
+              value={poseEdits.rightLegYaw}
+              min={-1.5}
+              max={1.5}
+              step={0.01}
+              disabled={!poseComposer}
+              textColor={t.text}
+              mutedColor={t.muted}
+              accentColor={t.accentColor}
+              onChange={(val) => onChangePoseEdit('rightLegYaw', val)}
+            />
+            <Slider
+              label="hind-leg tuck"
+              value={poseEdits.legTuck}
+              min={-1}
+              max={1}
+              step={0.01}
+              disabled={!poseComposer}
+              textColor={t.text}
+              mutedColor={t.muted}
+              accentColor={t.accentColor}
+              onChange={(val) => onChangePoseEdit('legTuck', val)}
+            />
+          </div>
+
+          <div style={{ display: 'flex', gap: 6, marginTop: 10 }}>
+            <LabButton
+              disabled={!isEdited || !poseComposer}
+              themeStyle={t}
+              onClick={onResetPoseEdits}
+              style={{ flex: 1 }}
+            >
+              Reset Offsets
+            </LabButton>
+
+            <LabButton
+              disabled={!poseComposer}
+              themeStyle={t}
+              onClick={() => {
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(poseEdits, null, 2));
+                const downloadAnchor = document.createElement('a');
+                downloadAnchor.setAttribute("href", dataStr);
+                downloadAnchor.setAttribute("download", `wyvern_pose_edits_${Date.now()}.json`);
+                document.body.appendChild(downloadAnchor);
+                downloadAnchor.click();
+                downloadAnchor.remove();
+              }}
+              style={{ flex: 1, backgroundColor: t.accentColor, color: '#fff' }}
+            >
+              Export Pose File (.json)
+            </LabButton>
+          </div>
         </div>
       </AppleCard>
     </div>
