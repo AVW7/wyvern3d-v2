@@ -12,9 +12,9 @@ import type { PropBase } from '../props/PropBase'
 export function useFlightLabState() {
   const [speciesIndex, setSpeciesIndex] = useState(0)
   const [extraScale, setExtraScale] = useState(1)
-  const [state, setState] = useState<ModelState>('cruise')
+  const [state, setState] = useState<ModelState>('idle')
   const [auto, setAuto] = useState(false)
-  const [horizontalSpeed, setHorizontalSpeed] = useState(18)
+  const [horizontalSpeed, setHorizontalSpeed] = useState(0)
   const [verticalSpeed, setVerticalSpeed] = useState(0)
   const [yawRate, setYawRate] = useState(0)
   const [referenceSpeed, setReferenceSpeed] = useState(18)
