@@ -426,7 +426,7 @@ export function FlightLabRigContainer({
       if (frozen) mixer.update(0)
     }
 
-    if (procedural) {
+    if (procedural && AIRBORNE_STATES.has(state)) {
       const phase = calculatePhase(labTime.current)
       propagateFullBodyWave(
         { spine: spineBones.current, neck: neckBones.current },
@@ -527,30 +527,24 @@ export function FlightLabRigContainer({
         applyLegTuck(chain, finalTuck)
       }
       
-      // The wing procedural layer (turbulence flutter, membrane billow, dive
-      // fold, turn asymmetry) is a flight behaviour. Grounded clips are authored
-      // with wings folded against the body; applying this layer on top of a
-      // grounded pose spreads them back out, which is why walk and idle shipped
-      // with permanently-expanded wings in the Lab. Gate it to airborne states.
-      if (AIRBORNE_STATES.has(state)) {
-        const turbulence = Math.abs(verticalSpeed) > 5 ? 0.35
-          : Math.abs(yawRate) > 0.5 ? 0.25
-          : Math.abs(verticalSpeed) > 2 ? 0.15
-          : 0
+      const turbulence = Math.abs(verticalSpeed) > 5 ? 0.35
+        : Math.abs(yawRate) > 0.5 ? 0.25
+        : Math.abs(verticalSpeed) > 2 ? 0.15
+        : 0
 
-        wingsState.current = dynamicWingController(
-          wingBonesL.current,
-          wingBonesR.current,
-          turbulence,
-          pose.current.pitch,
-          yawRate,
-          horizontalSpeed,
-          loopStateRef.current,
-          labTime.current,
-          wingsState.current,
-          dt
-        )
-      }
+      wingsState.current = dynamicWingController(
+        wingBonesL.current,
+        wingBonesR.current,
+        turbulence,
+        pose.current.pitch,
+        yawRate,
+        horizontalSpeed,
+        loopStateRef.current,
+        labTime.current,
+        wingsState.current,
+        dt
+      )
+    }
     }
 
     if (poseComposer) {
