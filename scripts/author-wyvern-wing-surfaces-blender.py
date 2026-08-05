@@ -252,51 +252,6 @@ def author_walk_knuckles(armature, action):
     print(f"authored walk: {WALK_KNUCKLE_SWAY_DEG:.1f}° alternating wing-knuckle carrier")
 
 
-def reverse_ground_elbow_direction(armature, action):
-    """Turn each grounded wing forward while keeping it on its own side.
-
-    The existing fold is bilaterally symmetric but points tailward and crosses
-    the torso: left reaches negative X / positive Y, right the inverse.  The
-    measured elbow local-Y/Z reversal moves the left spar to positive X and
-    negative Y (forward) without changing its lift axis.  The right elbow is
-    then authored as the direct local quaternion mirror, never rebuilt through
-    Euler angles.
-    """
-    bind(armature, action)
-    if action.get(GROUND_ELBOW_REVERSAL_PROPERTY) == "v1":
-        return
-
-    first, last = (round(value) for value in action.frame_range)
-    previous = {"L": None, "R": None}
-    for frame in range(first, last + 1):
-        bpy.context.scene.frame_set(frame)
-        bpy.context.view_layer.update()
-        left = armature.pose.bones["L_WingElbow"]
-        right = armature.pose.bones["R_WingElbow"]
-        source = left.rotation_quaternion.normalized()
-        left_rotation = Quaternion((source.w, source.x, -source.y, -source.z))
-        right_rotation = Quaternion((
-            left_rotation.w,
-            left_rotation.x,
-            -left_rotation.y,
-            -left_rotation.z,
-        ))
-        for side, bone, rotation in (
-            ("L", left, left_rotation),
-            ("R", right, right_rotation),
-        ):
-            if previous[side] is not None:
-                rotation.make_compatible(previous[side])
-            bone.rotation_mode = "QUATERNION"
-            bone.rotation_quaternion = rotation
-            bone.keyframe_insert(data_path="rotation_quaternion", frame=frame, group=bone.name)
-            previous[side] = rotation.copy()
-
-    set_linear_interpolation(action, ("L_WingElbow", "R_WingElbow"))
-    action[GROUND_ELBOW_REVERSAL_PROPERTY] = "v1"
-    print(f"authored {action.name}: corrected backward grounded wing direction")
-
-
 def author():
     armature = bpy.data.objects.get(ARMATURE)
     if armature is None or armature.type != "ARMATURE":
@@ -308,11 +263,7 @@ def author():
         author_action(armature, action, profile)
         if name == "walk":
             author_walk_knuckles(armature, action)
-    for name in GROUND_ELBOW_REVERSAL_ACTIONS:
-        action = bpy.data.actions.get(name)
-        if action is None:
-            raise SystemExit(f"action {name!r} not found")
-        reverse_ground_elbow_direction(armature, action)
+
 
 
 def export(path):
