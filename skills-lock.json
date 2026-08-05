@@ -1,0 +1,185 @@
+{
+  "version": 1,
+  "skills": {
+    "animation-quality-gate": {
+      "source": "roble3/cc-blender-skill",
+      "sourceType": "github",
+      "skillPath": "plugin/skills/animation-quality-gate/SKILL.md",
+      "computedHash": "9c3708805917d5248d0750095c43ba3f2695edbbdb6033a84713549c428207df"
+    },
+    "atlas-uv-fitting": {
+      "source": "roble3/cc-blender-skill",
+      "sourceType": "github",
+      "skillPath": "plugin/skills/atlas-uv-fitting/SKILL.md",
+      "computedHash": "358457fc3f348247f00f39f3d70b83b040dfe4abdde833f67b069be08e1a6241"
+    },
+    "blender-animation": {
+      "source": "roble3/cc-blender-skill",
+      "sourceType": "github",
+      "skillPath": "plugin/skills/blender-animation/SKILL.md",
+      "computedHash": "d66ba7e9b1e498b4ff294e845dba9dffcbda04742f3a04e8955db7e2e9aec588"
+    },
+    "blender-cameras": {
+      "source": "roble3/cc-blender-skill",
+      "sourceType": "github",
+      "skillPath": "plugin/skills/blender-cameras/SKILL.md",
+      "computedHash": "ee2088ee98926071793b15165c437a69ba144f12167c4221dc539e5af6c6daca"
+    },
+    "blender-export": {
+      "source": "roble3/cc-blender-skill",
+      "sourceType": "github",
+      "skillPath": "plugin/skills/blender-export/SKILL.md",
+      "computedHash": "aeb5e9694256f49accaa0c77e2710f9159741b7d9cb5971d018ff96fb212d55c"
+    },
+    "blender-lighting": {
+      "source": "roble3/cc-blender-skill",
+      "sourceType": "github",
+      "skillPath": "plugin/skills/blender-lighting/SKILL.md",
+      "computedHash": "aade0f23e4f9f486f52f0d6f802b1a2b3578029e9c8510c8d9817e95a4b28dc8"
+    },
+    "blender-materials": {
+      "source": "roble3/cc-blender-skill",
+      "sourceType": "github",
+      "skillPath": "plugin/skills/blender-materials/SKILL.md",
+      "computedHash": "293c348dab7837b1c135919e578fd241fcf8466e1c894c25852f042e8c5a087f"
+    },
+    "blender-modeling": {
+      "source": "roble3/cc-blender-skill",
+      "sourceType": "github",
+      "skillPath": "plugin/skills/blender-modeling/SKILL.md",
+      "computedHash": "9f5ffb5e39936d0e884258fd5f2ace437f6eddfe189318d652f2a6e157a0d924"
+    },
+    "blender-pro-workflow": {
+      "source": "roble3/cc-blender-skill",
+      "sourceType": "github",
+      "skillPath": "plugin/skills/blender-pro-workflow/SKILL.md",
+      "computedHash": "9ffb2a9b59a77a15cf2e48778d9d4799ec2c803a9087c3160b95674848e48805"
+    },
+    "blender-rendering": {
+      "source": "roble3/cc-blender-skill",
+      "sourceType": "github",
+      "skillPath": "plugin/skills/blender-rendering/SKILL.md",
+      "computedHash": "ceccfc40d249d5eee59b74412f8ea1ffebd894b6e300f47697349fd4bd041e99"
+    },
+    "blender-skill-harmonizer": {
+      "source": "roble3/cc-blender-skill",
+      "sourceType": "github",
+      "skillPath": "plugin/skills/blender-skill-harmonizer/SKILL.md",
+      "computedHash": "97402dee3051fab76b7318fb4ea34594e7a6d342c3511a6ec806be53ccb39143"
+    },
+    "blender-uv-texturing": {
+      "source": "roble3/cc-blender-skill",
+      "sourceType": "github",
+      "skillPath": "plugin/skills/blender-uv-texturing/SKILL.md",
+      "computedHash": "3254f40398217a55314c65b22fdcea797d5a83195061572ecb2ed2e8bff261d9"
+    },
+    "closed-surface-uv-coverage": {
+      "source": "roble3/cc-blender-skill",
+      "sourceType": "github",
+      "skillPath": "plugin/skills/closed-surface-uv-coverage/SKILL.md",
+      "computedHash": "79030cc037579c6f867ed4b03ee0d976dafbc5557bdcca352a0fd78c828512cf"
+    },
+    "contour-to-mesh": {
+      "source": "roble3/cc-blender-skill",
+      "sourceType": "github",
+      "skillPath": "plugin/skills/contour-to-mesh/SKILL.md",
+      "computedHash": "0e565831d66cf68a86b9e8796ce95f60b9ac9769184ff482ff32f620c505931a"
+    },
+    "fit-repair-optimizer": {
+      "source": "roble3/cc-blender-skill",
+      "sourceType": "github",
+      "skillPath": "plugin/skills/fit-repair-optimizer/SKILL.md",
+      "computedHash": "485071d52f4abb365c41ca40c209dbccebd77ae4f70f33394b972014d24f8a5d"
+    },
+    "landmark-fit-repair": {
+      "source": "roble3/cc-blender-skill",
+      "sourceType": "github",
+      "skillPath": "plugin/skills/landmark-fit-repair/SKILL.md",
+      "computedHash": "2a21b34561b433123383bf7997d8e25fdb1fe52fba9795302f88844646371634"
+    },
+    "mascot-logo-reconstruction": {
+      "source": "roble3/cc-blender-skill",
+      "sourceType": "github",
+      "skillPath": "plugin/skills/mascot-logo-reconstruction/SKILL.md",
+      "computedHash": "e56b16e2777bd052d5b5bf0bbe5af4bb37bf7ad1e700335235d0d91f12689f2c"
+    },
+    "multiview-constraint-solver": {
+      "source": "roble3/cc-blender-skill",
+      "sourceType": "github",
+      "skillPath": "plugin/skills/multiview-constraint-solver/SKILL.md",
+      "computedHash": "a45031152ecca9844be3f1414979c078572c8d78d7c16e70259559a0a7e5473c"
+    },
+    "multiview-fit-loop": {
+      "source": "roble3/cc-blender-skill",
+      "sourceType": "github",
+      "skillPath": "plugin/skills/multiview-fit-loop/SKILL.md",
+      "computedHash": "cb65b668e72126671c76dfee4135b8c885d9052fc282f2727f12f03ce54a5b12"
+    },
+    "orbital-hud-motion": {
+      "source": "roble3/cc-blender-skill",
+      "sourceType": "github",
+      "skillPath": "plugin/skills/orbital-hud-motion/SKILL.md",
+      "computedHash": "22708b60cd697401e823a7c960e5abfb07a07dd4eebdc3b340177905ee1157a8"
+    },
+    "orthographic-registration": {
+      "source": "roble3/cc-blender-skill",
+      "sourceType": "github",
+      "skillPath": "plugin/skills/orthographic-registration/SKILL.md",
+      "computedHash": "e9cdfec7d78d3a827944040408d7c719e21c531849388c857a8fd984e8f97049"
+    },
+    "quality-refinement-autoloop": {
+      "source": "roble3/cc-blender-skill",
+      "sourceType": "github",
+      "skillPath": "plugin/skills/quality-refinement-autoloop/SKILL.md",
+      "computedHash": "b492df23f95877504b8ab0dac03bd169d93b537cf36ee193dbebce97d7677187"
+    },
+    "reference-analysis-validator": {
+      "source": "roble3/cc-blender-skill",
+      "sourceType": "github",
+      "skillPath": "plugin/skills/reference-analysis-validator/SKILL.md",
+      "computedHash": "162481cc7352a7c9dfb89db4de88677e06261a78d4f5e96ee83b53a3d84a86a1"
+    },
+    "reference-look-calibration": {
+      "source": "roble3/cc-blender-skill",
+      "sourceType": "github",
+      "skillPath": "plugin/skills/reference-look-calibration/SKILL.md",
+      "computedHash": "540fb7d77eeb7550ec3c828445ac01272686b1a602f38618bb7a8f1a1cf0fc44"
+    },
+    "reference-to-3d": {
+      "source": "roble3/cc-blender-skill",
+      "sourceType": "github",
+      "skillPath": "plugin/skills/reference-to-3d/SKILL.md",
+      "computedHash": "6cc1d3f56af174f81d367648c5408b288699a5d0974f8e5790a61303fc4f8fac"
+    },
+    "source-part-segmentation": {
+      "source": "roble3/cc-blender-skill",
+      "sourceType": "github",
+      "skillPath": "plugin/skills/source-part-segmentation/SKILL.md",
+      "computedHash": "127eeccc092eaf471592378f7f7c7c2b8e2597c923ae61c1e6e24bb998fa391d"
+    },
+    "text-to-blender": {
+      "source": "roble3/cc-blender-skill",
+      "sourceType": "github",
+      "skillPath": "plugin/skills/text-to-blender/SKILL.md",
+      "computedHash": "cc8f429ef40902a76b4cb336cd296973a77dc53754322dbdf0e59dca8d19fbd1"
+    },
+    "texture-driven-mesh-fitting": {
+      "source": "roble3/cc-blender-skill",
+      "sourceType": "github",
+      "skillPath": "plugin/skills/texture-driven-mesh-fitting/SKILL.md",
+      "computedHash": "04979e31cbbde67970b0e917b47859c2a58bda3949f2279060bb8daf8666d57c"
+    },
+    "texture-state-animation": {
+      "source": "roble3/cc-blender-skill",
+      "sourceType": "github",
+      "skillPath": "plugin/skills/texture-state-animation/SKILL.md",
+      "computedHash": "774b4b3bd198df3166a3ed60aebb249a792fbf7e5da1585cc9c62e1e0dac2d0c"
+    },
+    "wireframe-to-3d": {
+      "source": "roble3/cc-blender-skill",
+      "sourceType": "github",
+      "skillPath": "plugin/skills/wireframe-to-3d/SKILL.md",
+      "computedHash": "4add95c902acb12ad2c92cc45fa380ad056f3ccd17dab2b018229bbfc0124d96"
+    }
+  }
+}
