@@ -3,6 +3,7 @@
 import { create } from 'zustand'
 import type { CharacterGesture } from '@/render/placeholders/PlaceholderProps'
 import type { CharacterMoveCommand } from '@/render/controllers/CharacterController'
+import type { PlayerLocomotion } from '@/render/player/PlayerCharacter'
 
 export type SanctuaryCommand =
   | 'offerFood'
@@ -71,6 +72,7 @@ interface SanctuaryCommandStore {
   playerMove: CharacterMoveCommand | null
   playerMoveResult: { token: number; result: 'arrived' | 'cancelled' } | null
   playerGesture: CharacterGesture
+  playerLocomotion: PlayerLocomotion
   playerPosition: [number, number]
   nextToken: number
 
@@ -92,6 +94,7 @@ interface SanctuaryCommandStore {
     face?: [number, number],
   ): number
   setPlayerPosition(position: [number, number]): void
+  setPlayerLocomotion(locomotion: PlayerLocomotion): void
   finishPlayerMove(token: number, result: 'arrived' | 'cancelled'): void
   acknowledgePlayerMove(): void
   clearPlayerInteraction(): void
@@ -118,6 +121,7 @@ export const useSanctuaryCommands = create<SanctuaryCommandStore>()((set, get) =
   playerMove: null,
   playerMoveResult: null,
   playerGesture: 'none',
+  playerLocomotion: 'idle',
   playerPosition: [0, 6],
   nextToken: 1,
 
@@ -270,6 +274,10 @@ export const useSanctuaryCommands = create<SanctuaryCommandStore>()((set, get) =
         ? state
         : { playerPosition: position },
     )
+  },
+
+  setPlayerLocomotion(locomotion) {
+    set((state) => state.playerLocomotion === locomotion ? state : { playerLocomotion: locomotion })
   },
 
   finishPlayerMove(token, result) {

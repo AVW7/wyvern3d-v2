@@ -4,7 +4,6 @@ import { useEffect, useMemo, useRef } from 'react'
 import { WorldLabel } from '@/render/labels/WorldLabel'
 import { CharacterController, type CharacterState } from '@/render/controllers/CharacterController'
 import {
-  PlaceholderCharacter,
   PlaceholderEgg,
   type CharacterGesture,
 } from '@/render/placeholders/PlaceholderProps'
@@ -31,6 +30,7 @@ import { useSanctuaryColors } from '@/state/sanctuaryColorsStore'
 import { SanctuaryEditorControls } from './components/SanctuaryEditorControls'
 import { sanctuaryPosition, sanctuaryPosition3 } from '@/core/data/sanctuaryStations'
 import type { SanctuaryPlacedObject } from '@/core/types'
+import { PlayerCharacter } from '@/render/player/PlayerCharacter'
 
 /**
  * The sanctuary hub: the player's walkable base inside the keep, and the
@@ -47,6 +47,7 @@ export function SanctuaryScene() {
   const interactLatch = useRef(false)
   const playerMove = useSanctuaryCommands((commands) => commands.playerMove)
   const playerGesture = useSanctuaryCommands((commands) => commands.playerGesture)
+  const playerLocomotion = useSanctuaryCommands((commands) => commands.playerLocomotion)
   const targetMode = useSanctuaryCommands((commands) => commands.targetMode)
   gesture.current = playerGesture
 
@@ -59,6 +60,9 @@ export function SanctuaryScene() {
    */
   const onCharacterUpdate = (char: CharacterState) => {
     moving.current = char.moving
+    useSanctuaryCommands.getState().setPlayerLocomotion(
+      char.running ? 'run' : char.moving ? 'walk' : 'idle',
+    )
     useSanctuaryCommands
       .getState()
       .setPlayerPosition([char.position.x, char.position.z])
@@ -154,7 +158,12 @@ export function SanctuaryScene() {
           }
           acceptGroundClicks={!targetMode && !isEditing}
         >
-          <PlaceholderCharacter movingRef={moving} gestureRef={gesture} />
+          <PlayerCharacter
+            locomotion={playerLocomotion}
+            gesture={playerGesture}
+            movingRef={moving}
+            gestureRef={gesture}
+          />
         </CharacterController>
       </group>
     </>

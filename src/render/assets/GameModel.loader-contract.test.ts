@@ -12,4 +12,9 @@ describe('GameModel GLTF animation runtime contract', () => {
     expect(source).not.toContain('scene.animations')
     expect(source).toContain('new AnimationMixer(cloned)')
   })
+
+  it('honours the model-library world toggle before loading a GLB', () => {
+    expect(source).toContain('library.disabled[id] !== true')
+    expect(source).toContain('if (!enabled || !entry || !entry.url)')
+  })
 })

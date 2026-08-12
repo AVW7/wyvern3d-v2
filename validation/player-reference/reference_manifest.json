@@ -1,0 +1,85 @@
+{
+  "source_files": {
+    "front": "/Users/ajadvanwyk/Downloads/sorcerer_front_apose.png",
+    "side": "/Users/ajadvanwyk/Downloads/sorcerer_side_apose.png",
+    "back": "/Users/ajadvanwyk/Downloads/sorcerer_back_apose.png",
+    "face": "/Users/ajadvanwyk/Downloads/sorcerer_face_closeup.png",
+    "hair": "/Users/ajadvanwyk/Downloads/sorcerer_hair_3view.png",
+    "coat": "/Users/ajadvanwyk/Downloads/sorcerer_coat_flatlay.png",
+    "gear": "/Users/ajadvanwyk/Downloads/sorcerer_gear_boots_gloves_belt_tools.png",
+    "materials": "/Users/ajadvanwyk/Downloads/sorcerer_material_sheet.png",
+    "pauldron": "/Users/ajadvanwyk/Downloads/sorcerer_shoulder_armor_detail.png",
+    "expressions": "/Users/ajadvanwyk/Downloads/sorcerer_expression_sheet.png"
+  },
+  "primary_view": "front",
+  "reference_type": "stylized_character_turnaround",
+  "expected_primary_parts": {
+    "count": 12,
+    "labels": [
+      "athletic_male_body",
+      "head_and_hair",
+      "high_collar_tunic",
+      "split_long_coat",
+      "asymmetric_blue_cape",
+      "left_leather_pauldron",
+      "cross_body_harness",
+      "belt_and_pouches",
+      "two_bracers",
+      "fingerless_gloves",
+      "fitted_trousers",
+      "two_mid_calf_boots"
+    ]
+  },
+  "structural_parts": [
+    "handsome_athletic_male_body",
+    "angular_clean_face_with_light_stubble",
+    "medium_wavy_dark_hair",
+    "fitted_high_collar_tunic",
+    "open_split_charcoal_coat",
+    "asymmetric_royal_blue_cape",
+    "layered_left_leather_pauldron",
+    "cross_body_leather_harness",
+    "belt_pouches_and_empty_sheath",
+    "leather_bracers_and_fingerless_gloves",
+    "fitted_trousers_and_mid_calf_boots"
+  ],
+  "decorative_parts": [
+    "silver_wyvern_brooch",
+    "silver_pauldron_badge",
+    "belt_hooks",
+    "two_small_handler_canisters"
+  ],
+  "excluded_from_rigged_base": [
+    "loose_keys",
+    "long_dangling_chains",
+    "rope_coils",
+    "dagger",
+    "whistles"
+  ],
+  "texture_regions": {
+    "coat": { "base": "#1C1A1B", "roughness": 0.85, "metallic": 0.0 },
+    "cape": { "base": "#2C4FA8", "roughness": 0.60, "metallic": 0.0 },
+    "brown_leather": { "base": "#5A3D2B", "roughness": 0.55, "metallic": 0.0 },
+    "black_leather": { "base": "#0F0F0F", "roughness": 0.45, "metallic": 0.0 },
+    "silver": { "base": "#C2C2C6", "roughness": 0.20, "metallic": 1.0 },
+    "skin": { "base": "#D8B79F", "roughness": 0.50, "metallic": 0.0 },
+    "hair": { "base": "#1A1816", "roughness": 0.70, "metallic": 0.0 },
+    "eyes": { "base": "#8A9FBA", "roughness": 0.35, "metallic": 0.0 }
+  },
+  "validation_thresholds": {
+    "front_mask_iou_min": 0.82,
+    "bbox_center_tolerance_px": 12,
+    "bbox_size_drift_percent_max": 3,
+    "part_count_exact": true
+  },
+  "production_constraints": {
+    "height_metres": 1.82,
+    "triangle_target": [20000, 35000],
+    "texture_max": "1x2048",
+    "pose": "neutral_A_pose",
+    "forward_axis": "+Z",
+    "ground_y": 0,
+    "max_bone_influences": 4,
+    "root_motion": false
+  }
+}

@@ -20,6 +20,7 @@ export interface CharacterState {
   position: Vector3
   yaw: number
   moving: boolean
+  running: boolean
 }
 
 export interface CharacterMoveCommand {
@@ -191,6 +192,7 @@ export function CharacterController({
     }
 
     let moving = keyboardMoving
+    const running = keyboardMoving && isDown(...CONTROLS.run)
     if (keyboardMoving) {
       const sin = Math.sin(cameraYaw.current)
       const cos = Math.cos(cameraYaw.current)
@@ -203,7 +205,7 @@ export function CharacterController({
       dx /= len
       dz /= len
 
-      const speed = isDown(...CONTROLS.run) ? RUN_SPEED : WALK_SPEED
+      const speed = running ? RUN_SPEED : WALK_SPEED
       position.current.x += dx * speed * dt
       position.current.z += dz * speed * dt
       yaw.current = Math.atan2(dx, dz)
@@ -275,7 +277,7 @@ export function CharacterController({
     camera.position.lerp(desiredCam.current, 1 - Math.exp(-camSettings.smoothing * dt))
     camera.lookAt(trackedTarget.current)
 
-    onUpdate?.({ position: position.current, yaw: yaw.current, moving })
+    onUpdate?.({ position: position.current, yaw: yaw.current, moving, running })
   })
 
   return <group ref={group}>{children}</group>

@@ -21,6 +21,7 @@ import {
   type MaterialOverride,
   type ModelState,
 } from './manifest'
+import { useModelLibraryStore } from '@/state/modelLibraryStore'
 
 /** Crossfade length between two states, in seconds. */
 const FADE = 0.25
@@ -115,9 +116,10 @@ export function GameModel({
   children?: React.ReactNode
 }) {
   const entry = getAsset(id)
+  const enabled = useModelLibraryStore((library) => library.disabled[id] !== true)
 
   // Placeholder mode
-  if (!entry || !entry.url) {
+  if (!enabled || !entry || !entry.url) {
     return <>{fallback}</>
   }
 
@@ -126,6 +128,7 @@ export function GameModel({
       <LoadedModel
         url={entry.url}
         animationUrl={entry.animationUrl}
+        animationUrls={entry.animationUrls}
         scale={entry.scale * scale}
         yOffset={entry.yOffset}
         material={entry.material}
@@ -147,6 +150,7 @@ export function GameModel({
 function LoadedModel({
   url,
   animationUrl,
+  animationUrls,
   scale,
   yOffset,
   animations: clips,
@@ -172,6 +176,7 @@ function LoadedModel({
 }) {
   const { scene, animations } = useGLTF(url) as { scene: Group; animations: AnimationClip[] }
   const animGltf = animationUrl ? (useGLTF(animationUrl) as { animations: AnimationClip[] }) : null
+  const animGltfs = useGLTF(animationUrls ?? []) as { animations: AnimationClip[] }[]
   const ref = useRef<Group>(null)
 
   const cloned = useMemo(() => {
@@ -187,13 +192,17 @@ function LoadedModel({
 
   const animsByName = useMemo(() => {
     // GLTFLoader returns animations on the GLTF payload, never on `scene`.
-    const source = animGltf ? animGltf.animations : animations
+    const source = animationUrls?.length
+      ? animGltfs.flatMap((gltf) => gltf.animations)
+      : animGltf
+        ? animGltf.animations
+        : animations
     const map = new Map<string, AnimationClip>()
     for (const clip of source) {
       map.set(clip.name, clip)
     }
     return map
-  }, [animations, animGltf])
+  }, [animations, animationUrls, animGltf, animGltfs])
 
   const stateWithFallback = state
   const stateSpec = clips?.[stateWithFallback]
@@ -339,4 +348,5 @@ export function preloadAsset(id: AssetId): void {
   if (!entry?.url) return
   useGLTF.preload(entry.url)
   if (entry.animationUrl) useGLTF.preload(entry.animationUrl)
+  if (entry.animationUrls) useGLTF.preload(entry.animationUrls)
 }

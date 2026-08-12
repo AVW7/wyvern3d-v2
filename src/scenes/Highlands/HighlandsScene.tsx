@@ -6,7 +6,7 @@ import { PlaneGeometry, Quaternion, Vector3, type Group, type Object3D } from 't
 import type { WyvernInstance } from '@/core/types'
 import { SPECIES } from '@/core/data/species'
 import { GameModel, type ModelActionRequest } from '@/render/assets/GameModel'
-import { PropInstances, type PropPlacement } from '@/render/assets/props'
+import { FoodProp, PropInstances, type PropPlacement } from '@/render/assets/props'
 import { PlaceholderWyvern } from '@/render/placeholders/PlaceholderWyvern'
 import { WorldLabel } from '@/render/labels/WorldLabel'
 import { consumeDrag, consumeWheel } from '@/render/controllers/input'
@@ -240,6 +240,7 @@ function HighlandsWildlife() {
 
 function HighlandsDoeActor({ doe }: { doe: HighlandsDoe }) {
   const group = useRef<Group>(null)
+  const huntPhase = useHighlandsHunt((session) => session.phase)
   const phase = useMemo(
     () => Array.from(doe.id).reduce((total, character) => total + character.charCodeAt(0), 0) * 0.17,
     [doe.id],
@@ -290,7 +291,15 @@ function HighlandsDoeActor({ doe }: { doe: HighlandsDoe }) {
     }
   })
 
-  if (doe.lifecycle === 'carried' || doe.lifecycle === 'respawning') return null
+  if (doe.lifecycle === 'carried' || (doe.lifecycle === 'respawning' && huntPhase !== 'finish')) return null
+
+  if (doe.lifecycle !== 'alive') {
+    return (
+      <group ref={group} position={[doe.position[0], 0, doe.position[1]]} rotation={[0, doe.yaw, 0]}>
+        <FoodProp id="prop.food.carcass" position={[0, 0, 0]} />
+      </group>
+    )
+  }
 
   return (
     <group ref={group} position={[doe.position[0], 0.35, doe.position[1]]} rotation={[0, doe.yaw, 0]}>
@@ -644,7 +653,7 @@ function HighlandsHuntDirector({
         visible={session.phase === 'carry' || session.phase === 'landing'}
       >
         <group rotation={[0, 0, Math.PI * 0.5]} scale={0.82}>
-          <GameModel id="wildlife.deer" state="death" fallback={<DoeFallback />} />
+          <FoodProp id="prop.food.carcass" position={[0, 0, 0]} />
         </group>
       </group>
       {session.phase === 'fire' && activeDoe && (

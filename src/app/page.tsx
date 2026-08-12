@@ -34,6 +34,12 @@ export default function MenuPage() {
               <span>Enter the sanctuary</span>
               <span aria-hidden="true">→</span>
             </Link>
+            <p className="title-panel__dev">
+              assets ·{' '}
+              <Link href="/models" style={DEV_LINK}>
+                model library
+              </Link>
+            </p>
             {/* Development tools are stripped from production builds, so this link
                 is too — otherwise the menu advertises a route that 404s. */}
             {process.env.NODE_ENV !== 'production' && (

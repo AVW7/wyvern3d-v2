@@ -45,6 +45,7 @@ export type ModelState =
   | 'attack'
   | 'attackAir'
   | 'walk'
+  | 'run'
   | 'death'
   | 'hop'
   | 'breathe'
@@ -72,6 +73,9 @@ export type ModelState =
   | 'hover'
   | 'nuzzle'
   | 'calm'
+  | 'offer'
+  | 'pet'
+  | 'inspect'
   | 'pickUp'
   | 'drop'
 
@@ -136,6 +140,8 @@ export interface AssetEntry {
   url: string | null
   /** Separate animation-only GLBs — common with Mixamo and similar sources. */
   animationUrl?: string
+  /** Multiple compact animation-only GLBs sharing the base model's node names. */
+  animationUrls?: string[]
   /** Uniform scale factor applied at the root. */
   scale: number
   /**
@@ -161,6 +167,7 @@ export type AssetId =
   | `building.${string}`
   | `prop.${string}`
   | `wildlife.${string}`
+  | `library.${string}`
   | 'character.player'
 
 /**
@@ -367,15 +374,53 @@ export const ASSETS: Record<AssetId, AssetEntry> = {
     animations: {},
   },
 
+  /** Imported Meshy showcase assets. Static and cosmetic until placed by a scene/editor. */
+  'library.alchemistWorkstation': {
+    url: '/models/library/arcane-alchemist-workstation.glb',
+    scale: 2.2,
+    yOffset: 0.390625,
+    animations: {},
+  },
+  'library.forestWyvernDisplay': {
+    url: '/models/library/forest-wyvern-display.glb',
+    scale: 6,
+    yOffset: 0.867645,
+    animations: {},
+  },
+  'library.arcaneAcademyCrest': {
+    url: '/models/library/arcane-academy-crest.glb',
+    scale: 1.25,
+    yOffset: 1,
+    animations: {},
+  },
+  'library.throneOfBooks': {
+    url: '/models/library/throne-of-books.glb',
+    scale: 1.6,
+    yOffset: 0.950724,
+    animations: {},
+  },
+
   /** Player character in direct-control scenes */
   'character.player': {
-    url: null,
+    url: '/models/arcane-handler.glb',
     scale: 1,
+    animationUrls: [
+      '/models/arcane-handler-animations/idle.glb',
+      '/models/arcane-handler-animations/walk.glb',
+      '/models/arcane-handler-animations/run.glb',
+      '/models/arcane-handler-animations/offer.glb',
+      '/models/arcane-handler-animations/pet.glb',
+      '/models/arcane-handler-animations/calm.glb',
+      '/models/arcane-handler-animations/inspect.glb',
+    ],
     animations: {
       idle: { clip: 'idle', yOffset: 0 },
       walk: { clip: 'walk', yOffset: 0 },
-      fly: { clip: 'fly', loop: false, next: 'airborne', yOffset: 0 },
-      airborne: { clip: 'cruise', yOffset: 0 },
+      run: { clip: 'run', yOffset: 0 },
+      offer: { clip: 'offer', loop: false, yOffset: 0 },
+      pet: { clip: 'pet', loop: false, yOffset: 0 },
+      calm: { clip: 'calm', loop: false, yOffset: 0 },
+      inspect: { clip: 'inspect', loop: false, yOffset: 0 },
     },
   },
 }
@@ -408,3 +453,6 @@ export function getAsset(id: AssetId): AssetEntry | undefined {
  * TODO: Rebuild prop atlas without animation dependencies.
  */
 export const PROP_ATLAS = '/models/sanctuary.glb'
+
+/** Small original static models used by feeding and sanctuary hunting. */
+export const FOOD_PROP_ATLAS = '/models/wyvern-food.glb'

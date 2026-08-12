@@ -4,7 +4,7 @@ import { useLayoutEffect, useMemo, useRef } from 'react'
 import { useGLTF } from '@react-three/drei'
 import { Matrix4, Quaternion, Vector3 } from 'three'
 import type { BufferGeometry, InstancedMesh, Material, Mesh, MeshStandardMaterial, Object3D } from 'three'
-import { PROP_ATLAS } from './manifest'
+import { FOOD_PROP_ATLAS, PROP_ATLAS } from './manifest'
 
 /**
  * Static scenery props, drawn from the shared prop atlas.
@@ -127,6 +127,45 @@ export function Prop({
   )
 }
 
+export type FoodPropId = 'prop.food.meat' | 'prop.food.carcass'
+
+/** A static food model from the compact original food atlas. */
+export function FoodProp({
+  id,
+  position,
+  rotationY = 0,
+  scale = 1,
+  castShadow = true,
+}: PropPlacement & { id: FoodPropId; castShadow?: boolean }) {
+  const { scene } = useGLTF(FOOD_PROP_ATLAS)
+  const model = useMemo(() => {
+    let source: Object3D | null = null
+    scene.traverse((object) => {
+      if (object.userData.name === id) source = object
+    })
+    if (!source) return null
+    const clone = (source as Object3D).clone(true)
+    clone.traverse((object) => {
+      const mesh = object as Mesh
+      if (mesh.isMesh) {
+        mesh.castShadow = castShadow
+        mesh.receiveShadow = true
+      }
+    })
+    return clone
+  }, [castShadow, id, scene])
+  if (!model) return null
+
+  return (
+    <primitive
+      object={model}
+      position={position}
+      rotation={[0, rotationY, 0]}
+      scale={scale}
+    />
+  )
+}
+
 const MATRIX = new Matrix4()
 const POSITION = new Vector3()
 const ROTATION = new Quaternion()
@@ -190,6 +229,7 @@ export function PropInstances({
 
 export function preloadProps(): void {
   useGLTF.preload(PROP_ATLAS)
+  useGLTF.preload(FOOD_PROP_ATLAS)
 }
 
 /**
@@ -201,4 +241,5 @@ export function preloadProps(): void {
  */
 export function usePropAtlas(): void {
   useGLTF(PROP_ATLAS)
+  useGLTF(FOOD_PROP_ATLAS)
 }

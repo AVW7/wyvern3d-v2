@@ -13,6 +13,12 @@
     "test:watch": "vitest",
     "assets:validate-wyvern": "node scripts/validate-wyvern-clips.mjs",
     "assets:validate-v1-catalog": "node scripts/validate-v1-action-catalog.mjs",
+    "assets:food": "node scripts/build-food-models.mjs",
+    "assets:player-sidecars": "python3 scripts/extract-meshy-animation-sidecars.py",
+    "assets:player-lod": "node scripts/build-player-lod.mjs",
+    "assets:player-references": "python3 scripts/prepare-player-references.py",
+    "assets:import-meshy-library": "node scripts/import-meshy-library-assets.mjs",
+    "assets:validate-player": "node scripts/validate-player-model.mjs",
     "assets:review-flightlab-rest": "node scripts/review-flightlab-rest.mjs",
     "assets:review-flightlab": "node scripts/review-flightlab-rest.mjs --all"
   },

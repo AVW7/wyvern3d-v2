@@ -8,6 +8,7 @@ import { type ModelState } from '@/render/assets/manifest'
 import { HEAD_BONE, HIND_LEG_CHAINS, JAW_BONE, TAIL_CHAIN } from '@/render/rigBones'
 import { PlaceholderWyvern } from '@/render/placeholders/PlaceholderWyvern'
 import { WorldLabel } from '@/render/labels/WorldLabel'
+import { FoodProp } from '@/render/assets/props'
 
 const JAW = JAW_BONE
 const HEAD = HEAD_BONE
@@ -46,16 +47,7 @@ function SelectionRing({ scale, airborne }: { scale: number; airborne: boolean }
 
 function FoodOffering({ scale }: { scale: number }) {
   return (
-    <group position={[0, 0.45 * scale, 4.5 * scale]}>
-      <mesh castShadow>
-        <dodecahedronGeometry args={[0.55 * scale, 0]} />
-        <meshStandardMaterial color="#7a342c" roughness={0.9} />
-      </mesh>
-      <mesh position={[0, -0.35 * scale, 0]} castShadow>
-        <cylinderGeometry args={[0.75 * scale, 0.6 * scale, 0.25 * scale, 10]} />
-        <meshStandardMaterial color="#7b5a35" roughness={1} />
-      </mesh>
-    </group>
+    <FoodProp id="prop.food.meat" position={[0, 0, 4.5 * scale]} scale={scale} />
   )
 }
 
