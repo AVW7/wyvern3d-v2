@@ -40,7 +40,7 @@ each one fails silently rather than loudly.
 Read `docs/WYVERN_ANIMATION_BASELINE.md` — in particular **§Measured rig axes**.
 
 Review in this project is **numeric, not visual**. `pnpm assets:analyze-clips`
-measures all 69 clips in Blender, headless, into a committed signature file, and
+measures all 78 clips in Blender, headless, into a committed signature file, and
 `pnpm test` asserts it against per-mode contracts. A near-black dragon hides pose
 in a render and two contact sheets cannot be diffed, which is how a cruise loop
 with no detectable wingbeat once shipped past a reviewed sheet.

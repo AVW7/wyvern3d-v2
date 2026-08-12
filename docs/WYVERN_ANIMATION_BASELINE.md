@@ -86,7 +86,7 @@ Two notes that matter when reading them:
 - **`symmetry_error` reflects, it does not compare magnitudes.** An earlier form
   scored `|left.x| − |right.x|`, which rates two wings stacked on the *same* side
   as perfectly symmetric — identical to a correct mirror. The reflected form
-  agreed with it on 43 of the 65 clips measured at the time, diverging only where a wingtip crosses
+  agreed with it on 43 of the 78 clips measured at the time, diverging only where a wingtip crosses
   the midline, which is exactly where the magnitude form under-reported:
   `Battle_SkyMoveL` 12.10 → 14.00, `Battle_Skill11_L` 18.90 → 22.40, the
   fly-away cinematic `Spawn01` 8.40 → 56.32. `wingtip_L/R.lateral` states the
@@ -124,7 +124,7 @@ holds a 23.5° body axis, which is why it stayed the takeoff.
 
 ## How the authored clips were created
 
-`scripts/author-drogon-sanctuary.py` does not hand-key bones. It **samples
+`scripts/build-sidecar.py` does not hand-key bones. It **samples
 measured poses out of the artist's own clips and re-times them**, which is why
 the sanctuary clips move like the vendor ones instead of like a programmer's idea
 of a dragon.
@@ -217,7 +217,7 @@ Five things that are non-obvious and were each learned the expensive way:
 
    It moves one foot 0.86 units fore/aft as well as 0.8 down, which is why it was
    deferred out of the carriage change and reviewed on its own. Nothing else
-   moved with it: across all 74 clips the regenerated signatures differ only in
+   moved with it: across all 78 clips the regenerated signatures differ only in
    `foot_drop_R`, `foot_asymmetry` and `skin_side_balance`, and the last of those
    moves *toward* zero on every clip. `ground_clearance` is unchanged, so no
    `yOffset` and no camera envelope followed.
@@ -546,17 +546,17 @@ It was validated by reproducing three tables built independently of it:
 |---|--:|---|
 | `docs/WYVERN_ANIMATIONS.md` catalogue — frames, duration, ground-Y min…max, loop error | 52 | reproduces; 4 rows differ by 0.02–0.06 rounding |
 | `BUILD_NOTES.md` — authored actions' measured ground Z | 13 | reproduces except `Sanct_Nuzzle` and `Sanct_Calm`, whose `.blend` bake predated the recipe |
-| `vendor-flight-survey.json` — arc, tip path, symmetry, body axis, semi-span | 10 | reproduced exactly on every column at the time of validation (see the note below on `symmetry_error`) |
+| `vendor-flight-survey.json` *(retired)* — arc, tip path, symmetry, body axis, semi-span | 10 | reproduced exactly on every column at the time of validation (see the note below on `symmetry_error`); source file since removed |
 
 Run it at `--clearance-samples 13` to repeat that comparison; the shipped
 signatures use 48. One column has since moved on purpose: `symmetry_error` was
-corrected from a magnitude comparison to a reflection, which changes 22 of the 65
+corrected from a magnitude comparison to a reflection, which changes 22 of the 78
 clips — all of them poses that swing a wing across the midline. The three numbers
 the contracts are built on (`Battle_Up` 1.25, `Battle_Down02` 1.49,
 `Battle_Stand` 0.28) are unchanged, because none of those poses crosses a wing.
 
 **Why 48 and not 13.** The minimum of a sparse sample over-estimates clearance,
-and clearance sets `yOffset`. 56 of the 65 clips measured at the time moved between the two densities
+and clearance sets `yOffset`. 56 of the 78 clips measured at the time moved between the two densities
 and some move a lot — `Battle_Attack02` from −4.14 to −7.74, `Battle_Skill01`
 from −3.95 to −8.89. Two shipped offsets were wrong because of it:
 `Sanct_Nuzzle` was wired at −1.73 against a true low point of +1.19, and
@@ -571,7 +571,7 @@ pnpm assets:analyze-clips
 ```
 
 Stages a decompressed vendor copy, measures, writes the signature file, prints
-the 65-clip summary. Add `--trace <clip>` for per-frame output. The vendor GLB
+the 78-clip summary. Add `--trace <clip>` for per-frame output. The vendor GLB
 is never re-exported and the tracked `.blend` is never saved.
 
 After any authoring change the order is: regenerate the `.blend`, rebuild the
@@ -580,7 +580,7 @@ sidecar, re-measure, and let `pnpm test` judge it.
 ```bash
 /Applications/Blender.app/Contents/MacOS/Blender --background \
   assets/blender/drogon-sanctuary.blend \
-  --python scripts/author-drogon-sanctuary.py -- --source-glb /tmp/drogon-source.glb
+  --python scripts/build-sidecar.py -- --source-glb /tmp/drogon-source.glb
 pnpm assets:drogon-sidecar && pnpm assets:validate-sidecar
 pnpm assets:analyze-clips
 pnpm test

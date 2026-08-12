@@ -6,8 +6,9 @@ the posed rig in Blender. This is the reference for deciding which clip drives
 which gameplay state, and it records the two facts that make the naive mapping
 wrong (no root motion anywhere; the flight clip is a one-shot takeoff).
 
-Source: Drogon — Game of Thrones Dragon by CoreMesh 3D, CC-BY-4.0 (see
-`CREDITS.md`). Rebuild the runtime file with `python3 scripts/rebuild-drogon.py`.
+Source: Drogon — Game of Thrones Dragon by CoreMesh 3D, CC-BY-4.0.
+The compression recipe (meshopt + WebP + metalrough conversion) is documented at the top of
+`src/render/assets/manifest.ts`.
 Clip names are wired to gameplay states in `src/render/assets/manifest.ts`.
 
 For a v1-to-repaired-rig rebuild, use
@@ -299,13 +300,13 @@ gameplay to still resolve them.
 Battle wyverns already spawn at cruise altitude, so `BattleScene` starts on
 `glide` and selects left/right bank loops from turn rate.
 
-Forty vendor clips remain unused. What is left there is not more art — it is
+Forty-two vendor clips remain unused. What is left there is not more art — it is
 states for gameplay to ask for, and the exit transitions that the enter
 transitions imply.
 
 ## Sanctuary animation sidecar
 
-`public/models/drogon-sanctuary.glb` adds twenty-two Wyvern3D-authored actions without
+`public/models/drogon-sanctuary.glb` adds twenty-six Wyvern3D-authored actions without
 round-tripping the vendor file. It is meshless and skinless: only armature nodes
 and animation channels ship. `GameModel` concatenates its clips with the base
 clips before applying the manifest filter.
@@ -335,7 +336,7 @@ clips before applying the manifest filter.
 | `Sanct_Nuzzle` | lowered-head nuzzle and return | 96 | no | −1.19 |
 | `Sanct_Calm` | folded-wing settle and slow exhale | 120 | no | −0.58 |
 
-All twenty-two are authored at 24 fps, target 292 existing base nodes, and contain
+All twenty-six are authored at 24 fps, target 292 existing base nodes, and contain
 876 three.js tracks each. Every looping clip returns exactly to its opening
 location, quaternion rotation, and scale. Rebuild with
 `pnpm assets:drogon-sidecar`; validate runtime binding with
@@ -471,7 +472,7 @@ Decided once, because two reasonable workflows conflict here.
   one-line edit.
 - **`core/**` never learns about any of it.** Clip choice, timing and offsets are
   cosmetic. Collision radii, ranges and speeds stay in `core/data`.
-- **Rebuild the base only through `scripts/rebuild-drogon.py`.** It asserts 52
-  clips, two skins and a `baseColorTexture` on every material. Build additions
+- **Rebuild the base GLB using the compression recipe in `manifest.ts`.** It documents
+  the meshopt + WebP + metalrough pipeline. Build additions
   through `scripts/build-sidecar.py`, which rejects geometry and any animation
   target not present in the base node set.

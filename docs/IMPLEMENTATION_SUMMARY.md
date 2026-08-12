@@ -206,7 +206,7 @@ Follow the detailed specifications in `AAA_FLIGHT_ANIMATION_PLAN.md` for:
 
 ### Where to Hook Into
 
-**Primary:** `SanctuaryWyverns.tsx` (lines ~650-850 in useFrame)
+**Primary:** `SanctuaryWyverns.tsx` (now ~1259 lines; was ~650-850 at time of writing)
 ```typescript
 useFrame((state, delta) => {
   mixer.update(delta);

@@ -19,8 +19,18 @@
     "assets:player-references": "python3 scripts/prepare-player-references.py",
     "assets:import-meshy-library": "node scripts/import-meshy-library-assets.mjs",
     "assets:validate-player": "node scripts/validate-player-model.mjs",
+    "assets:thornwing": "python3 scripts/build-thornwing.py",
+    "assets:validate-thornwing": "node scripts/validate-thornwing.mjs",
+    "assets:analyze-thornwing": "python3 scripts/analyze-thornwing.py",
+    "assets:contact-sheet-thornwing": "python3 scripts/render-thornwing-contact-sheet.py",
     "assets:review-flightlab-rest": "node scripts/review-flightlab-rest.mjs",
-    "assets:review-flightlab": "node scripts/review-flightlab-rest.mjs --all"
+    "assets:review-flightlab": "node scripts/review-flightlab-rest.mjs --all",
+    "assets:analyze-clips": "python3 scripts/analyze-clips.py",
+    "assets:wyvern-audit": "python3 scripts/audit-wyvern-clips.py",
+    "assets:drogon-sidecar": "python3 scripts/build-sidecar.py",
+    "assets:validate-sidecar": "node scripts/validate-sidecar-runtime.mjs",
+    "sim:battle": "tsx scripts/sim-battle.ts",
+    "sim:replay": "tsx scripts/sim-replay.ts"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",

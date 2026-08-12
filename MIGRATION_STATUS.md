@@ -6,7 +6,7 @@
 
 > **Current source of truth for scale/debugging:**
 > [`docs/MIGRATION_SCALE_AND_RIG_DEBUG.md`](docs/MIGRATION_SCALE_AND_RIG_DEBUG.md).
-> The clean 46-bone `wyvern.glb` has been exported and weight transfer completed.
+> The clean 56-bone `wyvern.glb` has been exported and weight transfer completed.
 > Its measured export size is 5395.04 cm across X, so `scale: 0.01` renders it
 > at ~53.95 m rather than the old Flight Lab's ~45.4 m adult reference. Use
 > `scale: 0.0084` as the measured compatibility starting point; do not copy
@@ -195,7 +195,7 @@ public/models/drogon-sanctuary.glb → wyvern-animations.glb (sidecar)
 **Completed:** August 3, 2026
 
 1. Created `public/models/wyvern-rig.blend`
-2. Built the clean 46-bone armature with `RootMotion`
+2. Built the clean 56-bone armature with `RootMotion`
 3. Re-parented both wings to `Spine3`
 4. Transferred all mesh weights with full vertex coverage
 5. Exported `public/models/wyvern.glb`

@@ -646,8 +646,8 @@ tracks. Its profiles are state-specific rather than a universal flutter:
 - `idle` and the quadrupedal `walk` only settle subtly; `rest` remains still by
   design; and `death` ends with a held membrane sag.
 
-The reusable entry point is `pnpm assets:wyvern-wing-surfaces`. It writes the
-ignored `public/models/wyvern-rig.blend` source and exports `wyvern.glb`.
+The reusable entry point is `scripts/author-wyvern-wing-surfaces-blender.py` (run inside
+Blender). It writes the ignored `public/models/wyvern-rig.blend` source and exports `wyvern.glb`.
 Each action stores its last applied profile in that source; a repeat run removes
 the recorded layer before applying the current one, so it is safe to tune and
 re-export without compounding the flex.

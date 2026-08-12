@@ -75,6 +75,7 @@ compatible loops.
 takeoff→swoop chain. Runtime crossfades, sanctuary placement/travel, the
 22-action sidecar, ambient idle scheduling, working banks, and a seven-mode
 flight selector (cruise/scout/speed/glide/dive/bank/hover) have since landed.
+The sidecar has since grown to 26 actions.
 The remaining staged gaps are the aerial attack action, battle VFX and mutable
 battle flight state, and the world event stream.
 
@@ -104,10 +105,10 @@ Update this table when you finish a stage. `NOT STARTED` → `DONE` (or `BLOCKED
 | 0 | Runtime foundations + 2 bugs | DONE | — | Clip filtering, real crossfades, per-clip fade/rate, correct attack/death offsets, and shadows; gates pass. |
 | 1 | Sanctuary placement | DONE | 0 | Stable perches, assignment-specific posts/states, injury rest, and overflow placement are implemented in `SanctuaryWyverns`. |
 | 2 | Sanctuary travel (fly + land) | DONE | 1 | One director owns takeoff, transit/patrol, returning, landing, safe attack landings, and explicit return-to-assignment. |
-| 3 | Sidecar clip pipeline | DONE | 0 | Thirteen short-name clips; 4.11 MB meshless GLB; 218 targets and 654 tracks/action validated through three.js. |
+| 3 | Sidecar clip pipeline | DONE | 0 | 26 short-name clips; 15.8 MB meshless GLB; 292 targets and 876 tracks/action validated through three.js. |
 | 4 | Ambient behaviour & Head Gaze | DONE | 2, 3 | Head gaze, the ambient idle scheduler (sleep/sit/groom/eat/drink/perch, weighted by hunger/injury/bond), and the `/debug/animation` Flight Lab are all in. |
 | 4.5 | Aerodynamic Flight State Machine | DONE | 2, 3 | Bank-hysteresis cruise and hover mode (optional `horizontalSpeed` param on `flightAnimationState`, gated to the `'hovering'` phase) are both implemented. |
-| 4.6 | Measured animation baseline & quality gate | DONE | 3, 4.5 | `pnpm assets:analyze-clips` measures all 65 clips into a committed signature; `animationContracts.test.ts` gates it. Its first run found the shipped cruise loop at a 27.3° stroke and 37.7 symmetry error against a documented 83°, and both bank clips with 0.04° of left/right difference. Rebuilding fixed all three and added `Sanct_Hover`. Numbers replaced contact sheets as the approval view. |
+| 4.6 | Measured animation baseline & quality gate | DONE | 3, 4.5 | `pnpm assets:analyze-clips` measures all 78 clips into a committed signature; `animationContracts.test.ts` gates it. Its first run found the shipped cruise loop at a 27.3° stroke and 37.7 symmetry error against a documented 83°, and both bank clips with 0.04° of left/right difference. Rebuilding fixed all three and added `Sanct_Hover`. Numbers replaced contact sheets as the approval view. |
 | 4.7 | Wingbeat fidelity & working banks | DONE | 4.6 | Rebuilt the cruise/bank/hover beat from nine measured landmarks of `Battle_Down02` f40–f66 instead of four, cutting reconstruction error from 5.6° to 1.0° and restoring the stroke plane (40.5°→52.1° azimuth) and wrist fold (5.15→6.37). Two things only a rig probe could find: the source's beat drags a 37° landing flare, so the body now comes from one frame while the wings cycle (`root_roll_delta_deg` 11.4→0.0); and `bank_wings` drove the wing chains with opposite signs, which measures *zero* bias with the mirror applied — the banks had been shipping flat, failing four contract rules, against numbers the docs quoted but the `.blend` never held. Equal signs give 23.6° of bias at 0.12 rad. Banks now measure ∓24/+30 attitude and ∓29/+27 asymmetry. Also found `neck_bend(down=…)` to be a no-op on the wrong axis. |
 | 4.8 | Flight variants: speed, glide, dive | DONE | 4.7 | Renamed the powered loop `glide`→`cruise` and freed the name for a real unpowered glide. `flightAnimationState` now takes a `FlightMotion` struct and picks dive→glide→hover→bank→speed→cruise, each on its own hysteresis band; omitting a channel makes the modes it gates unreachable, so `motion = {}` is byte-identical to the old behaviour. Three authored clips: `Sanct_Speed` (0.8 Hz, nose-down throughout), `Sanct_Soar` and `Sanct_Dive` (both held-wing, `cycle: null`, ±30° either side of cruise from the same 1:1 root trim). Two pre-existing battle bugs fixed on the way: the selector's output was laundered through a bank-only ternary every frame, which had already made hover unreachable there, and `horizontalSpeed` was computed and never passed. `Actor.ai` is finally consumed, latched 0.5 s because `updateAi` has no hysteresis at its range boundary. `Sanct_Cruise` measured byte-identical to the retired `Sanct_Glide`. |
 | 4.9 | Scout flight mode | DONE | 4.8 | `Sanct_Scout` measures 0.333 Hz over two exact-looping beats on a +8.08° body line; it selects after banks and before speed for sanctuary circle/patrol and battle AI idle. |
@@ -118,6 +119,7 @@ Update this table when you finish a stage. `NOT STARTED` → `DONE` (or `BLOCKED
 | 4.99 | Ground Gait & Toe/Claw Articulation Parity | DONE | 4.98 | 2026-08-05: Re-aligned `walk` cadence to 2.50s (60f @ 24fps, matching v1's 2.46s). Authored stance-splay (`-10°`) vs swing-curl (`+25°`) toe articulation across `walk`, `attack` (grip → lunge → release), `breath` (braced stance), and `death` (spasm → relax). Saved to blend and validated with 0.0007m mirror & 0.0006rad loop seam. All test suites pass. |
 | 4.991 | V1 Biomechanical Stance & Grounded Wing Arch Alignment | DONE | 4.99 | 2026-08-05: Measured canonical v1 `drogon.glb` pose. Set `L/R_WingShoulder` local X-rotation to `+35.0°` (high Gothic arch peak at $Z = 8.68\text{ m}$), `L/R_WingElbow` to `+45.0°` (elbow drop to $Z = 6.72\text{ m}$), `L/R_WingWrist` to `-25.0° / +25.0°` (inner claw touchdown at $Z = 1.94\text{ m}$), and `L/R_WingFinger1/2/3` to `-48° / -36° / -24°` (outer wing spars drape backward along torso). Re-authored `walk` to 59f (2.458s) with measured v1 pelvis sway ($X = +1.08 \to -0.56 \to +1.31$) and `attack` to 80f (3.333s). Added UI fallback specs in `manifest.ts` for all 35 `ModelState` values so presets never snap to GLTF T-pose. Validated `wyvern.glb` with 0.0007m mirror & 0.0009rad seam. All 370 tests pass. |
 | 5 | Battle readability & Mixer LOD | DONE | 0 | 2026-08-05: All items 1-12 complete: damage flash, reachable death, attack/breath tells, fire breath VFX, distance/frustum mixer LOD, death dissolve, actor.flying stamina/flight mutation for grounded combat, trauma² camera shake, hit-stop, and GroundDustVFX. |
+| 5.5 | Playable Thornwing species and animation set | DONE | 0, 5 | 2026-08-12: User-requested Forest Wyvern Display derivative ships as the separately rigged Thornwing with seven 24 fps actions, full manifest-state coverage through explicit reuse, Thornmarch acquisition/save compatibility, and dedicated numeric, GLB, and contact-sheet gates. The source records Meshy provenance but no licence grant, so external-release verification remains explicit. |
 | 6 | World event stream & Flourishes | NOT STARTED | 4 | |
 
 Stages 3 and 5 are independent of 1–2 and can be done in parallel by a second agent.
@@ -342,7 +344,7 @@ report what you observed rather than asserting it looks right.
 
 # STAGE 3 — Sidecar clip pipeline
 
-**Status:** DONE — 2026-07-30. Thirteen actions authored, contact-sheet
+**Status:** DONE — 2026-07-30. 26 actions authored, contact-sheet
 reviewed, and both export and three.js runtime-binding gates pass.
 
 **Goal.** A repeatable way to add hand-authored clips to the wyvern without touching `drogon.glb`.
@@ -351,7 +353,7 @@ reviewed, and both export and three.js runtime-binding gates pass.
 Blender read-only for this asset. Its stated reason is that Blender truncates action names at 63
 chars and two existing clips are 65–66, so a *round-trip* silently breaks gameplay's clip lookup.
 A sidecar never round-trips `drogon.glb`: it is a separate `.blend` exporting an animation-only GLB.
-All 52 existing names survive byte-for-byte and `rebuild-drogon.py`'s 52-clip assertion stays valid.
+All 52 existing names survive byte-for-byte and the base model's 52-clip integrity stays valid.
 **Update the contract wording to "forbids round-tripping, permits adding" as part of this stage.**
 
 **Pre-verified as safe** (see §Reference data): node names max 36 chars, all unique, no dots on any
@@ -371,14 +373,14 @@ animation target. The risk is Blender's exporter renaming something — hence th
    (curled, breathing), `sit`/`sit_loop`/`rise`, `eat` (head to ground, chew), `drink`, `groom`,
    `perch_grip`.
 3. **Export a mesh-less, skin-less GLB** — armature nodes + animations only.
-4. **`scripts/build-sidecar.py`**, mirroring `scripts/rebuild-drogon.py`'s structure and its
+4. **`scripts/build-sidecar.py`**, mirroring the asset build conventions documented in
+   `manifest.ts` and its
    assertion habit. **The load-bearing gate:** parse the sidecar's animation channels and assert every
    target node name exists in `drogon.glb`'s node set. That check is what catches a silent rename —
    without it a renamed bone fails silently as a frozen model.
 5. **Load and concatenate** in `GameModel`, before Stage 0's clip filter.
 6. **Fix build fragility while here:** `@gltf-transform/cli` is **not** in `package.json` and not in
-   `node_modules` — it resolves only from an evictable npx cache, and `rebuild-drogon.py:43` passes
-   `--no-install`. One `npm cache clean` breaks the asset build. Add it as a devDependency.
+   `node_modules` — it resolves only from an evictable npx cache. One `npm cache clean` breaks the asset build. Add it as a devDependency.
 7. **Record the new clips in `CREDITS.md`** — the base asset is CC-BY-4.0 and derivative work must be
    listed.
 
@@ -387,7 +389,7 @@ points at `~/Documents/3Dassets`, which does not exist. The real library is
 `/Volumes/Untitled/A4/3Dassets`, so `scripts/extract-assets.py` is broken as checked in.
 
 **Verify.** `python3 scripts/build-sidecar.py` passes its assertions; the new clips play in-browser;
-`python3 scripts/rebuild-drogon.py` still passes its 52-clip / 2-skin / baseColorTexture asserts.
+the base model's 52 clips still load and skin correctly.
 
 **Done when.** A new clip can be added by editing the `.blend` and rerunning one script.
 
@@ -395,7 +397,7 @@ points at `~/Documents/3Dassets`, which does not exist. The real library is
 
 # STAGE 4 — Ambient behaviour & Head Gaze
 
-**Status:** IN PROGRESS · **Depends on:** Stages 2 and 3
+**Status:** DONE — 2026-07-30 · **Depends on:** Stages 2 and 3
 
 **Re-verified 2026-07-30 against the live tree.** Head gaze (item 4 below) has already shipped:
 `src/scenes/Sanctuary/director/spatialAwareness.ts` exports `resolveGazeTarget`,
@@ -513,7 +515,7 @@ transitioning between hover, cruise, and banking maintains smooth wingbeat conti
 
 # STAGE 5 — Battle readability & Mixer LOD
 
-**Status:** IN PROGRESS · **Depends on:** Stage 0 · **Independent of 1–4**
+**Status:** DONE — 2026-08-05 · **Depends on:** Stage 0 · **Independent of 1–4**
 
 **Items 1-7 landed** (damage flash, death reachable, attack/breath tells, mixer LOD, bone sockets,
 hit flash on 2026-07-30; fire-breath VFX after — see the ledger row for stage 5 and each item below).
@@ -623,6 +625,100 @@ touching sim outcomes, and stable 60 FPS in multi-unit battles.
 
 ---
 
+# STAGE 5.5 — Playable Thornwing species and animation set
+
+**Status:** DONE — 2026-08-12. User-requested work order. The static Forest
+Wyvern Display remains intact; a script-built, separately rigged Thornwing ships
+with seven clips and explicit coverage for every runtime state. The input records
+Meshy provenance but no licence grant, so external-release verification remains
+an explicit caveat. · **Depends on:** Stages 0 and 5
+
+**Goal.** Turn the Model Library's static forest wyvern into a reproducible,
+playable Tier 2 species without changing gameplay dimensions based on its mesh,
+round-tripping the original display GLB, or exposing the bind pose in an
+unrepresented sanctuary or battle state.
+
+**Read first.** `docs/THORNWING_ANIMATION.md`,
+`docs/WYVERN_ANIMATION_BASELINE.md` §Measured rig axes, and
+`docs/FLIGHT_ANIMATION_DEVELOPMENT.md`. Thornwing has a custom armature: reuse
+the canonical runtime bone names, but measure its own axes rather than copying
+values from the Drogon or clean-v1 rigs.
+
+**Authoritative input and outputs.**
+
+- Read only `public/models/library/forest-wyvern-display.glb`, the committed
+  optimized Meshy-derived display asset (35,947 evaluated triangles against an
+  approximately 38,400-triangle import target). Preserve it unchanged.
+- Build `public/models/thornwing.glb` through `scripts/build-thornwing.py` and
+  its headless Blender implementation. There is no authoritative `.blend`; the
+  script is the recipe.
+- Commit the numeric approval artifact at
+  `validation/thornwing-animations/clip-signatures.json` and the visual sheet at
+  `docs/images/thornwing-animation-contact-sheet.png`. Actual measured values
+  come from the signature, not from prose in this work order.
+
+**Do.**
+
+1. Re-pose the asymmetric static mesh into a balanced neutral stance, retain
+   its UVs/materials and triangle budget, bind it to a custom six-limbed rig,
+   and limit every vertex to four finite, normalized weights. Use the canonical
+   `Root`/`RootMotion`/`Body`, head/jaw, neck, spine, tail, hind-leg and wing
+   names from `rigBones.ts`; add `L_FrontLegRoot -> L_FrontUpper ->
+   L_FrontLower -> L_FrontFoot` and the mirrored `R_*` chain for its separate
+   front legs.
+2. Author exactly seven actions at 24 fps: `idle` (6 s loop), `walk` (2 s
+   loop), `takeoff` (2 s one-shot), `cruise` (3 s/two-beat loop), `land` (2 s
+   one-shot), `attack` (1.5 s one-shot), and `death` (3 s one-shot). Close every
+   loop below `0.01` radians/units; keep grounded loops above -0.02 m; require
+   cruise to have a >=50-degree stroke, <=5-degree left/right stroke-range
+   difference, -5 to +15-degree body line, and negligible root drift.
+3. Register `wyvern.thornwing` at `/models/thornwing.glb`, fitted at scale 6.
+   `fly` chains `takeoff -> cruise`, `land` chains to `idle`, compatible flight
+   states reuse `cruise` in `phaseGroup: "thornwing-flight"`, locomotion reuses
+   `walk`, action states reuse the one-shot `attack`, and remaining social/rest
+   states reuse `idle`. Map every `ModelState` explicitly.
+4. Add Tier 2 `thornwing` with base power/speed/stamina/firepower/armor
+   `29/34/25/22/17`, growth `2.7/3.1/1.9/2.1/1.4`, traits `skittish`,
+   `venomous`, `loyal`, and UI colour `#688c4a`. Make it Thornmarch's native
+   egg while preserving existing serialized Mirefang eggs and wyverns.
+5. Bump the save to version 4. Migrate an owned-Thornmarch save only when it has
+   no Thornwing egg or wyvern: allocate a normal unique egg id and derive the
+   grant from a migration-specific deterministic seed without advancing the
+   serialized `state.rngState`. The migration must be idempotent.
+6. Use the canonical chains in sanctuary bone discovery so both the current
+   wyvern rig and Thornwing receive the supported gaze, spine, hind-leg, and
+   tail layers. Do not add a second creature-rendering API or read mesh-derived
+   measurements in `src/core/**`.
+7. Document source provenance, rebuild commands, rig axes, state reuse, and
+   limitations in `docs/THORNWING_ANIMATION.md`. Keep the original Model Library
+   entry beside the playable species so contributors can compare source and
+   derivative.
+
+**Verify.**
+
+```bash
+pnpm assets:thornwing
+pnpm assets:analyze-thornwing
+pnpm assets:validate-thornwing
+pnpm assets:contact-sheet-thornwing
+pnpm typecheck && pnpm lint && pnpm test
+pnpm sim:battle
+```
+
+Read the signature diff before the contact sheet. Then check idle, walk,
+takeoff/cruise/landing, attack, death, hatchling scale, and camera bounds in
+`/models?model=wyvern.thornwing`, sanctuary, and battle. Tests must cover species
+data, manifest-state coverage, one-shot action safety, Thornmarch acquisition,
+and migration eligibility, idempotence, and unchanged serialized RNG state.
+
+**Done when.** The preserved display asset rebuilds deterministically into a
+validated, ground-aligned, playable Thornwing; every state remains posed;
+eligible old saves receive exactly one deterministic egg without consuming the
+game RNG; and the numeric signature, contact sheet, runtime views, standard
+gates, and battle harness all approve the change.
+
+---
+
 # STAGE 6 — World event stream & Flourishes
 
 **Status:** NOT STARTED · **Depends on:** Stage 4
@@ -676,7 +772,7 @@ does not read as a wyvern travelling somewhere.
 §How the authored clips were created, then `docs/FLIGHT_ANIMATION_DEVELOPMENT.md`.
 Stage 4.8 built three modes this way; copy its shape rather than inventing one.
 
-**Files.** `scripts/author-drogon-sanctuary.py`, `src/render/flightPose.ts`,
+**Files.** `scripts/build-sidecar.py`, `src/render/flightPose.ts`,
 `src/render/assets/manifest.ts`, `validation/wyvern-animations/clip-contracts.json`,
 `src/scenes/Sanctuary/SanctuaryWyverns.tsx`, `src/scenes/Battle/BattleScene.tsx`,
 `src/app/debug/animation/page.tsx`, plus the five clip lists in §Cross-cutting.

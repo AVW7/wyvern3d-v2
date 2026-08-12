@@ -13,7 +13,7 @@ The current flight system provides solid foundational animation with:
 - ✅ Procedural pitch/bank from velocity
 - ✅ Head/neck tracking
 - ✅ Speed-based leg tuck
-- ✅ 9 distinct flight modes (cruise/scout/speed/glide/dive/bankL/bankR/hover)
+- ✅ 8 distinct flight modes (cruise/scout/speed/glide/dive/bankL/bankR/hover)
 - ✅ High-quality authored clips from Blender
 - ✅ **Phase 1: Spine Wave Propagation** - Fluid body coordination
 - ✅ **Phase 2: Intelligent Head & Neck Controller** - Predictive gaze tracking
@@ -391,7 +391,7 @@ Side-by-side comparison in `/debug/animation` Flight Lab
 ### Gate D: Integration Test
 - [ ] Sanctuary scene with 3 wyverns
 - [ ] Battle scene with 2 wyverns
-- [ ] All 9 flight modes tested
+- [ ] All 8 flight modes tested
 - [ ] Transitions smooth (no pops)
 
 ---

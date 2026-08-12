@@ -82,7 +82,7 @@ skeleton can be.
 
 Every clip except `idle` also started at frame 1, putting its first glTF key at
 t = 1/24 s; three.js clamps to the first pose for that opening frame, a 42 ms
-hitch on every loop. All 15 were shifted to start at frame 0. Relative timing
+hitch on every loop. All 15 non-idle clips were shifted to start at frame 0. Relative timing
 inside each clip is unchanged — the shift is one number per action — so each
 clip is now 1/24 s shorter and starts at t = 0.
 

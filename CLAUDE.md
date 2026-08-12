@@ -15,7 +15,7 @@ wired.
 | Change what a player can *do* | `src/core/intents/index.ts` then `src/core/executions/index.ts` |
 | Change what happens each tick | `src/core/systems/`, dispatched by `src/core/state/tick.ts` |
 | Change how battles play out | `src/core/combat/encounter.ts` (+ `ai.ts`) |
-| Wire up a real 3D model | `src/render/assets/manifest.ts` — one line, nothing else |
+| Browse, preview, or wire up a real 3D model | `docs/MODEL_LIBRARY.md`, then `src/render/assets/manifest.ts` |
 | Develop or review wyvern flight animation | `docs/WYVERN_ANIMATION_BASELINE.md`, then `docs/FLIGHT_ANIMATION_DEVELOPMENT.md` |
 | Know what an animation actually measures | `validation/wyvern-animations/clip-signatures.json`; regenerate with `pnpm assets:analyze-clips` |
 | Edit a clip on the new `WyvernRig` (wing axes, loop seams) | `docs/WYVERN_CLIP_AUDIT.md`; check with `pnpm assets:wyvern-audit` and `pnpm assets:validate-wyvern` |
@@ -23,7 +23,7 @@ wired.
 | Make a prop placeable in the sanctuary editor | `PROP_CATALOG` in `src/core/state/sanctuaryLayout.ts` |
 | Change how sanctuary wyverns move or behave | `src/scenes/Sanctuary/director/wyvernDirector.ts` |
 | Add a sanctuary player command | `src/state/sanctuaryCommands.ts`, then the director + `SanctuaryCommandWheel` |
-| Change a scene's look | `src/scenes/{Sanctuary,WorldMap,Battle}/` |
+| Change a scene's look | `src/scenes/{Sanctuary,WorldMap,Battle,Highlands}/` |
 | Change HUD/panels | `src/ui/` (DOM overlay, not in-canvas) |
 
 ## The invariant: `src/core/**` is pure
@@ -88,13 +88,76 @@ Placing an object goes through the normal Intent → Execution path; the save is
 migration spreads a legacy sanctuary into the campus layout without moving anything the player has
 already placed.
 
+## Code architecture & modularity
+
+This codebase is co-edited by humans and multiple AI agents, so structural conventions matter more
+than usual — a new contributor (human or AI) should be able to find the right file and predict what
+belongs in it.
+
+### Layer boundaries
+
+| Layer | Path | Owns | Must NOT import |
+|---|---|---|---|
+| **Core** | `src/core/**` | Game rules, state, data, combat — pure logic | `three`, `react`, `zustand`, `Math.random`, `Date.now` |
+| **Render** | `src/render/**` | Model loading, animation, camera, VFX, materials | Game rules or state mutation |
+| **Scenes** | `src/scenes/**` | Scene composition, per-frame directors, world layout | Core types or business logic |
+| **State** | `src/state/**` | Zustand stores, input queues, game clock | Render logic or JSX |
+| **UI** | `src/ui/**` | DOM overlay (HUD, panels, wheels, editors) | In-canvas rendering |
+
+Data flows one way: **UI emits intent → core executes → store revises state → render/scene reads →
+UI displays**. Never reverse this flow.
+
+### File-size and decomposition rules
+
+- **Target ≤ 400 lines per file.** Several legacy files exceed this
+  (`SanctuaryWyverns.tsx` ~1259, `poseTransition.ts` ~876, `Panels.tsx` ~813,
+  `HighlandsScene.tsx` ~923, `BattleScene.tsx` ~709). When extending these, extract
+  new logic into focused modules rather than growing them further. If a file passes
+  ~500 lines, plan a split.
+- **One responsibility per file.** A component that renders markup, manages state, *and*
+  contains business logic is a maintenance liability. Separate concerns into:
+  - **Components** — render only; read props, emit callbacks.
+  - **Stores** — zustand state containers, no JSX.
+  - **Systems/modules** — pure logic functions, independently importable and testable.
+- **Extract reusable logic into small, focused modules.** Flight pose math lives in
+  `flightPose.ts`, gaze in `gazeController.ts`, mouth in `flightMouth.ts` — each independently
+  testable. Follow this pattern for new features: one concern per file, co-located test.
+- **Debug/development tools must be componentized.** When building Flight Lab style test scenes
+  or debug panels, split into separate UI panels (e.g. `AnimationPanel`, `CombatPanel`,
+  `PropPanel`), isolated systems (e.g. `AnimationDebugger`, `CombatSimulator`, `PropManager`),
+  and clear prop hierarchies — never a monolithic single-file debug scene. The
+  `/debug/animation` route already follows this pattern with its `components/`, `hooks/`, and
+  `systems/` subdirectories.
+- **Test files sit next to their source.** `flightPose.test.ts` beside `flightPose.ts`. Every
+  module in `src/render/` and `src/core/` should have a co-located test.
+
+### When adding a new feature
+
+1. Find the layer from the table above — if it touches `core`, re-read the purity invariant.
+2. Create a focused module; if it grows past ~300 lines, look for a split point.
+3. Add a co-located test.
+4. Add a "Start here" table row if it introduces a new entry point other contributors need to know
+   about.
+
 ## Non-obvious traps (all of these have already bitten)
+
+### React & R3F
 
 - **Never `setState` in `useFrame`.** Per-frame values mutate `object3D` transforms directly. The
   sim's actor positions never enter React state.
 - **`drei`'s `<Text>` kills the WebGL context in WebKit** — the whole canvas goes blank the moment
   one label mounts. Use `render/labels/WorldLabel.tsx` (canvas-texture sprite) for all in-world text.
   `/webgl-probe` is a kept diagnostic route for bisecting this class of failure.
+- **React must stay pinned to `19.2.x`** — `@react-three/fiber`'s peer range is `>=19 <19.3`.
+- **The store mutates `GameState` in place** and bumps a `revision` counter. Object-returning
+  selectors are always reference-equal and will never re-render — use `useGameState()`, which
+  subscribes to `revision` and reads the live state.
+- **A store setter called from a per-frame loop must no-op when nothing changed.** `uiStore.setNearby`
+  compares ids and returns the previous state otherwise; without that guard the whole HUD re-renders
+  every frame. Same rule as never-`setState`-in-`useFrame`, one level further out.
+
+### Three.js & GLB
+
 - **Instanced skinned meshes don't work in WebGL three.js.** Squads are ~10 instanced *non-skinned*
   figures standing in for a 50-troop squad. Only wyverns (few) are skinned.
 - **Clone skinned models with `SkeletonUtils`**, never `scene.clone()` — the latter silently breaks
@@ -103,7 +166,7 @@ already placed.
   `KHR_materials_pbrSpecularGlossiness`, and such a source keeps its colour maps *inside* that
   extension, leaving `pbrMetallicRoughness` empty. The model loads, skins and animates perfectly —
   it is just white, which reads as a lighting bug rather than a material one. Run
-  `gltf-transform metalrough` before compressing. `scripts/rebuild-drogon.py` does this.
+  `gltf-transform metalrough` before compressing. The compression recipe is documented at the top of `manifest.ts`.
 - **A material override must clone the material first.** `SkeletonUtils`' clone keeps pointing at the
   cached source scene's materials, so assigning to one in place repaints every model sharing that
   GLB — and all five species share one file.
@@ -117,18 +180,9 @@ already placed.
   static prop lookup must use the authored name preserved in `object.userData.name`.
 - **`three-stdlib` is not importable** under pnpm's strict layout (it's a transitive drei dep). Use
   `three/examples/jsm/...` instead.
-- **React must stay pinned to `19.2.x`** — `@react-three/fiber`'s peer range is `>=19 <19.3`.
-- **The store mutates `GameState` in place** and bumps a `revision` counter. Object-returning
-  selectors are always reference-equal and will never re-render — use `useGameState()`, which
-  subscribes to `revision` and reads the live state.
-- **A store setter called from a per-frame loop must no-op when nothing changed.** `uiStore.setNearby`
-  compares ids and returns the previous state otherwise; without that guard the whole HUD re-renders
-  every frame. Same rule as never-`setState`-in-`useFrame`, one level further out.
-- **Battle presentation frame-diffs the sim; it never adds events to it.** Attack and breath tells
-  come from watching `actor.cooldown` / `actor.breathCooldown` jump back up, and death fires once on
-  the falling edge of `actor.alive`. The one exception is `Actor.hitThisTick`, which is explicitly
-  presentation-only and never read by the sim. Keep it that way — an event queue in the encounter
-  would have to be replay-stable.
+
+### Animation & clips
+
 - **Every clip the action channel plays must be `loop: false`.** `GameModel` emits
   `onActionFinished` for one-shots only, and that callback is the sole way a tell gets cleared, so a
   looping spec there plays forever and pins the base locomotion state under it. Both `attack` and
@@ -140,6 +194,14 @@ already placed.
   wings the same `Z` folds one forward across the chest and the other back, and it is nearly
   invisible on a near-black model — seven of the sixteen clips shipped that way, `rest` at 116.8
   degrees apart. See `docs/WYVERN_CLIP_AUDIT.md`; `pnpm assets:validate-wyvern` catches it.
+
+### Game state & combat
+
+- **Battle presentation frame-diffs the sim; it never adds events to it.** Attack and breath tells
+  come from watching `actor.cooldown` / `actor.breathCooldown` jump back up, and death fires once on
+  the falling edge of `actor.alive`. The one exception is `Actor.hitThisTick`, which is explicitly
+  presentation-only and never read by the sim. Keep it that way — an event queue in the encounter
+  would have to be replay-stable.
 - **The home region must never be losable.** Attacking requires an adjacent owned region, so losing
   it is an unrecoverable soft-lock. It is exempt from unrest, with a test guarding it.
 
@@ -149,6 +211,10 @@ One persistent `<Canvas>`; scenes swap on a store field (`mode`), **not** Next r
 tear down the WebGL context and stall the world clock on every transition. The clock itself is a
 plain rAF loop at the app root (`state/GameClock.tsx`), outside R3F, so the world keeps simulating
 regardless of which scene is mounted.
+
+Active scenes: **Sanctuary** (walkable, station interactions, layout editor, wyvern director),
+**WorldMap** (region graph), **Battle** (playable and auto-resolved), **Highlands** (hunt scenario),
+**Title**.
 
 ## Commands
 
@@ -197,7 +263,7 @@ and extraction settings live in `scripts/asset-sources.json`; rebuild it with
 Wyverns render from `public/models/drogon.glb` (15 MB, meshopt + WebP, 52 clips, 39 k tris) in both
 the sanctuary and battle. `GameModel` plays whichever clip the manifest maps to the requested
 `ModelState`, crossfading between them; the compression recipe is documented at the top of
-`manifest.ts` and automated by `scripts/rebuild-drogon.py`. All five species share this one model and
+`manifest.ts`. All five species share this one model and
 differ by `scale` — swapping in per-species models is a manifest edit and touches nothing else. The
 near-black surface comes from a cosmetic `material` override in the manifest, applied to cloned
 materials at load; it is the one place to art-direct the finish without rebuilding the GLB.
@@ -243,7 +309,7 @@ camera response. Procedural attitude must not compensate for the wrong base
 posture, and bank clips must not bake a second whole-body roll. Compatible
 cruise loops share `phaseGroup: "flight"` so steering preserves wingbeat phase.
 
-**Review is numeric, not visual.** `pnpm assets:analyze-clips` measures all 74
+**Review is numeric, not visual.** `pnpm assets:analyze-clips` measures all
 clips in Blender, headless, in ~20 s, into the committed
 `validation/wyvern-animations/clip-signatures.json`; `pnpm test` asserts it
 against `clip-contracts.json`, whose per-mode thresholds each name the vendor
@@ -304,10 +370,9 @@ Known gap: the balance harness reports near-binary outcomes (100%/0%) — the cu
 ordered but damage variance is low, so fights are decisive rather than close. Tune in
 `core/data/config.ts`; no other file should need to change.
 
-## Coding Contributors
+## Coding contributors
 
 This project is co-developed by human maintainers and AI coding agents:
 - **Antigravity** (Google DeepMind)
 - **Claude** (Anthropic)
 - **Codex** (OpenAI)
-

@@ -35,7 +35,7 @@ relative to its origin, or put the gameplay camera inside a wing.
   phase synchronization, and per-clip offsets.
 - `src/render/flightPose.ts` — pure procedural flight attitude and bank-state
   selection.
-- `scripts/author-drogon-sanctuary.py` — authored sidecar recipes.
+- `scripts/build-sidecar.py` — authored sidecar build pipeline.
 - `validation/wyvern-animations/` — generated reports and visual contact sheet.
 
 Read this guide and the catalogue before changing a flight state or action.
@@ -163,7 +163,7 @@ An eventual hover/cruise selector should follow the same pattern.
 
 - Confirm which `.blend` is open and whether it is dirty.
 - Never author from a stale action set.
-- Reload `assets/blender/drogon-sanctuary.blend` before regeneration.
+- Reload the sidecar source `.blend` before regeneration.
 - Create a fresh decompressed vendor source when source actions are required:
 
 ```bash
@@ -222,8 +222,7 @@ and falls in the elevation bar is a three-beat loop, `elevL` and `elevR` trackin
 within a degree is a symmetric beat, and the last frame returning to the first
 line's values is the cycle closing.
 
-Renders remain available (`scripts/build-animation-contact-sheet.py`,
-`scripts/render-drogon-sanctuary-samples.py`) and are useful for judging
+Renders remain available (`scripts/build-animation-contact-sheet.py`) and are useful for judging
 deformation detail a human will look at. They are **not** the approval gate. Two
 contact sheets cannot be diffed, an auto-framed sheet hides origin displacement,
 and a near-black dragon hides pose in a lit render — which is how a cruise loop
