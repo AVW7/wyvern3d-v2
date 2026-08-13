@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { createInitialState } from '@/core/state/game'
 import { execute } from '@/core/executions'
+import { PROP_CATALOG, createDefaultSanctuaryLayout } from '@/core/state/sanctuaryLayout'
 import {
   SANCTUARY_STATIONS,
   type SanctuaryStationId,
@@ -219,5 +220,28 @@ describe('Sanctuary layout customization and editor state', () => {
         SANCTUARY_STATIONS[item.id as SanctuaryStationId].position,
       )
     }
+  })
+})
+
+describe('Prop catalog completeness', () => {
+  /**
+   * The editor drawer is built from `Object.values(PROP_CATALOG)`, while
+   * `STORE_SANCTUARY_OBJECT` returns any placed object to `layout.storage` by
+   * its prop id. A placed prop with no catalog entry can therefore be stored
+   * but never re-placed — the player loses it permanently, with no card to drag
+   * back out. Three forge props shipped that way.
+   */
+  it('has a catalog entry for every prop placed by default', () => {
+    const { objects } = createDefaultSanctuaryLayout()
+    const missing = objects
+      .map((object) => object.propId)
+      .filter((propId) => !PROP_CATALOG[propId])
+    expect(missing).toEqual([])
+  })
+
+  it('has a catalog entry for every prop stocked in storage', () => {
+    const { storage } = createDefaultSanctuaryLayout()
+    const missing = Object.keys(storage).filter((propId) => !PROP_CATALOG[propId])
+    expect(missing).toEqual([])
   })
 })

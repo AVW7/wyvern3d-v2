@@ -5,7 +5,16 @@ import type { WyvernInstance } from '@/core/types'
 import { SPECIES } from '@/core/data/species'
 import { GameModel, type ModelActionRequest } from '@/render/assets/GameModel'
 import { type ModelState } from '@/render/assets/manifest'
-import { HEAD_BONE, HIND_LEG_CHAINS, JAW_BONE, TAIL_CHAIN } from '@/render/rigBones'
+import {
+  HEAD_BONE,
+  HIND_LEG_CHAINS,
+  JAW_BONE,
+  NECK_CHAIN,
+  SPINE_CHAIN,
+  TAIL_CHAIN,
+  findBone,
+  findChain,
+} from '@/render/rigBones'
 import { PlaceholderWyvern } from '@/render/placeholders/PlaceholderWyvern'
 import { WorldLabel } from '@/render/labels/WorldLabel'
 import { FoodProp } from '@/render/assets/props'
@@ -109,37 +118,16 @@ export function SanctuaryWyvernActor({
         seed={wyvern.name.charCodeAt(0) ?? 0}
         scale={scale}
         onReady={(root) => {
-          onJawReady(root.getObjectByName(JAW) ?? null)
-          onHeadReady(root.getObjectByName(HEAD) ?? null)
-          const neckBones = [
-            root.getObjectByName('Bip002-Neck_012'),
-            root.getObjectByName('Bip002-Neck1_013'),
-            root.getObjectByName('Bip002-Neck2_014'),
-          ].filter((b): b is Object3D => b !== null && b !== undefined)
-          onNeckBonesReady?.(neckBones)
-          
-          const spineBones = [
-            root.getObjectByName('Bip002-Spine_08'),
-            root.getObjectByName('Bip002-Spine1_09'),
-            root.getObjectByName('Bip002-Spine2_010'),
-            root.getObjectByName('Bip002-Spine3_011'),
-            root.getObjectByName('Bip002-Pelvis_07'),
-          ].filter((b): b is Object3D => b !== null && b !== undefined)
-          onSpineBonesReady?.(spineBones)
-          
+          onJawReady(findBone(root, JAW))
+          onHeadReady(findBone(root, HEAD))
+          onNeckBonesReady?.(findChain(root, NECK_CHAIN))
+          onSpineBonesReady?.(findChain(root, SPINE_CHAIN))
+
           onLegBonesReady?.(
-            HIND_LEG_CHAINS.map((chain) =>
-              chain
-                .map((name) => root.getObjectByName(name))
-                .filter((bone): bone is Object3D => bone !== null && bone !== undefined),
-            ),
+            HIND_LEG_CHAINS.map((chain) => findChain(root, chain)),
           )
 
-          onTailBonesReady?.(
-            TAIL_CHAIN.map((name) => root.getObjectByName(name)).filter(
-              (bone): bone is Object3D => bone !== null && bone !== undefined,
-            ),
-          )
+          onTailBonesReady?.(findChain(root, TAIL_CHAIN))
         }}
         onActionFinished={onActionFinished}
         fallback={<PlaceholderWyvern color={species?.color} scale={scale} />}

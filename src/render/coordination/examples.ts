@@ -181,8 +181,7 @@ export function exampleHuntEngagement() {
 export function exampleFlightPoses() {
   const currentPose = { pitch: 0, bank: 0 }
   const wyvernPos = new Vector3(20, 15, 20)
-  const wyvernVelocity = new Vector3(5, 0, 5)
-  const targetPos = new Vector3(25, 0, 25)
+  const wyvernVelocity = new Vector3(0, 0, 0)
   const dt = 0.016
   
   // Landing pose (flare)

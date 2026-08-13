@@ -23,15 +23,15 @@ chain-tip marker:
     Spine*/Neck*/Head   local +X pitches the head DOWN;  +Z yaws toward -X
     Tail1..Tail10       local +X lifts the tail UP  — the opposite sense to the
                         spine, because the tail runs +Y and the neck runs -Y
-    Wing shoulder/elbow/wrist
-                        local +X raises BOTH wings      (symmetric)
-                        local +Z sweeps them APART      (antisymmetric)
+    Wing shoulder       local +X raises BOTH wings; grounded fold uses X-
+    Wing elbow/wrist    local Z folds the spar; combined rotations are mirrored
+                        directly as quaternions, not rebuilt as Euler angles
     Body.location       local +Z is world DOWN
 
-That last pair is what the previous clip got wrong: it gave both wings the same
-negative `Z`, which folded the left wing forward and the right wing back, 97.5
-degrees apart. Anything mirrored must negate `Z` on the right side; anything
-mirrored on `X` must not.
+The previous clip treated shoulder Z as the primary fold. That only swept the
+wing while leaving the membrane open. A grounded fold starts with shoulder X-
+and explicitly closes every weighted distal and membrane helper. The right side
+is reflected from the left in quaternion space.
 """
 
 from __future__ import annotations
@@ -40,8 +40,12 @@ import argparse
 import math
 import sys
 
-import bpy
-from mathutils import Euler, Quaternion
+try:
+    import bpy  # type: ignore
+    from mathutils import Euler, Quaternion  # type: ignore
+except ImportError:
+    bpy = None  # type: ignore
+    Euler = Quaternion = None  # type: ignore
 
 ARMATURE = "WyvernRig"
 ACTION = "idle"
@@ -52,8 +56,8 @@ ACTION = "idle"
 # Frame 0, not frame 1: the glTF exporter writes a key's time as frame/fps, so a
 # clip starting at frame 1 has no key before t=1/24 and three.js clamps to the
 # first pose for that opening frame — a 42 ms hitch on every loop. Starting at 0
-# puts the first key at t=0 and the last at exactly 6.0 s. The other 15 clips in
-# this GLB all still start at frame 1 and still carry that hitch.
+# puts the first key at t=0 and the last at exactly 6.0 s. All production clips
+# currently start at zero; this generator preserves that contract.
 #
 # Longer than the v1 reference idle (5.04 s) so the repeat is harder to spot.
 PERIOD = 144
@@ -64,9 +68,6 @@ FPS = 24
 # a plausible resting rate for an animal this size); SWAY and SURVEY are the
 # slow carriers that keep the wings and neck from locking to the breath.
 BREATH, SWAY, TREMOR = 2, 1, 3
-
-DEG = math.pi / 180.0
-
 
 def wave(cycles: int, phase: float, frame_t: float, skew: float = 0.0) -> float:
     """One exactly-periodic harmonic, optionally phase-warped.
@@ -152,55 +153,53 @@ NECK = {
     },
 }
 
-# Wings, folded. The static Z is the fold, and it is MIRRORED — this is the
-# defect the previous clip shipped. X is the settle, and it is NOT mirrored.
+# Wings, fully folded. These are absolute local quaternions measured on the
+# clean rig against the EVALUATED SKIN, not Euler guesses or shoulder-to-tip
+# distance. The old +35 degree shoulder-X / +/-30 degree Z pose merely moved a
+# taut wing beside the torso: its side/front/top projected membrane area was
+# 97.8% / 180.3% / 117.6% of cruise. This pose measures approximately
+# 55.7% / 62.5% / 51.2% of cruise over the same 5,466 weighted wing faces.
 #
-# Left and right run on the same slow carrier at slightly different amplitudes
-# and a 0.7 rad phase offset, so the two wings drift independently. v1's idle
-# does the same thing: its wing_elev_bias swings wider than either wing alone,
-# which only happens if the sides are not locked together.
-WING_FOLD_SHOULDER = 35.0
-WING_FOLD_ELBOW = 45.0
-WING_FOLD_ARCH = 35.0
-
-WINGS = {
-    "L_WingShoulder": {
-        "rx": (35.0, [(BREATH, 0.040, 0.00)]),
-        "ry": (0.0, []),
-        "rz": (30.0, []),
-    },
-    "R_WingShoulder": {
-        "rx": (35.0, [(BREATH, 0.040, 0.00)]),
-        "ry": (0.0, []),
-        "rz": (-30.0, []),
-    },
-    "L_WingElbow": {
-        "rx": (45.0, []),
-        "ry": (0.0, []),
-        "rz": (0.0, []),
-    },
-    "R_WingElbow": {
-        "rx": (45.0, []),
-        "ry": (0.0, []),
-        "rz": (0.0, []),
-    },
-    "L_WingWrist": {
-        "rx": (-25.0, []),
-        "ry": (0.0, []),
-        "rz": (-18.0, []),
-    },
-    "R_WingWrist": {
-        "rx": (-25.0, []),
-        "ry": (0.0, []),
-        "rz": (18.0, []),
-    },
-    "L_WingFinger1": {"rx": (-48.0, []), "ry": (0.0, []), "rz": (14.0, [])},
-    "R_WingFinger1": {"rx": (-48.0, []), "ry": (0.0, []), "rz": (-14.0, [])},
-    "L_WingFinger2": {"rx": (-36.0, []), "ry": (0.0, []), "rz": (11.0, [])},
-    "R_WingFinger2": {"rx": (-36.0, []), "ry": (0.0, []), "rz": (-11.0, [])},
-    "L_WingFinger3": {"rx": (-24.0, []), "ry": (0.0, []), "rz": (8.0, [])},
-    "R_WingFinger3": {"rx": (-24.0, []), "ry": (0.0, []), "rz": (-8.0, [])},
+# Local shoulder X- drops the wing against the body. Elbow, wrist, finger rays,
+# distal finger bones, membrane struts, and the claw must all be explicitly
+# authored; otherwise the root tucks while the visible membrane remains open.
+# Values are stored only for the left side. The right side is reflected directly
+# in quaternion space as (w, x, -y, -z), the measured mirror convention for this
+# rig. Reconstructing mirrored combined rotations through Euler angles can add an
+# unwanted Y component.
+WING_FOLD_LEFT = {
+    "L_WingRoot": (1.0, 0.0, 0.0, 0.0),
+    "L_WingShoulder": (0.719340, -0.694658, 0.0, 0.0),
+    "L_WingElbow": (0.534660, 0.435676, -0.508340, 0.515670),
+    "L_WingWrist": (0.779975, 0.326319, -0.496899, 0.195569),
+    "L_WingFinger1": (0.905604, 0.293643, -0.020185, 0.305364),
+    "L_WingFinger2": (0.960126, 0.063122, 0.190884, 0.194263),
+    "L_WingFinger3": (0.957662, 0.033783, 0.256605, -0.126079),
+    "L_WingFinger1_end": (1.0, 0.0, 0.0, 0.0),
+    "L_WingFinger2_end": (1.0, 0.0, 0.0, 0.0),
+    "L_WingFinger3_end": (1.0, 0.0, 0.0, 0.0),
+    "L_WingMembrane1": (0.981968, -0.052056, -0.154716, 0.095350),
+    "L_WingMembrane2": (0.600352, 0.038914, -0.077891, -0.794982),
+    "L_WingClaw": (0.810346, 0.564047, 0.085017, 0.134020),
 }
+
+
+def reflect_wing_quaternion(quaternion):
+    """Reflect a left-wing local rotation onto the right-wing basis."""
+    return Quaternion(
+        (quaternion.w, quaternion.x, -quaternion.y, -quaternion.z)
+    )
+
+
+def wing_fold_quaternions() -> dict:
+    """Return the complete bilateral absolute fold pose."""
+    out = {}
+    for left_name, components in WING_FOLD_LEFT.items():
+        left = Quaternion(components).normalized()
+        right_name = f"R_{left_name[2:]}"
+        out[left_name] = left
+        out[right_name] = reflect_wing_quaternion(left)
+    return out
 
 # Tail, as a travelling wave rather than a hinge.
 #
@@ -264,7 +263,6 @@ GAINS = {
     # rise is a property of ITS curved neck and does not port. Held low.
     "neck_reach": 1.00,     # -> head_fwd range (secondary)
     "neck_yaw": 1.00,       # -> head_lat range
-    "wing": 1.00,           # -> wing_elev_L/R range
     "tail_lat": 1.00,       # -> tail_lat range
     "tail_vert": 1.00,      # -> tail_up range
     "body_lift": 1.00,      # -> foot_*_up range (must stay planted)
@@ -284,8 +282,6 @@ def _gain_for(group: str, channel: str, cycles: int, bone: str) -> float:
             if cycles == SWAY:
                 return GAINS["neck_reach"]
             return GAINS["head_level"] if bone == "Head" else GAINS["breath_neck"]
-    if group == "wing" and channel == "rx":
-        return GAINS["wing"]
     if group == "tail":
         return GAINS["tail_lat"] if channel == "rz" else GAINS["tail_vert"]
     if group == "body":
@@ -301,7 +297,6 @@ def clip_definition() -> dict:
         ("spine", SPINE),
         ("body", BODY),
         ("neck", NECK),
-        ("wing", WINGS),
         ("tail", tail_channels()),
         ("legs", LEGS),
     )
@@ -319,16 +314,6 @@ def clip_definition() -> dict:
                 )
             merged.setdefault(bone, {}).update(scaled)
     return merged
-
-
-CHANNEL_PATH = {
-    "rx": ("rotation_euler", 0),
-    "ry": ("rotation_euler", 1),
-    "rz": ("rotation_euler", 2),
-    "tx": ("location", 0),
-    "ty": ("location", 1),
-    "tz": ("location", 2),
-}
 
 
 def evaluate(spec, frame_index: int) -> float:
@@ -350,8 +335,12 @@ def armature() -> bpy.types.Object:
 
 
 def build(arm: bpy.types.Object) -> bpy.types.Action:
+    if Euler is None or Quaternion is None:
+        raise RuntimeError("this generator must run inside Blender")
     definition = clip_definition()
-    missing = [b for b in definition if b not in arm.pose.bones]
+    folded_wings = wing_fold_quaternions()
+    authored_bones = set(definition) | set(folded_wings)
+    missing = [bone for bone in authored_bones if bone not in arm.pose.bones]
     if missing:
         raise SystemExit(f"bones not on the rig: {missing}")
 
@@ -367,16 +356,15 @@ def build(arm: bpy.types.Object) -> bpy.types.Action:
     arm.animation_data.action_slot = slot
     layer = action.layers.new("idle")
     strip = layer.strips.new(type="KEYFRAME")
-    bag = strip.channelbags.new(slot)
+    strip.channelbags.new(slot)
 
-    for bone in sorted(definition):
+    for bone in sorted(authored_bones):
         pb = arm.pose.bones.get(bone)
         if pb:
-            pb.rotation_mode = 'QUATERNION'
+            pb.rotation_mode = "QUATERNION"
 
     # Build evaluation tracks
     for f in range(PERIOD + 1):
-        frame_t = f / PERIOD
         for bone, channels in sorted(definition.items()):
             pb = arm.pose.bones.get(bone)
             if not pb:
@@ -395,14 +383,26 @@ def build(arm: bpy.types.Object) -> bpy.types.Action:
                 elif key == "ry": rot_euler[1] = math.radians(val)
                 elif key == "rz": rot_euler[2] = math.radians(val)
             
-            q = Euler(rot_euler, 'XYZ').to_quaternion()
+            q = Euler(rot_euler, "XYZ").to_quaternion()
             pb.rotation_quaternion = q
             pb.location = loc
             pb.keyframe_insert(data_path="rotation_quaternion", frame=f)
             pb.keyframe_insert(data_path="location", frame=f)
 
+        # The fold is absolute. Do not compose it over the old action's
+        # per-frame wing rotations: those source keys are what reopened the web.
+        # Spine3's breathing motion is inherited by WingRoot, so the folded
+        # wings still settle with the ribcage without locally fanning open.
+        for bone, quaternion in sorted(folded_wings.items()):
+            pb = arm.pose.bones[bone]
+            pb.rotation_quaternion = quaternion
+            pb.location = (0.0, 0.0, 0.0)
+            pb.keyframe_insert(data_path="rotation_quaternion", frame=f)
+            pb.keyframe_insert(data_path="location", frame=f)
+
     action.use_frame_range = True
     action.frame_start, action.frame_end = 0.0, float(PERIOD)
+    action.use_fake_user = True
     return action
 
 
@@ -459,7 +459,8 @@ def main() -> None:
 
     print(
         f"authored {ACTION}: {PERIOD + 1} frames, "
-        f"{(PERIOD) / FPS:.2f}s, {len(clip_definition())} bones"
+        f"{PERIOD / FPS:.2f}s, "
+        f"{len(set(clip_definition()) | set(wing_fold_quaternions()))} bones"
     )
     if args.export:
         export(args.export)

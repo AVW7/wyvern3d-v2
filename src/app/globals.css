@@ -518,12 +518,22 @@ button:active, .nav-pill-btn:active, .camera-pill-btn:active, .control-shift-btn
 
 /* --- shared interaction feedback ---------------------------------------- */
 
-.interaction-notice {
+.interaction-notice-stack {
   position: absolute;
   z-index: var(--z-notice);
   top: 78px;
   left: 50%;
   transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.interaction-notice {
+  pointer-events: auto;
+  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -540,9 +550,43 @@ button:active, .nav-pill-btn:active, .camera-pill-btn:active, .control-shift-btn
   animation: interactionNoticeIn 0.22s var(--ease-out-expo);
 }
 
-.interaction-notice.success { border-color: rgba(74, 222, 128, 0.58); }
-.interaction-notice.warning { border-color: rgba(245, 200, 107, 0.65); }
-.interaction-notice.error { border-color: rgba(248, 113, 113, 0.68); }
+.interaction-notice.success { border-color: rgba(74, 222, 128, 0.58); border-left: 3px solid var(--good); }
+.interaction-notice.warning { border-color: rgba(245, 200, 107, 0.65); border-left: 3px solid var(--gold); }
+.interaction-notice.error { border-color: rgba(248, 113, 113, 0.68); border-left: 3px solid var(--bad); }
+.interaction-notice.status { border-left: 3px solid #60a5fa; }
+
+.notice-icon {
+  flex-shrink: 0;
+}
+.notice-icon.success { color: var(--good); }
+.notice-icon.warning { color: var(--gold); }
+.notice-icon.error { color: var(--bad); }
+.notice-icon.status { color: #60a5fa; }
+
+.notice-message {
+  flex: 1 1 auto;
+}
+
+.interaction-notice-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.35);
+  border-radius: 0 0 12px 12px;
+  transform-origin: left center;
+  animation: noticeBarDrain linear forwards;
+}
+
+.interaction-notice.success .interaction-notice-bar { background: var(--good); }
+.interaction-notice.warning .interaction-notice-bar { background: var(--gold); }
+.interaction-notice.error .interaction-notice-bar { background: var(--bad); }
+
+@keyframes noticeBarDrain {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
+}
 
 .interaction-notice-action,
 .interaction-notice-dismiss {
@@ -1302,9 +1346,18 @@ kbd {
 /* Unavailable commands stay in place and keep their tooltip, which explains
    what they are waiting for — see unavailableReason() in the component. */
 .wyvern-command:disabled {
-  opacity: 0.3;
-  filter: grayscale(0.85);
+  opacity: 0.38;
+  filter: grayscale(0.7);
   cursor: not-allowed;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.wyvern-command-lock-badge {
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  width: 17px;
+  height: 17px;
 }
 
 /**
@@ -2169,6 +2222,58 @@ table.compact th {
   letter-spacing: 0.02em;
 }
 
+.drawer-search-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 9999px;
+  padding: 3px 10px;
+  color: var(--muted);
+  transition: all 0.2s var(--ease-out-expo);
+  flex: 0 1 210px;
+}
+
+.drawer-search-box:focus-within {
+  border-color: rgba(56, 189, 248, 0.6);
+  background: rgba(0, 0, 0, 0.38);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+  color: #38bdf8;
+}
+
+.drawer-search-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: inherit;
+  font-size: 11px;
+  color: var(--text);
+  width: 100%;
+}
+
+.drawer-search-input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.drawer-search-clear {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1;
+  padding: 0 2px;
+  cursor: pointer;
+  border-radius: 50%;
+  backdrop-filter: none;
+  box-shadow: none;
+}
+
+.drawer-search-clear:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.15);
+}
+
 .category-tabs {
   display: flex;
   gap: 6px;
@@ -2996,3 +3101,246 @@ input[type='range'] {
     display: none;
   }
 }
+
+/* --- Wave 2 Sanctuary Enhancements ---------------------------------------- */
+
+/* Camera Preset Transition Flash Overlay */
+.camera-flash-overlay {
+  position: absolute;
+  top: 72px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--z-widget);
+  pointer-events: none;
+  padding: 6px 16px;
+  border-radius: 9999px;
+  background: var(--glass-bg-black);
+  border: 1px solid var(--glass-border-light);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-shadow-sm);
+  color: var(--gold);
+  font-family: var(--font-fantasy);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  animation: cameraFlashIn 1.2s var(--ease-out-expo) forwards;
+}
+
+@keyframes cameraFlashIn {
+  0% { opacity: 0; transform: translate(-50%, -10px) scale(0.95); }
+  20% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+  80% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, 4px) scale(0.98); }
+}
+
+/* Infirmary Panel Active Mechanics */
+.infirmary-status-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  margin-bottom: 16px;
+  border-radius: 12px;
+  background: rgba(249, 115, 22, 0.12);
+  border: 1px solid rgba(249, 115, 22, 0.35);
+  color: #fdba74;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.pulse-ring-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.7);
+  animation: pulseRing 1.6s infinite;
+}
+
+@keyframes pulseRing {
+  0% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.7); }
+  70% { box-shadow: 0 0 0 8px rgba(249, 115, 22, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0); }
+}
+
+.infirmary-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.severity-badge {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  text-transform: uppercase;
+}
+
+.severity-badge.critical {
+  background: rgba(248, 113, 113, 0.2);
+  color: var(--bad);
+  border: 1px solid rgba(248, 113, 113, 0.4);
+}
+
+.severity-badge.injured {
+  background: rgba(245, 200, 107, 0.2);
+  color: var(--gold);
+  border: 1px solid rgba(245, 200, 107, 0.4);
+}
+
+.severity-badge.recovering {
+  background: rgba(74, 222, 128, 0.2);
+  color: var(--good);
+  border: 1px solid rgba(74, 222, 128, 0.4);
+}
+
+.infirmary-card.priority {
+  border-color: rgba(245, 200, 107, 0.6);
+  box-shadow: 0 0 16px rgba(245, 200, 107, 0.15);
+}
+
+.wound-meter-group {
+  margin-top: 10px;
+}
+
+.wound-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.eta-tag {
+  font-variant-numeric: tabular-nums;
+  color: var(--gold);
+}
+
+.priority-btn {
+  margin-top: 12px;
+  width: 100%;
+  padding: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: all 0.15s ease;
+}
+
+.priority-btn.active {
+  background: rgba(245, 200, 107, 0.2);
+  border-color: rgba(245, 200, 107, 0.5);
+  color: var(--gold);
+}
+
+.accordion-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.accordion-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+}
+
+/* Catalog Empty State & Keyboard Hint Bar */
+.catalog-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+.catalog-empty-state svg {
+  width: 28px;
+  height: 28px;
+  opacity: 0.5;
+}
+
+.drawer-shortcut-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 8px 16px;
+  margin-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.drawer-shortcut-bar kbd {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-family: inherit;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.card-badge.warning {
+  background: rgba(245, 200, 107, 0.2);
+  color: var(--gold);
+  border-color: rgba(245, 200, 107, 0.4);
+}
+
+.tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Micro-animations & Tactile Feel */
+.panel {
+  animation: panelSlideIn 0.25s var(--ease-out-expo);
+}
+
+@keyframes panelSlideIn {
+  from { opacity: 0; transform: translate(-50%, 10px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.catalog-card {
+  transition: transform 0.18s var(--ease-out-expo), box-shadow 0.18s var(--ease-out-expo), border-color 0.18s ease;
+}
+
+.catalog-card:hover:not(.disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), inset 0 1px 0 0 rgba(255, 255, 255, 0.25);
+}
+
+button:active {
+  transform: scale(0.97);
+}
+
+.wyvern-command {
+  transition: transform 0.15s var(--ease-out-expo), background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.wyvern-command:hover:not(.is-disabled) {
+  transform: translate(calc(var(--dx) * var(--wheel) * 0.42), calc(var(--dy) * var(--wheel) * 0.42)) scale(1.08);
+}
+

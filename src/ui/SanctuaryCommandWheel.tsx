@@ -237,17 +237,23 @@ export function SanctuaryCommandWheel() {
                   <button
                     key={item.command}
                     type="button"
-                    className={`wyvern-command ${isPending ? 'is-pending' : ''}`}
+                    className={`wyvern-command ${isPending ? 'is-pending' : ''} ${reason ? 'is-disabled' : ''}`}
                     data-group={item.group}
                     style={{ '--dx': dx.toFixed(4), '--dy': dy.toFixed(4) } as CSSProperties}
                     aria-label={reason ? `${item.label} (${hotkey ? `key ${hotkey}` : ''}) — ${reason}` : `${item.label} (${hotkey ? `key ${hotkey}` : ''})`}
-                    title={reason ? `${item.label} [${hotkey}] — ${reason}` : `${item.label} [${hotkey}]`}
+                    title={reason ? `🔒 ${item.label} [${hotkey ?? '-'}] — ${reason}` : `${item.label} [${hotkey}]`}
                     disabled={reason !== null}
                     onClick={() => issue(item.command)}
                   >
-                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                      {ICONS[item.command]?.map((d) => <path key={d} d={d} />)}
-                    </svg>
+                    {reason ? (
+                      <div className="wyvern-command-lock-badge" aria-hidden="true">
+                        <LockIcon />
+                      </div>
+                    ) : (
+                      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        {ICONS[item.command]?.map((d) => <path key={d} d={d} />)}
+                      </svg>
+                    )}
                     <span>{item.short} {hotkey && <small style={{ opacity: 0.6, fontSize: '0.85em' }}>[{hotkey}]</small>}</span>
                   </button>
                 )
@@ -282,5 +288,14 @@ export function SanctuaryCommandWheel() {
         </div>
       )}
     </>
+  )
+}
+
+function LockIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" strokeWidth="2" fill="none" className="mono-svg">
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+    </svg>
   )
 }

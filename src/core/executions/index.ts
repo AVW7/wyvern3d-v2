@@ -1,7 +1,8 @@
-import type { GameState, Resources } from '../types'
+import type { BuildingId, ElixirType, EquipmentType, ElementalAffinity, GameState, PhilosophyId, Resources, RulerEdict, RulerTitle } from '../types'
 import type { Intent } from '../intents'
 import { BUILDINGS } from '../data/buildings'
 import { CONFIG } from '../data/config'
+import { PHILOSOPHIES } from '../data/philosophies'
 import { REGIONS } from '../data/regions'
 import { SPECIES } from '../data/species'
 import { STATIONS } from '../data/stations'
@@ -66,6 +67,22 @@ export function execute(state: GameState, intent: Intent): void {
       return stationSquad(state, intent.squadId, intent.regionId)
     case 'UPGRADE_BUILDING':
       return upgradeBuilding(state, intent.buildingId)
+    case 'SET_ASSIGNED_WORKERS':
+      return setAssignedWorkers(state, intent.buildingId, intent.count)
+    case 'SET_RULER_TITLE':
+      return setRulerTitle(state, intent.title)
+    case 'SET_RULER_EDICT':
+      return setRulerEdict(state, intent.edict)
+    case 'UPGRADE_ELEMENTAL_MASTERY':
+      return upgradeElementalMastery(state, intent.element)
+    case 'RESEARCH_PHILOSOPHY':
+      return researchPhilosophy(state, intent.philosophyId)
+    case 'CRAFT_EQUIPMENT':
+      return craftEquipment(state, intent.equipmentType)
+    case 'BREW_ELIXIR':
+      return brewElixir(state, intent.elixirType)
+    case 'USE_ELIXIR':
+      return useElixir(state, intent.elixirType, intent.wyvernId)
     case 'LAUNCH_ATTACK':
       return launchAttack(state, intent)
     case 'RESOLVE_BATTLE':
@@ -261,6 +278,140 @@ function upgradeBuilding(state: GameState, buildingId: string): void {
   spend(state, cost)
   state.buildings[def.id] = level + 1
   log(state, 'good', `${def.name} extended to level ${level + 1}.`)
+}
+
+function setAssignedWorkers(state: GameState, buildingId: BuildingId, count: number): void {
+  if (!state.economy) return
+  const targetCount = Math.max(0, Math.round(count))
+  const assigned = state.economy.population.assigned
+  const current = (assigned as Record<string, number>)[buildingId] ?? 0
+  const totalPop = state.economy.population.total
+  const totalAssigned = Object.values(assigned).reduce((a, b) => (a ?? 0) + (b ?? 0), 0)
+  const idle = Math.max(0, totalPop - totalAssigned)
+
+  const diff = targetCount - current
+  if (diff > 0 && idle < diff) {
+    return log(state, 'bad', 'Not enough idle villagers to assign.')
+  }
+
+  ;(assigned as Record<string, number>)[buildingId] = targetCount
+  log(state, 'info', `Assigned ${targetCount} workers to ${BUILDINGS[buildingId]?.name ?? buildingId}.`)
+}
+
+function setRulerTitle(state: GameState, title: RulerTitle): void {
+  if (!state.realm) return
+  state.realm.ruler.title = title
+  log(state, 'info', `The sovereign title was set to ${title.toUpperCase()}.`)
+}
+
+function setRulerEdict(state: GameState, edict: RulerEdict): void {
+  if (!state.realm) return
+  state.realm.ruler.edict = edict
+  const names: Record<RulerEdict, string> = {
+    conquest_harvest: 'Conquest Harvest (+25% yields)',
+    royal_garrison: 'Royal Garrison (-50% unrest)',
+    dragon_harmony: 'Dragon Harmony (+20% bond)',
+    grand_taxation: 'Grand Taxation (+50% gold)',
+  }
+  log(state, 'good', `Royal Edict enacted: ${names[edict]}.`)
+  state.realm.history.unshift({
+    tick: state.tick,
+    title: 'New Royal Edict',
+    description: `The sovereign enacted the edict: ${names[edict]}.`,
+    category: 'royal',
+  })
+}
+
+function upgradeElementalMastery(state: GameState, element: ElementalAffinity): void {
+  if (!state.realm) return
+  const currentLvl = state.realm.grandMaster.masteryLevels[element] ?? 0
+  if (currentLvl >= CONFIG.grandMaster.maxMasteryLevel) {
+    return log(state, 'bad', `${element.toUpperCase()} Mastery is already maxed.`)
+  }
+  const cost = CONFIG.grandMaster.costPerLevel[currentLvl] ?? {}
+  if (!canAfford(state, cost)) {
+    return log(state, 'bad', `Insufficient resources to advance ${element.toUpperCase()} Mastery.`)
+  }
+
+  spend(state, cost)
+  state.realm.grandMaster.masteryLevels[element] = currentLvl + 1
+  state.realm.grandMaster.activeFocus = element
+  log(state, 'good', `Grand Master advanced ${element.toUpperCase()} Elemental Mastery to Level ${currentLvl + 1}!`)
+  state.realm.history.unshift({
+    tick: state.tick,
+    title: `${element.toUpperCase()} Mastery Tier ${currentLvl + 1}`,
+    description: `Grand Master unlocked elemental mastery level ${currentLvl + 1}.`,
+    category: 'mastery',
+  })
+}
+
+function researchPhilosophy(state: GameState, philosophyId: PhilosophyId): void {
+  if (!state.realm) return
+  if (state.realm.philosophies.unlocked.includes(philosophyId)) {
+    return log(state, 'bad', 'Philosophy treatise already unlocked.')
+  }
+  const def = PHILOSOPHIES[philosophyId]
+  if (!def) return
+
+  if (!canAfford(state, def.researchCost)) {
+    return log(state, 'bad', `Insufficient supplies to initiate research into ${def.name}.`)
+  }
+
+  spend(state, def.researchCost)
+  state.realm.philosophies.activeResearch = philosophyId
+  state.realm.philosophies.researchProgress = 0
+  log(state, 'info', `Began research into ${def.name}.`)
+}
+
+function craftEquipment(state: GameState, equipmentType: EquipmentType): void {
+  if (!state.realm) return
+  const cost = CONFIG.crafting.equipmentCosts[equipmentType]
+  if (!canAfford(state, cost)) {
+    return log(state, 'bad', `Insufficient materials to craft ${equipmentType.replace('_', ' ')}.`)
+  }
+
+  spend(state, cost)
+  state.realm.equipment[equipmentType] = (state.realm.equipment[equipmentType] ?? 0) + 1
+  const names: Record<EquipmentType, string> = {
+    wyvern_armor: 'Dragon-Scale Armor Plating',
+    flame_spears: 'Flame-Hardened Spear Tips',
+    iron_shields: 'Heavy Iron Vanguard Shields',
+  }
+  log(state, 'good', `Blacksmith forged ${names[equipmentType]}!`)
+}
+
+function brewElixir(state: GameState, elixirType: ElixirType): void {
+  if (!state.realm) return
+  const cost = CONFIG.crafting.elixirCosts[elixirType]
+  if (!canAfford(state, cost)) {
+    return log(state, 'bad', `Insufficient herbs/arcane to brew ${elixirType.replace('_', ' ')}.`)
+  }
+
+  spend(state, cost)
+  state.realm.elixirs[elixirType] = (state.realm.elixirs[elixirType] ?? 0) + 1
+  log(state, 'good', `Apothecary brewed ${elixirType.replace('_', ' ')}!`)
+}
+
+function useElixir(state: GameState, elixirType: ElixirType, wyvernId: string): void {
+  if (!state.realm) return
+  const count = state.realm.elixirs[elixirType] ?? 0
+  if (count <= 0) return log(state, 'bad', 'No elixirs of that type in stock.')
+  const wyvern = state.wyverns[wyvernId]
+  if (!wyvern) return
+
+  state.realm.elixirs[elixirType] -= 1
+
+  if (elixirType === 'vitality_salve') {
+    wyvern.injury = Math.max(0, wyvern.injury - 40)
+    log(state, 'good', `Applied Vitality Salve to ${wyvern.name}. Injury reduced by 40.`)
+  } else if (elixirType === 'dragon_tonic') {
+    wyvern.hunger = Math.max(0, wyvern.hunger - 50)
+    wyvern.bond = clamp(wyvern.bond + 15, 0, CONFIG.wyvern.maxBond)
+    log(state, 'good', `Administered Dragon Tonic to ${wyvern.name}. Hunger relieved & bond +15.`)
+  } else if (elixirType === 'growth_elixir') {
+    wyvern.ageTicks += CONFIG.wyvern.hatchlingTicks
+    log(state, 'good', `Growth Elixir accelerated ${wyvern.name}'s maturity.`)
+  }
 }
 
 // ---------------------------------------------------------------------------

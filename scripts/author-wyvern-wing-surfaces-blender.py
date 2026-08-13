@@ -26,8 +26,12 @@ import json
 import math
 import sys
 
-import bpy
-from mathutils import Euler, Quaternion
+try:
+    import bpy  # type: ignore
+    from mathutils import Euler, Quaternion  # type: ignore
+except ImportError:
+    bpy = None  # type: ignore
+    Euler = Quaternion = None  # type: ignore
 
 
 ARMATURE = "WyvernRig"

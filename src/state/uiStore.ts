@@ -12,6 +12,8 @@ export type PanelId =
   | 'warTable'
   | 'help'
   | 'camera'
+  | 'economy'
+  | 'realm'
 
 export type InteractionNoticeTone = 'status' | 'success' | 'warning' | 'error'
 
@@ -40,7 +42,9 @@ interface UiStore {
   focusedStation: string | null
   /** Which wyvern the roster should lead with, set by clicking one in-world. */
   focusedWyvern: string | null
-  /** Shared, structured transient feedback for player interactions. */
+  /** Active queue of structured transient feedback notices (max 3 stacked). */
+  toasts: InteractionNotice[]
+  /** Shared, structured transient feedback for player interactions (most recent toast). */
   toast: InteractionNotice | null
   /** When true, all HUD elements are hidden for a clean viewport. */
   hudHidden: boolean
@@ -60,6 +64,7 @@ export const useUi = create<UiStore>()((set) => ({
   nearby: null,
   focusedStation: null,
   focusedWyvern: null,
+  toasts: [],
   toast: null,
   hudHidden: false,
 
@@ -74,18 +79,36 @@ export const useUi = create<UiStore>()((set) => ({
       s.nearby?.id === nearby?.id ? s : { nearby },
     ),
   notify: (notice) => {
-    if (notice === null) return set({ toast: null })
+    if (notice === null) return set({ toasts: [], toast: null })
     const input = typeof notice === 'string' ? { message: notice } : notice
-    set((state) => ({
-      toast: {
-        id: (state.toast?.id ?? 0) + 1,
+    set((state) => {
+      const currentToasts = state.toast === null ? [] : state.toasts
+      const lastId = currentToasts.length > 0
+        ? currentToasts[currentToasts.length - 1]!.id
+        : (state.toast?.id ?? 0)
+      const newNotice: InteractionNotice = {
+        id: lastId + 1,
         tone: input.tone ?? 'status',
         message: input.message,
         expiresAt: Date.now() + (input.durationMs ?? 5000),
         undoToken: input.undoToken,
-      },
-    }))
+      }
+      const toasts = [...currentToasts, newNotice].slice(-3)
+      return {
+        toasts,
+        toast: toasts[toasts.length - 1] ?? null,
+      }
+    })
   },
-  clearNotice: (id) => set((state) => (!id || state.toast?.id === id ? { toast: null } : state)),
+  clearNotice: (id) =>
+    set((state) => {
+      if (!id) return { toasts: [], toast: null }
+      const currentToasts = state.toast === null ? [] : state.toasts
+      const toasts = currentToasts.filter((t) => t.id !== id)
+      return {
+        toasts,
+        toast: toasts.length > 0 ? toasts[toasts.length - 1]! : null,
+      }
+    }),
   toggleHud: () => set((s) => ({ hudHidden: !s.hudHidden })),
 }))

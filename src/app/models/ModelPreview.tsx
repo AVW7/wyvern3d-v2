@@ -3,7 +3,7 @@
 import { Bounds, Environment, Grid, OrbitControls, useBounds } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
 import { Suspense, useCallback } from 'react'
-import type { Group } from 'three'
+import { Bone, Mesh, Object3D, type Group } from 'three'
 import { GameModel } from '@/render/assets/GameModel'
 import type { AssetId, ModelState } from '@/render/assets/manifest'
 
@@ -19,11 +19,56 @@ function PreviewFallback() {
 }
 
 /** Refit only after the real GLB has replaced GameModel's small fallback. */
-function PreviewAsset({ id, state }: { id: AssetId; state: ModelState }) {
+function PreviewAsset({
+  id,
+  state,
+  onLoadStats,
+}: {
+  id: AssetId
+  state: ModelState
+  onLoadStats?: (stats: { triangles: number; bones: number; materials: number; boneNames: string[] }) => void
+}) {
   const bounds = useBounds()
-  const fitLoadedModel = useCallback((_root: Group) => {
+  const fitLoadedModel = useCallback((root: Group) => {
     requestAnimationFrame(() => bounds.refresh().clip().fit())
-  }, [bounds])
+    if (onLoadStats) {
+      let triangles = 0
+      let bones = 0
+      const boneNames: string[] = []
+      const materialsSet = new Set<string>()
+      root.traverse((child: Object3D) => {
+        if (child instanceof Mesh) {
+          const geom = child.geometry
+          if (geom) {
+            if (geom.index) {
+              triangles += geom.index.count / 3
+            } else if (geom.attributes?.position) {
+              triangles += geom.attributes.position.count / 3
+            }
+          }
+          if (child.material) {
+            const mats = Array.isArray(child.material) ? child.material : [child.material]
+            mats.forEach((m) => {
+              if (m.name) materialsSet.add(m.name)
+              else if (m.uuid) materialsSet.add(m.uuid)
+            })
+          }
+        }
+        if (child instanceof Bone) {
+          bones++
+          if (child.name) {
+            boneNames.push(child.name)
+          }
+        }
+      })
+      onLoadStats({
+        triangles: Math.round(triangles),
+        bones,
+        materials: materialsSet.size,
+        boneNames: boneNames.sort(),
+      })
+    }
+  }, [bounds, onLoadStats])
 
   return (
     <GameModel
@@ -35,7 +80,15 @@ function PreviewAsset({ id, state }: { id: AssetId; state: ModelState }) {
   )
 }
 
-export function ModelPreview({ id, state }: { id: AssetId; state: ModelState }) {
+export function ModelPreview({
+  id,
+  state,
+  onLoadStats,
+}: {
+  id: AssetId
+  state: ModelState
+  onLoadStats?: (stats: { triangles: number; bones: number; materials: number; boneNames: string[] }) => void
+}) {
   return (
     <Canvas key={id} shadows camera={{ position: [5, 3.5, 7], fov: 42 }} dpr={[1, 1.75]}>
       <color attach="background" args={['#080c12']} />
@@ -43,7 +96,7 @@ export function ModelPreview({ id, state }: { id: AssetId; state: ModelState }) 
       <directionalLight position={[7, 10, 5]} intensity={2.2} castShadow />
       <Suspense fallback={null}>
         <Bounds fit clip observe margin={1.45}>
-          <PreviewAsset id={id} state={state} />
+          <PreviewAsset id={id} state={state} onLoadStats={onLoadStats} />
         </Bounds>
         <Environment preset="warehouse" environmentIntensity={0.4} />
       </Suspense>

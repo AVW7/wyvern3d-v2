@@ -1,5 +1,8 @@
 import type { GameState } from '../types'
 import { CONFIG, SAVE_VERSION } from '../data/config'
+import { createEgg, rollSpeciesStats, rollSpeciesTraits } from '../entities/wyvern'
+import { createRng, deriveSeed } from '../math/rng'
+import { nextId } from './game'
 import { advanceTicks } from './tick'
 import { ensureSanctuaryLayout, migrateLegacySanctuaryLayout } from './sanctuaryLayout'
 
@@ -79,6 +82,111 @@ const MIGRATIONS: Record<number, Migration> = {
     ),
     saveVersion: 3,
   }),
+  // 3 -> 4: Thornmarch now yields Thornwing eggs. Give established owners one
+  // deterministic egg without consuming the save's replay RNG stream.
+  3: (state) => {
+    const migrated: GameState = {
+      ...state,
+      eggs: { ...state.eggs },
+      saveVersion: 4,
+    }
+    const ownsThornmarch = state.regions.thornmarch?.owner === 'player'
+    const alreadyHasThornwing =
+      Object.values(state.eggs).some((egg) => egg.speciesId === 'thornwing') ||
+      Object.values(state.wyverns).some((wyvern) => wyvern.speciesId === 'thornwing')
+
+    if (!ownsThornmarch || alreadyHasThornwing) return migrated
+
+    const rng = createRng(deriveSeed(state.seed, 'save-v4:thornwing-egg'))
+    let id = nextId(migrated, 'egg')
+    while (migrated.eggs[id]) id = nextId(migrated, 'egg')
+    migrated.eggs[id] = createEgg({
+      id,
+      speciesId: 'thornwing',
+      stats: rollSpeciesStats('thornwing', rng),
+      traits: rollSpeciesTraits('thornwing', rng),
+      parents: null,
+    })
+    return migrated
+  },
+  // 4 -> 5: Sanctuary Economy, Agriculture, Wildlife Breeding & Infrastructure
+  4: (state) => {
+    const migrated: GameState = {
+      ...state,
+      resources: {
+        ...state.resources,
+        water: state.resources.water ?? 150,
+        hide: state.resources.hide ?? 20,
+        iron: state.resources.iron ?? 15,
+      },
+      buildings: {
+        ...state.buildings,
+        farm: state.buildings.farm ?? 0,
+        aqueduct: state.buildings.aqueduct ?? 0,
+        pasture: state.buildings.pasture ?? 0,
+        foundry: state.buildings.foundry ?? 0,
+        sawmill: state.buildings.sawmill ?? 0,
+        housing: state.buildings.housing ?? 0,
+      },
+      economy: state.economy ?? {
+        population: {
+          total: 10,
+          assigned: { farm: 2, aqueduct: 2, pasture: 2, foundry: 2, sawmill: 2, housing: 0 },
+        },
+        livestock: { deer: 4, boar: 2, goat: 3, bird: 8 },
+      },
+      saveVersion: 5,
+    }
+    return migrated
+  },
+  // 5 -> 6: Realm Governance, Ruler Edicts, Philosophy Academy & History Codex
+  5: (state) => {
+    const migrated: GameState = {
+      ...state,
+      buildings: {
+        ...state.buildings,
+        academy: state.buildings.academy ?? 1,
+        apothecary: state.buildings.apothecary ?? 1,
+        blacksmith: state.buildings.blacksmith ?? 0,
+      },
+      realm: state.realm ?? {
+        ruler: {
+          title: 'king',
+          edict: 'conquest_harvest',
+          prestige: 10,
+        },
+        grandMaster: {
+          masteryLevels: { fire: 1, water: 1, earth: 1, air: 1 },
+          activeFocus: 'fire',
+        },
+        philosophies: {
+          unlocked: ['balance'],
+          activeResearch: null,
+          researchProgress: 0,
+        },
+        equipment: {
+          wyvern_armor: 0,
+          flame_spears: 0,
+          iron_shields: 0,
+        },
+        elixirs: {
+          vitality_salve: 3,
+          dragon_tonic: 1,
+          growth_elixir: 0,
+        },
+        history: [
+          {
+            tick: state.tick,
+            title: 'The Royal Sovereign Rises',
+            description: 'The realm realm framework was established.',
+            category: 'royal',
+          },
+        ],
+      },
+      saveVersion: 6,
+    }
+    return migrated
+  },
 }
 
 export function migrate(state: GameState): GameState {

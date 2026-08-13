@@ -27,7 +27,17 @@ export function AttackTargetReticle() {
   )
 }
 
+/**
+ * The patrol ellipse, shown only while the selected wyvern is actually flying
+ * it. These twelve spheres previously rendered unconditionally, so the live
+ * sanctuary always had a ring of markers hanging at altitude 22 whether or not
+ * anything was patrolling. Gating on the phase the store already publishes
+ * turns them from debug residue into feedback for the circle/patrol command.
+ */
 export function PatrolMarkers() {
+  const phase = useSanctuaryCommands((state) => state.agent?.phase)
+  if (phase !== 'patrol' && phase !== 'circle') return null
+
   return (
     <group>
       {Array.from({ length: 12 }, (_, index) => {

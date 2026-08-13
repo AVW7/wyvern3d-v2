@@ -1,5 +1,6 @@
 import type { GameState } from '../types'
 import { CONFIG } from '../data/config'
+import { PHILOSOPHIES } from '../data/philosophies'
 import { SPECIES } from '../data/species'
 import { STATIONS } from '../data/stations'
 import { capacityOf, log, nextId, withRng } from '../state/game'
@@ -21,6 +22,7 @@ export function sanctuaryTick(state: GameState): void {
   incubationTick(state)
   growthTick(state)
   recoveryTick(state)
+  philosophyTick(state)
 }
 
 function trainingTick(state: GameState): void {
@@ -122,10 +124,40 @@ function growthTick(state: GameState): void {
 }
 
 function recoveryTick(state: GameState): void {
+  const waterMastery = state.realm?.grandMaster?.masteryLevels?.water ?? 0
+  const hasStoicism = state.realm?.philosophies?.unlocked?.includes('stoicism')
+  const stoicismMult = hasStoicism ? 1.25 : 1.0
+  const waterMult = 1 + waterMastery * CONFIG.grandMaster.waterBonusPerLevel
+
   // Base recovery even without an infirmary; each level speeds it up.
-  const rate = CONFIG.wyvern.healPerTick * (capacityOf(state, 'infirmary') + 1)
+  const rate = CONFIG.wyvern.healPerTick * (capacityOf(state, 'infirmary') + 1) * stoicismMult * waterMult
   for (const w of Object.values(state.wyverns)) {
     if (w.injury > 0) w.injury = Math.max(0, w.injury - rate)
     if (w.breedCooldown > 0) w.breedCooldown -= 1
+  }
+}
+
+function philosophyTick(state: GameState): void {
+  if (!state.realm?.philosophies?.activeResearch) return
+  const academyWorkers = state.economy?.population?.assigned?.academy ?? 0
+  if (academyWorkers <= 0) return
+
+  state.realm.philosophies.researchProgress += 1
+  const targetId = state.realm.philosophies.activeResearch
+  const targetDef = PHILOSOPHIES[targetId]
+  if (!targetDef) return
+
+  if (state.realm.philosophies.researchProgress >= targetDef.researchDurationTicks) {
+    state.realm.philosophies.unlocked.push(targetId)
+    state.realm.philosophies.activeResearch = null
+    state.realm.philosophies.researchProgress = 0
+
+    log(state, 'good', `Sanctuary Scholars completed research on ${targetDef.name}!`)
+    state.realm.history.unshift({
+      tick: state.tick,
+      title: `Unlocked: ${targetDef.name}`,
+      description: `The scholars completed the treatise on ${targetDef.subtitle}.`,
+      category: 'philosophy',
+    })
   }
 }

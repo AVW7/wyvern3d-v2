@@ -63,6 +63,7 @@ export function Hud() {
 
   return (
     <div className="overlay">
+      <CameraTransitionFlash />
       <InteractionNotice />
       {/* Standalone button shown ONLY when HUD is hidden */}
       {hudHidden && (
@@ -144,6 +145,18 @@ export function Hud() {
                 </button>
                 <button className="nav-pill-btn" onClick={() => open('roster')}>
                   <RosterIcon /> Roster
+                </button>
+                <button
+                  className={`nav-pill-btn ${openPanel === 'economy' ? 'active' : ''}`}
+                  onClick={() => open('economy')}
+                >
+                  <span style={{ fontSize: 13, marginRight: 2 }}>🌾</span> Economy
+                </button>
+                <button
+                  className={`nav-pill-btn ${openPanel === 'realm' ? 'active' : ''}`}
+                  onClick={() => open('realm')}
+                >
+                  <span style={{ fontSize: 13, marginRight: 2 }}>👑</span> Realm
                 </button>
                 <button
                   className={`nav-pill-btn ${openPanel === 'camera' ? 'active' : ''}`}
@@ -443,3 +456,33 @@ function Controls({ mode }: { mode: string }) {
     </div>
   )
 }
+
+function CameraTransitionFlash() {
+  const presetToken = useCameraStore((s) => s.presetToken)
+  const preset = useCameraStore((s) => s.preset)
+  const [activeLabel, setActiveLabel] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (presetToken === 0) return
+    const labels: Record<string, string> = {
+      default: 'Default View',
+      topDown: 'Top-Down View',
+      isometric: 'Isometric View',
+      chase: 'Chase Cam',
+      cinematic: 'Cinematic View',
+      followWyvern: 'Wyvern Tracking View',
+    }
+    setActiveLabel(labels[preset] ?? preset)
+    const timer = window.setTimeout(() => setActiveLabel(null), 1200)
+    return () => window.clearTimeout(timer)
+  }, [presetToken, preset])
+
+  if (!activeLabel) return null
+
+  return (
+    <div className="camera-flash-overlay" role="status" aria-live="polite">
+      <span>{activeLabel}</span>
+    </div>
+  )
+}
+

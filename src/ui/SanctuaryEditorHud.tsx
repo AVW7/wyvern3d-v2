@@ -27,15 +27,25 @@ export function SanctuaryEditorHud() {
   const selectObject = useSanctuaryEditor((s) => s.selectObject)
   const stageUndo = useSanctuaryEditor((s) => s.stageUndo)
 
+  const [searchQuery, setSearchQuery] = useState('')
+
   if (!isEditing) return null
 
   const objects = state.sanctuaryLayout?.objects ?? []
   const storage = state.sanctuaryLayout?.storage ?? {}
   const selectedObject = objects.find((o) => o.id === selectedObjectId)
 
+  const query = searchQuery.trim().toLowerCase()
   const catalogList = Object.values(PROP_CATALOG).filter((entry) => {
-    if (activeCategoryTab === 'all') return true
-    return entry.category === activeCategoryTab
+    const matchesCategory = activeCategoryTab === 'all' || entry.category === activeCategoryTab
+    if (!matchesCategory) return false
+    if (!query) return true
+    return (
+      entry.label.toLowerCase().includes(query) ||
+      entry.description.toLowerCase().includes(query) ||
+      entry.category.toLowerCase().includes(query) ||
+      entry.propId.toLowerCase().includes(query)
+    )
   })
 
   return (
@@ -167,6 +177,27 @@ export function SanctuaryEditorHud() {
             <span className="drawer-title">Storage & Building Catalog</span>
           </div>
 
+          <div className="drawer-search-box">
+            <SearchIcon />
+            <input
+              type="text"
+              className="drawer-search-input"
+              placeholder="Search catalog…"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                className="drawer-search-clear"
+                onClick={() => setSearchQuery('')}
+                aria-label="Clear search"
+              >
+                ×
+              </button>
+            )}
+          </div>
+
           <div className="category-tabs">
             {(['all', 'structure', 'utility', 'furniture', 'scenery'] as const).map((tab) => (
               <button
@@ -174,43 +205,67 @@ export function SanctuaryEditorHud() {
                 className={`tab-btn ${activeCategoryTab === tab ? 'active' : ''}`}
                 onClick={() => setCategoryTab(tab)}
               >
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                <CategoryTabIcon category={tab} />
+                <span>{tab.charAt(0).toUpperCase() + tab.slice(1)}</span>
               </button>
             ))}
           </div>
         </div>
 
-        <div className="catalog-grid">
-          {catalogList.map((item) => {
-            const count = item.isStructure ? 'Placed / Movable' : (storage[item.propId] ?? 0)
-            const available = item.isStructure || (storage[item.propId] ?? 0) > 0
+        {catalogList.length === 0 ? (
+          <div className="catalog-empty-state">
+            <SearchIcon />
+            <p>No items match &quot;{searchQuery}&quot;</p>
+            <button type="button" className="editor-btn-sub" onClick={() => setSearchQuery('')}>
+              Clear Search
+            </button>
+          </div>
+        ) : (
+          <div className="catalog-grid">
+            {catalogList.map((item) => {
+              const stockNum = storage[item.propId] ?? 0
+              const count = item.isStructure ? 'Placed' : stockNum
+              const available = item.isStructure || stockNum > 0
+              const isLowStock = !item.isStructure && stockNum > 0 && stockNum <= 2
 
-            return (
-              <div
-                key={item.propId}
-                className={`catalog-card ${!available ? 'disabled' : ''}`}
-                onClick={() => available && startPlacing(item)}
-              >
-                <div className="card-top">
-                  <span className="card-label">{item.label}</span>
-                  <span className="card-badge">{count}</span>
+              return (
+                <div
+                  key={item.propId}
+                  className={`catalog-card ${!available ? 'disabled' : ''} ${isLowStock ? 'low-stock' : ''}`}
+                  onClick={() => available && startPlacing(item)}
+                >
+                  <div className="card-top">
+                    <span className="card-label">
+                      <CategoryTabIcon category={item.category} />
+                      {item.label}
+                    </span>
+                    <span className={`card-badge ${isLowStock ? 'warning' : ''}`}>
+                      {count}
+                    </span>
+                  </div>
+                  <p className="card-desc">{item.description}</p>
+                  <button className="card-add-btn" disabled={!available}>
+                    {item.isStructure ? (
+                      'Place Structure'
+                    ) : available ? (
+                      <>
+                        <PlusIcon />
+                        <span>Add to Scene</span>
+                      </>
+                    ) : (
+                      'Out of Stock'
+                    )}
+                  </button>
                 </div>
-                <p className="card-desc">{item.description}</p>
-                <button className="card-add-btn" disabled={!available}>
-                  {item.isStructure ? (
-                    'Place Structure'
-                  ) : available ? (
-                    <>
-                      <PlusIcon />
-                      <span>Add</span>
-                    </>
-                  ) : (
-                    'Out of Stock'
-                  )}
-                </button>
-              </div>
-            )
-          })}
+              )
+            })}
+          </div>
+        )}
+
+        <div className="drawer-shortcut-bar">
+          <span><kbd>Q</kbd> / <kbd>E</kbd> Rotate</span>
+          <span><kbd>Click</kbd> Select / Place</span>
+          <span><kbd>Esc</kbd> Cancel / Deselect</span>
         </div>
       </div>
 
@@ -411,3 +466,52 @@ function PlusIcon() {
     </svg>
   )
 }
+
+function SearchIcon() {
+  return (
+    <svg className="icon-monotone" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="11" cy="11" r="8" />
+      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+    </svg>
+  )
+}
+
+function CategoryTabIcon({ category }: { category: string }) {
+  switch (category) {
+    case 'structure':
+      return (
+        <svg className="icon-monotone" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6" />
+        </svg>
+      )
+    case 'utility':
+      return (
+        <svg className="icon-monotone" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+        </svg>
+      )
+    case 'furniture':
+      return (
+        <svg className="icon-monotone" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M19 9V6a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v3M3 13v6M21 13v6M4 13h16a1 1 0 0 0 1-1v-1a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1z" />
+        </svg>
+      )
+    case 'scenery':
+      return (
+        <svg className="icon-monotone" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7z" />
+          <circle cx="12" cy="9" r="2.5" />
+        </svg>
+      )
+    default:
+      return (
+        <svg className="icon-monotone" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <rect x="3" y="3" width="7" height="7" rx="1" />
+          <rect x="14" y="3" width="7" height="7" rx="1" />
+          <rect x="14" y="14" width="7" height="7" rx="1" />
+          <rect x="3" y="14" width="7" height="7" rx="1" />
+        </svg>
+      )
+  }
+}
+

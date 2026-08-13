@@ -23,3 +23,7 @@ validation/drogon-uncompressed.glb
 *.blend
 *.blend1
 *.fbx
+
+# Python bytecode from the Blender authoring scripts
+__pycache__/
+*.pyc

@@ -4,8 +4,12 @@ from __future__ import annotations
 
 import math
 
-import bpy
-from mathutils import Euler
+try:
+    import bpy  # type: ignore
+    from mathutils import Euler  # type: ignore
+except ImportError:
+    bpy = None  # type: ignore
+    Euler = None  # type: ignore
 
 
 ARMATURE = "WyvernRig"
@@ -89,6 +93,7 @@ def author() -> dict:
             curve.update()
     action.use_frame_range = True
     action.frame_start, action.frame_end = 0.0, float(PERIOD)
+    action.use_fake_user = True
     bpy.context.scene.render.fps = FPS
     arm.animation_data.action = None
     bpy.context.scene.frame_set(0)
@@ -96,4 +101,9 @@ def author() -> dict:
 
 
 if __name__ == "__main__":
+    import sys
     print(author())
+    if "--save" in sys.argv:
+        bpy.ops.wm.save_mainfile()
+        print("saved mainfile")
+

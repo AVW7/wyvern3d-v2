@@ -12,7 +12,7 @@ import { CONTROLS, isDown } from '@/render/controllers/input'
 import { useGame, useGameState } from '@/state/store'
 import { useUi } from '@/state/uiStore'
 import { SPECIES } from '@/core/data/species'
-import { getInteractables, GROUND_RADIUS, KEEP, ROOSTS, buildColliders } from './layout'
+import { getInteractables, GROUND_RADIUS, ROOSTS, buildColliders } from './layout'
 import {
   HILLS,
   KEEP_FLOOR,
@@ -23,14 +23,24 @@ import {
   SCATTER,
 } from './dressing'
 import { SanctuaryWyverns } from './SanctuaryWyverns'
+import { GROUND_DECAL } from './groundDecal'
+import { SanctuaryAtmosphere } from './atmosphere/SanctuaryAtmosphere'
+import { Firelight } from './atmosphere/Firelight'
+import { SanctuaryWind } from './atmosphere/SanctuaryWind'
+import { Ambience, SmokePlumes } from './atmosphere/Ambience'
+import { SanctuaryGround } from './atmosphere/SanctuaryGround'
+import { outerHeightAt } from './atmosphere/terrain'
+import { emissiveFor } from './atmosphere/fireSources'
 import { useSanctuaryCommands } from '@/state/sanctuaryCommands'
 import { usePlayerControlStore } from '@/state/playerControlStore'
 import { useSanctuaryEditor } from '@/state/sanctuaryEditorStore'
 import { useSanctuaryColors } from '@/state/sanctuaryColorsStore'
 import { SanctuaryEditorControls } from './components/SanctuaryEditorControls'
-import { sanctuaryPosition, sanctuaryPosition3 } from '@/core/data/sanctuaryStations'
-import type { SanctuaryPlacedObject } from '@/core/types'
+import { sanctuaryPosition3 } from '@/core/data/sanctuaryStations'
+import { SanctuaryPlacedObject } from '@/core/types'
 import { PlayerCharacter } from '@/render/player/PlayerCharacter'
+import { ProductionBuildings3D } from './components/ProductionBuildings3D'
+import { AcademyAndForge3D } from './components/AcademyAndForge3D'
 
 /**
  * The sanctuary hub: the player's walkable base inside the keep, and the
@@ -121,13 +131,21 @@ export function SanctuaryScene() {
 
   return (
     <>
-      <SanctuaryLighting />
-      <Ground />
+      <SanctuaryAtmosphere />
+      <Firelight />
+      <SanctuaryWind />
+      <Ambience />
+      <SmokePlumes />
+      <SanctuaryGround />
       <Scenery />
       <KeepWalls />
       <DynamicObjects />
+      <ProductionBuildings3D />
+      <AcademyAndForge3D />
 
       <SanctuaryEditorControls />
+
+      <HatcheryNests />
 
       {/* Eggs warming on the hatchery roost pads. */}
       {incubating.slice(0, ROOSTS.length).map((egg, i) => {
@@ -170,50 +188,26 @@ export function SanctuaryScene() {
   )
 }
 
-function SanctuaryLighting() {
-  return (
-    <>
-      <hemisphereLight args={['#bcd4e6', '#4a4034', 0.8]} />
-      <directionalLight
-        position={[30, 45, 20]}
-        intensity={1.7}
-        castShadow
-        shadow-mapSize={[1024, 1024]}
-        shadow-camera-left={-70}
-        shadow-camera-right={70}
-        shadow-camera-top={70}
-        shadow-camera-bottom={-70}
-      />
-      <fog attach="fog" args={['#c3cbd4', 140, 350]} />
-      <color attach="background" args={['#c3cbd4']} />
-    </>
-  )
-}
-
-function Ground() {
-  const grass = useSanctuaryColors((s) => s.grass)
-  return (
-    <>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <circleGeometry args={[GROUND_RADIUS, 64]} />
-        <meshStandardMaterial color={grass} roughness={1} />
-      </mesh>
-      {/* Sits under the flagstones and shows through their gaps as grout. */}
-      <mesh
-        rotation={[-Math.PI / 2, 0, 0]}
-        position={[KEEP.centerX, 0.02, KEEP.centerZ]}
-        receiveShadow
-      >
-        <planeGeometry args={[KEEP.halfW * 2, KEEP.halfD * 2]} />
-        <meshStandardMaterial color="#5c554b" roughness={0.9} />
-      </mesh>
-    </>
-  )
-}
-
 /** Woodland, grass and horizon hills. All instanced — see dressing.ts. */
 function Scenery() {
   const soil = useSanctuaryColors((s) => s.soil)
+  // The hills were authored at y=-2 against a flat plane, so that they read as
+  // emerging from the ground rather than sitting on it. The outer landform now
+  // rises underneath them, so keep that -2 relative to the surface instead of
+  // to zero, or they sink into the new relief.
+  const seatedHills = useMemo(
+    () =>
+      HILLS.map((hill) => ({
+        ...hill,
+        position: [
+          hill.position[0],
+          outerHeightAt(hill.position[0], hill.position[2]) - 2,
+          hill.position[2],
+        ] as [number, number, number],
+      })),
+    [],
+  )
+
   return (
     <group userData={{ sanctuaryAttackBlocker: true }}>
       {Object.entries(SCATTER).map(([id, items]) => (
@@ -224,12 +218,13 @@ function Scenery() {
           // Grass tufts are too small to read as shadows and there are hundreds
           // of them; leaving them out of the shadow pass costs nothing visually.
           castShadow={!id.startsWith('prop.scatter.grass')}
+          wind={WIND_STRENGTH[id]}
         />
       ))}
       {Object.entries(PATHS).map(([id, items]) => (
         <PropInstances key={id} id={id} items={items} castShadow={false} />
       ))}
-      <PropInstances id="prop.scatter.hill" items={HILLS} color={soil} />
+      <PropInstances id="prop.scatter.hill" items={seatedHills} color={soil} />
     </group>
   )
 }
@@ -251,7 +246,48 @@ function KeepWalls() {
 /** Height of a roost pad's top, so eggs sit on it rather than in it. */
 const NEST_TOP = 0.77
 
+/**
+ * The four roost pads inside the hatchery.
+ *
+ * These render at absolute `ROOSTS` coordinates rather than inside the
+ * hatchery's compound group, because the eggs above them do too. Keeping both
+ * in the same frame of reference is what guarantees an egg is never left
+ * floating over bare ground — which is exactly what happened while the only
+ * reference to this prop sat in an unreachable branch.
+ */
+function HatcheryNests() {
+  return (
+    <group userData={{ sanctuaryAttackBlocker: true }}>
+      {ROOSTS.map(([x, z]) => (
+        <Prop key={`${x},${z}`} id="prop.hatchery.nest" position={[x, 0, z]} />
+      ))}
+    </group>
+  )
+}
+
+/**
+ * Sway amplitude per metre of height, by prop id.
+ *
+ * Measured heights from the atlas: grass 0.70-0.78, firA 5.17, firB 3.76,
+ * firC 7.40, deadTree 5.36. Short props need a larger factor to read at all,
+ * tall ones need a smaller one or their crowns visibly slide. Anything absent
+ * from this table stays rigid — walls, stone and furniture must not breathe.
+ */
+const WIND_STRENGTH: Record<string, number> = {
+  // Grass is short — 0.70-0.78 — so a modest per-metre figure works out to only
+  // a few centimetres of travel and reads as nothing at gameplay camera
+  // distance. It is also excluded from the shadow pass, so unlike the firs it
+  // can be pushed hard for free.
+  'prop.scatter.grassA': 0.32,
+  'prop.scatter.grassB': 0.34,
+  'prop.scatter.firA': 0.028,
+  'prop.scatter.firB': 0.032,
+  'prop.scatter.firC': 0.022,
+  'prop.scatter.deadTree': 0.014,
+}
+
 const TAU = Math.PI * 2
+
 
 /**
  * Dynamic Sanctuary layout objects rendered from GameState.
@@ -260,9 +296,7 @@ function DynamicObjects() {
   const state = useGameState()
   const objects = state.sanctuaryLayout?.objects
 
-  if (!objects || objects.length === 0) {
-    return <Structures />
-  }
+  if (!objects || objects.length === 0) return null
 
   return (
     <group userData={{ sanctuaryAttackBlocker: true }}>
@@ -294,103 +328,40 @@ function DynamicObject({ object }: { object: SanctuaryPlacedObject }) {
       return <HuntingPen {...groupProps} />
     case 'enduranceRun':
       return <EnduranceRun {...groupProps} />
+    case 'scaleForge':
+      return <ScaleForge {...groupProps} />
+    case 'breeding':
+      return <BreedingRoosts {...groupProps} />
     default:
       return (
         <group position={object.position} rotation={[0, object.rotationY, 0]}>
-          <Prop id={object.propId} position={[0, 0, 0]} scale={object.scale ?? 1} />
+          <Prop
+            id={object.propId}
+            position={[0, 0, 0]}
+            scale={object.scale ?? 1}
+            emissive={emissiveFor(object.propId)}
+          />
         </group>
       )
   }
 }
 
-function Structures() {
+/**
+ * The forge's fixed furniture. The anvil, trough and grindstone are separate
+ * placed objects the player can rearrange; these three are part of the
+ * building's silhouette and travel with the station itself.
+ */
+function ScaleForge({
+  position = sanctuaryPosition3('scaleForge'),
+  rotationY = 0,
+  scale = 1,
+}: StationGroupProps) {
   return (
-    <group userData={{ sanctuaryAttackBlocker: true }}>
-      <WarTable />
-      <KeepRooms />
-      <Hatchery />
-      <ScaleForge />
-      <BurnRange />
-      <FlightRing />
-      <BreedingRoosts />
-      <HuntingPen />
-      <EnduranceRun />
-    </group>
-  )
-}
-
-function WarTable() {
-  return (
-    <group position={sanctuaryPosition3('warTable')}>
-      <Prop id="prop.warTable" position={[0, 0, 0]} scale={1.8} />
-      <Prop id="prop.torch" position={[-2.6, 0, 0]} />
-      <Prop id="prop.torch" position={[2.6, 0, 0]} />
-      <Prop id="prop.chest" position={[0, 0, -2.2]} rotationY={Math.PI} />
-    </group>
-  )
-}
-
-function KeepRooms() {
-  return (
-    <group>
-      {/* Roster ledger. */}
-      <group position={sanctuaryPosition3('roster')}>
-        <Prop id="prop.lectern" position={[0, 0, 0]} rotationY={0.3} />
-        <Prop id="prop.chest" position={[-1.4, 0, -0.8]} rotationY={-0.4} />
-      </group>
-
-      {/* Barracks: crates, barrels and a weapon blockade. */}
-      <group position={sanctuaryPosition3('barracks')}>
-        <Prop id="prop.blockade" position={[0, 0, -0.8]} rotationY={Math.PI} />
-        <Prop id="prop.crate" position={[-1.3, 0, 0.6]} rotationY={0.5} />
-        <Prop id="prop.crate" position={[-0.7, 0.6, 0.5]} rotationY={-0.2} />
-        <Prop id="prop.barrel" position={[1.3, 0, 0.5]} />
-        <Prop id="prop.torch" position={[2.4, 0, -1.4]} />
-      </group>
-
-      {/* Infirmary. */}
-      <group position={sanctuaryPosition3('infirmary')}>
-        <Prop id="prop.campfire" position={[0, 0, 0]} />
-        <Prop id="prop.barrel" position={[-1.6, 0, -0.9]} />
-        <Prop id="prop.crate" position={[1.5, 0, -1.1]} rotationY={0.8} />
-        <Prop id="prop.logPile" position={[1.2, 0, 1.3]} rotationY={-0.6} />
-      </group>
-    </group>
-  )
-}
-
-/** A cave mouth rather than a hut — eggs are brooded underground. */
-function Hatchery() {
-  const [centerX, centerZ] = sanctuaryPosition('hatchery')
-
-  return (
-    <group position={sanctuaryPosition3('hatchery')}>
-      <Prop id="prop.hatchery.cave" position={[0, 0, 0]} scale={0.75} rotationY={Math.PI} />
-      <Prop id="prop.torch" position={[-3.4, 0, 3.6]} />
-      <Prop id="prop.torch" position={[3.4, 0, 3.6]} />
-      {ROOSTS.map(([x, z]) => (
-        <Prop
-          key={`${x},${z}`}
-          id="prop.hatchery.nest"
-          position={[x - centerX, 0, z - centerZ]}
-        />
-      ))}
-    </group>
-  )
-}
-
-function ScaleForge() {
-  return (
-    <group position={sanctuaryPosition3('scaleForge')}>
-      <Prop id="prop.forge.furnace" position={[0, 0, -1.6]} />
-      <Prop id="prop.forge.chimney" position={[1.7, 0, -1.8]} />
-      <Prop id="prop.forge.anvil" position={[0, 0, 1.1]} rotationY={0.4} />
-      <Prop id="prop.forge.trough" position={[-1.7, 0, 0.7]} />
-      <Prop id="prop.forge.grindstone" position={[1.8, 0, 0.9]} rotationY={-0.5} />
-      <Prop id="prop.forge.toolHolder" position={[-1.9, 0, -0.8]} rotationY={Math.PI / 2} />
-      <Prop id="prop.forge.sign" position={[2.2, 0, 2.4]} rotationY={-0.6} />
-      <Prop id="prop.logPile" position={[-2.4, 0, 2.0]} rotationY={0.7} />
-      <Prop id="prop.crate" position={[2.6, 0, -0.4]} rotationY={0.3} />
+    <group position={position} rotation={[0, rotationY, 0]} scale={scale}>
+      <Prop id="prop.forge.furnace" position={[0, 0, 0]} emissive={emissiveFor('prop.forge.furnace')} />
+      <Prop id="prop.forge.chimney" position={[1.7, 0, -0.2]} />
+      <Prop id="prop.forge.toolHolder" position={[-1.9, 0, 0.8]} rotationY={Math.PI / 2} />
+      <Prop id="prop.forge.sign" position={[2.2, 0, 3.4]} rotationY={-0.6} />
     </group>
   )
 }
@@ -409,13 +380,29 @@ function BurnRange({
 }: StationGroupProps) {
   return (
     <group position={position} rotation={[0, rotationY, 0]} scale={scale}>
-      <Prop id="prop.burn.volcano" position={[2, 0, 9]} rotationY={0.6} />
+      <Prop
+        id="prop.burn.volcano"
+        position={[2, 0, 9]}
+        rotationY={0.6}
+        emissive={emissiveFor('prop.burn.volcano')}
+      />
       <Prop id="prop.burn.lavaColumn" position={[-5.5, 0, 2.5]} rotationY={0.9} />
       <Prop id="prop.burn.lavaColumnAlt" position={[5.8, 0, -1.5]} rotationY={-1.2} />
       <Prop id="prop.burn.burnedTree" position={[-3.4, 0, -4.2]} rotationY={2.1} />
       <Prop id="prop.burn.burnedTreeAlt" position={[4.6, 0, 4.4]} rotationY={-0.7} />
-      <Prop id="prop.burn.lavaStone" position={[-1.6, 0, 4.6]} rotationY={1.4} />
-      <Prop id="prop.burn.lavaStone" position={[2.8, 0, -4.8]} rotationY={-2.3} scale={0.8} />
+      <Prop
+        id="prop.burn.lavaStone"
+        position={[-1.6, 0, 4.6]}
+        rotationY={1.4}
+        emissive={emissiveFor('prop.burn.lavaStone')}
+      />
+      <Prop
+        id="prop.burn.lavaStone"
+        position={[2.8, 0, -4.8]}
+        rotationY={-2.3}
+        scale={0.8}
+        emissive={emissiveFor('prop.burn.lavaStone')}
+      />
     </group>
   )
 }
@@ -460,14 +447,21 @@ function FlightRing({
   )
 }
 
-function BreedingRoosts() {
+/**
+ * The breeding station is a pair of plateaus, not one. Both are tinted from the
+ * editor's roost colour, which had no renderer at all while this component was
+ * unreachable.
+ */
+function BreedingRoosts({
+  position = sanctuaryPosition3('breeding'),
+  rotationY = 0,
+  scale = 1,
+}: StationGroupProps) {
   const roost = useSanctuaryColors((s) => s.roost)
   return (
-    <group position={sanctuaryPosition3('breeding')}>
-      <Prop id="prop.roost.plateau" position={[-3.6, 0, 0]} rotationY={0.4} color={roost} />
-      <Prop id="prop.roost.plateau" position={[3.6, 0, 0.6]} rotationY={-1.1} color={roost} />
-      <Prop id="prop.roost.runeStone" position={[0, 0, -3.2]} color={roost} />
-      <Prop id="prop.roost.runeStone" position={[0.8, 0, 3.4]} rotationY={0.9} color={roost} />
+    <group position={position} rotation={[0, rotationY, 0]} scale={scale}>
+      <Prop id="prop.roost.plateau" position={[0, 0, 0]} color={roost} />
+      <Prop id="prop.roost.plateau" position={[7.2, 0, 0.6]} rotationY={-1.5} color={roost} />
     </group>
   )
 }
@@ -557,14 +551,14 @@ function InteractableMarkers({ interactables }: { interactables: ReturnType<type
         return (
           <group key={item.id} position={[item.position[0], 0, item.position[1]]}>
             {/* Outer Ground Ring */}
-            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.05, 0]}>
+            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.05, 0]} renderOrder={2}>
               <ringGeometry args={[item.radius - 0.35, item.radius, 32]} />
-              <meshBasicMaterial color="#f0d9a8" transparent opacity={0.4} />
+              <meshBasicMaterial {...GROUND_DECAL} color="#f0d9a8" opacity={0.4} />
             </mesh>
             {/* Inner Accent Ring */}
-            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.06, 0]}>
+            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.06, 0]} renderOrder={3}>
               <ringGeometry args={[item.radius - 0.7, item.radius - 0.55, 32]} />
-              <meshBasicMaterial color="#d4af37" transparent opacity={0.25} />
+              <meshBasicMaterial {...GROUND_DECAL} color="#d4af37" opacity={0.25} />
             </mesh>
             {/* Floating Station Plaque Label */}
             <WorldLabel

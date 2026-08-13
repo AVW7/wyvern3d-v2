@@ -1,12 +1,69 @@
 /** Shared shapes for the whole simulation. Pure data — no behaviour lives here. */
 
-export type ResourceId = 'food' | 'gold' | 'ore' | 'timber' | 'arcane'
+export type ResourceId = 'food' | 'gold' | 'ore' | 'timber' | 'arcane' | 'water' | 'hide' | 'iron'
 export type Resources = Record<ResourceId, number>
 
 export type StatId = 'power' | 'speed' | 'stamina' | 'firepower' | 'armor'
 export type Stats = Record<StatId, number>
 
-export type BuildingId = 'hatchery' | 'trainingGrounds' | 'barracks' | 'infirmary'
+export type BuildingId =
+  | 'hatchery'
+  | 'trainingGrounds'
+  | 'barracks'
+  | 'infirmary'
+  | 'farm'
+  | 'aqueduct'
+  | 'pasture'
+  | 'foundry'
+  | 'sawmill'
+  | 'housing'
+  | 'academy'
+  | 'apothecary'
+  | 'blacksmith'
+
+export type WildlifeType = 'deer' | 'boar' | 'goat' | 'bird'
+
+export type RulerTitle = 'king' | 'queen'
+export type RulerEdict = 'conquest_harvest' | 'royal_garrison' | 'dragon_harmony' | 'grand_taxation'
+export type ElementalAffinity = 'fire' | 'water' | 'earth' | 'air'
+export type PhilosophyId = 'balance' | 'dominion' | 'stoicism' | 'hermetics'
+export type EquipmentType = 'wyvern_armor' | 'flame_spears' | 'iron_shields'
+export type ElixirType = 'vitality_salve' | 'dragon_tonic' | 'growth_elixir'
+
+export interface RealmHistoryEntry {
+  tick: number
+  title: string
+  description: string
+  category: 'conquest' | 'revolt' | 'philosophy' | 'mastery' | 'royal'
+}
+
+export interface SanctuaryRealmState {
+  ruler: {
+    title: RulerTitle
+    edict: RulerEdict
+    prestige: number
+  }
+  grandMaster: {
+    masteryLevels: Record<ElementalAffinity, number>
+    activeFocus: ElementalAffinity
+  }
+  philosophies: {
+    unlocked: PhilosophyId[]
+    activeResearch: PhilosophyId | null
+    researchProgress: number
+  }
+  equipment: Record<EquipmentType, number>
+  elixirs: Record<ElixirType, number>
+  history: RealmHistoryEntry[]
+}
+
+export interface SanctuaryEconomyState {
+  population: {
+    total: number
+    assigned: Partial<Record<BuildingId, number>>
+  }
+  livestock: Record<WildlifeType, number>
+}
 
 /** Only `adult` is battle-legal — that gate is what makes the raising loop matter. */
 export type AgeStage = 'hatchling' | 'juvenile' | 'adult'
@@ -251,6 +308,10 @@ export interface GameState {
   squads: Record<string, Squad>
   regions: Record<string, RegionState>
   buildings: Record<BuildingId, number>
+  /** Sanctuary population, worker assignment & livestock state. */
+  economy: SanctuaryEconomyState
+  /** Macro realm governance, philosophy, elemental mastery & history codex. */
+  realm: SanctuaryRealmState
   /** Customizable sanctuary layout & stored inventory. */
   sanctuaryLayout: SanctuaryLayoutState
   /** Monotonic id counter — deterministic, unlike a uuid. */

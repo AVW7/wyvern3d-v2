@@ -17,4 +17,14 @@ describe('GameModel GLTF animation runtime contract', () => {
     expect(source).toContain('library.disabled[id] !== true')
     expect(source).toContain('if (!enabled || !entry || !entry.url)')
   })
+
+  it('honours manifest transitions, phase families, playback rate, and exact finish events', () => {
+    expect(source).toContain('setActive(chained)')
+    expect(source).toContain('const chainedFrom = override === null ? active : null')
+    expect(source).toContain('previousSpec?.phaseGroup === playingSpec.phaseGroup')
+    expect(source).toContain('synchronizedPhase * clip.duration')
+    expect(source).toContain('action.timeScale = playingSpec.timeScale ?? 1')
+    expect(source).toContain('event.action !== action')
+    expect(source).toContain('onActionFinished?.(completed)')
+  })
 })

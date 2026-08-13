@@ -8,6 +8,7 @@ import { consumeClick, pointer } from '@/render/controllers/input'
 import { dispatch, useGameState } from '@/state/store'
 import { useSanctuaryEditor } from '@/state/sanctuaryEditorStore'
 import { useUi } from '@/state/uiStore'
+import { GROUND_DECAL } from '../groundDecal'
 import { GROUND_RADIUS } from '../layout'
 
 const GROUND_PLANE = new Plane(new Vector3(0, 1, 0), 0)
@@ -165,17 +166,17 @@ export function SanctuaryEditorControls() {
   return (
     <group>
       {/* Visual Placement Grid Ring */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.03, 0]}>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.03, 0]} renderOrder={1}>
         <ringGeometry args={[0, GROUND_RADIUS, 64, 32]} />
-        <meshBasicMaterial color="#38bdf8" transparent opacity={0.06} wireframe />
+        <meshBasicMaterial {...GROUND_DECAL} color="#38bdf8" opacity={0.06} wireframe />
       </mesh>
 
       {/* Selected Object Highlight Circle */}
       {selectedObject && (
         <group position={selectedObject.position}>
-          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.08, 0]}>
+          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.08, 0]} renderOrder={5}>
             <ringGeometry args={[(selectedObject.radius ?? 2) - 0.2, (selectedObject.radius ?? 2) + 0.2, 32]} />
-            <meshBasicMaterial color="#fbbf24" transparent opacity={0.6} />
+            <meshBasicMaterial {...GROUND_DECAL} color="#fbbf24" opacity={0.6} />
           </mesh>
         </group>
       )}
@@ -184,9 +185,9 @@ export function SanctuaryEditorControls() {
       {hoverPoint.current && ghostPropId && (
         <group position={hoverPoint.current} rotation={[0, dragRotationY, 0]}>
           <Prop id={ghostPropId} position={[0, 0, 0]} scale={ghostScale} castShadow={false} />
-          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.05, 0]}>
+          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.05, 0]} renderOrder={4}>
             <circleGeometry args={[2, 32]} />
-            <meshBasicMaterial color={placingItem ? '#22c55e' : '#38bdf8'} transparent opacity={0.32} />
+            <meshBasicMaterial {...GROUND_DECAL} color={placingItem ? '#22c55e' : '#38bdf8'} opacity={0.32} />
           </mesh>
         </group>
       )}

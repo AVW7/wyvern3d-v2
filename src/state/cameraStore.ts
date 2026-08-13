@@ -74,7 +74,11 @@ export const useCameraStore = create<CameraState>()((set) => ({
   setInvertY: (val) => set({ invertY: val }),
   setFov: (val) => set({ fov: Math.max(35, Math.min(90, Math.round(val))) }),
   setSmoothing: (val) => set({ smoothing: Math.max(1, Math.min(20, Math.round(val))) }),
-  setFollowTarget: (target) => set({ followTarget: target }),
+  setFollowTarget: (target) =>
+    set((state) => ({
+      followTarget: target,
+      presetToken: state.presetToken + 1,
+    })),
   setWyvernTargetPosition: (pos) => set({ wyvernTargetPosition: pos }),
 
   applyPreset: (preset) =>

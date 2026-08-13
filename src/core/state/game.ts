@@ -6,9 +6,18 @@ import { SPECIES } from '../data/species'
 import { createRng, type Rng } from '../math/rng'
 import { createWyvern, nameFor, rollSpeciesStats, rollSpeciesTraits } from '../entities/wyvern'
 
-export const RESOURCE_IDS: ResourceId[] = ['food', 'gold', 'ore', 'timber', 'arcane']
+export const RESOURCE_IDS: ResourceId[] = ['food', 'gold', 'ore', 'timber', 'arcane', 'water', 'hide', 'iron']
 
-export const emptyResources = (): Resources => ({ food: 0, gold: 0, ore: 0, timber: 0, arcane: 0 })
+export const emptyResources = (): Resources => ({
+  food: 0,
+  gold: 0,
+  ore: 0,
+  timber: 0,
+  arcane: 0,
+  water: 0,
+  hide: 0,
+  iron: 0,
+})
 
 /**
  * Runs `fn` with an RNG resumed from the state's stored cursor, then writes the
@@ -75,7 +84,62 @@ export function createInitialState(seed: number): GameState {
     eggs: {},
     squads: {},
     regions: {},
-    buildings: { hatchery: 1, trainingGrounds: 1, barracks: 1, infirmary: 0 },
+    buildings: {
+      hatchery: 1,
+      trainingGrounds: 1,
+      barracks: 1,
+      infirmary: 0,
+      farm: 1,
+      aqueduct: 1,
+      pasture: 1,
+      foundry: 0,
+      sawmill: 0,
+      housing: 1,
+      academy: 1,
+      apothecary: 1,
+      blacksmith: 0,
+    },
+    economy: {
+      population: {
+        total: CONFIG.starting.population,
+        assigned: { farm: 2, aqueduct: 2, pasture: 2, foundry: 0, sawmill: 0, housing: 0, academy: 1, apothecary: 1, blacksmith: 0 },
+      },
+      livestock: { ...CONFIG.starting.livestock },
+    },
+    realm: {
+      ruler: {
+        title: 'king',
+        edict: 'conquest_harvest',
+        prestige: 10,
+      },
+      grandMaster: {
+        masteryLevels: { fire: 1, water: 1, earth: 1, air: 1 },
+        activeFocus: 'fire',
+      },
+      philosophies: {
+        unlocked: ['balance'],
+        activeResearch: null,
+        researchProgress: 0,
+      },
+      equipment: {
+        wyvern_armor: 0,
+        flame_spears: 0,
+        iron_shields: 0,
+      },
+      elixirs: {
+        vitality_salve: 3,
+        dragon_tonic: 1,
+        growth_elixir: 0,
+      },
+      history: [
+        {
+          tick: 0,
+          title: 'The Royal Banners Rise',
+          description: 'The King has declared Hearthvale the high throne of the dragon realm.',
+          category: 'royal',
+        },
+      ],
+    },
     sanctuaryLayout: createDefaultSanctuaryLayout(),
     nextId: 0,
     log: [],

@@ -76,26 +76,118 @@ function usePropTemplates(): Map<string, PropTemplate> {
 }
 
 /**
- * All props share one material, so tinting one prop id must clone that
- * material rather than mutate it in place — otherwise every other prop
- * drawn from the atlas repaints too. Cached per (source material, color) so
- * repeated instances of the same tinted prop still share one clone.
+ * All props share one material, so changing the look of one prop id must clone
+ * that material rather than mutate it in place — otherwise every other prop
+ * drawn from the atlas changes too. Cached per (source material, variant key)
+ * so repeated instances of the same variant still share one clone, and so the
+ * number of shader programs stays bounded no matter how many props ask.
  */
-const tintCache = new Map<Material, Map<string, Material>>()
+const variantCache = new Map<Material, Map<string, Material>>()
 
-function tintedMaterial(base: Material, color: string): Material {
-  let byColor = tintCache.get(base)
-  if (!byColor) {
-    byColor = new Map()
-    tintCache.set(base, byColor)
+function variantMaterial(
+  base: Material,
+  key: string,
+  apply: (material: MeshStandardMaterial) => void,
+): Material {
+  let byKey = variantCache.get(base)
+  if (!byKey) {
+    byKey = new Map()
+    variantCache.set(base, byKey)
   }
-  let tinted = byColor.get(color)
-  if (!tinted) {
-    tinted = base.clone()
-    ;(tinted as MeshStandardMaterial).color?.set(color)
-    byColor.set(color, tinted)
+  let variant = byKey.get(key)
+  if (!variant) {
+    variant = base.clone()
+    apply(variant as MeshStandardMaterial)
+    byKey.set(key, variant)
   }
-  return tinted
+  return variant
+}
+
+/**
+ * Shared wind clock, in seconds.
+ *
+ * One object, referenced by every swaying material's shader uniform, advanced
+ * once per frame by <SanctuaryWind>. This is the whole reason foliage motion is
+ * affordable: `PropInstances` writes its matrices once on mount and must keep
+ * doing so — pushing a few hundred instance matrices per frame would cost more
+ * than the rest of the scene, so the sway lives in the vertex shader instead.
+ */
+export const WIND_CLOCK = { value: 0 }
+
+/**
+ * Adds a root-planted sway to a material.
+ *
+ * Displacement scales with the vertex's height above the prop's own base, so
+ * roots stay planted and tips move most — every atlas prop rests on y=0, which
+ * is what makes local `y` usable directly. Each instance takes its phase from
+ * its own translation column, so a field of grass ripples rather than pulsing
+ * in unison.
+ *
+ * Known limitation: three renders the shadow pass with its own depth material,
+ * which does not carry this `onBeforeCompile`, so a swaying prop casts a static
+ * shadow. That is why the amplitudes in `WIND_STRENGTH` are small and why grass
+ * — the strongest sway by far — is excluded from the shadow pass entirely. Only
+ * the firs both sway and cast, and at ~0.2m of crown travel against a 6cm
+ * shadow texel the mismatch is not readable. Raise those amplitudes and it will
+ * become so.
+ */
+function applyWind(material: MeshStandardMaterial, strength: number): void {
+  material.onBeforeCompile = (shader) => {
+    shader.uniforms.uWindTime = WIND_CLOCK
+    shader.uniforms.uWindStrength = { value: strength }
+    shader.vertexShader = shader.vertexShader
+      .replace(
+        '#include <common>',
+        `#include <common>
+        uniform float uWindTime;
+        uniform float uWindStrength;`,
+      )
+      .replace(
+        '#include <begin_vertex>',
+        `#include <begin_vertex>
+        {
+          vec3 windOrigin = vec3(0.0);
+          #ifdef USE_INSTANCING
+            windOrigin = instanceMatrix[3].xyz;
+          #endif
+          float phase = windOrigin.x * 0.31 + windOrigin.z * 0.27;
+          float gust = 0.65 + 0.35 * sin(uWindTime * 0.37 + windOrigin.x * 0.05);
+          float sway = sin(uWindTime * 1.6 + phase);
+          float reach = max(transformed.y, 0.0) * uWindStrength * gust;
+          transformed.x += sway * reach;
+          transformed.z += cos(uWindTime * 1.1 + phase) * reach * 0.55;
+        }`,
+      )
+  }
+  // Without a distinct cache key this variant would reuse the base material's
+  // compiled program and the sway would silently never appear.
+  material.customProgramCacheKey = () => `wind:${strength}`
+}
+
+/** Self-illumination for props that are meant to be a light source. */
+export interface PropEmissive {
+  color: string
+  intensity: number
+}
+
+function propMaterial(
+  base: Material,
+  color?: string,
+  emissive?: PropEmissive,
+  wind?: number,
+): Material {
+  if (!color && !emissive && !wind) return base
+  const key = `c:${color ?? ''}|e:${
+    emissive ? `${emissive.color}:${emissive.intensity}` : ''
+  }|w:${wind ?? ''}`
+  return variantMaterial(base, key, (material) => {
+    if (color) material.color?.set(color)
+    if (emissive) {
+      material.emissive?.set(emissive.color)
+      material.emissiveIntensity = emissive.intensity
+    }
+    if (wind) applyWind(material, wind)
+  })
 }
 
 /** A single prop. For more than a handful of copies, use <PropInstances>. */
@@ -106,11 +198,19 @@ export function Prop({
   scale = 1,
   castShadow = true,
   color,
-}: PropPlacement & { id: string; castShadow?: boolean; color?: string }) {
+  emissive,
+  wind,
+}: PropPlacement & {
+  id: string
+  castShadow?: boolean
+  color?: string
+  emissive?: PropEmissive
+  wind?: number
+}) {
   const template = usePropTemplates().get(id)
   const material = useMemo(
-    () => (template && color ? tintedMaterial(template.material, color) : template?.material),
-    [template, color],
+    () => (template ? propMaterial(template.material, color, emissive, wind) : undefined),
+    [template, color, emissive, wind],
   )
   if (!template) return null
 
@@ -184,17 +284,22 @@ export function PropInstances({
   items,
   castShadow = true,
   color,
+  emissive,
+  wind,
 }: {
   id: string
   items: PropPlacement[]
   castShadow?: boolean
   color?: string
+  emissive?: PropEmissive
+  /** Sway amplitude per metre of height. Omit for rigid props. */
+  wind?: number
 }) {
   const ref = useRef<InstancedMesh>(null)
   const template = usePropTemplates().get(id)
   const material = useMemo(
-    () => (template && color ? tintedMaterial(template.material, color) : template?.material),
-    [template, color],
+    () => (template ? propMaterial(template.material, color, emissive, wind) : undefined),
+    [template, color, emissive, wind],
   )
 
   useLayoutEffect(() => {

@@ -12,4 +12,10 @@ describe('Model Library preview framing', () => {
   it('resets the camera when selecting another model', () => {
     expect(source).toContain('<Canvas key={id}')
   })
+
+  it('calculates and passes model stats on load', () => {
+    expect(source).toContain('onLoadStats')
+    expect(source).toContain('child instanceof Mesh')
+    expect(source).toContain('child instanceof Bone')
+  })
 })

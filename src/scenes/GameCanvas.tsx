@@ -36,7 +36,12 @@ export function GameCanvas({ onCanvasReady }: { onCanvasReady?: () => void }) {
       // maps is enough VRAM to lose the WebGL context outright on integrated
       // and mobile GPUs, and the visual difference at this art style is slight.
       dpr={[1, 1.5]}
-      camera={{ fov: 60, near: 0.1, far: 700, position: [0, 12, 24] }}
+      // Depth precision scales with the near plane, and every scene here is
+      // third-person: `CAMERA_MIN_DISTANCE` is 4, so the camera never comes
+      // within 0.3 of what it orbits. Moving near from 0.1 to 0.3 is a ~3x
+      // depth-buffer improvement across the whole scene for one number, which
+      // is what stops coplanar ground decals shimmering at the far rim.
+      camera={{ fov: 60, near: 0.3, far: 700, position: [0, 12, 24] }}
       gl={{ antialias: true, powerPreference: 'high-performance' }}
     >
       {mode === 'sanctuary' && <SanctuaryScene />}

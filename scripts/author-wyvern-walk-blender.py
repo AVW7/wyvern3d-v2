@@ -21,8 +21,12 @@ import argparse
 import math
 import sys
 
-import bpy
-from mathutils import Euler
+try:
+    import bpy  # type: ignore
+    from mathutils import Euler  # type: ignore
+except ImportError:
+    bpy = None  # type: ignore
+    Euler = None  # type: ignore
 
 
 ARMATURE = "WyvernRig"
@@ -112,6 +116,7 @@ def author() -> None:
 
     action.use_frame_range = True
     action.frame_start, action.frame_end = float(first), float(last)
+    action.use_fake_user = True
     print(
         f"authored {ACTION}: relaxed quadrupedal {last - first + 1}-frame wing carrier "
         f"({first}..{last})"

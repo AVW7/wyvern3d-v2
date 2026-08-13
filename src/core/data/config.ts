@@ -9,10 +9,40 @@ export const CONFIG = {
   maxOfflineTicks: 24,
 
   starting: {
-    resources: { food: 400, gold: 250, ore: 80, timber: 120, arcane: 10 },
+    resources: { food: 400, gold: 250, ore: 80, timber: 120, arcane: 10, water: 150, hide: 20, iron: 15 },
+    population: 10,
+    livestock: { deer: 4, boar: 2, goat: 3, bird: 8 },
     /** Species ids the player begins with, already adult. */
     wyverns: ['emberback'],
     squads: [{ unitId: 'spearman', strength: 40 }],
+  },
+
+  economy: {
+    /** Water gathered per tick per aqueduct level. */
+    waterPerAqueductLevel: 4,
+    /** Food produced per tick per assigned farm worker (requires 0.5 water per worker). */
+    foodPerFarmWorker: 1.5,
+    waterPerFarmWorker: 0.5,
+    /** Livestock breeding ticks per species. */
+    breedingTicks: { deer: 30, boar: 25, goat: 20, bird: 15 },
+    /** Harvest rewards per animal slaughtered. */
+    harvestYields: {
+      deer: { food: 40, hide: 5 },
+      boar: { food: 50, hide: 8 },
+      goat: { food: 30, hide: 4 },
+      bird: { food: 15, hide: 1 },
+    },
+    /** Smelting: ore + workers -> iron + gold. */
+    orePerSmelt: 2,
+    ironPerSmelt: 1,
+    goldPerSmelt: 2,
+    /** Sawmill: timber + workers -> bonus timber output. */
+    timberBonusPerWorker: 1.2,
+    /** Population capacity per housing level. */
+    populationPerHousingLevel: 8,
+    /** Villager food & water consumption per tick per 5 workers. */
+    foodPerPerson: 0.1,
+    waterPerPerson: 0.15,
   },
 
   wyvern: {
@@ -93,8 +123,37 @@ export const CONFIG = {
     squadsPerBarracksLevel: 2,
   },
 
+  grandMaster: {
+    maxMasteryLevel: 5,
+    costPerLevel: [
+      { arcane: 40, gold: 50 },
+      { arcane: 100, gold: 120 },
+      { arcane: 200, gold: 250 },
+      { arcane: 380, gold: 500 },
+      { arcane: 600, gold: 900 },
+    ],
+    /** Multipliers per mastery level. */
+    fireBonusPerLevel: 0.08, // +8% firepower per level
+    waterBonusPerLevel: 0.10, // +10% healing and water yield
+    earthBonusPerLevel: 0.08, // +8% defense and iron yield
+    airBonusPerLevel: 0.08,   // +8% speed and stamina
+  },
+
+  crafting: {
+    equipmentCosts: {
+      wyvern_armor: { iron: 30, hide: 20, gold: 50 },
+      flame_spears: { timber: 40, iron: 25, gold: 40 },
+      iron_shields: { iron: 35, timber: 20, gold: 30 },
+    },
+    elixirCosts: {
+      vitality_salve: { water: 30, food: 20, arcane: 5 },
+      dragon_tonic: { water: 50, food: 40, arcane: 15 },
+      growth_elixir: { water: 80, food: 60, arcane: 30 },
+    },
+  },
+
   /** Ring buffer size for the in-game event feed. */
   logLimit: 60,
 } as const
 
-export const SAVE_VERSION = 3
+export const SAVE_VERSION = 6

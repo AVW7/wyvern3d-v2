@@ -22,13 +22,18 @@ export function regionTick(state: GameState): void {
       continue
     }
 
+    const edict = state.realm?.ruler?.edict
+    const edictMult = edict === 'royal_garrison' ? 0.5 : edict === 'grand_taxation' ? 1.1 : 1.0
+    const hasDominion = state.realm?.philosophies?.unlocked?.includes('dominion')
+    const suppressionMult = hasDominion ? 1.1 : 1.0
+
     const garrison = Object.values(state.squads)
       .filter((s) => s.stationedAt === region.id)
       .reduce((sum, s) => sum + s.strength, 0)
 
-    const suppression = (garrison / 10) * CONFIG.region.unrestPerGarrison
+    const suppression = (garrison / 10) * CONFIG.region.unrestPerGarrison * suppressionMult
     region.unrest = clamp(
-      region.unrest + CONFIG.region.unrestPerTick - suppression,
+      region.unrest + CONFIG.region.unrestPerTick * edictMult - suppression,
       0,
       CONFIG.region.revoltAt,
     )
@@ -56,4 +61,12 @@ function revolt(state: GameState, regionId: string): void {
   }
 
   log(state, 'bad', `${def.name} has risen in revolt and thrown you out.`)
+  if (state.realm?.history) {
+    state.realm.history.unshift({
+      tick: state.tick,
+      title: `Revolt at ${def.name}`,
+      description: `High unrest caused ${def.name} to rise up against player rule.`,
+      category: 'revolt',
+    })
+  }
 }

@@ -570,7 +570,10 @@ describe('save', () => {
     const state = createInitialState(55)
     const old = { ...state, saveVersion: 0 } as GameState
     const migrated = migrate(old)
-    expect(migrated.saveVersion).toBe(3)
+    expect(migrated.saveVersion).toBe(6)
+    expect(migrated.resources.water).toBeDefined()
+    expect(migrated.resources.hide).toBeDefined()
+    expect(migrated.resources.iron).toBeDefined()
   })
 
   it('moves untouched legacy sanctuary defaults but preserves edited stations', () => {
@@ -584,8 +587,53 @@ describe('save', () => {
 
     const migrated = migrate(old)
 
-    expect(migrated.saveVersion).toBe(3)
+    expect(migrated.saveVersion).toBe(6)
     expect(huntingPen.position).toEqual([-30, 0, 2])
     expect(flightRing.position).toEqual([7, 0, 7])
+  })
+
+  it('processes sanctuary production ticks and worker assignments', () => {
+    const state = createInitialState(42)
+    const initialWater = state.resources.water
+    const initialFood = state.resources.food
+
+    // Execute next tick
+    executeNextTick(state)
+    expect(state.resources.water).toBeGreaterThan(initialWater)
+    expect(state.resources.food).toBeGreaterThan(initialFood)
+
+    // Assign worker to foundry
+    executeNextTick(state, [{ type: 'SET_ASSIGNED_WORKERS', buildingId: 'foundry', count: 2 }])
+    expect(state.economy.population.assigned.foundry).toBe(2)
+  })
+
+  it('handles ruler title, edicts, elemental mastery, and elixir crafting', () => {
+    const state = createInitialState(101)
+
+    // Switch title & edict
+    executeNextTick(state, [{ type: 'SET_RULER_TITLE', title: 'queen' }])
+    expect(state.realm.ruler.title).toBe('queen')
+
+    executeNextTick(state, [{ type: 'SET_RULER_EDICT', edict: 'royal_garrison' }])
+    expect(state.realm.ruler.edict).toBe('royal_garrison')
+
+    // Upgrade elemental mastery
+    state.resources.arcane = 500
+    state.resources.gold = 500
+    executeNextTick(state, [{ type: 'UPGRADE_ELEMENTAL_MASTERY', element: 'fire' }])
+    expect(state.realm.grandMaster.masteryLevels.fire).toBe(2)
+
+    // Brew & Use Vitality Salve
+    state.resources.water = 100
+    state.resources.food = 100
+    state.resources.arcane = 50
+    const wyvernId = Object.keys(state.wyverns)[0]!
+    state.wyverns[wyvernId]!.injury = 50
+
+    executeNextTick(state, [{ type: 'BREW_ELIXIR', elixirType: 'vitality_salve' }])
+    const countBefore = state.realm.elixirs.vitality_salve
+    executeNextTick(state, [{ type: 'USE_ELIXIR', elixirType: 'vitality_salve', wyvernId }])
+    expect(state.realm.elixirs.vitality_salve).toBe(countBefore - 1)
+    expect(state.wyverns[wyvernId]!.injury).toBeLessThan(10)
   })
 })

@@ -1,5 +1,5 @@
 import { Vector3 } from 'three'
-import { clamp, damp, clampLength } from '@/core/math/vec'
+import { clamp, damp } from '@/core/math/vec'
 import type { FlightPose } from '@/render/flightPose'
 
 /**
@@ -82,13 +82,8 @@ export function calculateLandingApproach(
   const toTarget = targetLanding.clone().sub(currentPos)
   const horizontalDist = Math.hypot(toTarget.x, toTarget.z)
   
-  // Approach angle based on current altitude
+  // Altitude for approach calculations
   const altitude = currentPos.y
-  const approachAngle = clamp(
-    Math.atan2(altitude, horizontalDist),
-    0.2, // Minimum glide angle
-    0.7  // Maximum steep approach
-  )
   
   // Calculate approach direction (upwind preference would go here)
   const approachDirection = new Vector3(
@@ -221,7 +216,7 @@ export function planAttackRun(
       ))
       break
       
-    case 'sweep':
+    case 'sweep': {
       // Wide arc approach
       const sweepRadius = distance * 0.7
       const sweepCenter = target.position.clone()
@@ -235,6 +230,7 @@ export function planAttackRun(
         trajectory.push(point)
       }
       break
+    }
   }
   
   // Exit point is beyond target

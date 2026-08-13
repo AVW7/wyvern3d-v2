@@ -5,6 +5,8 @@ import type { ModelState } from '@/render/assets/manifest'
 import type { FlightLoopState, FlightPose, HeadNeckPose } from '@/render/flightPose'
 import type { HeadNeckState } from '@/render/gazeController'
 import type { ClosedJawPose } from '@/render/flightMouth'
+import type { TailState } from '@/render/tailController'
+import type { LegsState } from '@/render/legPhysics'
 import type { SanctuaryCommand, SanctuaryCommandPhase, SanctuaryCommandRequest } from '@/state/sanctuaryCommands'
 import {
   assignmentVisualState,
@@ -40,6 +42,9 @@ export interface Agent {
   spineBones: Object3D[]
   /** Thigh → calf → foot for each hind leg; used by the runtime tuck layer. */
   legBones: Object3D[][]
+  tailBones: Object3D[]
+  tailState: TailState
+  legsState: LegsState
   position: Vector3
   yaw: number
   headYaw: number

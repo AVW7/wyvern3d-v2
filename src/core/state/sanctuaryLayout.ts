@@ -38,6 +38,9 @@ export const PROP_CATALOG: Record<string, PropCatalogEntry> = {
   'prop.logPile': { propId: 'prop.logPile', label: 'Log Pile', category: 'utility', description: 'Firewood fuel stack.' },
   'prop.blockade': { propId: 'prop.blockade', label: 'Wooden Blockade', category: 'furniture', description: 'Heavy timber defensive barrier.' },
   'prop.campfire': { propId: 'prop.campfire', label: 'Infirmary Fire', category: 'utility', description: 'Warm fire for healing injuries.' },
+  'prop.forge.anvil': { propId: 'prop.forge.anvil', label: 'Forge Anvil', category: 'utility', defaultScale: 0.55, description: 'Struck steel for scale-plate armor.' },
+  'prop.forge.trough': { propId: 'prop.forge.trough', label: 'Quenching Trough', category: 'utility', description: 'Water bath for cooling hot metal.' },
+  'prop.forge.grindstone': { propId: 'prop.forge.grindstone', label: 'Grinding Stone', category: 'utility', description: 'Whetstone wheel for finishing edges.' },
 
   // Scenery & Decor
   'prop.roost.runeStone': { propId: 'prop.roost.runeStone', label: 'Rune Stone', category: 'scenery', description: 'Ancient carved stone emitting arcane energy.' },

@@ -12,6 +12,8 @@ import { readDirectWyvernFlightInput, stepDirectWyvernFlight } from '@/render/co
 import { applyBoneOffset, applyLegTuck } from '@/render/boneOffsets'
 import { captureClosedJawPose, isMouthAction, sealFlightJaw } from '@/render/flightMouth'
 import { propagateFullBodyWave, calculatePhase } from '@/render/spineWave'
+import { createTailState, dynamicTailController } from '@/render/tailController'
+import { createLegsState, dynamicLegController } from '@/render/legPhysics'
 import {
   intelligentHeadNeckController,
   fromSpatialTarget,
@@ -34,6 +36,8 @@ import {
   type SanctuaryCommand,
   type SanctuaryCommandRequest,
 } from '@/state/sanctuaryCommands'
+import { SanctuaryDust } from './atmosphere/SanctuaryDust'
+import { SanctuaryWildlife } from './atmosphere/SanctuaryWildlife'
 import { useCameraStore } from '@/state/cameraStore'
 import { usePlayerControlStore } from '@/state/playerControlStore'
 import { useGame } from '@/state/store'
@@ -212,6 +216,9 @@ export function SanctuaryWyverns({ wyverns, colliders, seed }: SanctuaryWyvernsP
           neckBones: [],
           spineBones: [],
           legBones: [],
+          tailBones: [],
+          tailState: createTailState(),
+          legsState: createLegsState(),
           flightLegTuck: 0,
           flightAnimation: 'cruise',
           powered: true,
@@ -243,7 +250,7 @@ export function SanctuaryWyverns({ wyverns, colliders, seed }: SanctuaryWyvernsP
     })
   }
 
-  useFrame((_, rawDelta) => {
+  useFrame((threeState, rawDelta) => {
     const dt = Math.min(rawDelta, 0.05)
     const commands = useSanctuaryCommands.getState()
     const selected = commands.selectedWyvernId
@@ -532,6 +539,30 @@ export function SanctuaryWyverns({ wyverns, colliders, seed }: SanctuaryWyvernsP
           for (const chain of agent.legBones) {
             applyLegTuck(chain, agent.flightLegTuck)
           }
+          agent.tailState = dynamicTailController(
+            agent.tailBones,
+            yawRate,
+            agent.flightPose.bank,
+            horizontalSpeed,
+            agent.flightAnimation,
+            0.5,
+            threeState.clock.elapsedTime,
+            agent.tailState,
+            dt,
+          )
+          agent.legsState = dynamicLegController(
+            agent.legBones[0] ?? [],
+            agent.legBones[1] ?? [],
+            yawRate,
+            horizontalSpeed,
+            verticalSpeed,
+            agent.position.y,
+            agent.flightAnimation,
+            0,
+            threeState.clock.elapsedTime,
+            agent.legsState,
+            dt,
+          )
           if (!isMouthAction(agent.activeAction?.state ?? null)) {
             sealFlightJaw(agent.jaw, agent.jawClosed)
           }
@@ -1180,6 +1211,9 @@ export function SanctuaryWyverns({ wyverns, colliders, seed }: SanctuaryWyvernsP
             onLegBonesReady={(bones) => {
               agent.legBones = bones
             }}
+            onTailBonesReady={(bones) => {
+              agent.tailBones = bones
+            }}
             onActionFinished={(request) => {
               if (agent.activeAction?.token === request.token) agent.activeAction = null
             }}
@@ -1189,6 +1223,8 @@ export function SanctuaryWyverns({ wyverns, colliders, seed }: SanctuaryWyvernsP
           />
         )
       })}
+      <SanctuaryDust agents={agents} />
+      <SanctuaryWildlife agents={agents} />
       <AttackTargetReticle />
       <PatrolMarkers />
     </>

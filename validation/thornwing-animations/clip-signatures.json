@@ -1,0 +1,425 @@
+{
+  "schema": "thornwing_clip_signature.v1",
+  "source": "public/models/thornwing.glb",
+  "input": {
+    "source": "public/models/library/forest-wyvern-display.glb",
+    "sha256": "95382c76993a2d1c869b781b2b122321d26246a43536509791c5db17c459368c"
+  },
+  "model": {
+    "bytes": 3760676,
+    "sha256": "48644f8989adac2b1e812bf058e496b253524def5f6dc39f8a7411cc3dfec22d",
+    "vertices": 22885,
+    "triangles": 35947,
+    "joints": 64,
+    "max_vertex_weights": 4,
+    "materials": 1
+  },
+  "clips": {
+    "attack": {
+      "frames": [
+        0,
+        36
+      ],
+      "frame_count": 37,
+      "duration_s": 1.5,
+      "loop": {
+        "pose_mean": 0.0,
+        "pose_max": 0.0,
+        "basis_max": 0.0,
+        "loops": true
+      },
+      "ground_clearance": {
+        "start": 0.0,
+        "end": 0.0,
+        "min": -0.0,
+        "max": 1e-06
+      },
+      "wing_elevation_left_deg": {
+        "min": -51.84968,
+        "max": -41.67923,
+        "mean": -46.70497,
+        "range": 10.17045
+      },
+      "wing_elevation_right_deg": {
+        "min": -51.84969,
+        "max": -41.67924,
+        "mean": -46.70498,
+        "range": 10.17045
+      },
+      "wing_stroke": {
+        "left_range_deg": 10.17045,
+        "right_range_deg": 10.17045,
+        "range_difference_deg": 0.0,
+        "beats": 1,
+        "cadence_hz": 0.66667
+      },
+      "body_axis_deg": {
+        "min": 24.13273,
+        "max": 36.60496,
+        "mean": 30.53957,
+        "range": 12.47223
+      },
+      "root_path": {
+        "start": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.2925324
+        },
+        "max_distance": 0.0361831,
+        "span": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0395005
+        }
+      }
+    },
+    "cruise": {
+      "frames": [
+        0,
+        72
+      ],
+      "frame_count": 73,
+      "duration_s": 3.0,
+      "loop": {
+        "pose_mean": 0.0,
+        "pose_max": 0.0,
+        "basis_max": 0.0,
+        "loops": true
+      },
+      "ground_clearance": {
+        "start": -1.268623,
+        "end": -1.268623,
+        "min": -1.271297,
+        "max": -1.25733
+      },
+      "wing_elevation_left_deg": {
+        "min": -43.61508,
+        "max": 7.86199,
+        "mean": -19.22707,
+        "range": 51.47707
+      },
+      "wing_elevation_right_deg": {
+        "min": -43.61509,
+        "max": 7.86198,
+        "mean": -19.22708,
+        "range": 51.47707
+      },
+      "wing_stroke": {
+        "left_range_deg": 51.47707,
+        "right_range_deg": 51.47707,
+        "range_difference_deg": 0.0,
+        "beats": 2,
+        "cadence_hz": 0.66667
+      },
+      "body_axis_deg": {
+        "min": -4.30692,
+        "max": -2.2654,
+        "mean": -3.27871,
+        "range": 2.04152
+      },
+      "root_path": {
+        "start": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": -0.76
+        },
+        "max_distance": 0.0,
+        "span": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        }
+      }
+    },
+    "death": {
+      "frames": [
+        0,
+        72
+      ],
+      "frame_count": 73,
+      "duration_s": 3.0,
+      "loop": {
+        "pose_mean": 0.7148257,
+        "pose_max": 1.308263,
+        "basis_max": 0.6277874,
+        "loops": false
+      },
+      "ground_clearance": {
+        "start": 0.0,
+        "end": 0.0,
+        "min": -1e-06,
+        "max": 1e-06
+      },
+      "wing_elevation_left_deg": {
+        "min": -46.96524,
+        "max": 3.89358,
+        "mean": -21.33595,
+        "range": 50.85883
+      },
+      "wing_elevation_right_deg": {
+        "min": -47.17942,
+        "max": -11.30888,
+        "mean": -34.36143,
+        "range": 35.87054
+      },
+      "wing_stroke": {
+        "left_range_deg": 50.85883,
+        "right_range_deg": 35.87054,
+        "range_difference_deg": 14.98829,
+        "beats": 0,
+        "cadence_hz": 0.0
+      },
+      "body_axis_deg": {
+        "min": -1.48919,
+        "max": 30.28387,
+        "mean": 15.20642,
+        "range": 31.77306
+      },
+      "root_path": {
+        "start": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.2925324
+        },
+        "max_distance": 0.0927346,
+        "span": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0927346
+        }
+      }
+    },
+    "idle": {
+      "frames": [
+        0,
+        144
+      ],
+      "frame_count": 145,
+      "duration_s": 6.0,
+      "loop": {
+        "pose_mean": 0.0,
+        "pose_max": 0.0,
+        "basis_max": 0.0,
+        "loops": true
+      },
+      "ground_clearance": {
+        "start": -0.0,
+        "end": -0.0,
+        "min": -0.0,
+        "max": 1e-06
+      },
+      "wing_elevation_left_deg": {
+        "min": -48.89422,
+        "max": -44.95356,
+        "mean": -46.9456,
+        "range": 3.94066
+      },
+      "wing_elevation_right_deg": {
+        "min": -48.89423,
+        "max": -44.95356,
+        "mean": -46.94561,
+        "range": 3.94067
+      },
+      "wing_stroke": {
+        "left_range_deg": 3.94066,
+        "right_range_deg": 3.94067,
+        "range_difference_deg": 1e-05,
+        "beats": 1,
+        "cadence_hz": 0.16667
+      },
+      "body_axis_deg": {
+        "min": 29.37736,
+        "max": 31.18861,
+        "mean": 30.28282,
+        "range": 1.81125
+      },
+      "root_path": {
+        "start": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.2925135
+        },
+        "max_distance": 0.0283341,
+        "span": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0470886
+        }
+      }
+    },
+    "land": {
+      "frames": [
+        0,
+        48
+      ],
+      "frame_count": 49,
+      "duration_s": 2.0,
+      "loop": {
+        "pose_mean": 1.1291112,
+        "pose_max": 1.7623225,
+        "basis_max": 1.0525324,
+        "loops": false
+      },
+      "ground_clearance": {
+        "start": -1.26166,
+        "end": 0.0,
+        "min": -1.26166,
+        "max": 0.0
+      },
+      "wing_elevation_left_deg": {
+        "min": -46.96524,
+        "max": -0.29032,
+        "mean": -14.94941,
+        "range": 46.67493
+      },
+      "wing_elevation_right_deg": {
+        "min": -46.96525,
+        "max": -0.29032,
+        "mean": -14.94941,
+        "range": 46.67493
+      },
+      "wing_stroke": {
+        "left_range_deg": 46.67493,
+        "right_range_deg": 46.67493,
+        "range_difference_deg": 0.0,
+        "beats": 1,
+        "cadence_hz": 0.5
+      },
+      "body_axis_deg": {
+        "min": -6.72035,
+        "max": 30.28387,
+        "mean": 11.78244,
+        "range": 37.00422
+      },
+      "root_path": {
+        "start": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": -0.76
+        },
+        "max_distance": 1.0525325,
+        "span": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 1.0525324
+        }
+      }
+    },
+    "takeoff": {
+      "frames": [
+        0,
+        48
+      ],
+      "frame_count": 49,
+      "duration_s": 2.0,
+      "loop": {
+        "pose_mean": 1.0669474,
+        "pose_max": 1.801671,
+        "basis_max": 0.9728634,
+        "loops": false
+      },
+      "ground_clearance": {
+        "start": 1e-06,
+        "end": -1.26166,
+        "min": -1.26166,
+        "max": 1e-06
+      },
+      "wing_elevation_left_deg": {
+        "min": -55.08533,
+        "max": -3.46071,
+        "mean": -19.24675,
+        "range": 51.62462
+      },
+      "wing_elevation_right_deg": {
+        "min": -55.08534,
+        "max": -3.4607,
+        "mean": -19.24675,
+        "range": 51.62464
+      },
+      "wing_stroke": {
+        "left_range_deg": 51.62462,
+        "right_range_deg": 51.62464,
+        "range_difference_deg": 2e-05,
+        "beats": 1,
+        "cadence_hz": 0.5
+      },
+      "body_axis_deg": {
+        "min": -6.72035,
+        "max": 37.25611,
+        "mean": 15.27562,
+        "range": 43.97646
+      },
+      "root_path": {
+        "start": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.2128634
+        },
+        "max_distance": 0.9728634,
+        "span": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 1.0674579
+        }
+      }
+    },
+    "walk": {
+      "frames": [
+        0,
+        48
+      ],
+      "frame_count": 49,
+      "duration_s": 2.0,
+      "loop": {
+        "pose_mean": 0.0,
+        "pose_max": 0.0,
+        "basis_max": 0.0,
+        "loops": true
+      },
+      "ground_clearance": {
+        "start": 0.0,
+        "end": 0.0,
+        "min": -1e-06,
+        "max": 0.0
+      },
+      "wing_elevation_left_deg": {
+        "min": -44.98018,
+        "max": -39.77683,
+        "mean": -42.4049,
+        "range": 5.20335
+      },
+      "wing_elevation_right_deg": {
+        "min": -44.98019,
+        "max": -39.77683,
+        "mean": -42.40491,
+        "range": 5.20335
+      },
+      "wing_stroke": {
+        "left_range_deg": 5.20335,
+        "right_range_deg": 5.20335,
+        "range_difference_deg": 0.0,
+        "beats": 2,
+        "cadence_hz": 1.0
+      },
+      "body_axis_deg": {
+        "min": 23.52093,
+        "max": 25.04264,
+        "mean": 24.27294,
+        "range": 1.52172
+      },
+      "root_path": {
+        "start": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.3487792
+        },
+        "max_distance": 0.0466673,
+        "span": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0669328
+        }
+      }
+    }
+  }
+}

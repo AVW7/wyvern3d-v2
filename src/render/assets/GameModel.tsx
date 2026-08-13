@@ -1,6 +1,7 @@
 'use client'
 
-import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
+import { Component, Suspense, useEffect, useMemo, useRef, useState } from 'react'
+import type { ErrorInfo, ReactNode } from 'react'
 import { useGLTF } from '@react-three/drei'
 import { AnimationMixer, LoopOnce, LoopRepeat } from 'three'
 // From `three` directly, not three-stdlib: pnpm's strict node_modules does not
@@ -18,9 +19,16 @@ import {
   getAsset,
   type AssetEntry,
   type AssetId,
+  type ClipSpec,
   type MaterialOverride,
   type ModelState,
 } from './manifest'
+import {
+  canReuseLoopAction,
+  normalizedPlaybackPhase,
+  resolveClipSpec,
+  shouldApplyNext,
+} from './gameModelPlayback'
 import { useModelLibraryStore } from '@/state/modelLibraryStore'
 
 /** Crossfade length between two states, in seconds. */
@@ -124,27 +132,56 @@ export function GameModel({
   }
 
   return (
-    <Suspense fallback={fallback}>
-      <LoadedModel
-        url={entry.url}
-        animationUrl={entry.animationUrl}
-        animationUrls={entry.animationUrls}
-        scale={entry.scale * scale}
-        yOffset={entry.yOffset}
-        material={entry.material}
-        animations={entry.animations}
-        state={state}
-        commandAction={action}
-        seed={seed}
-        onReady={onReady}
-        onActionFinished={onActionFinished}
-        frozen={frozen}
-        manualMixer={manualMixer}
-      >
-        {children}
-      </LoadedModel>
-    </Suspense>
+    <ModelErrorBoundary assetId={id} fallback={fallback}>
+      <Suspense fallback={fallback}>
+        <LoadedModel
+          url={entry.url}
+          animationUrl={entry.animationUrl}
+          animationUrls={entry.animationUrls}
+          scale={entry.scale * scale}
+          yOffset={entry.yOffset}
+          material={entry.material}
+          animations={entry.animations}
+          state={state}
+          commandAction={action}
+          seed={seed}
+          onReady={onReady}
+          onActionFinished={onActionFinished}
+          frozen={frozen}
+          manualMixer={manualMixer}
+        >
+          {children}
+        </LoadedModel>
+      </Suspense>
+    </ModelErrorBoundary>
   )
+}
+
+/**
+ * A missing or malformed GLB throws while rendering, and `Suspense` only
+ * catches promises — so without this the whole persistent canvas unmounts and
+ * the screen goes blank. Every asset slot already has a procedural fallback for
+ * the `url: null` case; this routes a failed *load* to that same fallback, so a
+ * manifest entry pointing at an asset that has not been produced yet degrades
+ * to a placeholder instead of taking down the game.
+ */
+class ModelErrorBoundary extends Component<
+  { assetId: AssetId; fallback: ReactNode; children: ReactNode },
+  { failed: boolean }
+> {
+  override state = { failed: false }
+
+  static getDerivedStateFromError() {
+    return { failed: true }
+  }
+
+  override componentDidCatch(error: Error, info: ErrorInfo) {
+    console.error(`[GameModel] "${this.props.assetId}" failed to load; using placeholder.`, error, info)
+  }
+
+  override render() {
+    return this.state.failed ? <>{this.props.fallback}</> : <>{this.props.children}</>
+  }
 }
 
 function LoadedModel({
@@ -204,119 +241,119 @@ function LoadedModel({
     return map
   }, [animations, animationUrls, animGltf, animGltfs])
 
-  const stateWithFallback = state
-  const stateSpec = clips?.[stateWithFallback]
+  const currentAction = useRef<AnimationAction | null>(null)
+  const currentSpec = useRef<ClipSpec | null>(null)
+  const currentWasOverride = useRef(false)
 
-  /**
-   * The spec whose pose is actually on screen — a one-shot action overrides the
-   * base state for as long as it plays. Resolved here, rather than only inside
-   * the effects below, because the render needs its `yOffset`. The two branches
-   * mirror how each effect picks from a clip pool, so the offset always belongs
-   * to the clip the mixer is playing.
-   */
-  const playingSpec = useMemo(() => {
-    const override = commandAction ? clips?.[commandAction.state] : undefined
-    if (override) return Array.isArray(override) ? override[0] : override
-    if (!stateSpec) return undefined
-    return Array.isArray(stateSpec) ? stateSpec[seed % stateSpec.length] : stateSpec
-  }, [clips, commandAction, stateSpec, seed])
-
-  const [, setBaseAction] = useState<AnimationAction | null>(null)
-  const [activeAction, setActiveAction] = useState<AnimationAction | null>(null)
-  const [lastActionToken, setLastActionToken] = useState<number | null>(null)
-  const prevActionRef = useRef<AnimationAction | null>(null)
-
-  useEffect(() => {
-    const spec =
-      !stateSpec || Array.isArray(stateSpec)
-        ? Array.isArray(stateSpec)
-          ? stateSpec[seed % stateSpec.length]
-          : undefined
-        : stateSpec
-
-    if (!spec) {
-      if (prevActionRef.current) prevActionRef.current.stop()
-      prevActionRef.current = null
-      setBaseAction(null)
-      return
-    }
-
-    const clip = animsByName.get(spec.clip)
-    if (!clip) {
-      if (prevActionRef.current) prevActionRef.current.stop()
-      prevActionRef.current = null
-      setBaseAction(null)
-      return
-    }
-
-    const action = mixer.clipAction(clip)
-    if (spec.loop === false) {
-      action.setLoop(LoopOnce, 1)
-      action.clampWhenFinished = true
-    } else {
-      action.setLoop(LoopRepeat, Infinity)
-    }
-
-    const fadeIn = spec.fadeIn ?? FADE
-    const prev = prevActionRef.current
-    if (prev && prev !== action) {
-      prev.crossFadeTo(action, fadeIn, true)
-    }
-    action.reset().play()
-
-    prevActionRef.current = action
-    setBaseAction(action)
-  }, [stateWithFallback, stateSpec, seed, animsByName, mixer])
-
+  // The base state actually playing can differ from gameplay's request: a
+  // takeoff with `next: 'cruise'` hands off cosmetically while gameplay remains
+  // in `fly`. A command action temporarily overrides this base, then returns to
+  // the latest controlled state when its exact mixer action finishes.
+  const [active, setActive] = useState<ModelState>(state)
+  const [override, setOverride] = useState<ModelActionRequest | null>(null)
+  const requestedState = useRef(state)
+  requestedState.current = state
+  useEffect(() => setActive(state), [state])
   useEffect(() => {
     if (!commandAction) {
-      if (activeAction) {
-        activeAction.fadeOut(0.2)
-        setActiveAction(null)
-        setLastActionToken(null)
+      setOverride(null)
+      return
+    }
+    setOverride((current) => current?.token === commandAction.token ? current : commandAction)
+  }, [commandAction])
+
+  /** The one manifest spec whose pose and cosmetic offset are on screen. */
+  const playingState = override?.state ?? active
+  const chainedFrom = override === null ? active : null
+  const playingSpec = useMemo(() => {
+    return resolveClipSpec(clips?.[playingState], seed)
+  }, [clips, playingState, seed])
+
+  useEffect(() => {
+    if (!playingSpec) {
+      currentAction.current?.fadeOut(FADE)
+      currentAction.current = null
+      currentSpec.current = null
+      currentWasOverride.current = false
+      return
+    }
+    const clip = animsByName.get(playingSpec.clip)
+    if (!clip) {
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn(
+          `[GameModel] ${url} has no clip "${playingSpec.clip}". Available: ${[...animsByName.keys()].join(', ')}`,
+        )
       }
       return
     }
 
-    if (commandAction.token === lastActionToken) return
-    setLastActionToken(commandAction.token)
-
-    const spec = clips?.[commandAction.state]
-    if (!spec) return
-
-    const specResolved = (Array.isArray(spec) ? spec[0] : spec)!
-    const clip = animsByName.get(specResolved.clip)
-    if (!clip) return
-
     const action = mixer.clipAction(clip)
-    const specObj = specResolved
+    // Command actions always interrupt once, even if their ordinary base-state
+    // mapping is a loop. Manifest one-shots behave the same way.
+    const once = override !== null || playingSpec.loop === false
+    const previous = currentAction.current
+    const previousSpec = currentSpec.current
 
-    if (specObj.loop === false) {
-      action.setLoop(LoopOnce, 1)
-      action.clampWhenFinished = true
-    } else {
-      action.setLoop(LoopRepeat, Infinity)
+    // Alias states can resolve to the same loop. Do not reset it just because
+    // gameplay changed the label from cruise to huntCarry, for example.
+    if (
+      override === null &&
+      !once &&
+      previous === action &&
+      canReuseLoopAction(
+        currentWasOverride.current,
+        override !== null,
+        previousSpec?.phaseGroup,
+        playingSpec.phaseGroup,
+      )
+    ) {
+      action.timeScale = playingSpec.timeScale ?? 1
+      currentSpec.current = playingSpec
+      return
     }
 
-    action.reset().play()
-    if (activeAction) activeAction.crossFadeTo(action, 0.2, true)
-    setActiveAction(action)
-  }, [commandAction, clips, animsByName, mixer, lastActionToken, activeAction])
+    const previousDuration = previous?.getClip().duration ?? 0
+    const synchronizedPhase =
+      !once &&
+      previous &&
+      previousSpec?.loop !== false &&
+      playingSpec.phaseGroup !== undefined &&
+      previousSpec?.phaseGroup === playingSpec.phaseGroup &&
+      previousDuration > 0
+        ? normalizedPlaybackPhase(previous.time, previousDuration)
+        : null
 
-  useEffect(() => {
-    const onFinished = () => {
-      if (!activeAction || !onActionFinished || !lastActionToken || !commandAction) return
-      const spec = clips?.[commandAction.state]
-      if (!spec) return
+    action.reset()
+    if (synchronizedPhase !== null) action.time = synchronizedPhase * clip.duration
+    action.timeScale = playingSpec.timeScale ?? 1
+    action.setLoop(once ? LoopOnce : LoopRepeat, once ? 1 : Infinity)
+    action.clampWhenFinished = once
+    const fade = playingSpec.fadeIn ?? FADE
+    action.play()
+    if (previous && previous !== action) action.crossFadeFrom(previous, fade, true)
+    else action.fadeIn(fade)
+    currentAction.current = action
+    currentSpec.current = playingSpec
+    currentWasOverride.current = override !== null
 
-      const specObj = (Array.isArray(spec) ? spec[0] : spec)!
-      if (specObj.loop === false) {
-        onActionFinished({ state: commandAction.state, token: lastActionToken })
+    const chained = chainedFrom !== null && once ? playingSpec.next : undefined
+    if (!chained && override === null) return
+
+    // Mixer events fire once and outside useFrame. Filtering by action identity
+    // prevents an unrelated base one-shot from completing the command channel.
+    const advance = (event: { action: AnimationAction }) => {
+      if (event.action !== action) return
+      if (override) {
+        const completed = override
+        setOverride(null)
+        onActionFinished?.(completed)
+      } else if (chained && chainedFrom && shouldApplyNext(requestedState.current, chainedFrom)) {
+        setActive(chained)
       }
     }
-    mixer.addEventListener('finished', onFinished)
-    return () => mixer.removeEventListener('finished', onFinished)
-  }, [activeAction, onActionFinished, lastActionToken, clips, commandAction])
+    mixer.addEventListener('finished', advance)
+    return () => mixer.removeEventListener('finished', advance)
+  }, [animsByName, chainedFrom, mixer, onActionFinished, override, playingSpec, url])
 
   useFrame((_, dt) => {
     if (frozen || manualMixer) return

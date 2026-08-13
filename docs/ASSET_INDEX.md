@@ -1,5 +1,9 @@
 # 3D asset library index
 
+For the runtime model registry, `/models` previewer, animation mappings, fallbacks,
+and contributor workflow, see `docs/MODEL_LIBRARY.md`. This index records source
+assets and art-direction decisions rather than runtime configuration.
+
 Source library: `/Users/ajadvanwyk/Documents/3Dassets`  
 Art direction: **flat-shaded low-poly**, led by Poly Perfect (PP) with selective
 use of the Low Poly Ultimate Asset Pack.

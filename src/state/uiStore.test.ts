@@ -3,7 +3,7 @@ import { useUi } from './uiStore'
 
 describe('interaction notices', () => {
   beforeEach(() => {
-    useUi.setState({ toast: null })
+    useUi.setState({ toast: null, toasts: [] })
   })
 
   afterEach(() => vi.restoreAllMocks())

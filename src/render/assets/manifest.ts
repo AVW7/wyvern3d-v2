@@ -290,6 +290,128 @@ function wyvernAsset(size: number): AssetEntry {
 }
 
 /**
+ * Thornwing's seven authored source clips. Keeping the clip names and measured
+ * fitting values in one place makes the manifest easy to update after the
+ * asset analyzer reports its final clearances.
+ */
+const THORNWING_SOURCE_CLIPS = {
+  idle: 'idle',
+  walk: 'walk',
+  takeoff: 'takeoff',
+  cruise: 'cruise',
+  land: 'land',
+  attack: 'attack',
+  death: 'death',
+} as const
+
+/**
+ * Per-source-clip fitting in Thornwing rig units. The build bakes measured
+ * visual RootMotion alignment into every grounded frame, so no static manifest
+ * lift is needed (and gait frames cannot hover when their low point changes).
+ * Flight keeps the authored origin because scene motion owns its altitude.
+ */
+const THORNWING_Y_OFFSETS: Record<keyof typeof THORNWING_SOURCE_CLIPS, number> = {
+  idle: 0,
+  walk: 0,
+  takeoff: 0,
+  cruise: 0,
+  land: 0,
+  attack: 0,
+  death: 0,
+}
+
+const THORNWING_IDLE: ClipSpec = {
+  clip: THORNWING_SOURCE_CLIPS.idle,
+  yOffset: THORNWING_Y_OFFSETS.idle,
+}
+const THORNWING_WALK: ClipSpec = {
+  clip: THORNWING_SOURCE_CLIPS.walk,
+  yOffset: THORNWING_Y_OFFSETS.walk,
+}
+const THORNWING_CRUISE: ClipSpec = {
+  clip: THORNWING_SOURCE_CLIPS.cruise,
+  yOffset: THORNWING_Y_OFFSETS.cruise,
+  phaseGroup: 'thornwing-flight',
+}
+const THORNWING_ATTACK: ClipSpec = {
+  clip: THORNWING_SOURCE_CLIPS.attack,
+  loop: false,
+  yOffset: THORNWING_Y_OFFSETS.attack,
+}
+/**
+ * Attack carries a measured 1.052532-unit visual ground alignment at its
+ * neutral endpoints. Airborne aliases cancel that carrier so switching from
+ * cruise does not move the creature roughly five world metres at scale 6.
+ */
+const THORNWING_ATTACK_AIR: ClipSpec = {
+  clip: THORNWING_SOURCE_CLIPS.attack,
+  loop: false,
+  yOffset: -1.052532,
+  fadeIn: 0.16,
+}
+
+/**
+ * Complete runtime coverage from Thornwing's compact seven-clip vertical
+ * slice. `satisfies Record` intentionally turns any future ModelState addition
+ * into a compile error here rather than a bind-pose fallback in the world.
+ */
+const THORNWING_CLIPS = {
+  idle: THORNWING_IDLE,
+  fly: {
+    clip: THORNWING_SOURCE_CLIPS.takeoff,
+    loop: false,
+    next: 'cruise',
+    yOffset: THORNWING_Y_OFFSETS.takeoff,
+  },
+  airborne: THORNWING_CRUISE,
+  attack: THORNWING_ATTACK,
+  attackAir: THORNWING_ATTACK_AIR,
+  walk: THORNWING_WALK,
+  run: THORNWING_WALK,
+  death: {
+    clip: THORNWING_SOURCE_CLIPS.death,
+    loop: false,
+    yOffset: THORNWING_Y_OFFSETS.death,
+  },
+  hop: THORNWING_WALK,
+  breathe: THORNWING_ATTACK,
+  breatheAir: THORNWING_ATTACK_AIR,
+  rest: THORNWING_IDLE,
+  land: {
+    clip: THORNWING_SOURCE_CLIPS.land,
+    loop: false,
+    next: 'idle',
+    yOffset: THORNWING_Y_OFFSETS.land,
+  },
+  sleep: THORNWING_IDLE,
+  sit: THORNWING_IDLE,
+  seated: THORNWING_IDLE,
+  rise: THORNWING_IDLE,
+  eat: THORNWING_IDLE,
+  huntGrip: THORNWING_ATTACK,
+  huntCarry: THORNWING_CRUISE,
+  huntFinish: THORNWING_ATTACK,
+  drink: THORNWING_IDLE,
+  groom: THORNWING_IDLE,
+  perch: THORNWING_IDLE,
+  cruise: THORNWING_CRUISE,
+  scout: THORNWING_CRUISE,
+  speed: THORNWING_CRUISE,
+  glide: THORNWING_CRUISE,
+  dive: THORNWING_CRUISE,
+  bankLeft: THORNWING_CRUISE,
+  bankRight: THORNWING_CRUISE,
+  hover: THORNWING_CRUISE,
+  nuzzle: THORNWING_IDLE,
+  calm: THORNWING_IDLE,
+  offer: THORNWING_IDLE,
+  pet: THORNWING_IDLE,
+  inspect: THORNWING_IDLE,
+  pickUp: THORNWING_ATTACK,
+  drop: THORNWING_ATTACK_AIR,
+} satisfies Record<ModelState, ClipSpec>
+
+/**
  * Wyvern model wired to the clean rig (wyvern.glb): 46 joints, wings parented
  * to Spine3 (not Neck), RootMotion bone.
  *
@@ -305,6 +427,12 @@ export const ASSETS: Record<AssetId, AssetEntry> = {
   'wyvern.mirefang': wyvernAsset(1),
   'wyvern.frostmaw': wyvernAsset(1.05),
   'wyvern.duskwyrm': wyvernAsset(1.1),
+  'wyvern.thornwing': {
+    url: '/models/thornwing.glb',
+    scale: 6,
+    yOffset: 0,
+    animations: THORNWING_CLIPS,
+  },
 
   /** Units - placeholder army troops */
   'unit.soldier': {

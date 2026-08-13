@@ -22,6 +22,14 @@ export type Intent =
   | { type: 'DISBAND_SQUAD'; squadId: string }
   | { type: 'STATION_SQUAD'; squadId: string; regionId: string | null }
   | { type: 'UPGRADE_BUILDING'; buildingId: BuildingId }
+  | { type: 'SET_ASSIGNED_WORKERS'; buildingId: BuildingId; count: number }
+  | { type: 'SET_RULER_TITLE'; title: 'king' | 'queen' }
+  | { type: 'SET_RULER_EDICT'; edict: 'conquest_harvest' | 'royal_garrison' | 'dragon_harmony' | 'grand_taxation' }
+  | { type: 'UPGRADE_ELEMENTAL_MASTERY'; element: 'fire' | 'water' | 'earth' | 'air' }
+  | { type: 'RESEARCH_PHILOSOPHY'; philosophyId: 'balance' | 'dominion' | 'stoicism' | 'hermetics' }
+  | { type: 'CRAFT_EQUIPMENT'; equipmentType: 'wyvern_armor' | 'flame_spears' | 'iron_shields' }
+  | { type: 'BREW_ELIXIR'; elixirType: 'vitality_salve' | 'dragon_tonic' | 'growth_elixir' }
+  | { type: 'USE_ELIXIR'; elixirType: 'vitality_salve' | 'dragon_tonic' | 'growth_elixir'; wyvernId: string }
   | {
       type: 'LAUNCH_ATTACK'
       regionId: string

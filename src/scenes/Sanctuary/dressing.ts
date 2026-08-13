@@ -176,7 +176,7 @@ export const PATHS: Record<'prop.pathA' | 'prop.pathB', PropPlacement[]> = {
 // ---------------------------------------------------------------------------
 
 /** Circles the scatter must not intrude on: the keep, every station, every perch. */
-function exclusions(): { x: number; z: number; r: number }[] {
+export function exclusions(): { x: number; z: number; r: number }[] {
   const zones = [
     // The keep, as a circle around its diagonal — deliberately generous, so no
     // tree ends up pressed against the wall the player walks along.

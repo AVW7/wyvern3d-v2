@@ -32,6 +32,15 @@ export const SPECIES: Record<string, WyvernSpecies> = {
     growth: { power: 2.2, speed: 2.8, stamina: 1.9, firepower: 2.9, armor: 1.5 },
     traitPool: ['venomous', 'skittish', 'hotblooded'],
   },
+  thornwing: {
+    id: 'thornwing',
+    name: 'Thornwing',
+    color: '#688c4a',
+    tier: 2,
+    baseStats: { power: 29, speed: 34, stamina: 25, firepower: 22, armor: 17 },
+    growth: { power: 2.7, speed: 3.1, stamina: 1.9, firepower: 2.1, armor: 1.4 },
+    traitPool: ['skittish', 'venomous', 'loyal'],
+  },
   frostmaw: {
     id: 'frostmaw',
     name: 'Frostmaw',
