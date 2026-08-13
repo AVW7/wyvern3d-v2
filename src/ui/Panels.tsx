@@ -659,6 +659,19 @@ function WarTablePanel() {
         subtitle={`Tier ${target.tier} · ${target.biome} · drops ${SPECIES[target.nativeSpecies]?.name} eggs`}
       />
 
+      <div style={{ marginBottom: 12 }}>
+        <button
+          className="primary"
+          style={{ width: '100%' }}
+          onClick={() => {
+            setMode('biome')
+            close()
+          }}
+        >
+          🌐 Explore Region (3D Biome World)
+        </button>
+      </div>
+
       {region.owner === 'player' ? (
         <p className="subtitle" style={{ color: 'var(--good)' }}>
           You already hold this region. Unrest {Math.round(region.unrest)}%.

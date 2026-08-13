@@ -30,10 +30,12 @@ const LABELS: Partial<Record<AssetId, string>> = {
   'prop.tree': 'Tree',
   'prop.rock': 'Rock',
   'wildlife.deer': 'Deer',
+  'wildlife.guineafowl': 'Guineafowl',
   'library.alchemistWorkstation': 'Arcane Alchemist Workstation',
   'library.forestWyvernDisplay': 'Forest Wyvern Display',
   'library.arcaneAcademyCrest': 'Arcane Academy Crest',
   'library.throneOfBooks': 'Throne of Books',
+  'library.ancientTree': 'Ancient World Tree',
 }
 
 const CATEGORY_LABELS: Record<string, string> = {

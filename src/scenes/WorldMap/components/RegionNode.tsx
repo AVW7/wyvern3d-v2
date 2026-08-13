@@ -181,6 +181,18 @@ export function RegionNode({
           </mesh>
         </group>
       )}
+      {def.biome === 'grove' && (
+        <group position={[0, baseHeight + 0.6, 0]}>
+          <mesh position={[0, 0.9, 0]}>
+            <cylinderGeometry args={[0.22, 0.35, 1.8, 6]} />
+            <meshStandardMaterial color="#59422e" roughness={0.9} />
+          </mesh>
+          <mesh position={[0, 2.1, 0]}>
+            <sphereGeometry args={[1.35, 12, 10]} />
+            <meshStandardMaterial color="#6f8a3f" roughness={0.8} />
+          </mesh>
+        </group>
+      )}
       {def.biome === 'mountain' && (
         <group position={[0, baseHeight + 0.6, 0]}>
           <mesh position={[-radius * 0.2, 1, -radius * 0.2]}>

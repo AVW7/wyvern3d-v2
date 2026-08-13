@@ -63,11 +63,12 @@ export function capacityOf(state: GameState, id: BuildingId): number {
 export const ownedRegions = (state: GameState): RegionState[] =>
   Object.values(state.regions).filter((r) => r.owner === 'player')
 
-/** A region is attackable when an adjacent region is already held. */
+/** A region is attackable when an adjacent region is already held (or all regions in dev mode for testing). */
 export function isAttackable(state: GameState, regionId: string): boolean {
   const region = state.regions[regionId]
   const def = REGIONS[regionId]
   if (!region || !def || region.owner === 'player') return false
+  if (process.env.NODE_ENV === 'development') return true
   return def.neighbors.some((n) => state.regions[n]?.owner === 'player')
 }
 

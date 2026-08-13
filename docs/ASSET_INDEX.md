@@ -27,6 +27,17 @@ The sanctuary currently ships one generated runtime atlas:
 - Scene placement: `src/scenes/Sanctuary/dressing.ts` and
   `src/scenes/Sanctuary/SanctuaryScene.tsx`.
 
+Animated prey now ship separately from the static atlas:
+
+- `public/models/wildlife/doe.glb`: 19,950 triangles, 48 bones, 46 clips, numerically fitted to 1.35 m overall height; used by sanctuary deer and the Highlands hunt.
+- `public/models/wildlife/guineafowl.glb`: 9,105 triangles, 165 bones, 3 clips, numerically fitted to 0.55 m overall height; a deliberately small sanctuary flock representing bird prey.
+Biome landmarks ship the same way:
+
+- `public/models/library/ancient-tree.glb`: 17,482 triangles, static, numerically fitted to 34 m overall height; the world tree at the centre of the Elderroot Grove region (`grove` biome), placed by `src/scenes/BiomeWorld/dressing/GroveLandmark.tsx`. Licence status pending — see `CREDITS.md`.
+
+- Intake command: `pnpm assets:inspect-model <file.glb> <target-height-metres>` (handles meshopt-compressed GLBs).
+- Acceptance gate: `src/render/assets/wildlifeModels.test.ts`.
+
 The 57 logical props are:
 
 | Area | Used asset families |

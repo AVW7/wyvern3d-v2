@@ -134,6 +134,14 @@ export function Hud() {
                 >
                   <MapIcon /> Map
                 </button>
+                {mode === 'biome' && (
+                  <button
+                    className="nav-pill-btn active"
+                    onClick={() => setMode('biome')}
+                  >
+                    <span style={{ fontSize: 13, marginRight: 2 }}>🌐</span> Biome World
+                  </button>
+                )}
                 <button
                   className={`nav-pill-btn ${mode === 'highlands' ? 'active' : ''}`}
                   onClick={() => {
@@ -441,6 +449,13 @@ function Controls({ mode }: { mode: string }) {
           <div className="hint-row">
             <kbd>E</kbd> station
           </div>
+        </>
+      ) : mode === 'biome' ? (
+        <>
+          <div className="hint-row">
+            <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> fly wyvern · <kbd>Shift</kbd> boost
+          </div>
+          <div className="hint-row">drag orbit · scroll zoom</div>
         </>
       ) : mode === 'highlands' ? (
         <>

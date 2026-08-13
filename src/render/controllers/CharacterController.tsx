@@ -53,11 +53,17 @@ export function CharacterController({
   onCommandArrival,
   onCommandCancel,
   acceptGroundClicks = true,
+  groundHeightAt,
   children,
 }: {
   spawn?: [number, number, number]
   colliders?: Collider[]
   bounds?: number
+  /**
+   * Terrain sampler for scenes whose ground is not flat. Omit it and the
+   * character stays on the y=0 plane, which is what the sanctuary wants.
+   */
+  groundHeightAt?: (x: number, z: number) => number
   /** Called every frame. Must not call setState — mutate a ref instead. */
   onUpdate?: (state: CharacterState) => void
   /** Optional external walk order used by sanctuary contact interactions. */
@@ -243,6 +249,10 @@ export function CharacterController({
     if (flat > bounds) {
       position.current.x *= bounds / flat
       position.current.z *= bounds / flat
+    }
+
+    if (groundHeightAt) {
+      position.current.y = groundHeightAt(position.current.x, position.current.z)
     }
 
     if (group.current) {

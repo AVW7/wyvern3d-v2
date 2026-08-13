@@ -15,6 +15,7 @@ export const BIOME_COLORS: Record<string, string> = {
   mountain: '#5b616e',
   cavern: '#6a3f8c',
   jungle: '#1d7a3e',
+  grove: '#5f7d3a',
   swamp: '#356147',
   ashland: '#753b30',
   tundra: '#437585',

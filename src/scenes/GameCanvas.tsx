@@ -8,6 +8,7 @@ import { SanctuaryScene } from './Sanctuary/SanctuaryScene'
 import { WorldMapScene } from './WorldMap/WorldMapScene'
 import { BattleScene } from './Battle/BattleScene'
 import { HighlandsScene } from './Highlands/HighlandsScene'
+import { BiomeScene } from './BiomeWorld/BiomeScene'
 import { usePropAtlas } from '@/render/assets/props'
 
 /**
@@ -48,6 +49,7 @@ export function GameCanvas({ onCanvasReady }: { onCanvasReady?: () => void }) {
       {mode === 'worldmap' && <WorldMapScene />}
       {mode === 'battle' && <BattleScene />}
       {mode === 'highlands' && <HighlandsScene />}
+      {mode === 'biome' && <BiomeScene />}
     </Canvas>
   )
 }

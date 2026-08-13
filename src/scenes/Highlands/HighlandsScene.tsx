@@ -274,7 +274,7 @@ function HighlandsDoeActor({ doe }: { doe: HighlandsDoe }) {
     if (doe.lifecycle === 'feeding') {
       const t = frame.clock.elapsedTime * 6
       const tug = Math.max(0, Math.sin(t)) * 0.12
-      group.current.position.set(doe.position[0], 0.35 + tug * 0.4, doe.position[1] + tug * 0.2)
+      group.current.position.set(doe.position[0], tug * 0.4, doe.position[1] + tug * 0.2)
       group.current.rotation.z = Math.sin(t * 0.5) * 0.08
       return
     }
@@ -283,7 +283,7 @@ function HighlandsDoeActor({ doe }: { doe: HighlandsDoe }) {
     const drift = doe.animation === 'walk' ? 1.25 : 0.35
     const x = doe.position[0] + Math.cos(t) * drift
     const z = doe.position[1] + Math.sin(t * 0.8) * drift * 0.6
-    group.current.position.set(x, 0.35, z)
+    group.current.position.set(x, 0, z)
     if (doe.animation === 'walk') {
       group.current.rotation.y = Math.atan2(-Math.sin(t), Math.cos(t * 0.8) * 0.8)
     } else {
@@ -302,7 +302,7 @@ function HighlandsDoeActor({ doe }: { doe: HighlandsDoe }) {
   }
 
   return (
-    <group ref={group} position={[doe.position[0], 0.35, doe.position[1]]} rotation={[0, doe.yaw, 0]}>
+    <group ref={group} position={[doe.position[0], 0, doe.position[1]]} rotation={[0, doe.yaw, 0]}>
       <GameModel
         id="wildlife.deer"
         state={doe.animation}

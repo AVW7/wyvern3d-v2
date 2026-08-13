@@ -36,6 +36,23 @@ Drag the preview to orbit and scroll to zoom. Changing the selected asset resets
 
 Before importing third-party work, verify its licence and redistribution terms and record required attribution in `CREDITS.md`. `docs/ASSET_INDEX.md` is the source-asset inventory and art-direction reference; this guide covers the runtime registry rather than duplicating that inventory.
 
+## Asset intake requirements
+
+Every new world model must have a written target before anyone adjusts its manifest scale. Review is numeric first and visual second.
+
+1. **Provenance:** record title, author, source URL, licence, redistribution permission, and modifications in `CREDITS.md`. Reject unknown or incompatible licences.
+2. **Declared role:** name the logical asset ID, target scenes, expected maximum simultaneous instances, whether it is static or skinned, required gameplay-facing clips, and its real-world target dimensions in metres. One world unit is one metre.
+3. **Source inspection:** run `pnpm assets:inspect-model <file.glb> <target-height-metres>`. Record bounds, triangle count, materials/textures, skins/bones, and exact clip names. Never infer scale from the file's unit setting or object name.
+4. **Scale and ground fit:** calculate `manifest scale = target height / measured posed height`; use the reported `yOffsetRigUnits = -bounds.min.y`. Verify the fitted width and length remain anatomically plausible. Do not compensate with scene-specific magic scale or Y offsets.
+5. **Orientation and origin:** in the Model Library, confirm Y-up, the expected forward direction, feet/contact surface at Y=0, a stable root, and no unexpected root motion. Apply object rotation/scale before export when authoring in Blender.
+6. **Geometry budget:** ordinary web animals must be at most 30,000 triangles; prefer at most 10,000 for repeated ambient creatures. Declare an instance budget. A skinned creature is never eligible for `InstancedMesh`; reduce count, bones, or use a non-skinned distance representation.
+7. **Materials and textures:** glTF must use metallic/roughness PBR. Convert `KHR_materials_pbrSpecularGlossiness`; use Principled BSDF-compatible materials; cap ordinary textures at 1024 px; verify base colour, normals, roughness, alpha, and colour space in three.js, not only Blender.
+8. **Rig and animation:** preserve hierarchy for skinned assets; no flatten/join/palette/instance optimization. Limit weights to four per vertex. Map only clips that exist, mark one-shots `loop: false`, check loop seams and root motion, and test at least two simultaneous clones to expose broken skeleton cloning.
+9. **Runtime package:** ship GLB under `public/models/`, use a stable lowercase filename, keep an ordinary asset under the 15 MB hard cap and preferably under 8 MB, then add its cosmetic manifest entry. Simulation collision/range values remain in `src/core/**` and never come from mesh bounds.
+10. **Acceptance:** inspect every mapped state in `/models`, compare against a 1.6 m player and a known metre marker, check ground contact from front/side, test all target scenes at the declared maximum instance count, toggle the fallback, and run `pnpm typecheck && pnpm lint && pnpm test`.
+
+For important or repeated assets, add a focused test like `wildlifeModels.test.ts` that locks the shipped GLB's measured height, ground offset, triangle budget, rig/clip inventory, and forbidden extensions. A manifest number without a measurement-backed test is provisional.
+
 ### Static model
 
 1. Optimize the source GLB for the web and place the finished file under `public/models/` (or `public/models/library/` for showcase imports).

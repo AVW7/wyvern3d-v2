@@ -14,6 +14,7 @@
     "assets:validate-wyvern": "node scripts/validate-wyvern-clips.mjs",
     "assets:validate-v1-catalog": "node scripts/validate-v1-action-catalog.mjs",
     "assets:food": "node scripts/build-food-models.mjs",
+    "assets:inspect-model": "node scripts/inspect-model-asset.mjs",
     "assets:player-sidecars": "python3 scripts/extract-meshy-animation-sidecars.py",
     "assets:player-lod": "node scripts/build-player-lod.mjs",
     "assets:player-references": "python3 scripts/prepare-player-references.py",

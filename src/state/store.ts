@@ -8,7 +8,7 @@ import { createInitialState } from '@/core/state/game'
 import { executeNextTick } from '@/core/state/tick'
 import { loadGame, localStorageAdapter, saveGame, SAVE_KEY } from '@/core/state/save'
 
-export type SceneMode = 'sanctuary' | 'worldmap' | 'battle' | 'highlands'
+export type SceneMode = 'sanctuary' | 'worldmap' | 'battle' | 'highlands' | 'biome'
 
 interface GameStore {
   /** The live core state. Mutated in place — never spread or cloned per frame. */

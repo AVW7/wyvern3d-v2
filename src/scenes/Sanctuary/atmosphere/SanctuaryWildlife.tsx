@@ -11,13 +11,15 @@ import { alarmLevel, fleeHeading, placeDeer } from './wildlifeLogic'
 /**
  * Ambient deer at the treeline.
  *
- * Kept small on purpose. `wildlife.deer` currently has `url: null` in the
- * manifest, so every one of these renders the cheap procedural fallback below;
- * if a real model is ever assigned to that slot it must stay non-skinned at
- * this count, because the documented 60fps ceiling for this scene is already
- * spent on eight skinned wyverns.
+ * Kept small because these supplied prey assets are skinned. Their count is a
+ * deliberate part of the scene budget alongside the sanctuary wyverns.
  */
-const HERD_SIZE = 5
+const HERD_SIZE = 3
+
+const GUINEAFOWL = [
+  { id: 'guineafowl-1', position: [-24, 0, 6] as const, yaw: 0.8 },
+  { id: 'guineafowl-2', position: [-26, 0, 8] as const, yaw: -0.35 },
+]
 
 export function SanctuaryWildlife({ agents }: { agents: React.RefObject<Map<string, Agent>> }) {
   const state = useGameState()
@@ -104,6 +106,31 @@ export function SanctuaryWildlife({ agents }: { agents: React.RefObject<Map<stri
           </group>
         </group>
       ))}
+      {GUINEAFOWL.map((bird, index) => (
+        <group key={bird.id} position={bird.position} rotation={[0, bird.yaw, 0]}>
+          <GameModel
+            id="wildlife.guineafowl"
+            state="idle"
+            seed={index}
+            fallback={<GuineafowlFallback />}
+          />
+        </group>
+      ))}
+    </group>
+  )
+}
+
+function GuineafowlFallback() {
+  return (
+    <group position={[0, 0.28, 0]}>
+      <mesh castShadow>
+        <sphereGeometry args={[0.2, 8, 6]} />
+        <meshStandardMaterial color="#4f5960" roughness={0.95} />
+      </mesh>
+      <mesh position={[0, 0.16, 0.15]} castShadow>
+        <sphereGeometry args={[0.09, 7, 5]} />
+        <meshStandardMaterial color="#27333b" roughness={0.95} />
+      </mesh>
     </group>
   )
 }

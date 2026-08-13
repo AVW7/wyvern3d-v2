@@ -497,9 +497,28 @@ export const ASSETS: Record<AssetId, AssetEntry> = {
 
   /** Wildlife - placeholder ambient creatures */
   'wildlife.deer': {
-    url: null,
-    scale: 1,
-    animations: {},
+    url: '/models/wildlife/doe.glb',
+    // Numeric fit: 1.77004 authored units high -> 1.35 m adult doe.
+    scale: 0.7627,
+    yOffset: 0.0146,
+    animations: {
+      idle: { clip: 'SK-Deer_Female|AA_Stand_Idle_01' },
+      walk: { clip: 'SK-Deer_Female|Loco_Walk' },
+      run: { clip: 'SK-Deer_Female|Loco_Run' },
+      eat: { clip: 'SK-Deer_Female|Stand_Eating_01' },
+      death: { clip: 'SK-Deer_Female|Death_Stand_R01', loop: false },
+    },
+  },
+  'wildlife.guineafowl': {
+    url: '/models/wildlife/guineafowl.glb',
+    // Numeric fit: 0.64765 authored units high -> 0.55 m adult bird.
+    scale: 0.84922,
+    yOffset: 0.00279,
+    animations: {
+      idle: { clip: 'Guineafowl|Guineafowl_A_Idle' },
+      walk: { clip: 'Guineafowl|Guineafowl_A_WalkMedium' },
+      fly: { clip: 'Guineafowl|Guineafowl_B_FlyFlapping' },
+    },
   },
 
   /** Imported Meshy showcase assets. Static and cosmetic until placed by a scene/editor. */
@@ -519,6 +538,22 @@ export const ASSETS: Record<AssetId, AssetEntry> = {
     url: '/models/library/arcane-academy-crest.glb',
     scale: 1.25,
     yOffset: 1,
+    animations: {},
+  },
+  /**
+   * The Elderroot Grove landmark. Numeric fit: 1150.08 authored units tall ->
+   * 34 m, which reads as a canopy a wyvern can circle rather than a set piece.
+   *
+   * The offset is deliberately *not* the usual -min.y. Only seven vertices sit
+   * at the model's lowest point — dangling root tips 11 m out — while the
+   * trunk's underside is 2.4 m above them, so planting the bounding box left
+   * the whole tree hovering on its root tips. This offset drops it by that 2.4
+   * m instead: the trunk meets the ground and the tips bury.
+   */
+  'library.ancientTree': {
+    url: '/models/library/ancient-tree.glb',
+    scale: 0.02956,
+    yOffset: 1.5927,
     animations: {},
   },
   'library.throneOfBooks': {
