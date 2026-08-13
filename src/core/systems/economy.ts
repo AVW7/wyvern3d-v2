@@ -30,19 +30,41 @@ export function goldDemand(state: GameState): number {
   return total
 }
 
+export function edictYieldMultiplier(edict: string | undefined, resourceId: string): number {
+  if (edict === 'conquest_harvest') return 1.25
+  if (edict === 'grand_taxation' && resourceId === 'gold') return 1.5
+  return 1.0
+}
+
+/** Total yields produced by held regions taking unrest and ruler edicts into account. */
+export function regionYields(state: GameState): Record<string, number> {
+  const yields: Record<string, number> = {}
+  for (const id of RESOURCE_IDS) yields[id] = 0
+
+  const edict = state.realm?.ruler?.edict
+  for (const region of Object.values(state.regions)) {
+    if (region.owner !== 'player') continue
+    const def = REGIONS[region.id]
+    if (!def) continue
+    const mult = yieldMultiplier(region.unrest)
+
+    for (const id of RESOURCE_IDS) {
+      const base = def.yields[id] ?? 0
+      const eMult = edictYieldMultiplier(edict, id)
+      yields[id] = (yields[id] ?? 0) + base * mult * eMult
+    }
+  }
+  return yields
+}
+
 /** Net per-tick resource change, for the UI's income readout. */
 export function netIncome(state: GameState): Record<string, number> {
   const net: Record<string, number> = {}
   for (const id of RESOURCE_IDS) net[id] = 0
 
   // Regional conquest yields
-  for (const region of Object.values(state.regions)) {
-    if (region.owner !== 'player') continue
-    const def = REGIONS[region.id]
-    if (!def) continue
-    const mult = yieldMultiplier(region.unrest)
-    for (const id of RESOURCE_IDS) net[id] = (net[id] ?? 0) + (def.yields[id] ?? 0) * mult
-  }
+  const rYields = regionYields(state)
+  for (const id of RESOURCE_IDS) net[id] = (net[id] ?? 0) + (rYields[id] ?? 0)
 
   // Sanctuary Aqueduct Water output
   const aqueductLvl = state.buildings.aqueduct ?? 0
@@ -85,14 +107,9 @@ export function netIncome(state: GameState): Record<string, number> {
 
 export function economyTick(state: GameState): void {
   // Production from held regions.
-  for (const region of Object.values(state.regions)) {
-    if (region.owner !== 'player') continue
-    const def = REGIONS[region.id]
-    if (!def) continue
-    const mult = yieldMultiplier(region.unrest)
-    for (const id of RESOURCE_IDS) {
-      state.resources[id] += (def.yields[id] ?? 0) * mult
-    }
+  const rYields = regionYields(state)
+  for (const id of RESOURCE_IDS) {
+    state.resources[id] += rYields[id] ?? 0
   }
 
   // 1. Water Collection from Wells & Aqueducts

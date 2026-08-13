@@ -11,7 +11,7 @@ import { createRng } from './math/rng'
 import { autoResolveConfig } from './combat/autoResolve'
 import { buildEncounterConfig } from './combat/setup'
 import { createEncounter } from './combat/encounter'
-import { deserialize, migrate, serialize } from './state/save'
+import { serialize, deserialize, migrate } from './state/save'
 import { breedStats, effectiveStats, rollSpeciesStats, STAT_IDS } from './entities/wyvern'
 import type { Intent } from './intents'
 import type { GameState } from './types'
@@ -316,6 +316,25 @@ describe('conquest', () => {
     expect(isAttackable(state, 'hearthvale')).toBe(false)
   })
 
+  it('backfills missing regions on save deserialization', () => {
+    const state = createInitialState(42)
+    if (state.regions['ashfen']) {
+      state.regions['ashfen'].garrison = []
+      state.regions['ashfen'].unrest = 45
+    }
+    delete (state.regions as Record<string, unknown>)['duskspire']
+    expect(state.regions['duskspire']).toBeUndefined()
+
+    const serialized = serialize(state, 1000)
+    const loaded = deserialize(serialized, 1000)
+    expect(loaded).not.toBeNull()
+    const restored = loaded!.state
+    expect(restored.regions['duskspire']).toBeDefined()
+    expect(restored.regions['duskspire']?.garrison.length).toBeGreaterThan(0)
+    expect(restored.regions['ashfen']?.unrest).toBe(45)
+    expect(restored.regions['ashfen']?.garrison).toEqual([])
+  })
+
   it('flips a region on an auto-resolved victory and pays out', () => {
     const state = createInitialState(9)
     // Give the player enough force that the first region is a formality.
@@ -570,7 +589,7 @@ describe('save', () => {
     const state = createInitialState(55)
     const old = { ...state, saveVersion: 0 } as GameState
     const migrated = migrate(old)
-    expect(migrated.saveVersion).toBe(6)
+    expect(migrated.saveVersion).toBe(8)
     expect(migrated.resources.water).toBeDefined()
     expect(migrated.resources.hide).toBeDefined()
     expect(migrated.resources.iron).toBeDefined()
@@ -587,7 +606,7 @@ describe('save', () => {
 
     const migrated = migrate(old)
 
-    expect(migrated.saveVersion).toBe(6)
+    expect(migrated.saveVersion).toBe(8)
     expect(huntingPen.position).toEqual([-30, 0, 2])
     expect(flightRing.position).toEqual([7, 0, 7])
   })

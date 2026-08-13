@@ -5,7 +5,7 @@ import type { RegionDef } from '../types'
  * already hold, so the tier ladder doubles as the difficulty curve: you cannot
  * reach Duskspire without first taking a path of tier 1–3 regions.
  *
- * `neighbors` must be symmetric — asserted in regions.test.ts.
+ * `neighbors` must be symmetric — asserted in core.test.ts.
  */
 export const REGIONS: Record<string, RegionDef> = {
   hearthvale: {

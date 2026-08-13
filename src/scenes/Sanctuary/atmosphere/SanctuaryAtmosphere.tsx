@@ -50,6 +50,7 @@ export function SanctuaryAtmosphere() {
   useEffect(() => {
     const previousFog = scene.fog
     const previousBackground = scene.background
+    const previousExposure = gl.toneMappingExposure
     scene.fog = new Fog('#c3cbd4', 52, 190)
     scene.background = new Color('#c3cbd4')
     return () => {
@@ -57,8 +58,9 @@ export function SanctuaryAtmosphere() {
       // highlands scenes, so this must hand back what it found.
       scene.fog = previousFog
       scene.background = previousBackground
+      gl.toneMappingExposure = previousExposure
     }
-  }, [scene])
+  }, [scene, gl])
 
   useFrame(() => {
     const sky = skyStateFor(useGame.getState().state.tick)

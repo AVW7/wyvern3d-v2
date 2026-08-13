@@ -13,6 +13,7 @@ import { TRAITS } from '@/core/data/traits'
 import { UNIT_LIST, UNITS } from '@/core/data/units'
 import { capacityOf, isAttackable } from '@/core/state/game'
 import { isDeployable, powerRating, getWyvernLevelProgress } from '@/core/entities/wyvern'
+import { pathToRegion } from '@/scenes/WorldMap/mapGraph'
 import { CameraSettingsPanel } from './CameraSettingsPanel'
 import { EconomyManagementPanel } from '@/scenes/Sanctuary/ui/EconomyManagementPanel'
 import { RealmGovernancePanel } from '@/scenes/Sanctuary/ui/RealmGovernancePanel'
@@ -677,9 +678,21 @@ function WarTablePanel() {
           You already hold this region. Unrest {Math.round(region.unrest)}%.
         </p>
       ) : !attackable ? (
-        <p className="subtitle" style={{ color: 'var(--bad)' }}>
-          Not reachable — you must hold a neighbouring region first.
-        </p>
+        <div className="card" style={{ marginBottom: 14 }}>
+          <p className="subtitle" style={{ color: 'var(--bad)', margin: 0 }}>
+            Not reachable — you must hold a neighbouring region first.
+          </p>
+          {(() => {
+            const path = pathToRegion(state, selectedRegion)
+            if (!path || path.length <= 1) return null
+            const pathNames = path.map((id) => REGIONS[id]?.name ?? id).join(' → ')
+            return (
+              <p className="subtitle" style={{ marginTop: 6, fontSize: 11 }}>
+                Shortest Conquest Path: <span style={{ color: 'var(--text)' }}>{pathNames}</span>
+              </p>
+            )
+          })()}
+        </div>
       ) : (
         <>
           <div className="card" style={{ marginBottom: 14 }}>

@@ -112,6 +112,10 @@ export const CONFIG = {
     minYieldMultiplier: 0.2,
     /** Eggs a region drops on conquest. */
     eggsOnConquest: 2,
+    /** Ticks for a garrisoned matching wyvern to regenerate 1 egg. */
+    eggRegenTicks: 60,
+    /** Max eggs a region can hold in reserve. */
+    maxEggsHeld: 3,
   },
 
   army: {
@@ -156,4 +160,4 @@ export const CONFIG = {
   logLimit: 60,
 } as const
 
-export const SAVE_VERSION = 6
+export const SAVE_VERSION = 8

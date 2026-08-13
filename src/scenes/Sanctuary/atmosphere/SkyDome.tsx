@@ -19,7 +19,13 @@ export interface SkyDomeHandle {
   setColors: (horizon: Rgb, zenith: Rgb) => void
 }
 
-export function SkyDome({ handleRef }: { handleRef: { current: SkyDomeHandle | null } }) {
+export function SkyDome({
+  handleRef,
+  radius = 340,
+}: {
+  handleRef: { current: SkyDomeHandle | null }
+  radius?: number
+}) {
   const material = useMemo(
     () =>
       new ShaderMaterial({
@@ -54,7 +60,7 @@ export function SkyDome({ handleRef }: { handleRef: { current: SkyDomeHandle | n
     [],
   )
 
-  const geometry = useMemo(() => new SphereGeometry(340, 32, 20), [])
+  const geometry = useMemo(() => new SphereGeometry(radius, 32, 20), [radius])
   const horizon = useRef(new Color())
   const zenith = useRef(new Color())
 

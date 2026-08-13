@@ -1,7 +1,7 @@
 import type { BuildingId, GameState, LogEntry, RegionState, Resources, ResourceId } from '../types'
 import { BUILDINGS } from '../data/buildings'
 import { CONFIG, SAVE_VERSION } from '../data/config'
-import { REGIONS, REGION_LIST, STARTING_REGION } from '../data/regions'
+import { REGIONS, STARTING_REGION } from '../data/regions'
 import { SPECIES } from '../data/species'
 import { createRng, type Rng } from '../math/rng'
 import { createWyvern, nameFor, rollSpeciesStats, rollSpeciesTraits } from '../entities/wyvern'
@@ -21,8 +21,8 @@ export const emptyResources = (): Resources => ({
 
 /**
  * Runs `fn` with an RNG resumed from the state's stored cursor, then writes the
- * cursor back. Every random draw in the core must go through this — a stray
- * `Math.random()` silently breaks replay and the balance harness.
+ * cursor back. Every random draw in the core must go through this — unseeded
+ * random draws silently break replay and the balance harness.
  */
 export function withRng<T>(state: GameState, fn: (rng: Rng) => T): T {
   const rng = createRng(state.rngState)
@@ -63,16 +63,16 @@ export function capacityOf(state: GameState, id: BuildingId): number {
 export const ownedRegions = (state: GameState): RegionState[] =>
   Object.values(state.regions).filter((r) => r.owner === 'player')
 
-/** A region is attackable when an adjacent region is already held (or all regions in dev mode for testing). */
+/** A region is attackable when an adjacent region is already held. */
 export function isAttackable(state: GameState, regionId: string): boolean {
   const region = state.regions[regionId]
   const def = REGIONS[regionId]
   if (!region || !def || region.owner === 'player') return false
-  if (process.env.NODE_ENV === 'development') return true
   return def.neighbors.some((n) => state.regions[n]?.owner === 'player')
 }
 
 import { createDefaultSanctuaryLayout } from './sanctuaryLayout'
+import { ensureRegions } from './regionsState'
 
 export function createInitialState(seed: number): GameState {
   const state: GameState = {
@@ -148,16 +148,7 @@ export function createInitialState(seed: number): GameState {
     lastBattle: null,
   }
 
-  for (const def of REGION_LIST) {
-    state.regions[def.id] = {
-      id: def.id,
-      owner: def.starting ? 'player' : 'enemy',
-      unrest: 0,
-      garrison: def.garrison.map((g) => ({ ...g })),
-      eggsAvailable: def.starting ? 0 : CONFIG.region.eggsOnConquest,
-      conqueredAtTick: def.starting ? 0 : null,
-    }
-  }
+  ensureRegions(state)
 
   withRng(state, (rng) => {
     for (const speciesId of CONFIG.starting.wyverns) {

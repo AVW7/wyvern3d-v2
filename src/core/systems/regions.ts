@@ -40,6 +40,18 @@ export function regionTick(state: GameState): void {
 
     if (region.unrest >= CONFIG.region.revoltAt) {
       revolt(state, region.id)
+      continue
+    }
+
+    // Wyvern garrison egg regeneration: matching species regenerates eggs
+    const def = REGIONS[region.id]
+    if (def && state.tick > 0 && state.tick % CONFIG.region.eggRegenTicks === 0) {
+      const garrisonedWyvern = Object.values(state.wyverns).find(
+        (w) => w.assignment.kind === 'garrison' && w.assignment.regionId === region.id
+      )
+      if (garrisonedWyvern && garrisonedWyvern.speciesId === def.nativeSpecies) {
+        region.eggsAvailable = Math.min(region.eggsAvailable + 1, CONFIG.region.maxEggsHeld)
+      }
     }
   }
 }

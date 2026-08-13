@@ -33,11 +33,13 @@ export default tseslint.config(
       'no-restricted-globals': [
         'error',
         { name: 'Date', message: 'src/core must be deterministic — take time as a tick parameter instead.' },
+        { name: 'process', message: 'src/core must be environment-agnostic — do not read process or process.env in core.' },
       ],
       'no-restricted-properties': [
         'error',
         { object: 'Math', property: 'random', message: 'src/core must be deterministic — use the seeded rng from @/core/math/rng.' },
         { object: 'Date', property: 'now', message: 'src/core must be deterministic — take time as a tick parameter instead.' },
+        { object: 'process', property: 'env', message: 'src/core must be environment-agnostic — do not read process.env in core.' },
       ],
     },
   },

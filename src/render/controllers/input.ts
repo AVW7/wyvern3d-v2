@@ -71,6 +71,12 @@ export const CONTROLS = {
 } as const
 
 /** Installs the global listeners. Mount exactly once, at the app root. */
+export const CLICK_SLOP = 6
+
+export function pointerDownPosition(): { x: number; y: number } {
+  return { x: pointer.downX, y: pointer.downY }
+}
+
 export function useInputListeners(): void {
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -93,6 +99,7 @@ export function useInputListeners(): void {
         pointer.dragY += e.movementY
       }
     }
+
     const onPointerDown = (e: PointerEvent) => {
       if (e.button === 0 && e.target instanceof HTMLCanvasElement) {
         pointer.dragging = true
@@ -106,7 +113,7 @@ export function useInputListeners(): void {
       pointer.dragging = false
       // A short release is a movement order. Larger movements remain camera
       // orbit gestures and must not send the character walking afterwards.
-      if (Math.hypot(e.clientX - pointer.downX, e.clientY - pointer.downY) <= 6) {
+      if (Math.hypot(e.clientX - pointer.downX, e.clientY - pointer.downY) <= CLICK_SLOP) {
         pointer.x = (e.clientX / window.innerWidth) * 2 - 1
         pointer.y = -((e.clientY / window.innerHeight) * 2 - 1)
         pointer.clicked = true

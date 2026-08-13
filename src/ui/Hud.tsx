@@ -14,6 +14,7 @@ import { QuickLevelWidget } from './QuickLevelWidget'
 import { ControlShiftWidget } from './ControlShiftWidget'
 import { useCameraStore } from '@/state/cameraStore'
 import { InteractionNotice } from './InteractionNotice'
+import { RegionInspector } from './RegionInspector'
 import { HighlandsHud } from './HighlandsHud'
 import { useHighlandsHunt } from '@/state/highlandsHuntStore'
 
@@ -65,6 +66,7 @@ export function Hud() {
     <div className="overlay">
       <CameraTransitionFlash />
       <InteractionNotice />
+      <RegionInspector />
       {/* Standalone button shown ONLY when HUD is hidden */}
       {hudHidden && (
         <button

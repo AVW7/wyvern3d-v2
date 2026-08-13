@@ -5,6 +5,7 @@ import { createRng, deriveSeed } from '../math/rng'
 import { nextId } from './game'
 import { advanceTicks } from './tick'
 import { ensureSanctuaryLayout, migrateLegacySanctuaryLayout } from './sanctuaryLayout'
+import { ensureRegions } from './regionsState'
 
 /**
  * Storage is behind an interface so a server-backed save can replace
@@ -187,6 +188,19 @@ const MIGRATIONS: Record<number, Migration> = {
     }
     return migrated
   },
+  // 6 -> 7: Ensure region state completeness for newly added regions
+  6: (state) => {
+    const migrated = ensureRegions(state)
+    return {
+      ...migrated,
+      saveVersion: 7,
+    }
+  },
+  // 7 -> 8: Unified Edict Yield Multipliers & Strategic Region Actions
+  7: (state) => ({
+    ...state,
+    saveVersion: 8,
+  }),
 }
 
 export function migrate(state: GameState): GameState {
@@ -232,6 +246,7 @@ export function deserialize(raw: string, now: number): LoadResult | null {
   if (!envelope?.state) return null
 
   const state = migrate(envelope.state)
+  ensureRegions(state)
   ensureSanctuaryLayout(state)
 
   const elapsedMs = Math.max(0, now - (envelope.savedAt ?? now))

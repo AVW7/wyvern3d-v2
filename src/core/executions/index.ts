@@ -45,6 +45,10 @@ export function execute(state: GameState, intent: Intent): void {
       return assignTraining(state, intent.wyvernId, intent.stationId)
     case 'CANCEL_ASSIGNMENT':
       return cancelAssignment(state, intent.wyvernId)
+    case 'GARRISON_WYVERN':
+      return garrisonWyvern(state, intent.wyvernId, intent.regionId)
+    case 'COLLECT_REGION_EGGS':
+      return collectRegionEggs(state, intent.regionId)
     case 'START_BREEDING':
       return startBreeding(state, intent.aId, intent.bId)
     case 'INCUBATE_EGG':
@@ -217,6 +221,55 @@ function releaseWyvern(state: GameState, wyvernId: string): void {
   cancelAssignment(state, wyvernId)
   delete state.wyverns[wyvernId]
   log(state, 'info', `${w.name} is released to the wild.`)
+}
+
+function garrisonWyvern(state: GameState, wyvernId: string, regionId: string | null): void {
+  const w = state.wyverns[wyvernId]
+  if (!w) return
+
+  if (regionId === null) {
+    if (w.assignment.kind === 'garrison') {
+      w.assignment = { kind: 'idle' }
+      log(state, 'info', `${w.name} recalled to sanctuary.`)
+    }
+    return
+  }
+
+  const region = state.regions[regionId]
+  if (!region || region.owner !== 'player') {
+    return log(state, 'bad', 'You do not hold that region.')
+  }
+
+  if (w.stage !== 'adult') {
+    return log(state, 'bad', 'Only adult wyverns can be garrisoned.')
+  }
+
+  w.assignment = { kind: 'garrison', regionId }
+  log(state, 'good', `${w.name} posted to garrison ${REGIONS[regionId]?.name ?? regionId}.`)
+}
+
+function collectRegionEggs(state: GameState, regionId: string): void {
+  const region = state.regions[regionId]
+  const def = REGIONS[regionId]
+  if (!region || !def || region.owner !== 'player') return
+
+  if (region.eggsAvailable <= 0) {
+    return log(state, 'info', `No eggs available in ${def.name}.`)
+  }
+
+  region.eggsAvailable -= 1
+  withRng(state, (rng) => {
+    const id = nextId(state, 'egg')
+    state.eggs[id] = {
+      id,
+      speciesId: def.nativeSpecies,
+      parents: null,
+      rolledStats: rollSpeciesStats(def.nativeSpecies, rng),
+      rolledTraits: rollSpeciesTraits(def.nativeSpecies, rng),
+      incubatingTicksLeft: null,
+    }
+  })
+  log(state, 'good', `Collected 1 ${SPECIES[def.nativeSpecies]?.name ?? 'wyvern'} egg from ${def.name}.`)
 }
 
 // ---------------------------------------------------------------------------

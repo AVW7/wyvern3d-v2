@@ -11,6 +11,8 @@ import type { BattleResult, BuildingId, SanctuaryLayoutState } from '../types'
 export type Intent =
   | { type: 'ASSIGN_TRAINING'; wyvernId: string; stationId: string }
   | { type: 'CANCEL_ASSIGNMENT'; wyvernId: string }
+  | { type: 'GARRISON_WYVERN'; wyvernId: string; regionId: string | null }
+  | { type: 'COLLECT_REGION_EGGS'; regionId: string }
   | { type: 'START_BREEDING'; aId: string; bId: string }
   | { type: 'INCUBATE_EGG'; eggId: string }
   | { type: 'FEED_WYVERN'; wyvernId: string }

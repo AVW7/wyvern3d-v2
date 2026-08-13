@@ -177,7 +177,10 @@ export function applyXp(w: WyvernInstance, xp: number): number {
 }
 
 export const isDeployable = (w: WyvernInstance): boolean =>
-  w.stage === 'adult' && w.injury < CONFIG.wyvern.maxDeployInjury && w.assignment.kind !== 'breeding'
+  w.stage === 'adult' &&
+  w.injury < CONFIG.wyvern.maxDeployInjury &&
+  w.assignment.kind !== 'breeding' &&
+  w.assignment.kind !== 'garrison'
 
 /** Returns precise level progress, required XP, and percentage. */
 export function getWyvernLevelProgress(w: WyvernInstance): {
