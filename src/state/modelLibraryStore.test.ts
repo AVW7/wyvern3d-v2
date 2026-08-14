@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { useModelLibraryStore } from './modelLibraryStore'
 
 describe('model library preferences', () => {
@@ -14,5 +14,31 @@ describe('model library preferences', () => {
 
     useModelLibraryStore.getState().setEnabled('wyvern.emberback', true)
     expect(useModelLibraryStore.getState().isEnabled('wyvern.emberback')).toBe(true)
+  })
+})
+
+describe('model library hydration', () => {
+  afterEach(() => {
+    Reflect.deleteProperty(globalThis, 'window')
+    vi.resetModules()
+  })
+
+  it('starts empty even when a preference is already stored', async () => {
+    // /models is server-rendered and prints a model's readiness as text, so
+    // seeding this at module init made the client's first render disagree with
+    // the server HTML and threw a hydration error. The stored value is applied
+    // by useModelLibraryHydration after mount instead.
+    const stored = JSON.stringify({ 'wyvern.emberback': true })
+    Object.defineProperty(globalThis, 'window', {
+      configurable: true,
+      value: { localStorage: { getItem: () => stored, setItem: () => {} } },
+    })
+
+    vi.resetModules()
+    const module = await import('./modelLibraryStore')
+
+    expect(module.useModelLibraryStore.getState().disabled).toEqual({})
+    expect(module.useModelLibraryStore.getState().isEnabled('wyvern.emberback')).toBe(true)
+    expect(typeof module.useModelLibraryHydration).toBe('function')
   })
 })

@@ -107,3 +107,12 @@ export function animationDetails(state: ModelState, value: ClipSpec | ClipSpec[]
   const specs = Array.isArray(value) ? value : [value]
   return { state, clips: specs.map(clipSummary) }
 }
+
+/** Move the selection by `delta` rows within the visible list, clamped at both ends. */
+export function stepSelection(entries: ModelLibraryEntry[], current: AssetId, delta: number): AssetId {
+  if (entries.length === 0) return current
+  const index = entries.findIndex((entry) => entry.id === current)
+  if (index === -1) return entries[delta < 0 ? entries.length - 1 : 0]!.id
+  const next = Math.min(entries.length - 1, Math.max(0, index + delta))
+  return entries[next]!.id
+}

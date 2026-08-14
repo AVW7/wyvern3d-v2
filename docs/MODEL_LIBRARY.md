@@ -19,8 +19,14 @@ Selecting an entry:
 
 - updates the preview and inspector;
 - keeps the selected row visible;
+- responds to arrow keys, `Home`, and `End` for stepping through the filtered list;
 - writes `?model=<asset-id>` to the URL so the selection can be bookmarked or shared;
 - falls back to `character.player` if a URL contains an unknown asset ID.
+
+The inspector pins the status card and the "Use in world" toggle, and splits the rest across three
+tabs: **Info** (source, world scale, root offset, state count), **Animation** (preview-state picker
+and the per-state clip map), and **Rig** (polygon/bone/material counts and bone names, populated once
+a GLB has loaded).
 
 The status indicator distinguishes three cases:
 

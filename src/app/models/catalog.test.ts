@@ -8,6 +8,7 @@ import {
   modelCounts,
   resolveModelId,
   statusFor,
+  stepSelection,
 } from './catalog'
 
 describe('Model Library catalog helpers', () => {
@@ -49,6 +50,22 @@ describe('Model Library catalog helpers', () => {
       'idle-a · loop · phase: rest',
       'idle-b · loop · speed: 0.8×',
     ])
+  })
+
+  it('steps the selection through the visible list and clamps at both ends', () => {
+    const visible = MODEL_LIBRARY_ENTRIES.slice(0, 3)
+    expect(stepSelection(visible, visible[0]!.id, 1)).toBe(visible[1]!.id)
+    expect(stepSelection(visible, visible[2]!.id, -1)).toBe(visible[1]!.id)
+    expect(stepSelection(visible, visible[0]!.id, -1)).toBe(visible[0]!.id)
+    expect(stepSelection(visible, visible[2]!.id, 1)).toBe(visible[2]!.id)
+    expect(stepSelection(visible, visible[0]!.id, 99)).toBe(visible[2]!.id)
+  })
+
+  it('falls back to an end of the list when the selection is filtered out', () => {
+    const visible = MODEL_LIBRARY_ENTRIES.slice(0, 3)
+    expect(stepSelection(visible, 'not.real' as never, 1)).toBe(visible[0]!.id)
+    expect(stepSelection(visible, 'not.real' as never, -1)).toBe(visible[2]!.id)
+    expect(stepSelection([], 'wyvern.emberback', 1)).toBe('wyvern.emberback')
   })
 
   it('distinguishes production, disabled, and placeholder entries', () => {

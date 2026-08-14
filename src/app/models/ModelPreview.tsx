@@ -1,9 +1,9 @@
 'use client'
 
 import { Bounds, Environment, Grid, OrbitControls, useBounds } from '@react-three/drei'
-import { Canvas } from '@react-three/fiber'
-import { Suspense, useCallback } from 'react'
-import { Bone, Mesh, Object3D, type Group } from 'three'
+import { Canvas, useFrame } from '@react-three/fiber'
+import { Suspense, useCallback, useRef } from 'react'
+import { Bone, Mesh, Object3D, type Box3, type Group, type SkinnedMesh, type Sphere } from 'three'
 import { GameModel } from '@/render/assets/GameModel'
 import type { AssetId, ModelState } from '@/render/assets/manifest'
 
@@ -29,8 +29,41 @@ function PreviewAsset({
   onLoadStats?: (stats: { triangles: number; bones: number; materials: number; boneNames: string[] }) => void
 }) {
   const bounds = useBounds()
+  const modelRoot = useRef<Group | null>(null)
+  /**
+   * Frames left to wait before measuring, counted down in `useFrame`. A
+   * `requestAnimationFrame` scheduled from `onReady` lands before R3F has
+   * rendered the newly mounted model, so the skeleton has not been posed yet.
+   */
+  const framesUntilFit = useRef(0)
+
+  useFrame(() => {
+    if (framesUntilFit.current === 0) return
+    framesUntilFit.current -= 1
+    if (framesUntilFit.current > 0) return
+
+    // three caches a SkinnedMesh's object-level bounding box the first time
+    // `Box3.expandByObject` asks for it, and `Bounds` asks on mount — before
+    // the skeleton has been posed, which measured the wyvern as a 0.04-unit
+    // slab instead of the 15.8 it stands and parked the camera inside the
+    // model. Nothing invalidates that cache afterwards, so a later refresh
+    // reuses the same wrong box; dropping it forces the skinning-aware
+    // recompute in `SkinnedMesh.computeBoundingBox`.
+    modelRoot.current?.traverse((child: Object3D) => {
+      const skinned = child as SkinnedMesh
+      if (!skinned.isSkinnedMesh) return
+      // three initialises and invalidates both to null at runtime; only the
+      // published types insist they are always present.
+      const cache = skinned as unknown as { boundingBox: Box3 | null; boundingSphere: Sphere | null }
+      cache.boundingBox = null
+      cache.boundingSphere = null
+    })
+    bounds.refresh().clip().fit()
+  })
+
   const fitLoadedModel = useCallback((root: Group) => {
-    requestAnimationFrame(() => bounds.refresh().clip().fit())
+    modelRoot.current = root
+    framesUntilFit.current = 2
     if (onLoadStats) {
       let triangles = 0
       let bones = 0
@@ -68,7 +101,7 @@ function PreviewAsset({
         boneNames: boneNames.sort(),
       })
     }
-  }, [bounds, onLoadStats])
+  }, [onLoadStats])
 
   return (
     <GameModel
