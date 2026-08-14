@@ -16,10 +16,14 @@ import { BIOME_WORLD_RADIUS, biomeHeightAt } from './terrain/BiomeTerrain'
  */
 export function BiomeExplorer({
   biome,
+  regionId,
+  seed = 42,
   colliders,
   spawn,
 }: {
   biome: string
+  regionId?: string
+  seed?: number
   colliders: Collider[]
   spawn: [number, number]
 }) {
@@ -27,7 +31,7 @@ export function BiomeExplorer({
   const gesture = useRef<CharacterGesture>('none')
   const locomotion = useSanctuaryCommands((commands) => commands.playerLocomotion)
 
-  const groundHeightAt = (x: number, z: number) => biomeHeightAt(biome, x, z)
+  const groundHeightAt = (x: number, z: number) => biomeHeightAt(biome, x, z, regionId, seed)
 
   // The world map leaves its own distance and follow target in the shared
   // camera store; without this the expedition opens ~100 m out, with the player

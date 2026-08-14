@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { createInitialState, capacityOf, isAttackable } from './state/game'
+import { createInitialState, capacityOf, isAttackable, emit } from './state/game'
 import { executeNextTick, advanceTicks } from './state/tick'
 import { execute } from './executions'
 import { REGIONS, REGION_LIST } from './data/regions'
 import { SPECIES } from './data/species'
 import { UNITS } from './data/units'
 import { STATIONS } from './data/stations'
-import { CONFIG } from './data/config'
+import { CONFIG, SAVE_VERSION } from './data/config'
 import { createRng } from './math/rng'
 import { autoResolveConfig } from './combat/autoResolve'
 import { buildEncounterConfig } from './combat/setup'
@@ -589,10 +589,12 @@ describe('save', () => {
     const state = createInitialState(55)
     const old = { ...state, saveVersion: 0 } as GameState
     const migrated = migrate(old)
-    expect(migrated.saveVersion).toBe(8)
+    expect(migrated.saveVersion).toBe(SAVE_VERSION)
     expect(migrated.resources.water).toBeDefined()
     expect(migrated.resources.hide).toBeDefined()
     expect(migrated.resources.iron).toBeDefined()
+    expect(migrated.events).toBeDefined()
+    expect(migrated.nextEventSeq).toBeDefined()
   })
 
   it('moves untouched legacy sanctuary defaults but preserves edited stations', () => {
@@ -606,9 +608,11 @@ describe('save', () => {
 
     const migrated = migrate(old)
 
-    expect(migrated.saveVersion).toBe(8)
+    expect(migrated.saveVersion).toBe(SAVE_VERSION)
     expect(huntingPen.position).toEqual([-30, 0, 2])
     expect(flightRing.position).toEqual([7, 0, 7])
+    expect(migrated.events).toEqual([])
+    expect(migrated.nextEventSeq).toBe(0)
   })
 
   it('processes sanctuary production ticks and worker assignments', () => {
@@ -654,5 +658,40 @@ describe('save', () => {
     executeNextTick(state, [{ type: 'USE_ELIXIR', elixirType: 'vitality_salve', wyvernId }])
     expect(state.realm.elixirs.vitality_salve).toBe(countBefore - 1)
     expect(state.wyverns[wyvernId]!.injury).toBeLessThan(10)
+  })
+
+  it('records discrete game events with monotonic sequence numbers and caps at eventLimit', () => {
+    const state = createInitialState(42)
+    expect(state.events).toEqual([])
+    expect(state.nextEventSeq).toBe(0)
+
+    for (let i = 0; i < 100; i++) {
+      emit(state, 'stage_promoted', `wy_${i}`, undefined, { stage: 'adult' })
+    }
+
+    expect(state.nextEventSeq).toBe(100)
+    expect(state.events.length).toBe(CONFIG.eventLimit)
+    expect(state.events[0]!.seq).toBe(36)
+    expect(state.events[state.events.length - 1]!.seq).toBe(99)
+  })
+
+  it('emits events during training, breeding, hatching, and release', () => {
+    const state = createInitialState(42)
+    const wyvernId = Object.keys(state.wyverns)[0]!
+
+    // Training event
+    executeNextTick(state, [{ type: 'ASSIGN_TRAINING', wyvernId, stationId: 'flightRing' }])
+    state.wyverns[wyvernId]!.assignment = { kind: 'training', stationId: 'flightRing', ticksLeft: 1 }
+    executeNextTick(state)
+
+    const trainingEvent = state.events.find((e) => e.kind === 'training_completed')
+    expect(trainingEvent).toBeDefined()
+    expect(trainingEvent!.subjectId).toBe(wyvernId)
+
+    // Release event
+    executeNextTick(state, [{ type: 'RELEASE_WYVERN', wyvernId }])
+    const deathEvent = state.events.find((e) => e.kind === 'wyvern_died')
+    expect(deathEvent).toBeDefined()
+    expect(deathEvent!.subjectId).toBe(wyvernId)
   })
 })

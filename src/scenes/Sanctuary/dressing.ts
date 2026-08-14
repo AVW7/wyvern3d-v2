@@ -1,5 +1,6 @@
 import type { PropPlacement } from '@/render/assets/props'
 import { SANCTUARY_STATIONS } from '@/core/data/sanctuaryStations'
+import { isInsideFlightCorridor } from '@/core/data/sanctuaryMasterplan'
 import {
   BREEDING_POSTS,
   GROUND_RADIUS,
@@ -200,21 +201,33 @@ export function exclusions(): { x: number; z: number; r: number }[] {
 function scatter(
   seed: number,
   count: number,
-  options: { minRadius: number; maxRadius: number; minScale: number; maxScale: number; spacing: number },
+  options: {
+    minRadius: number
+    maxRadius: number
+    minScale: number
+    maxScale: number
+    spacing: number
+    minAngle?: number
+    maxAngle?: number
+  },
 ): PropPlacement[] {
   const rng = mulberry32(seed)
   const zones = exclusions()
   const placed: PropPlacement[] = []
 
+  const minA = options.minAngle ?? 0
+  const maxA = options.maxAngle ?? TAU
+
   // Rejection sampling. The sanctuary has plenty of free ground, so a bounded
   // number of tries per prop is enough; falling short just means slightly
   // sparser dressing, never a hang.
   for (let attempt = 0; attempt < count * 40 && placed.length < count; attempt++) {
-    const angle = rng() * TAU
+    const angle = minA + rng() * (maxA - minA)
     const radius = options.minRadius + rng() * (options.maxRadius - options.minRadius)
     const x = Math.cos(angle) * radius
     const z = Math.sin(angle) * radius
 
+    if (isInsideFlightCorridor(x, z)) continue
     if (zones.some((zone) => Math.hypot(x - zone.x, z - zone.z) < zone.r)) continue
     if (placed.some((p) => Math.hypot(x - p.position[0], z - p.position[2]) < options.spacing)) continue
 
@@ -233,61 +246,123 @@ function scatter(
  * in while the horizon still reads as enclosed rather than as a cut-off disc.
  */
 export const SCATTER: Record<string, PropPlacement[]> = {
-  'prop.scatter.firA': scatter(0xf1a, 34, {
-    minRadius: 26,
+  'prop.scatter.firA': scatter(0xf1a, 24, {
+    minRadius: 28,
     maxRadius: GROUND_RADIUS - 3,
     minScale: 0.8,
     maxScale: 1.3,
-    spacing: 4,
+    spacing: 5,
   }),
-  'prop.scatter.firB': scatter(0xf1b, 30, {
-    minRadius: 24,
+  'prop.scatter.firB': scatter(0xf1b, 20, {
+    minRadius: 26,
     maxRadius: GROUND_RADIUS - 3,
     minScale: 0.9,
     maxScale: 1.4,
-    spacing: 4,
+    spacing: 5,
   }),
-  'prop.scatter.firC': scatter(0xf1c, 18, {
-    minRadius: 34,
+  'prop.scatter.firC': scatter(0xf1c, 14, {
+    minRadius: 36,
     maxRadius: GROUND_RADIUS - 2,
     minScale: 0.7,
     maxScale: 1.1,
     spacing: 6,
   }),
-  'prop.scatter.deadTree': scatter(0xdea, 10, {
+  'prop.scatter.deadTree': scatter(0xdea, 8, {
     minRadius: 30,
     maxRadius: GROUND_RADIUS - 5,
     minScale: 0.7,
     maxScale: 1.0,
     spacing: 8,
+    minAngle: -Math.PI * 0.2,
+    maxAngle: Math.PI * 0.4,
   }),
-  'prop.scatter.mysticStone': scatter(0x57e, 16, {
-    minRadius: 14,
+  'prop.scatter.mysticStone': scatter(0x57e, 12, {
+    minRadius: 16,
     maxRadius: GROUND_RADIUS - 8,
     minScale: 0.7,
     maxScale: 1.2,
     spacing: 7,
   }),
-  'prop.perch.trunk': scatter(0x709, 12, {
-    minRadius: 16,
+  'prop.perch.trunk': scatter(0x709, 10, {
+    minRadius: 18,
     maxRadius: GROUND_RADIUS - 8,
     minScale: 0.8,
     maxScale: 1.2,
     spacing: 9,
   }),
-  'prop.scatter.grassA': scatter(0x67a, 130, {
+  'prop.scatter.grassA': scatter(0x67a, 70, {
     minRadius: 8,
     maxRadius: GROUND_RADIUS - 4,
     minScale: 0.8,
     maxScale: 1.6,
     spacing: 2.5,
   }),
-  'prop.scatter.grassB': scatter(0x67b, 110, {
+  'prop.scatter.grassB': scatter(0x67b, 60, {
     minRadius: 8,
     maxRadius: GROUND_RADIUS - 4,
     minScale: 0.8,
     maxScale: 1.5,
     spacing: 2.5,
+  }),
+}
+
+/**
+ * Ecological cluster dressing using approved models from `biomes.glb`.
+ * Reuses high-quality conifers, broadleaf trees, rock clusters, cliffs, and grass tufts.
+ */
+export const BIOME_SCATTER: Record<string, PropPlacement[]> = {
+  // Northwest windward highland ridge
+  'prop.biome.tree.conifer': scatter(0xb1c, 14, {
+    minRadius: 32,
+    maxRadius: GROUND_RADIUS - 3,
+    minScale: 0.85,
+    maxScale: 1.3,
+    spacing: 6,
+    minAngle: Math.PI * 0.7,
+    maxAngle: Math.PI * 1.4,
+  }),
+  // Southeast sheltered care court & glade
+  'prop.biome.tree.broadleaf': scatter(0xb1b, 10, {
+    minRadius: 28,
+    maxRadius: GROUND_RADIUS - 5,
+    minScale: 0.8,
+    maxScale: 1.2,
+    spacing: 7,
+    minAngle: -Math.PI * 0.4,
+    maxAngle: Math.PI * 0.2,
+  }),
+  // Western rocky trail & training edge
+  'prop.biome.rock.cluster': scatter(0xb1d, 8, {
+    minRadius: 24,
+    maxRadius: GROUND_RADIUS - 6,
+    minScale: 0.85,
+    maxScale: 1.35,
+    spacing: 8,
+    minAngle: Math.PI * 0.8,
+    maxAngle: Math.PI * 1.3,
+  }),
+  'prop.biome.rock.smallA': scatter(0xb1e, 16, {
+    minRadius: 14,
+    maxRadius: GROUND_RADIUS - 5,
+    minScale: 0.7,
+    maxScale: 1.4,
+    spacing: 4,
+  }),
+  // Lush meadow grass tufts
+  'prop.biome.grass.tuftA': scatter(0xb1f, 50, {
+    minRadius: 10,
+    maxRadius: GROUND_RADIUS - 5,
+    minScale: 0.8,
+    maxScale: 1.5,
+    spacing: 3.0,
+  }),
+  // Perimeter cliff outcroppings breaking the circular silhouette
+  'prop.biome.rock.cliff': scatter(0xb1a, 6, {
+    minRadius: 48,
+    maxRadius: GROUND_RADIUS - 2,
+    minScale: 0.9,
+    maxScale: 1.3,
+    spacing: 14,
   }),
 }
 

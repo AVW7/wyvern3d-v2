@@ -3,7 +3,7 @@ import { CONFIG } from '../data/config'
 import { PHILOSOPHIES } from '../data/philosophies'
 import { SPECIES } from '../data/species'
 import { STATIONS } from '../data/stations'
-import { capacityOf, log, nextId, withRng } from '../state/game'
+import { capacityOf, emit, log, nextId, withRng } from '../state/game'
 import {
   bondRate,
   breedStats,
@@ -15,7 +15,7 @@ import {
 } from '../entities/wyvern'
 import { clamp } from '../math/vec'
 
-/** Training, breeding, incubation, growth and recovery — one tick of sanctuary life. */
+/** Training, breeding, incubation, growth, recovery and care duties — one tick of sanctuary life. */
 export function sanctuaryTick(state: GameState): void {
   trainingTick(state)
   breedingTick(state)
@@ -23,6 +23,7 @@ export function sanctuaryTick(state: GameState): void {
   growthTick(state)
   recoveryTick(state)
   philosophyTick(state)
+  dutiesTick(state)
 }
 
 function trainingTick(state: GameState): void {
@@ -39,6 +40,7 @@ function trainingTick(state: GameState): void {
     // Traits scale bond gain, so a Loyal wyvern becomes battle-reliable much
     // faster than a Stubborn one on the same schedule.
     w.bond = clamp(w.bond + station.bond * bondRate(w.traits), 0, CONFIG.wyvern.maxBond)
+    emit(state, 'training_completed', w.id, station.id, { stat: station.stat, gain: station.gain, bond: station.bond })
     log(state, 'good', `${w.name} finishes at the ${station.name}. ${station.stat} +${station.gain}.`)
   }
 }
@@ -60,10 +62,12 @@ function breedingTick(state: GameState): void {
     partner.assignment = { kind: 'idle' }
     partner.breedCooldown = CONFIG.wyvern.breedCooldown
 
+    let eggId = ''
     withRng(state, (rng) => {
       // The hatchling takes after whichever parent the roll favours.
       const speciesId = rng.chance(0.5) ? w.speciesId : partner.speciesId
       const id = nextId(state, 'egg')
+      eggId = id
       state.eggs[id] = createEgg({
         id,
         speciesId,
@@ -72,6 +76,7 @@ function breedingTick(state: GameState): void {
         parents: [w.id, partner.id],
       })
     })
+    emit(state, 'egg_laid', eggId, partner.id, { speciesId: state.eggs[eggId]?.speciesId, parents: [w.id, partner.id] })
     log(state, 'good', `${w.name} and ${partner.name} have produced an egg.`)
   }
 }
@@ -95,6 +100,7 @@ function incubationTick(state: GameState): void {
       // Hatchlings imprint on you — the cheapest route to a high-bond mount.
       bond: 45,
     })
+    emit(state, 'egg_hatched', id, egg.speciesId, { speciesId: egg.speciesId, stage: 'hatchling' })
     log(state, 'good', `A ${SPECIES[egg.speciesId]?.name ?? 'wyvern'} has hatched.`)
   }
 }
@@ -106,6 +112,7 @@ function growthTick(state: GameState): void {
 
     if (w.stage === 'hatchling' && w.ageTicks >= CONFIG.wyvern.hatchlingTicks) {
       w.stage = 'juvenile'
+      emit(state, 'stage_promoted', w.id, undefined, { stage: 'juvenile' })
       log(state, 'info', `${w.name} is now a juvenile.`)
     } else if (
       w.stage === 'juvenile' &&
@@ -118,6 +125,7 @@ function growthTick(state: GameState): void {
       for (const [stat, value] of Object.entries(mods)) {
         w.stats[stat as keyof typeof w.stats] += (value ?? 0) * 0.5
       }
+      emit(state, 'stage_promoted', w.id, undefined, { stage: 'adult' })
       log(state, 'good', `${w.name} has come of age and can ride to war.`)
     }
   }
@@ -159,5 +167,37 @@ function philosophyTick(state: GameState): void {
       description: `The scholars completed the treatise on ${targetDef.subtitle}.`,
       category: 'philosophy',
     })
+  }
+}
+
+function dutiesTick(state: GameState): void {
+  if (!state.duties) return
+
+  // Prune any active duties whose subject wyvern no longer exists
+  state.duties.active = state.duties.active.filter((d) => state.wyverns[d.subjectId])
+  if (state.duties.carriedDutyId && !state.duties.active.some((d) => d.id === state.duties.carriedDutyId)) {
+    state.duties.carriedDutyId = null
+  }
+
+  // If active duty cap is reached, do not generate new ones
+  if (state.duties.active.length >= CONFIG.duties.maxActive) return
+
+  // Deterministically find eligible hungry wyverns sorted by ID
+  const existingSubjects = new Set(state.duties.active.map((d) => d.subjectId))
+  const hungryWyverns = Object.values(state.wyverns)
+    .filter((w) => w.hunger >= CONFIG.duties.feedThreshold && !existingSubjects.has(w.id))
+    .sort((a, b) => a.id.localeCompare(b.id))
+
+  if (hungryWyverns.length > 0) {
+    const candidate = hungryWyverns[0]!
+    const dutyId = state.duties.nextSeq++
+    state.duties.active.push({
+      id: dutyId,
+      kind: 'feed',
+      subjectId: candidate.id,
+      createdTick: state.tick,
+      status: 'available',
+    })
+    log(state, 'info', `${candidate.name} is hungry and awaits feeding.`)
   }
 }

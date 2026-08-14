@@ -25,6 +25,11 @@ units and battle terrain still use procedural placeholders until their model pip
 | Make a prop placeable in the sanctuary editor | `PROP_CATALOG` in `src/core/state/sanctuaryLayout.ts` |
 | Change how sanctuary wyverns move or behave | `src/scenes/Sanctuary/director/wyvernDirector.ts` |
 | Add a sanctuary player command | `src/state/sanctuaryCommands.ts`, then the director + `SanctuaryCommandWheel` |
+| Build the sanctuary duties/care gameplay loop | `docs/SANCTUARY_GAMEPLAY_PLAN.md` (after animation-plan Stage 6) |
+| Improve sanctuary layout, environment art, assets, and prop interactions | `docs/SANCTUARY_ENVIRONMENT_ART_PLAN.md` |
+| Turn the Highlands hunt test into gameplay | `docs/HIGHLANDS_GAMEPLAY_PLAN.md` |
+| Build the searchable/discoverable world atlas | `docs/WORLD_ATLAS_PLAN.md` |
+| Enhance explorable biome identity and activities | `docs/BIOME_ENHANCEMENT_PLAN.md` |
 | Change a scene's look | `src/scenes/{Sanctuary,WorldMap,Battle,Highlands}/` |
 | Change HUD/panels | `src/ui/` (DOM overlay, not in-canvas) |
 

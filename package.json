@@ -22,6 +22,7 @@
   "assets:index-biome-library": "node scripts/index-biome-library.mjs",
   "assets:biome-atlas": "node scripts/build-biome-atlas.mjs",
   "assets:validate-biome-atlas": "node scripts/validate-biome-atlas.mjs",
+  "assets:validate-sanctuary-atlas": "node scripts/validate-sanctuary-atlas.mjs",
     "assets:validate-player": "node scripts/validate-player-model.mjs",
     "assets:thornwing": "python3 scripts/build-thornwing.py",
     "assets:validate-thornwing": "node scripts/validate-thornwing.mjs",

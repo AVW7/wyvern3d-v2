@@ -10,14 +10,14 @@ duplicated from it, because two copies drift.
 
 ## Picking up work
 
-Animation and sanctuary-behaviour work is staged as self-contained work orders in
-`docs/WYVERN_ANIMATION_PLAN.md`. Follow its **HANDOFF PROTOCOL** at the top:
-take the first stage in the progress ledger not marked DONE, do only that stage,
-then update its ledger row and `Status:` line in the same commit.
-
-Next up are **Stage 4.9 (scout flight mode)** and **Stage 4.95 (aerial attack
-action)**. Both are written to be executable with no memory of the session that
-produced them.
+Finish the first incomplete work order in `docs/WYVERN_ANIMATION_PLAN.md` using
+its **HANDOFF PROTOCOL**. The remaining work there is **Stage 6 (world event
+stream and flourishes)**. Product-area plans then live in
+`docs/SANCTUARY_GAMEPLAY_PLAN.md`, `docs/HIGHLANDS_GAMEPLAY_PLAN.md`,
+`docs/WORLD_ATLAS_PLAN.md`, `docs/BIOME_ENHANCEMENT_PLAN.md`, and
+`docs/SANCTUARY_ENVIRONMENT_ART_PLAN.md`. Use the plan named by the
+user/maintainer; do not infer priority between them. Within that plan, take only
+its first eligible ledger row not marked DONE.
 
 ## Non-negotiables
 

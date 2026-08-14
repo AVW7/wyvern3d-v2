@@ -156,8 +156,21 @@ export const CONFIG = {
     },
   },
 
+  duties: {
+    /** Maximum active duties at any one time. */
+    maxActive: 3,
+    /** Minimum hunger for a wyvern to trigger a feed duty. */
+    feedThreshold: 30,
+    /** Bonus bond granted when completing a feed duty. */
+    feedBondBonus: 1,
+  },
+
   /** Ring buffer size for the in-game event feed. */
   logLimit: 60,
+
+  /** Ring buffer size for discrete game events. */
+  eventLimit: 64,
 } as const
 
-export const SAVE_VERSION = 8
+export const SAVE_VERSION = 11
+

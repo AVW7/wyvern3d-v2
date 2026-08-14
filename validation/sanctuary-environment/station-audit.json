@@ -1,0 +1,326 @@
+{
+  "version": 1,
+  "capturedAt": "2026-08-14T13:50:00Z",
+  "auditCriteria": [
+    "silhouetteReadability",
+    "constructionCredibility",
+    "materialConsistency",
+    "playerApproachLegibility",
+    "wyvernClearance",
+    "groundContact",
+    "lightingIntegration"
+  ],
+  "stations": [
+    {
+      "id": "warTable",
+      "label": "War Table",
+      "panel": "warTable",
+      "position": [0, -30],
+      "radius": 3.5,
+      "clearance": 4.0,
+      "currentPropId": "prop.warTable",
+      "vendorNode": "PP_Wooden_Table_01",
+      "triangles": 128,
+      "scale": 1.8,
+      "dimensionsM": { "w": 3.6, "h": 1.58, "d": 2.16 },
+      "verdict": "resurface",
+      "priority": 7,
+      "evaluation": {
+        "silhouette": "Modest rectangular table. Reads clearly as furniture but lacks command presence for the main strategic center of the sanctuary.",
+        "construction": "Plain 4-legged wooden table scaled up. Solid ground contact on keep flagstones.",
+        "approach": "Direct south approach from keep courtyard.",
+        "wyvernClearance": "Sheltered inside keep north court; not directly under wyvern landing path.",
+        "recommendation": "Retain core desk form; add map parchment surface, campaign marker tokens, iron trim, and side map chests."
+      }
+    },
+    {
+      "id": "roster",
+      "label": "Roster Ledger",
+      "panel": "roster",
+      "position": [-9, -30],
+      "radius": 3.0,
+      "clearance": 3.0,
+      "currentPropId": "prop.lectern",
+      "vendorNode": "PP_Wooden_Table_02",
+      "triangles": 76,
+      "scale": 1.0,
+      "dimensionsM": { "w": 1.2, "h": 0.88, "d": 0.8 },
+      "verdict": "resurface",
+      "priority": 8,
+      "evaluation": {
+        "silhouette": "Compact writing desk. Functionally readable but slightly small relative to player height.",
+        "construction": "Simple wooden timber desk.",
+        "approach": "Clear east/south approach from keep spine.",
+        "wyvernClearance": "Sheltered inside keep west wing.",
+        "recommendation": "Add open leather-bound wyvern registry ledger, inkwell, quill, and rolled parchment scrolls."
+      }
+    },
+    {
+      "id": "barracks",
+      "label": "Barracks",
+      "panel": "barracks",
+      "position": [9, -30],
+      "radius": 3.0,
+      "clearance": 4.0,
+      "currentPropId": "prop.blockade",
+      "vendorNode": "PP_Wooden_Blockade_01",
+      "triangles": 188,
+      "scale": 1.0,
+      "dimensionsM": { "w": 3.0, "h": 1.4, "d": 1.2 },
+      "verdict": "replace",
+      "priority": 1,
+      "evaluation": {
+        "silhouette": "FATAL: Currently a spiked wooden roadblock/blockade. Completely misrepresents living quarters or troop staging.",
+        "construction": "Crude crossed timber roadblock with spikes.",
+        "approach": "Approached from west.",
+        "wyvernClearance": "Inside keep east wing.",
+        "recommendation": "Priority Replacement #1: Replace with a timber-and-stone guard post / barracks shelter with canvas lean-to, bunk rolls, weapon rack, and lantern."
+      }
+    },
+    {
+      "id": "infirmary",
+      "label": "Infirmary",
+      "panel": "infirmary",
+      "position": [-13, -22],
+      "radius": 3.0,
+      "clearance": 4.0,
+      "currentPropId": "prop.campfire",
+      "vendorNode": "PP_Campfire_01",
+      "triangles": 276,
+      "scale": 1.0,
+      "dimensionsM": { "w": 1.6, "h": 0.65, "d": 1.6 },
+      "verdict": "replace",
+      "priority": 2,
+      "evaluation": {
+        "silhouette": "FATAL: Currently an open campfire on the ground. Fails to convey a healing shelter or veterinary care facility.",
+        "construction": "Loose stones in a circle with firewood.",
+        "approach": "Approached from eastern keep path.",
+        "wyvernClearance": "Near west path bend.",
+        "recommendation": "Priority Replacement #2: Replace with a sheltered healer's awning with herbal drying rack, warm stone hearth, water basin, clean bandages/balms table, and soft straw recovery mat."
+      }
+    },
+    {
+      "id": "hatchery",
+      "label": "Hatchery",
+      "panel": "hatchery",
+      "position": [14, -3],
+      "radius": 4.0,
+      "clearance": 10.0,
+      "currentPropId": "prop.hatchery.cave",
+      "vendorNode": "PP_Cave_Small_01",
+      "triangles": 2616,
+      "scale": 0.75,
+      "dimensionsM": { "w": 11.25, "h": 6.75, "d": 9.75 },
+      "verdict": "remodel",
+      "priority": 6,
+      "evaluation": {
+        "silhouette": "Impressive natural rock cavern entrance. Strong landmark read.",
+        "construction": "Downscaled natural cave mesh. Faceted low-poly shading at entrance.",
+        "approach": "Wide opening facing south-west into care court.",
+        "wyvernClearance": "Excellent (10m radius).",
+        "recommendation": "Remodel cave entrance geometry for smoother rock transitions, add thermal ember hearth inside, straw nesting pads, and carved incubation runes at the arch."
+      }
+    },
+    {
+      "id": "breeding",
+      "label": "Breeding Roosts",
+      "panel": "breeding",
+      "position": [34, 8],
+      "radius": 4.0,
+      "clearance": 10.0,
+      "currentPropId": "prop.roost.plateau",
+      "vendorNode": "PP_Stone_Plateau_Moss_Grown_03",
+      "triangles": 1332,
+      "scale": 0.35,
+      "dimensionsM": { "w": 11.9, "h": 2.8, "d": 10.5 },
+      "verdict": "resurface",
+      "priority": 9,
+      "evaluation": {
+        "silhouette": "Broad elevated rock plateau flanked by twin rune stones. Excellent scale for two adult wyverns.",
+        "construction": "Tiered mossy rock platform with flat top.",
+        "approach": "Approached from west flight commons.",
+        "wyvernClearance": "Spacious (10m radius).",
+        "recommendation": "Keep geometry; add detailed claw-gripped rock texture, nest indentations, soft heather bedding, and glowing bonding runes."
+      }
+    },
+    {
+      "id": "huntingPen",
+      "label": "Hunting Pen",
+      "panel": "training",
+      "station": "huntingPen",
+      "position": [-30, 2],
+      "radius": 3.5,
+      "clearance": 10.0,
+      "currentPropId": "prop.blockade",
+      "vendorNode": "PP_Wooden_Blockade_01",
+      "triangles": 188,
+      "scale": 1.0,
+      "dimensionsM": { "w": 3.0, "h": 1.4, "d": 1.2 },
+      "verdict": "replace",
+      "priority": 3,
+      "evaluation": {
+        "silhouette": "FATAL: Reuses the wooden road blockade. Completely ambiguous.",
+        "construction": "Single freestanding barrier.",
+        "approach": "Approached from east commons.",
+        "wyvernClearance": "Generous open space (10m radius).",
+        "recommendation": "Priority Replacement #3: Replace with a circular palisade training enclosure with stout wooden posts, leather dummy targets, carcass rack, and hunting horn post."
+      }
+    },
+    {
+      "id": "flightRing",
+      "label": "Flight Ring",
+      "panel": "training",
+      "station": "flightRing",
+      "position": [0, 30],
+      "radius": 4.5,
+      "clearance": 11.0,
+      "currentPropId": "prop.ring.columnA",
+      "vendorNode": "PP_Stone_Column_Mystic_01",
+      "triangles": 292,
+      "scale": 1.0,
+      "dimensionsM": { "w": 2.2, "h": 5.8, "d": 2.2 },
+      "verdict": "keep",
+      "priority": 11,
+      "evaluation": {
+        "silhouette": "Tall mystic standing stone monolith. Forms a strong visual terminus to the central north-south spine.",
+        "construction": "Dressed ancient carved stone with weathered spiral runes.",
+        "approach": "Approached from north spine corridor.",
+        "wyvernClearance": "Spacious landing envelope (11m radius).",
+        "recommendation": "Keep as anchor; add wind direction streamers, perimeter marker stones, and subtle updraft particle seam."
+      }
+    },
+    {
+      "id": "burnRange",
+      "label": "Burn Range",
+      "panel": "training",
+      "station": "burnRange",
+      "position": [34, 32],
+      "radius": 3.5,
+      "clearance": 12.0,
+      "currentPropId": "prop.burn.volcano",
+      "vendorNode": "PP_Volcano_Dead_01",
+      "triangles": 1172,
+      "scale": 0.8,
+      "dimensionsM": { "w": 12.8, "h": 4.8, "d": 12.8 },
+      "verdict": "replace",
+      "priority": 4,
+      "evaluation": {
+        "silhouette": "Miniature volcano cone. Thematic idea is clear but the execution feels like a toy volcano sitting on top of the grass.",
+        "construction": "Conical lava rock mound.",
+        "approach": "Approached from west path.",
+        "wyvernClearance": "Large hazard exclusion (12m radius).",
+        "recommendation": "Priority Replacement #4: Replace with an engineered dragon-fire target range: heat-treated obsidian deflection wall, iron target baffles, ash pit, and scorched post targets."
+      }
+    },
+    {
+      "id": "enduranceRun",
+      "label": "Endurance Run",
+      "panel": "training",
+      "station": "enduranceRun",
+      "position": [-38, 26],
+      "radius": 3.5,
+      "clearance": 10.0,
+      "currentPropId": "prop.signpost",
+      "vendorNode": "PP_Signpost_01",
+      "triangles": 380,
+      "scale": 0.6,
+      "dimensionsM": { "w": 0.72, "h": 1.56, "d": 0.48 },
+      "verdict": "replace",
+      "priority": 5,
+      "evaluation": {
+        "silhouette": "FATAL: A small wooden trail signpost, hard to notice against background trees.",
+        "construction": "Thin wooden signpost on post.",
+        "approach": "Approached from north-west path.",
+        "wyvernClearance": "Transition to rugged highlands edge (10m radius).",
+        "recommendation": "Priority Replacement #5: Replace with an imposing timber-and-stone mountain trailhead archway, waypoint banner, stone mileage cairn, and water trough."
+      }
+    },
+    {
+      "id": "scaleForge",
+      "label": "Scale Forge",
+      "panel": "training",
+      "station": "scaleForge",
+      "position": [32, -12],
+      "radius": 3.5,
+      "clearance": 9.0,
+      "currentPropId": "prop.forge.furnace",
+      "vendorNode": "PP_Furnace_01",
+      "triangles": 1380,
+      "scale": 1.0,
+      "dimensionsM": { "w": 3.2, "h": 4.1, "d": 2.8 },
+      "verdict": "keep",
+      "priority": 10,
+      "evaluation": {
+        "silhouette": "Stone chimney furnace with integrated forge tools (anvil, quenching trough, grindstone, tool holder). Highly readable.",
+        "construction": "Dressed stone blocks with iron chimney flue.",
+        "approach": "Approached from west craft court.",
+        "wyvernClearance": "Safe clearance downwind (9m radius).",
+        "recommendation": "Keep core structure; add timber protective lean-to roof, slag pile, scale-plate displays, and dynamic quench smoke."
+      }
+    }
+  ],
+  "topFiveReplacements": [
+    {
+      "rank": 1,
+      "stationId": "barracks",
+      "currentProp": "prop.blockade",
+      "replacementConcept": "Timber & stone guard shelter with weapon rack and bedrolls"
+    },
+    {
+      "rank": 2,
+      "stationId": "infirmary",
+      "currentProp": "prop.campfire",
+      "replacementConcept": "Covered healing pavilion with herbal drying rack, hearth, and care basin"
+    },
+    {
+      "rank": 3,
+      "stationId": "huntingPen",
+      "currentProp": "prop.blockade",
+      "replacementConcept": "Reinforced training stockade with leather dummy targets and carcass rack"
+    },
+    {
+      "rank": 4,
+      "stationId": "burnRange",
+      "currentProp": "prop.burn.volcano",
+      "replacementConcept": "Fortified dragon-fire testing range with obsidian deflection wall and ash pit"
+    },
+    {
+      "rank": 5,
+      "stationId": "enduranceRun",
+      "currentProp": "prop.signpost",
+      "replacementConcept": "Monumental highland trailhead gateway with waypoint cairn and banner"
+    }
+  ],
+  "topFiveReuseResurfaceCandidates": [
+    {
+      "rank": 1,
+      "propId": "prop.forge.furnace",
+      "stationId": "scaleForge",
+      "action": "Resurface stone and add protective timber awning"
+    },
+    {
+      "rank": 2,
+      "propId": "prop.roost.plateau",
+      "stationId": "breeding",
+      "action": "Resurface with highland rock shader, claw wear, and nesting hollows"
+    },
+    {
+      "rank": 3,
+      "propId": "prop.hatchery.cave",
+      "stationId": "hatchery",
+      "action": "Remodel entrance seams and add thermal glow/straw bedding"
+    },
+    {
+      "rank": 4,
+      "propId": "prop.ring.columnA",
+      "stationId": "flightRing",
+      "action": "Retain mystic standing stone monolith and add wind banner"
+    },
+    {
+      "rank": 5,
+      "propId": "prop.keep.wall",
+      "stationId": "keep",
+      "action": "Retain ashlar wall kit and integrate wooden scaffold/repaired masonry"
+    }
+  ]
+}

@@ -63,8 +63,28 @@ export function wearAt(x: number, z: number): number {
   return Math.min(1, wear)
 }
 
+function sootAt(x: number, z: number): number {
+  const distForge = Math.hypot(x - 32, z - (-12))
+  const distBurn = Math.hypot(x - 34, z - 32)
+  let soot = 0
+  if (distForge < 8) soot = Math.max(soot, (1 - distForge / 8) * 0.9)
+  if (distBurn < 12) soot = Math.max(soot, (1 - distBurn / 12) * 0.95)
+  return soot
+}
+
+function moistureAt(x: number, z: number): number {
+  const distHatchery = Math.hypot(x - 14, z - (-3))
+  const distTrough = Math.hypot(x - 30.3, z - (-11.3))
+  let moisture = 0
+  if (distHatchery < 6) moisture = Math.max(moisture, (1 - distHatchery / 6) * 0.7)
+  if (distTrough < 4) moisture = Math.max(moisture, (1 - distTrough / 4) * 0.8)
+  return moisture
+}
+
 const DIRT: Rgb = [0.36, 0.29, 0.21]
 const MOSS: Rgb = [0.19, 0.26, 0.15]
+const SOOT: Rgb = [0.12, 0.11, 0.12]
+const MUD: Rgb = [0.22, 0.17, 0.12]
 
 function hexToRgb(hex: string): Rgb {
   const value = hex.replace('#', '')
@@ -91,6 +111,8 @@ export interface GroundFactors {
   shade: number
   rim: number
   wear: number
+  soot: number
+  moisture: number
 }
 
 export function groundFactorsAt(x: number, z: number): GroundFactors {
@@ -103,6 +125,8 @@ export function groundFactorsAt(x: number, z: number): GroundFactors {
     // Mossier and darker toward the treeline, where the canopy closes in.
     rim: Math.max(0, (radius - GROUND_RADIUS * 0.65) / (GROUND_RADIUS * 0.35)),
     wear: wearAt(x, z),
+    soot: sootAt(x, z),
+    moisture: moistureAt(x, z),
   }
 }
 
@@ -110,8 +134,19 @@ export function groundFactorsAt(x: number, z: number): GroundFactors {
 export function groundColorFrom(factors: GroundFactors, base: Rgb): Rgb {
   let color: Rgb = [base[0] * factors.shade, base[1] * factors.shade, base[2] * factors.shade]
   color = mix(color, MOSS, Math.min(0.45, factors.rim * 0.45))
-  // Wear goes on last, so a path through the treeline still reads as a path.
-  return mix(color, DIRT, factors.wear * 0.8)
+  // Moisture darkens soil to damp mud
+  if (factors.moisture > 0) {
+    color = mix(color, MUD, factors.moisture * 0.75)
+  }
+  // Wear turns trampled areas to dirt path
+  if (factors.wear > 0) {
+    color = mix(color, DIRT, factors.wear * 0.8)
+  }
+  // Soot and ash at forge and burn range dominate ground
+  if (factors.soot > 0) {
+    color = mix(color, SOOT, factors.soot * 0.9)
+  }
+  return color
 }
 
 /**

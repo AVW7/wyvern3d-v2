@@ -1,4 +1,4 @@
-import type { BuildingId, GameState, LogEntry, RegionState, Resources, ResourceId } from '../types'
+import type { BuildingId, GameEventKind, GameState, LogEntry, RegionState, Resources, ResourceId } from '../types'
 import { BUILDINGS } from '../data/buildings'
 import { CONFIG, SAVE_VERSION } from '../data/config'
 import { REGIONS, STARTING_REGION } from '../data/regions'
@@ -41,6 +41,26 @@ export function log(state: GameState, kind: LogEntry['kind'], message: string): 
   if (state.log.length > CONFIG.logLimit) state.log.splice(0, state.log.length - CONFIG.logLimit)
 }
 
+export function emit(
+  state: GameState,
+  kind: GameEventKind,
+  subjectId: string,
+  objectId?: string,
+  payload?: Record<string, unknown>,
+): void {
+  state.events.push({
+    seq: state.nextEventSeq++,
+    tick: state.tick,
+    kind,
+    subjectId,
+    objectId,
+    payload,
+  })
+  if (state.events.length > CONFIG.eventLimit) {
+    state.events.splice(0, state.events.length - CONFIG.eventLimit)
+  }
+}
+
 export const canAfford = (state: GameState, cost: Partial<Resources>): boolean =>
   RESOURCE_IDS.every((id) => state.resources[id] >= (cost[id] ?? 0))
 
@@ -73,6 +93,7 @@ export function isAttackable(state: GameState, regionId: string): boolean {
 
 import { createDefaultSanctuaryLayout } from './sanctuaryLayout'
 import { ensureRegions } from './regionsState'
+import { ensureAtlasKnowledge } from './atlasKnowledge'
 
 export function createInitialState(seed: number): GameState {
   const state: GameState = {
@@ -85,6 +106,13 @@ export function createInitialState(seed: number): GameState {
     eggs: {},
     squads: {},
     regions: {},
+    atlasKnowledge: {},
+    duties: {
+      nextSeq: 1,
+      active: [],
+      carriedDutyId: null,
+      completed: 0,
+    },
     buildings: {
       hatchery: 1,
       trainingGrounds: 1,
@@ -144,11 +172,14 @@ export function createInitialState(seed: number): GameState {
     sanctuaryLayout: createDefaultSanctuaryLayout(),
     nextId: 0,
     log: [],
+    nextEventSeq: 0,
+    events: [],
     pendingBattle: null,
     lastBattle: null,
   }
 
   ensureRegions(state)
+  ensureAtlasKnowledge(state)
 
   withRng(state, (rng) => {
     for (const speciesId of CONFIG.starting.wyverns) {

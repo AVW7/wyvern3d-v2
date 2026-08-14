@@ -4,12 +4,14 @@ import { BUILDINGS } from '../data/buildings'
 import { CONFIG } from '../data/config'
 import { PHILOSOPHIES } from '../data/philosophies'
 import { REGIONS } from '../data/regions'
+import { REGION_ATLAS_DATA } from '../data/atlas'
 import { SPECIES } from '../data/species'
 import { STATIONS } from '../data/stations'
 import { UNITS } from '../data/units'
 import {
   canAfford,
   capacityOf,
+  emit,
   gain,
   isAttackable,
   log,
@@ -33,6 +35,7 @@ import {
   createDefaultSanctuaryLayout,
   ensureSanctuaryLayout,
 } from '../state/sanctuaryLayout'
+import { ensureAtlasKnowledge } from '../state/atlasKnowledge'
 
 /**
  * Executions are the ONLY code permitted to mutate GameState. Every one of
@@ -41,6 +44,16 @@ import {
  */
 export function execute(state: GameState, intent: Intent): void {
   switch (intent.type) {
+    case 'RECORD_REGION_VISIT':
+      return recordRegionVisit(state, intent.regionId)
+    case 'DISCOVER_LANDMARK':
+      return discoverLandmark(state, intent.regionId, intent.landmarkId)
+    case 'TAKE_DUTY_ITEM':
+      return takeDutyItem(state, intent.dutyId)
+    case 'ABANDON_DUTY_ITEM':
+      return abandonDutyItem(state, intent.dutyId)
+    case 'COMPLETE_DUTY':
+      return completeDuty(state, intent.dutyId)
     case 'ASSIGN_TRAINING':
       return assignTraining(state, intent.wyvernId, intent.stationId)
     case 'CANCEL_ASSIGNMENT':
@@ -220,7 +233,72 @@ function releaseWyvern(state: GameState, wyvernId: string): void {
   if (!w) return
   cancelAssignment(state, wyvernId)
   delete state.wyverns[wyvernId]
+  emit(state, 'wyvern_died', w.id)
   log(state, 'info', `${w.name} is released to the wild.`)
+}
+
+// ---------------------------------------------------------------------------
+// Sanctuary Duties
+// ---------------------------------------------------------------------------
+
+function takeDutyItem(state: GameState, dutyId: number): void {
+  if (!state.duties) return
+  const duty = state.duties.active.find((d) => d.id === dutyId)
+  if (!duty || duty.status !== 'available') return
+
+  duty.status = 'carrying'
+  state.duties.carriedDutyId = duty.id
+  log(state, 'info', `Collected provisions for duty #${duty.id}.`)
+}
+
+function abandonDutyItem(state: GameState, dutyId: number): void {
+  if (!state.duties) return
+  const duty = state.duties.active.find((d) => d.id === dutyId)
+  if (!duty || duty.status !== 'carrying') return
+
+  duty.status = 'available'
+  if (state.duties.carriedDutyId === duty.id) {
+    state.duties.carriedDutyId = null
+  }
+  log(state, 'info', `Returned provisions for duty #${duty.id}.`)
+}
+
+function completeDuty(state: GameState, dutyId: number): void {
+  if (!state.duties) return
+  const dutyIndex = state.duties.active.findIndex((d) => d.id === dutyId)
+  if (dutyIndex === -1) return
+  const duty = state.duties.active[dutyIndex]!
+
+  const wyvern = state.wyverns[duty.subjectId]
+  if (!wyvern) {
+    // Subject no longer exists
+    state.duties.active.splice(dutyIndex, 1)
+    if (state.duties.carriedDutyId === duty.id) state.duties.carriedDutyId = null
+    return log(state, 'bad', 'The duty subject is no longer in the sanctuary.')
+  }
+
+  if (duty.kind === 'feed') {
+    if (state.resources.food < CONFIG.wyvern.feedCost) {
+      return log(state, 'bad', 'Not enough food to complete the feed duty.')
+    }
+
+    state.resources.food -= CONFIG.wyvern.feedCost
+    wyvern.hunger = clamp(wyvern.hunger - CONFIG.wyvern.feedRelief, 0, 100)
+    wyvern.bond = clamp(wyvern.bond + CONFIG.duties.feedBondBonus, 0, CONFIG.wyvern.maxBond)
+
+    state.duties.active.splice(dutyIndex, 1)
+    if (state.duties.carriedDutyId === duty.id) {
+      state.duties.carriedDutyId = null
+    }
+    state.duties.completed += 1
+
+    emit(state, 'sanctuary_duty_completed', wyvern.id, undefined, {
+      dutyId: duty.id,
+      kind: duty.kind,
+      bondGain: CONFIG.duties.feedBondBonus,
+    })
+    log(state, 'good', `Completed feed duty for ${wyvern.name}. Hunger relieved & bond +${CONFIG.duties.feedBondBonus}.`)
+  }
 }
 
 function garrisonWyvern(state: GameState, wyvernId: string, regionId: string | null): void {
@@ -520,13 +598,17 @@ function resolveBattle(state: GameState, result: GameState['lastBattle']): void 
     if (!w) continue
     if (outcome.died) {
       delete state.wyverns[id]
+      emit(state, 'wyvern_died', id, result.regionId)
       log(state, 'bad', `${w.name} fell at ${REGIONS[result.regionId]?.name ?? result.regionId}.`)
       continue
     }
     w.injury = clamp(w.injury + outcome.injury, 0, 100)
     w.bond = clamp(w.bond + outcome.bondDelta, 0, CONFIG.wyvern.maxBond)
     const levels = applyXp(w, outcome.xp)
-    if (levels > 0) log(state, 'good', `${w.name} reaches level ${w.level}.`)
+    if (levels > 0) {
+      emit(state, 'wyvern_leveled', id, undefined, { level: w.level, levelsGained: levels })
+      log(state, 'good', `${w.name} reaches level ${w.level}.`)
+    }
   }
 
   // Squad casualties.
@@ -557,6 +639,21 @@ function resolveBattle(state: GameState, result: GameState['lastBattle']): void 
 
   log(state, 'good', `${def.name} falls. The banners are yours.`)
 
+  // Conquer marks region visited and maps adjacent neighbors in the atlas.
+  ensureAtlasKnowledge(state)
+  const knowledge = state.atlasKnowledge[result.regionId]
+  if (knowledge && !knowledge.visited) {
+    knowledge.visited = true
+    knowledge.mapped = true
+    if (knowledge.firstVisitedTick === null) knowledge.firstVisitedTick = state.tick
+    emit(state, 'region_visited', result.regionId)
+    for (const neighborId of def.neighbors) {
+      if (state.atlasKnowledge[neighborId]) {
+        state.atlasKnowledge[neighborId].mapped = true
+      }
+    }
+  }
+
   // Loot eggs of the region's native species — this is the main collection path.
   const eggs = Math.min(result.eggsLooted, region.eggsAvailable)
   region.eggsAvailable -= eggs
@@ -585,6 +682,64 @@ function resolveBattle(state: GameState, result: GameState['lastBattle']): void 
     })
     log(state, 'good', `A wild ${SPECIES[result.tamed]?.name ?? 'wyvern'} submits to you.`)
   }
+}
+
+// ---------------------------------------------------------------------------
+// World Atlas Discovery
+// ---------------------------------------------------------------------------
+
+function recordRegionVisit(state: GameState, regionId: string): void {
+  const def = REGIONS[regionId]
+  if (!def) return
+
+  ensureAtlasKnowledge(state)
+  const knowledge = state.atlasKnowledge[regionId]
+  if (!knowledge) return
+
+  // Idempotent: if already visited, do not re-emit or re-log
+  if (knowledge.visited) return
+
+  knowledge.visited = true
+  knowledge.mapped = true
+  if (knowledge.firstVisitedTick === null) {
+    knowledge.firstVisitedTick = state.tick
+  }
+
+  // Discovering/visiting a region maps all its immediate neighbors
+  for (const neighborId of def.neighbors) {
+    if (state.atlasKnowledge[neighborId]) {
+      state.atlasKnowledge[neighborId].mapped = true
+    }
+  }
+
+  emit(state, 'region_visited', regionId)
+  log(state, 'info', `Explored ${def.name}. Recorded in the World Atlas.`)
+}
+
+function discoverLandmark(state: GameState, regionId: string, landmarkId: string): void {
+  const def = REGIONS[regionId]
+  const atlas = REGION_ATLAS_DATA[regionId]
+  if (!def || !atlas) return
+
+  const landmarkDef = atlas.landmarks.find((lm) => lm.id === landmarkId)
+  if (!landmarkDef) return
+
+  ensureAtlasKnowledge(state)
+  const knowledge = state.atlasKnowledge[regionId]
+  if (!knowledge) return
+
+  // Idempotent: return early if already discovered
+  if (knowledge.discoveredLandmarkIds.includes(landmarkId)) return
+
+  knowledge.discoveredLandmarkIds.push(landmarkId)
+  knowledge.visited = true
+  knowledge.mapped = true
+  if (knowledge.firstVisitedTick === null) {
+    knowledge.firstVisitedTick = state.tick
+  }
+
+  emit(state, 'landmark_discovered', regionId, landmarkId)
+  log(state, 'good', `Discovered landmark: ${landmarkDef.name} in ${def.name}.`)
 }
 
 function createTamed(speciesId: string, id: string, n: number, rng: Rng) {

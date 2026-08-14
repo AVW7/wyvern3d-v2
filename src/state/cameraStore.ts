@@ -2,7 +2,23 @@
 
 import { create } from 'zustand'
 
-export type CameraPreset = 'default' | 'topDown' | 'isometric' | 'chase' | 'cinematic' | 'followWyvern'
+export type CameraPreset =
+  | 'default'
+  | 'topDown'
+  | 'isometric'
+  | 'chase'
+  | 'cinematic'
+  | 'followWyvern'
+  | 'reviewKeepArrival'
+  | 'reviewMainSpine'
+  | 'reviewCentralCommons'
+  | 'reviewCareCourt'
+  | 'reviewCraftYard'
+  | 'reviewTrainingEdge'
+  | 'reviewPerimeter'
+  | 'reviewInteractionForge'
+  | 'reviewInteractionHatchery'
+
 export type CameraFollowTarget = 'character' | 'wyvern'
 
 export interface CameraPresetConfig {
@@ -19,6 +35,16 @@ export const CAMERA_PRESETS: Record<CameraPreset, CameraPresetConfig> = {
   chase: { pitch: 0.20, distance: 8, fov: 65, yaw: 0 },
   cinematic: { pitch: 0.45, distance: 28, fov: 45, yaw: -Math.PI / 6 },
   followWyvern: { pitch: 0.22, distance: 26, fov: 65, yaw: 0 },
+  // Developer Review Views (fixed lens equivalents)
+  reviewKeepArrival: { pitch: 0.35, distance: 16, fov: 65, yaw: 0 },
+  reviewMainSpine: { pitch: 0.45, distance: 22, fov: 54, yaw: 0 },
+  reviewCentralCommons: { pitch: 0.90, distance: 34, fov: 74, yaw: 0 },
+  reviewCareCourt: { pitch: 0.35, distance: 20, fov: 54, yaw: -Math.PI / 4 },
+  reviewCraftYard: { pitch: 0.40, distance: 24, fov: 54, yaw: -Math.PI / 3 },
+  reviewTrainingEdge: { pitch: 0.40, distance: 24, fov: 54, yaw: Math.PI / 3 },
+  reviewPerimeter: { pitch: 1.10, distance: 55, fov: 74, yaw: 0 },
+  reviewInteractionForge: { pitch: 0.25, distance: 6, fov: 40, yaw: -Math.PI / 4 },
+  reviewInteractionHatchery: { pitch: 0.25, distance: 8, fov: 40, yaw: Math.PI / 6 },
 }
 
 export interface CameraState {

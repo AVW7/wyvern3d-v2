@@ -1,0 +1,192 @@
+.container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  background-color: #0b0f17;
+  color: #e2e8f0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 380px;
+  min-width: 320px;
+  background: #111827;
+  border-right: 1px solid #1f293d;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.header {
+  padding: 18px 20px;
+  border-bottom: 1px solid #1f293d;
+  background: #0d131f;
+}
+
+.header h1 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  color: #f8fafc;
+  letter-spacing: -0.01em;
+}
+
+.header p {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.filterBar {
+  display: flex;
+  gap: 6px;
+  padding: 10px 16px;
+  border-bottom: 1px solid #1f293d;
+  overflow-x: auto;
+  background: #0f1624;
+}
+
+.filterBtn {
+  padding: 5px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 4px;
+  border: 1px solid #28354b;
+  background: #162032;
+  color: #94a3b8;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.filterBtn:hover {
+  background: #1e2d46;
+  color: #f1f5f9;
+}
+
+.filterBtnActive {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #3b82f6;
+}
+
+.propList {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 12px;
+}
+
+.propItem {
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  margin-bottom: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.propItem:hover {
+  background: #1a2436;
+}
+
+.propItemActive {
+  background: #1e2e4a;
+  border-color: #3b82f6;
+}
+
+.propInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.propId {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #f1f5f9;
+  font-family: monospace;
+}
+
+.propMeta {
+  font-size: 0.72rem;
+  color: #64748b;
+  display: flex;
+  gap: 8px;
+}
+
+.badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+
+.badgeStructure { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+.badgeUtility { background: rgba(234, 179, 8, 0.2); color: #facc15; }
+.badgeFurniture { background: rgba(168, 85, 247, 0.2); color: #c084fc; }
+.badgeScenery { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+.badgeScatter { background: rgba(148, 163, 184, 0.2); color: #cbd5e1; }
+
+.viewport {
+  flex: 1;
+  position: relative;
+  height: 100%;
+}
+
+.detailOverlay {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 320px;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  pointer-events: auto;
+  z-index: 10;
+}
+
+.detailTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #f8fafc;
+  margin: 0 0 10px 0;
+  font-family: monospace;
+}
+
+.metricRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 0.8rem;
+}
+
+.metricLabel {
+  color: #94a3b8;
+}
+
+.metricValue {
+  color: #f1f5f9;
+  font-weight: 600;
+  font-family: monospace;
+}
+
+.socketsList {
+  margin-top: 10px;
+  font-size: 0.75rem;
+}
+
+.socketsTitle {
+  color: #38bdf8;
+  font-weight: 600;
+  margin-bottom: 4px;
+}

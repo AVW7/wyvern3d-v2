@@ -1,8 +1,6 @@
 # Wyvern animation + sanctuary life — staged work orders
 
-**Status: OPEN.** This is a live handoff artifact — it is *meant* to be edited as work lands. Each
-stage is a self-contained work order executable by an agent with no memory of the session that
-produced it. Stages repeat context deliberately — do not collapse the repetition.
+**Status: CLOSED — 2026-08-14.** All staged animation, sanctuary travel/ambient scheduling, aerodynamic flight state machine, battle readability/LOD, Thornwing species set, and discrete world event stream work orders are complete and validated. This document remains as the permanent decision and measurement record; runtime development continues in `docs/SANCTUARY_GAMEPLAY_PLAN.md`.
 
 ---
 
@@ -120,7 +118,7 @@ Update this table when you finish a stage. `NOT STARTED` → `DONE` (or `BLOCKED
 | 4.991 | V1 Biomechanical Stance & Grounded Wing Arch Alignment | DONE | 4.99 | 2026-08-05: Measured canonical v1 `drogon.glb` pose. Set `L/R_WingShoulder` local X-rotation to `+35.0°` (high Gothic arch peak at $Z = 8.68\text{ m}$), `L/R_WingElbow` to `+45.0°` (elbow drop to $Z = 6.72\text{ m}$), `L/R_WingWrist` to `-25.0° / +25.0°` (inner claw touchdown at $Z = 1.94\text{ m}$), and `L/R_WingFinger1/2/3` to `-48° / -36° / -24°` (outer wing spars drape backward along torso). Re-authored `walk` to 59f (2.458s) with measured v1 pelvis sway ($X = +1.08 \to -0.56 \to +1.31$) and `attack` to 80f (3.333s). Added UI fallback specs in `manifest.ts` for all 35 `ModelState` values so presets never snap to GLTF T-pose. Validated `wyvern.glb` with 0.0007m mirror & 0.0009rad seam. All 370 tests pass. |
 | 5 | Battle readability & Mixer LOD | DONE | 0 | 2026-08-05: All items 1-12 complete: damage flash, reachable death, attack/breath tells, fire breath VFX, distance/frustum mixer LOD, death dissolve, actor.flying stamina/flight mutation for grounded combat, trauma² camera shake, hit-stop, and GroundDustVFX. |
 | 5.5 | Playable Thornwing species and animation set | DONE | 0, 5 | 2026-08-12: User-requested Forest Wyvern Display derivative ships as the separately rigged Thornwing with seven 24 fps actions, full manifest-state coverage through explicit reuse, Thornmarch acquisition/save compatibility, and dedicated numeric, GLB, and contact-sheet gates. The source records Meshy provenance but no licence grant, so external-release verification remains explicit. |
-| 6 | World event stream & Flourishes | NOT STARTED | 4 | |
+| 6 | World event stream & Flourishes | DONE | 4 | 2026-08-14: GameEvent stream in core, SAVE_VERSION 9 migration, monotonic sequence-cursor draining with offline catch-up protection, in-world hatch bursts and expanding spectral aura flourishes, and __wyvern.advance dev handle. |
 
 Stages 3 and 5 are independent of 1–2 and can be done in parallel by a second agent.
 
@@ -721,7 +719,7 @@ gates, and battle harness all approve the change.
 
 # STAGE 6 — World event stream & Flourishes
 
-**Status:** NOT STARTED · **Depends on:** Stage 4
+**Status:** DONE — 2026-08-14. GameEvent stream in core, SAVE_VERSION 9 migration, monotonic sequence-cursor drain hook with offline catch-up protection, in-world hatch burst particles and expanding spectral aura flourishes, and __wyvern.advance dev handle. · **Depends on:** Stage 4
 
 **Goal.** Discrete sim moments (hatch, level-up, coming of age) trigger explicit visual and animation flourishes.
 

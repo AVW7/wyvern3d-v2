@@ -6,6 +6,7 @@ import { nextId } from './game'
 import { advanceTicks } from './tick'
 import { ensureSanctuaryLayout, migrateLegacySanctuaryLayout } from './sanctuaryLayout'
 import { ensureRegions } from './regionsState'
+import { ensureAtlasKnowledge } from './atlasKnowledge'
 
 /**
  * Storage is behind an interface so a server-backed save can replace
@@ -201,6 +202,41 @@ const MIGRATIONS: Record<number, Migration> = {
     ...state,
     saveVersion: 8,
   }),
+  // 8 -> 9: Discrete Game Events Stream and Sequence Counter
+  8: (state) => ({
+    ...state,
+    nextEventSeq: state.nextEventSeq ?? (state.events?.length ?? 0),
+    events: state.events ?? [],
+    saveVersion: 9,
+  }),
+  // 9 -> 10: World Atlas Content & Persistent Knowledge Contract
+  9: (state) => {
+    const migrated = ensureAtlasKnowledge(state)
+    return {
+      ...migrated,
+      saveVersion: 10,
+    }
+  },
+  // 10 -> 11: Sanctuary Care Duties & Physical Routine Loop
+  10: (state) => {
+    const migrated = ensureSanctuaryDuties(state)
+    return {
+      ...migrated,
+      saveVersion: 11,
+    }
+  },
+}
+
+export function ensureSanctuaryDuties(state: GameState): GameState {
+  if (!state.duties) {
+    state.duties = {
+      nextSeq: 1,
+      active: [],
+      carriedDutyId: null,
+      completed: 0,
+    }
+  }
+  return state
 }
 
 export function migrate(state: GameState): GameState {
@@ -248,6 +284,8 @@ export function deserialize(raw: string, now: number): LoadResult | null {
   const state = migrate(envelope.state)
   ensureRegions(state)
   ensureSanctuaryLayout(state)
+  ensureAtlasKnowledge(state)
+  ensureSanctuaryDuties(state)
 
   const elapsedMs = Math.max(0, now - (envelope.savedAt ?? now))
   const offlineTicks = Math.min(

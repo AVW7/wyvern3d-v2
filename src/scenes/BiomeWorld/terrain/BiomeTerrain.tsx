@@ -9,9 +9,11 @@ export { BIOME_WORLD_RADIUS, GROVE_MOUND_HEIGHT, biomeHeightAt } from './biomeHe
 
 interface BiomeTerrainProps {
   biome: string
+  regionId?: string
+  seed?: number
 }
 
-export function BiomeTerrain({ biome }: BiomeTerrainProps) {
+export function BiomeTerrain({ biome, regionId, seed = 42 }: BiomeTerrainProps) {
   const palette = useMemo(() => getBiomePalette(biome), [biome])
 
   const geometry = useMemo(() => {
@@ -19,13 +21,13 @@ export function BiomeTerrain({ biome }: BiomeTerrainProps) {
     const positions = ground.attributes.position!
 
     for (let i = 0; i < positions.count; i += 1) {
-      positions.setZ(i, surfaceHeight(biome, positions.getX(i), positions.getY(i)))
+      positions.setZ(i, surfaceHeight(biome, positions.getX(i), positions.getY(i), regionId, seed))
     }
 
     positions.needsUpdate = true
     ground.computeVertexNormals()
     return ground
-  }, [biome])
+  }, [biome, regionId, seed])
 
   useEffect(() => () => geometry.dispose(), [geometry])
 

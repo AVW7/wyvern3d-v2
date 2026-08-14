@@ -32,6 +32,11 @@ export type Intent =
   | { type: 'CRAFT_EQUIPMENT'; equipmentType: 'wyvern_armor' | 'flame_spears' | 'iron_shields' }
   | { type: 'BREW_ELIXIR'; elixirType: 'vitality_salve' | 'dragon_tonic' | 'growth_elixir' }
   | { type: 'USE_ELIXIR'; elixirType: 'vitality_salve' | 'dragon_tonic' | 'growth_elixir'; wyvernId: string }
+  | { type: 'RECORD_REGION_VISIT'; regionId: string }
+  | { type: 'DISCOVER_LANDMARK'; regionId: string; landmarkId: string }
+  | { type: 'TAKE_DUTY_ITEM'; dutyId: number }
+  | { type: 'ABANDON_DUTY_ITEM'; dutyId: number }
+  | { type: 'COMPLETE_DUTY'; dutyId: number }
   | {
       type: 'LAUNCH_ATTACK'
       regionId: string

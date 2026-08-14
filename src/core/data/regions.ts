@@ -1,4 +1,5 @@
 import type { RegionDef } from '../types'
+import { REGION_ATLAS_DATA } from './atlas'
 
 /**
  * The conquest graph. Attacks are only legal into a region adjacent to one you
@@ -7,13 +8,14 @@ import type { RegionDef } from '../types'
  *
  * `neighbors` must be symmetric — asserted in core.test.ts.
  */
-export const REGIONS: Record<string, RegionDef> = {
+const RAW_REGIONS: Record<string, Omit<RegionDef, 'atlas'>> = {
   hearthvale: {
     id: 'hearthvale',
     name: 'Hearthvale',
     biome: 'valley',
     tier: 0,
     starting: true,
+    compositionTag: 'sheltered_valley',
     position: { x: 0, z: 75 },
     neighbors: ['ashfen', 'greyreach', 'thornmarch', 'whisperingwoods', 'sunkenreach'],
     yields: { food: 3, gold: 2, timber: 2 },
@@ -26,6 +28,7 @@ export const REGIONS: Record<string, RegionDef> = {
     name: 'Sunkenreach',
     biome: 'coast',
     tier: 1,
+    compositionTag: 'tidal_shallows',
     position: { x: -35, z: 52 },
     neighbors: ['hearthvale', 'greyreach', 'whisperingwoods', 'saltcrag'],
     yields: { gold: 4, food: 4 },
@@ -38,6 +41,7 @@ export const REGIONS: Record<string, RegionDef> = {
     name: 'Whispering Woods',
     biome: 'forest',
     tier: 1,
+    compositionTag: 'dense_canopy',
     position: { x: 35, z: 52 },
     neighbors: ['hearthvale', 'thornmarch', 'sunkenreach', 'serpentfang', 'elderrootgrove'],
     yields: { timber: 6, food: 3 },
@@ -50,6 +54,7 @@ export const REGIONS: Record<string, RegionDef> = {
     name: 'Ashfen',
     biome: 'marsh',
     tier: 1,
+    compositionTag: 'misty_mire',
     position: { x: 0, z: 30 },
     neighbors: [
       'hearthvale',
@@ -70,6 +75,7 @@ export const REGIONS: Record<string, RegionDef> = {
     name: 'Greyreach',
     biome: 'moor',
     tier: 1,
+    compositionTag: 'windswept_moor',
     position: { x: -60, z: 30 },
     neighbors: ['hearthvale', 'sunkenreach', 'ashfen', 'cinderpeaks', 'saltcrag'],
     yields: { gold: 3, ore: 2 },
@@ -82,6 +88,7 @@ export const REGIONS: Record<string, RegionDef> = {
     name: 'Thornmarch',
     biome: 'forest',
     tier: 1,
+    compositionTag: 'iron_briar',
     position: { x: 60, z: 30 },
     neighbors: ['hearthvale', 'whisperingwoods', 'ashfen', 'mirelands', 'stonewatch', 'elderrootgrove'],
     yields: { timber: 5, food: 2 },
@@ -94,6 +101,7 @@ export const REGIONS: Record<string, RegionDef> = {
     name: 'Saltcrag',
     biome: 'coast',
     tier: 2,
+    compositionTag: 'craggy_cliffs',
     position: { x: -95, z: -5 },
     neighbors: ['sunkenreach', 'greyreach', 'cinderpeaks', 'stormshores'],
     yields: { gold: 5, food: 2, arcane: 1 },
@@ -106,6 +114,7 @@ export const REGIONS: Record<string, RegionDef> = {
     name: 'Cinderpeaks',
     biome: 'mountain',
     tier: 2,
+    compositionTag: 'volcanic_crags',
     position: { x: -60, z: -15 },
     neighbors: ['greyreach', 'saltcrag', 'emberwaste', 'frostgate', 'ironhold'],
     yields: { ore: 6, gold: 2 },
@@ -118,6 +127,7 @@ export const REGIONS: Record<string, RegionDef> = {
     name: 'Ironhold',
     biome: 'highland',
     tier: 2,
+    compositionTag: 'defensive_plateau',
     position: { x: -30, z: -10 },
     neighbors: ['cinderpeaks', 'crystalgrotto', 'emberwaste', 'ashfen'],
     yields: { ore: 5, gold: 4, timber: 2 },
@@ -130,6 +140,7 @@ export const REGIONS: Record<string, RegionDef> = {
     name: 'Crystal Grotto',
     biome: 'cavern',
     tier: 2,
+    compositionTag: 'luminescent_cavern',
     position: { x: 0, z: -10 },
     neighbors: ['ironhold', 'serpentfang', 'emberwaste', 'ashfen'],
     yields: { arcane: 5, ore: 3, gold: 2 },
@@ -142,6 +153,7 @@ export const REGIONS: Record<string, RegionDef> = {
     name: 'Serpentfang',
     biome: 'jungle',
     tier: 2,
+    compositionTag: 'emerald_jungle',
     position: { x: 30, z: -10 },
     neighbors: ['whisperingwoods', 'crystalgrotto', 'mirelands', 'emberwaste'],
     yields: { food: 6, arcane: 2 },
@@ -154,6 +166,7 @@ export const REGIONS: Record<string, RegionDef> = {
     name: 'Mirelands',
     biome: 'swamp',
     tier: 2,
+    compositionTag: 'cypress_swamp',
     position: { x: 60, z: -15 },
     neighbors: ['ashfen', 'thornmarch', 'serpentfang', 'stonewatch', 'emberwaste'],
     yields: { food: 5, arcane: 2 },
@@ -166,6 +179,7 @@ export const REGIONS: Record<string, RegionDef> = {
     name: 'Stonewatch',
     biome: 'highland',
     tier: 2,
+    compositionTag: 'alpine_bastion',
     position: { x: 95, z: -5 },
     neighbors: ['thornmarch', 'mirelands', 'hollowmoor', 'glaciercrest', 'elderrootgrove'],
     yields: { ore: 4, gold: 3, timber: 2 },
@@ -178,6 +192,7 @@ export const REGIONS: Record<string, RegionDef> = {
     name: 'Elderroot Grove',
     biome: 'grove',
     tier: 2,
+    compositionTag: 'sacred_world_tree',
     position: { x: 92, z: 30 },
     neighbors: ['whisperingwoods', 'thornmarch', 'stonewatch'],
     yields: { arcane: 4, timber: 4, food: 3 },
@@ -190,6 +205,7 @@ export const REGIONS: Record<string, RegionDef> = {
     name: 'Emberwaste',
     biome: 'ashland',
     tier: 3,
+    compositionTag: 'magma_fissures',
     position: { x: 0, z: -40 },
     neighbors: [
       'ashfen',
@@ -212,6 +228,7 @@ export const REGIONS: Record<string, RegionDef> = {
     name: 'Obsidian Ridge',
     biome: 'ashland',
     tier: 3,
+    compositionTag: 'glass_needles',
     position: { x: 0, z: -70 },
     neighbors: ['emberwaste', 'stormshores', 'glaciercrest', 'shadowcitadel'],
     yields: { ore: 7, arcane: 4 },
@@ -224,6 +241,7 @@ export const REGIONS: Record<string, RegionDef> = {
     name: 'Stormshores',
     biome: 'coast',
     tier: 3,
+    compositionTag: 'tempest_reefs',
     position: { x: -80, z: -55 },
     neighbors: ['saltcrag', 'frostgate', 'obsidianridge'],
     yields: { gold: 6, arcane: 4 },
@@ -236,6 +254,7 @@ export const REGIONS: Record<string, RegionDef> = {
     name: 'Glaciercrest',
     biome: 'tundra',
     tier: 3,
+    compositionTag: 'azure_glacier',
     position: { x: 80, z: -55 },
     neighbors: ['stonewatch', 'hollowmoor', 'obsidianridge'],
     yields: { arcane: 6, timber: 4 },
@@ -248,6 +267,7 @@ export const REGIONS: Record<string, RegionDef> = {
     name: 'Frostgate',
     biome: 'tundra',
     tier: 3,
+    compositionTag: 'glacial_archway',
     position: { x: -45, z: -75 },
     neighbors: ['cinderpeaks', 'stormshores', 'emberwaste', 'shadowcitadel', 'duskspire'],
     yields: { arcane: 5, ore: 4 },
@@ -260,6 +280,7 @@ export const REGIONS: Record<string, RegionDef> = {
     name: 'Hollowmoor',
     biome: 'barrens',
     tier: 3,
+    compositionTag: 'frozen_steppe',
     position: { x: 45, z: -75 },
     neighbors: ['stonewatch', 'glaciercrest', 'emberwaste', 'shadowcitadel', 'duskspire'],
     yields: { arcane: 5, gold: 5 },
@@ -272,6 +293,7 @@ export const REGIONS: Record<string, RegionDef> = {
     name: 'Shadow Citadel',
     biome: 'spire',
     tier: 4,
+    compositionTag: 'twilight_keep',
     position: { x: 0, z: -95 },
     neighbors: ['obsidianridge', 'frostgate', 'hollowmoor', 'duskspire'],
     yields: { arcane: 8, gold: 7, ore: 4 },
@@ -288,6 +310,7 @@ export const REGIONS: Record<string, RegionDef> = {
     name: 'Duskspire',
     biome: 'spire',
     tier: 4,
+    compositionTag: 'apex_spire',
     position: { x: 0, z: -125 },
     neighbors: ['shadowcitadel', 'frostgate', 'hollowmoor'],
     yields: { arcane: 12, gold: 10, ore: 6 },
@@ -300,6 +323,16 @@ export const REGIONS: Record<string, RegionDef> = {
     defenders: ['duskwyrm', 'frostmaw', 'frostmaw'],
   },
 }
+
+export const REGIONS: Record<string, RegionDef> = Object.fromEntries(
+  Object.entries(RAW_REGIONS).map(([id, def]) => [
+    id,
+    {
+      ...def,
+      atlas: REGION_ATLAS_DATA[id],
+    },
+  ]),
+)
 
 export const REGION_LIST = Object.values(REGIONS)
 

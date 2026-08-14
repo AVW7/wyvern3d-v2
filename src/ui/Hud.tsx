@@ -18,12 +18,14 @@ import { InteractionNotice } from './InteractionNotice'
 import { RegionInspector } from './RegionInspector'
 import { HighlandsHud } from './HighlandsHud'
 import { useHighlandsHunt } from '@/state/highlandsHuntStore'
+import { BiomeTransitionOverlay } from '@/scenes/BiomeWorld/transitions/BiomeTransitionOverlay'
 
 /** DOM overlay HUD. Kept out of the canvas so it stays accessible and cheap. */
 export function Hud() {
   const state = useGameState()
   const mode = useGame((s) => s.mode)
   const setMode = useGame((s) => s.setMode)
+  const selectedRegion = useGame((s) => s.selectedRegion)
   const nearby = useUi((s) => s.nearby)
   const openPanel = useUi((s) => s.openPanel)
   const open = useUi((s) => s.open)
@@ -67,6 +69,7 @@ export function Hud() {
     <div className="overlay">
       <CameraTransitionFlash />
       <InteractionNotice />
+      {mode === 'biome' && <BiomeTransitionOverlay regionId={selectedRegion ?? undefined} key={selectedRegion ?? 'biome-trans'} />}
       {/* Standalone button shown ONLY when HUD is hidden */}
       {hudHidden && (
         <button

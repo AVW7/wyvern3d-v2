@@ -6,12 +6,15 @@ import { REGIONS, REGION_LIST, STARTING_REGION } from '@/core/data/regions'
 import { useGameState, useGame } from '@/state/store'
 import { usePlayerControlStore } from '@/state/playerControlStore'
 import { getBiomePalette } from './atmosphere/biomePalettes'
+import { BiomeAtmosphere } from './atmosphere/BiomeAtmosphere'
 import { BiomeTerrain } from './terrain/BiomeTerrain'
 import { BiomeDressing } from './dressing/BiomeDressing'
 import { GROVE_COLLIDERS } from './dressing/GroveLandmark'
+import { getRegionColliders, BIOME_SPAWN_ANCHOR } from './terrain/biomeTraversal'
 import { BiomeExplorer } from './BiomeExplorer'
 import { BiomeFlightActor } from './flight/BiomeFlightActor'
 import { WorldLabel } from '@/render/labels/WorldLabel'
+import { biomeAudio } from './audio/biomeAudio'
 
 /**
  * Where the player lands when they enter a region. Negative Z with the default
@@ -19,7 +22,7 @@ import { WorldLabel } from '@/render/labels/WorldLabel'
  * sits between the grove's trunk collider and its stone ring, so the arrival
  * frame is never a fir tree in the player's face.
  */
-const SPAWN: [number, number] = [0, -18]
+const SPAWN: [number, number] = BIOME_SPAWN_ANCHOR
 
 export function BiomeScene() {
   const state = useGameState()
@@ -36,13 +39,25 @@ export function BiomeScene() {
   // then the placeholder box keeps the player out of the trunk. This is a
   // load-time swap, not a per-frame one, so React state is the right home.
   const [measured, setMeasured] = useState<Collider[] | null>(null)
+  const regionColliders = useMemo(
+    () => getRegionColliders(biome, regionId, state.seed),
+    [biome, regionId, state.seed],
+  )
   const colliders = useMemo(
-    () => (biome === 'grove' ? measured ?? GROVE_COLLIDERS : []),
-    [biome, measured],
+    () => (biome === 'grove' && measured ? [...measured, ...regionColliders.filter((c) => !GROVE_COLLIDERS.includes(c))] : regionColliders),
+    [biome, measured, regionColliders],
   )
   const onColliders = useCallback((next: Collider[]) => setMeasured(next), [])
 
   useEffect(() => setMeasured(null), [biome])
+
+  // Biome ambient audio layer
+  useEffect(() => {
+    biomeAudio.startAmbience(biome)
+    return () => {
+      biomeAudio.stopAmbience(0.3)
+    }
+  }, [biome])
 
   // The expedition starts on foot; Tab shifts between the explorer and the
   // wyvern, exactly as it does in the sanctuary.
@@ -64,29 +79,19 @@ export function BiomeScene() {
 
   return (
     <>
-      {/* Lighting & Fog */}
-      <hemisphereLight
-        args={[palette.hemiSky, palette.hemiGround, palette.hemiIntensity]}
+      {/* Dynamic Weather & Lighting Atmosphere */}
+      <BiomeAtmosphere
+        biome={biome}
+        regionId={regionId}
+        seed={state.seed}
+        tick={state.tick}
       />
-      <directionalLight
-        position={palette.sunPosition}
-        intensity={palette.sunIntensity}
-        color={palette.sunColor}
-        castShadow
-        shadow-mapSize={[1024, 1024]}
-        shadow-camera-left={-120}
-        shadow-camera-right={120}
-        shadow-camera-top={120}
-        shadow-camera-bottom={-120}
-      />
-      <fog attach="fog" args={[palette.fogColor, palette.fogNear, palette.fogFar]} />
-      <color attach="background" args={[palette.background]} />
 
       {/* Procedural Biome Terrain */}
-      <BiomeTerrain biome={biome} />
+      <BiomeTerrain biome={biome} regionId={regionId} seed={state.seed} />
 
       {/* Biome Scatter Props */}
-      <BiomeDressing biome={biome} onColliders={onColliders} />
+      <BiomeDressing biome={biome} regionId={regionId} seed={state.seed} onColliders={onColliders} />
 
       {/* Region Landmark Title Banner */}
       <WorldLabel
@@ -101,7 +106,7 @@ export function BiomeScene() {
         `useFrame` callbacks fighting over `camera.position` every frame.
       */}
       {controlMode === 'human' || !activeWyvern ? (
-        <BiomeExplorer biome={biome} colliders={colliders} spawn={SPAWN} />
+        <BiomeExplorer biome={biome} regionId={regionId} seed={state.seed} colliders={colliders} spawn={SPAWN} />
       ) : (
         <BiomeFlightActor wyvern={activeWyvern} />
       )}

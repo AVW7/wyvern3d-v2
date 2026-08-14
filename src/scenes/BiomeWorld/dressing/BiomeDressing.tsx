@@ -28,22 +28,26 @@ class BiomePropsBoundary extends Component<{ children: ReactNode }, { failed: bo
 
 interface BiomeDressingProps {
   biome: string
+  regionId?: string
+  seed?: number
   /** Receives the grove landmark's measured footprint once its model loads. */
   onColliders?: (colliders: Collider[]) => void
 }
 
-export function BiomeDressing({ biome, onColliders }: BiomeDressingProps) {
+export function BiomeDressing({ biome, regionId, seed = 42, onColliders }: BiomeDressingProps) {
   const layers: BiomeLayer[] = BIOME_DRESSING[biome] ?? []
 
   const placements = useMemo(
     () =>
       scatterBiome(layers, {
-        heightAt: (x, z) => biomeHeightAt(biome, x, z),
+        heightAt: (x, z) => biomeHeightAt(biome, x, z, regionId, seed),
         // The grove keeps its middle clear: the world tree and its stone ring
         // own everything inside 32 m.
         clearing: biome === 'grove' ? 32 : 0,
+        regionId,
+        seed,
       }),
-    [biome, layers],
+    [biome, layers, regionId, seed],
   )
 
   return (

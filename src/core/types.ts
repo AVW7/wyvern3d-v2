@@ -127,6 +127,21 @@ export interface BuildingDef {
   capacityPerLevel: number[]
 }
 
+export interface LandmarkDef {
+  id: string
+  name: string
+  description: string
+  category: 'natural' | 'ruin' | 'settlement' | 'monolith' | 'shrine'
+}
+
+export interface AtlasRegionData {
+  summary: string
+  climateTags: string[]
+  terrainTags: string[]
+  threatNotes: string
+  landmarks: LandmarkDef[]
+}
+
 export interface RegionDef {
   id: string
   name: string
@@ -146,6 +161,10 @@ export interface RegionDef {
   defenders: string[]
   /** True for the player's starting territory. */
   starting?: boolean
+  /** Optional authored composition tag guiding regional identity (e.g. 'windswept', 'dense_canopy'). */
+  compositionTag?: string
+  /** Authored static atlas lore and landmark data. */
+  atlas?: AtlasRegionData
 }
 
 export interface TrainingStationDef {
@@ -231,10 +250,57 @@ export interface RegionState {
   conqueredAtTick: number | null
 }
 
+export interface RegionKnowledge {
+  regionId: string
+  mapped: boolean
+  visited: boolean
+  discoveredLandmarkIds: string[]
+  firstVisitedTick: number | null
+}
+
+export type SanctuaryDutyKind = 'feed' | 'medicine' | 'companionship' | 'flightExercise'
+export type SanctuaryDutyStatus = 'available' | 'carrying' | 'complete'
+
+export interface SanctuaryDuty {
+  id: number
+  kind: SanctuaryDutyKind
+  subjectId: string
+  createdTick: number
+  status: SanctuaryDutyStatus
+  sourceId?: string
+}
+
+export interface SanctuaryDutiesState {
+  nextSeq: number
+  active: SanctuaryDuty[]
+  carriedDutyId: number | null
+  completed: number
+}
+
 export interface LogEntry {
   tick: number
   kind: 'info' | 'good' | 'bad'
   message: string
+}
+
+export type GameEventKind =
+  | 'training_completed'
+  | 'egg_laid'
+  | 'egg_hatched'
+  | 'stage_promoted'
+  | 'wyvern_died'
+  | 'wyvern_leveled'
+  | 'sanctuary_duty_completed'
+  | 'region_visited'
+  | 'landmark_discovered'
+
+export interface GameEvent {
+  seq: number
+  tick: number
+  kind: GameEventKind
+  subjectId: string
+  objectId?: string
+  payload?: Record<string, unknown>
 }
 
 // ---------------------------------------------------------------------------
@@ -307,6 +373,10 @@ export interface GameState {
   eggs: Record<string, Egg>
   squads: Record<string, Squad>
   regions: Record<string, RegionState>
+  /** Persistent player discovery and exploration knowledge of regions and landmarks. */
+  atlasKnowledge: Record<string, RegionKnowledge>
+  /** Active and completed physical sanctuary duties for wyvern care. */
+  duties: SanctuaryDutiesState
   buildings: Record<BuildingId, number>
   /** Sanctuary population, worker assignment & livestock state. */
   economy: SanctuaryEconomyState
@@ -317,6 +387,10 @@ export interface GameState {
   /** Monotonic id counter — deterministic, unlike a uuid. */
   nextId: number
   log: LogEntry[]
+  /** Sequence counter for discrete game events. */
+  nextEventSeq: number
+  /** Bounded event ring for visual flourishes and notifications. */
+  events: GameEvent[]
   /** Set when a battle is staged and awaiting resolution. */
   pendingBattle: BattleSetup | null
   lastBattle: BattleResult | null

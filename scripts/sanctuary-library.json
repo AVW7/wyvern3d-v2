@@ -1,0 +1,1166 @@
+{
+  "_readme": [
+    "Authored specification for all static sanctuary atlas props.",
+    "Validated against public/models/sanctuary.glb by pnpm assets:validate-sanctuary-atlas.",
+    "",
+    "targetHeight: authored height in metres (used to detect unexpected geometry drift).",
+    "footprint: { halfW, halfD } authored bounding footprint for gameplay collision.",
+    "maxTriangles: hard polygon budget for the prop node.",
+    "sockets: named anchors for interaction, particle effects, lights, and perching."
+  ],
+  "out": "sanctuary",
+  "softBudgetMb": 8,
+  "hardCapMb": 15,
+  "props": [
+    {
+      "id": "prop.barrel",
+      "pack": "mining",
+      "sourceNode": "PP_Barrel_01",
+      "category": "furniture",
+      "targetHeight": 1,
+      "footprint": {
+        "halfW": 0.45,
+        "halfD": 0.45
+      },
+      "clearance": 0.7,
+      "materialClass": "timber",
+      "shadowClass": "hero",
+      "maxTriangles": 392,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.blockade",
+      "pack": "mining",
+      "sourceNode": "PP_Wooden_Blockade_01",
+      "category": "furniture",
+      "targetHeight": 1.33,
+      "footprint": {
+        "halfW": 0.65,
+        "halfD": 1
+      },
+      "clearance": 1.5,
+      "materialClass": "timber",
+      "shadowClass": "hero",
+      "maxTriangles": 271,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.burn.burnedTree",
+      "pack": "lava",
+      "sourceNode": "PP_Tree_Burned_01",
+      "category": "structure",
+      "targetHeight": 6.81,
+      "footprint": {
+        "halfW": 2.5,
+        "halfD": 1.73
+      },
+      "clearance": 3.8,
+      "materialClass": "stone",
+      "shadowClass": "hero",
+      "maxTriangles": 1980,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.burn.burnedTreeAlt",
+      "pack": "lava",
+      "sourceNode": "PP_Tree_Burned_03",
+      "category": "structure",
+      "targetHeight": 7.73,
+      "footprint": {
+        "halfW": 2.27,
+        "halfD": 2.46
+      },
+      "clearance": 3.7,
+      "materialClass": "stone",
+      "shadowClass": "hero",
+      "maxTriangles": 2078,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.burn.lavaColumn",
+      "pack": "lava",
+      "sourceNode": "PP_Lava_Column_01",
+      "category": "structure",
+      "targetHeight": 10.01,
+      "footprint": {
+        "halfW": 2.38,
+        "halfD": 2.57
+      },
+      "clearance": 3.9,
+      "materialClass": "earth",
+      "shadowClass": "hero",
+      "maxTriangles": 1313,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.burn.lavaColumnAlt",
+      "pack": "lava",
+      "sourceNode": "PP_Lava_Column_03",
+      "category": "structure",
+      "targetHeight": 9.99,
+      "footprint": {
+        "halfW": 3.3,
+        "halfD": 3.12
+      },
+      "clearance": 4.9,
+      "materialClass": "earth",
+      "shadowClass": "hero",
+      "maxTriangles": 1643,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.burn.lavaStone",
+      "pack": "lava",
+      "sourceNode": "PP_Stone_Lava_01",
+      "category": "structure",
+      "targetHeight": 1.99,
+      "footprint": {
+        "halfW": 1.01,
+        "halfD": 0.89
+      },
+      "clearance": 1.5,
+      "materialClass": "earth",
+      "shadowClass": "hero",
+      "maxTriangles": 1272,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.burn.volcano",
+      "pack": "lava",
+      "sourceNode": "PP_Volcano_Dead_01",
+      "category": "structure",
+      "targetHeight": 8.58,
+      "footprint": {
+        "halfW": 5.13,
+        "halfD": 5.29
+      },
+      "clearance": 7.9,
+      "materialClass": "earth",
+      "shadowClass": "hero",
+      "maxTriangles": 1156,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.campfire",
+      "pack": "nature",
+      "sourceNode": "PP_Campfire_01",
+      "category": "utility",
+      "targetHeight": 0.57,
+      "footprint": {
+        "halfW": 0.67,
+        "halfD": 0.64
+      },
+      "clearance": 1,
+      "materialClass": "vegetation",
+      "shadowClass": "hero",
+      "maxTriangles": 1382,
+      "sockets": {
+        "light": [
+          0,
+          0.46,
+          0
+        ],
+        "effect": [
+          0,
+          0.46,
+          0
+        ]
+      },
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.chest",
+      "pack": "mining",
+      "sourceNode": "PP_Treasure_Chest_01_Iron",
+      "category": "furniture",
+      "targetHeight": 0.59,
+      "footprint": {
+        "halfW": 0.56,
+        "halfD": 0.32
+      },
+      "clearance": 0.8,
+      "materialClass": "metal",
+      "shadowClass": "hero",
+      "maxTriangles": 6444,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.crate",
+      "pack": "mining",
+      "sourceNode": "PP_Crate_Wooden_01",
+      "category": "furniture",
+      "targetHeight": 0.6,
+      "footprint": {
+        "halfW": 0.3,
+        "halfD": 0.3
+      },
+      "clearance": 0.4,
+      "materialClass": "timber",
+      "shadowClass": "hero",
+      "maxTriangles": 468,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.fenceA",
+      "pack": "nature",
+      "sourceNode": "PP_Small_Fence_01",
+      "category": "scenery",
+      "targetHeight": 0.49,
+      "footprint": {
+        "halfW": 0.93,
+        "halfD": 0.08
+      },
+      "clearance": 1.4,
+      "materialClass": "timber",
+      "shadowClass": "hero",
+      "maxTriangles": 844,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.fenceB",
+      "pack": "nature",
+      "sourceNode": "PP_Small_Fence_02",
+      "category": "scenery",
+      "targetHeight": 0.49,
+      "footprint": {
+        "halfW": 0.9,
+        "halfD": 0.08
+      },
+      "clearance": 1.4,
+      "materialClass": "timber",
+      "shadowClass": "hero",
+      "maxTriangles": 739,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.forge.anvil",
+      "pack": "mining",
+      "sourceNode": "PP_Anvil_Used_01_Used_Iron",
+      "category": "structure",
+      "targetHeight": 0.44,
+      "footprint": {
+        "halfW": 0.47,
+        "halfD": 0.21
+      },
+      "clearance": 0.7,
+      "materialClass": "metal",
+      "shadowClass": "hero",
+      "maxTriangles": 380,
+      "sockets": {
+        "playerApproach": [
+          0,
+          0,
+          1.2
+        ],
+        "interaction": [
+          0,
+          0.8,
+          0
+        ],
+        "effect": [
+          0,
+          0.85,
+          0
+        ]
+      },
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.forge.chimney",
+      "pack": "mining",
+      "sourceNode": "PP_Chimney_01",
+      "category": "structure",
+      "targetHeight": 4.33,
+      "footprint": {
+        "halfW": 0.51,
+        "halfD": 0.36
+      },
+      "clearance": 0.8,
+      "materialClass": "stone",
+      "shadowClass": "hero",
+      "maxTriangles": 1085,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.forge.furnace",
+      "pack": "mining",
+      "sourceNode": "PP_Furnace_01",
+      "category": "structure",
+      "targetHeight": 5.36,
+      "footprint": {
+        "halfW": 1.22,
+        "halfD": 1.03
+      },
+      "clearance": 1.8,
+      "materialClass": "stone",
+      "shadowClass": "hero",
+      "maxTriangles": 2779,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.forge.grindstone",
+      "pack": "mining",
+      "sourceNode": "PP_Grinding_Stone_01",
+      "category": "structure",
+      "targetHeight": 0.81,
+      "footprint": {
+        "halfW": 0.53,
+        "halfD": 0.34
+      },
+      "clearance": 0.8,
+      "materialClass": "stone",
+      "shadowClass": "hero",
+      "maxTriangles": 717,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.forge.sign",
+      "pack": "mining",
+      "sourceNode": "PP_Blacksmithing_Sign_01",
+      "category": "structure",
+      "targetHeight": 1.21,
+      "footprint": {
+        "halfW": 0.88,
+        "halfD": 0.06
+      },
+      "clearance": 1.3,
+      "materialClass": "timber",
+      "shadowClass": "hero",
+      "maxTriangles": 267,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.forge.toolHolder",
+      "pack": "mining",
+      "sourceNode": "PP_Tool_Holder_01",
+      "category": "structure",
+      "targetHeight": 0.95,
+      "footprint": {
+        "halfW": 0.9,
+        "halfD": 0.33
+      },
+      "clearance": 1.4,
+      "materialClass": "metal",
+      "shadowClass": "hero",
+      "maxTriangles": 1000,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.forge.trough",
+      "pack": "mining",
+      "sourceNode": "PP_Quenching_Trough_01",
+      "category": "structure",
+      "targetHeight": 0.54,
+      "footprint": {
+        "halfW": 0.28,
+        "halfD": 0.28
+      },
+      "clearance": 0.4,
+      "materialClass": "metal",
+      "shadowClass": "hero",
+      "maxTriangles": 426,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.hatchery.cave",
+      "pack": "mining",
+      "sourceNode": "PP_Cave_Small_01",
+      "category": "structure",
+      "targetHeight": 6.73,
+      "footprint": {
+        "halfW": 6.29,
+        "halfD": 6.13
+      },
+      "clearance": 9.4,
+      "materialClass": "stone",
+      "shadowClass": "hero",
+      "maxTriangles": 3011,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.hatchery.entrance",
+      "pack": "mining",
+      "sourceNode": "PP_Mountain_Cave_Entrance_01",
+      "category": "structure",
+      "targetHeight": 4.4,
+      "footprint": {
+        "halfW": 8.4,
+        "halfD": 6.11
+      },
+      "clearance": 12.6,
+      "materialClass": "stone",
+      "shadowClass": "hero",
+      "maxTriangles": 2471,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.hatchery.nest",
+      "pack": "nature",
+      "sourceNode": "PP_Stone_Plateau_Moss_Grown_01",
+      "category": "structure",
+      "targetHeight": 0.77,
+      "footprint": {
+        "halfW": 0.81,
+        "halfD": 0.81
+      },
+      "clearance": 1.2,
+      "materialClass": "stone",
+      "shadowClass": "hero",
+      "maxTriangles": 1218,
+      "sockets": {
+        "wyvernPerch": [
+          0,
+          0.77,
+          0
+        ]
+      },
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.keep.floorA",
+      "pack": "nature",
+      "sourceNode": "PP_Floor_Tile_01",
+      "category": "structure",
+      "targetHeight": 0.19,
+      "footprint": {
+        "halfW": 0.67,
+        "halfD": 0.88
+      },
+      "clearance": 1.3,
+      "materialClass": "stone",
+      "shadowClass": "hero",
+      "maxTriangles": 161,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.keep.floorB",
+      "pack": "nature",
+      "sourceNode": "PP_Floor_Tile_03",
+      "category": "structure",
+      "targetHeight": 0.19,
+      "footprint": {
+        "halfW": 0.67,
+        "halfD": 1.02
+      },
+      "clearance": 1.5,
+      "materialClass": "stone",
+      "shadowClass": "hero",
+      "maxTriangles": 160,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.keep.floorC",
+      "pack": "nature",
+      "sourceNode": "PP_Floor_Tile_05",
+      "category": "structure",
+      "targetHeight": 0.22,
+      "footprint": {
+        "halfW": 0.76,
+        "halfD": 0.66
+      },
+      "clearance": 1.1,
+      "materialClass": "stone",
+      "shadowClass": "hero",
+      "maxTriangles": 164,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.keep.gate",
+      "pack": "nature",
+      "sourceNode": "PP_Stone_Gate_01",
+      "category": "structure",
+      "targetHeight": 5.97,
+      "footprint": {
+        "halfW": 3.11,
+        "halfD": 0.61
+      },
+      "clearance": 4.7,
+      "materialClass": "stone",
+      "shadowClass": "hero",
+      "maxTriangles": 10599,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.keep.pillar",
+      "pack": "mining",
+      "sourceNode": "PP_Pillar_Stone_01",
+      "category": "structure",
+      "targetHeight": 2.43,
+      "footprint": {
+        "halfW": 0.36,
+        "halfD": 0.32
+      },
+      "clearance": 0.5,
+      "materialClass": "stone",
+      "shadowClass": "hero",
+      "maxTriangles": 296,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.keep.stairs",
+      "pack": "nature",
+      "sourceNode": "PP_Stairs_Stone_Brown_03",
+      "category": "structure",
+      "targetHeight": 0.59,
+      "footprint": {
+        "halfW": 1.55,
+        "halfD": 1.01
+      },
+      "clearance": 2.3,
+      "materialClass": "stone",
+      "shadowClass": "hero",
+      "maxTriangles": 453,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.keep.wall",
+      "pack": "mining",
+      "sourceNode": "PP_Stone_Wall_Plain_01",
+      "category": "structure",
+      "targetHeight": 4.39,
+      "footprint": {
+        "halfW": 2.21,
+        "halfD": 0.35
+      },
+      "clearance": 3.3,
+      "materialClass": "stone",
+      "shadowClass": "hero",
+      "maxTriangles": 661,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.keep.wallAlt",
+      "pack": "mining",
+      "sourceNode": "PP_Stone_Wall_Plain_02",
+      "category": "structure",
+      "targetHeight": 4.01,
+      "footprint": {
+        "halfW": 2.19,
+        "halfD": 0.35
+      },
+      "clearance": 3.3,
+      "materialClass": "stone",
+      "shadowClass": "hero",
+      "maxTriangles": 567,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.lectern",
+      "pack": "mining",
+      "sourceNode": "PP_Wooden_Table_02",
+      "category": "structure",
+      "targetHeight": 0.83,
+      "footprint": {
+        "halfW": 0.93,
+        "halfD": 0.47
+      },
+      "clearance": 1.4,
+      "materialClass": "timber",
+      "shadowClass": "hero",
+      "maxTriangles": 331,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.logPile",
+      "pack": "mining",
+      "sourceNode": "PP_Log_Pile_01",
+      "category": "utility",
+      "targetHeight": 0.52,
+      "footprint": {
+        "halfW": 0.52,
+        "halfD": 0.29
+      },
+      "clearance": 0.8,
+      "materialClass": "timber",
+      "shadowClass": "hero",
+      "maxTriangles": 1394,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.pathA",
+      "pack": "nature",
+      "sourceNode": "PP_Stone_Path_01",
+      "category": "scenery",
+      "targetHeight": 0.1,
+      "footprint": {
+        "halfW": 1.84,
+        "halfD": 1.82
+      },
+      "clearance": 2.8,
+      "materialClass": "stone",
+      "shadowClass": "hero",
+      "maxTriangles": 1768,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.pathB",
+      "pack": "nature",
+      "sourceNode": "PP_Stone_Path_02",
+      "category": "scenery",
+      "targetHeight": 0.11,
+      "footprint": {
+        "halfW": 1.89,
+        "halfD": 1.87
+      },
+      "clearance": 2.8,
+      "materialClass": "stone",
+      "shadowClass": "hero",
+      "maxTriangles": 1845,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.perch.rockA",
+      "pack": "nature",
+      "sourceNode": "PP_Rock_Moss_Grown_02",
+      "category": "scenery",
+      "targetHeight": 2.23,
+      "footprint": {
+        "halfW": 1.55,
+        "halfD": 1.77
+      },
+      "clearance": 2.7,
+      "materialClass": "stone",
+      "shadowClass": "hero",
+      "maxTriangles": 584,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.perch.rockB",
+      "pack": "nature",
+      "sourceNode": "PP_Rock_Moss_Grown_04",
+      "category": "scenery",
+      "targetHeight": 2.8,
+      "footprint": {
+        "halfW": 1.98,
+        "halfD": 1.7
+      },
+      "clearance": 3,
+      "materialClass": "stone",
+      "shadowClass": "hero",
+      "maxTriangles": 644,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.perch.stump",
+      "pack": "nature",
+      "sourceNode": "PP_Tree_Stump_01",
+      "category": "scenery",
+      "targetHeight": 1.22,
+      "footprint": {
+        "halfW": 0.75,
+        "halfD": 0.72
+      },
+      "clearance": 1.1,
+      "materialClass": "timber",
+      "shadowClass": "hero",
+      "maxTriangles": 702,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.perch.trunk",
+      "pack": "nature",
+      "sourceNode": "PP_Tree_Trunk_11",
+      "category": "scenery",
+      "targetHeight": 0.64,
+      "footprint": {
+        "halfW": 0.28,
+        "halfD": 1.43
+      },
+      "clearance": 2.1,
+      "materialClass": "timber",
+      "shadowClass": "hero",
+      "maxTriangles": 1086,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.ring.columnA",
+      "pack": "nature",
+      "sourceNode": "PP_Stone_Column_Mystic_01",
+      "category": "structure",
+      "targetHeight": 2.5,
+      "footprint": {
+        "halfW": 0.36,
+        "halfD": 0.34
+      },
+      "clearance": 0.5,
+      "materialClass": "stone",
+      "shadowClass": "hero",
+      "maxTriangles": 286,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.ring.columnB",
+      "pack": "nature",
+      "sourceNode": "PP_Stone_Column_Mystic_03",
+      "category": "structure",
+      "targetHeight": 1.86,
+      "footprint": {
+        "halfW": 0.46,
+        "halfD": 0.36
+      },
+      "clearance": 0.7,
+      "materialClass": "stone",
+      "shadowClass": "hero",
+      "maxTriangles": 305,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.ring.columnC",
+      "pack": "nature",
+      "sourceNode": "PP_Stone_Column_Mystic_05",
+      "category": "structure",
+      "targetHeight": 2.65,
+      "footprint": {
+        "halfW": 0.41,
+        "halfD": 0.34
+      },
+      "clearance": 0.6,
+      "materialClass": "stone",
+      "shadowClass": "hero",
+      "maxTriangles": 347,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.ring.menhir",
+      "pack": "nature",
+      "sourceNode": "PP_Flying_Menhir_01",
+      "category": "structure",
+      "targetHeight": 1.19,
+      "footprint": {
+        "halfW": 0.47,
+        "halfD": 0.46
+      },
+      "clearance": 0.7,
+      "materialClass": "stone",
+      "shadowClass": "hero",
+      "maxTriangles": 1226,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.ring.menhirAlt",
+      "pack": "nature",
+      "sourceNode": "PP_Flying_Menhir_02",
+      "category": "structure",
+      "targetHeight": 1.32,
+      "footprint": {
+        "halfW": 0.47,
+        "halfD": 0.46
+      },
+      "clearance": 0.7,
+      "materialClass": "stone",
+      "shadowClass": "hero",
+      "maxTriangles": 1018,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.roost.plateau",
+      "pack": "nature",
+      "sourceNode": "PP_Stone_Plateau_Moss_Grown_03",
+      "category": "structure",
+      "targetHeight": 1.3,
+      "footprint": {
+        "halfW": 2.62,
+        "halfD": 2.69
+      },
+      "clearance": 4,
+      "materialClass": "stone",
+      "shadowClass": "hero",
+      "maxTriangles": 974,
+      "sockets": {
+        "wyvernPerch": [
+          0,
+          1.3,
+          0
+        ]
+      },
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.roost.runeStone",
+      "pack": "mining",
+      "sourceNode": "PP_Rune_Stone_01",
+      "category": "structure",
+      "targetHeight": 1.09,
+      "footprint": {
+        "halfW": 0.28,
+        "halfD": 0.26
+      },
+      "clearance": 0.4,
+      "materialClass": "stone",
+      "shadowClass": "hero",
+      "maxTriangles": 259,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.scatter.deadTree",
+      "pack": "nature",
+      "sourceNode": "PP_Tree_Leafless_04",
+      "category": "scatter",
+      "targetHeight": 5.36,
+      "footprint": {
+        "halfW": 2.33,
+        "halfD": 1.66
+      },
+      "clearance": 3.5,
+      "materialClass": "stone",
+      "shadowClass": "hero",
+      "maxTriangles": 1936,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.scatter.firA",
+      "pack": "nature",
+      "sourceNode": "PP_Fir_Tree_11",
+      "category": "scatter",
+      "targetHeight": 5.17,
+      "footprint": {
+        "halfW": 1.72,
+        "halfD": 1.72
+      },
+      "clearance": 2.6,
+      "materialClass": "vegetation",
+      "shadowClass": "hero",
+      "maxTriangles": 338,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.scatter.firB",
+      "pack": "nature",
+      "sourceNode": "PP_Fir_Tree_13",
+      "category": "scatter",
+      "targetHeight": 3.76,
+      "footprint": {
+        "halfW": 1.19,
+        "halfD": 1.25
+      },
+      "clearance": 1.9,
+      "materialClass": "vegetation",
+      "shadowClass": "hero",
+      "maxTriangles": 359,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.scatter.firC",
+      "pack": "nature",
+      "sourceNode": "PP_Fir_Tree_17",
+      "category": "scatter",
+      "targetHeight": 7.4,
+      "footprint": {
+        "halfW": 1.41,
+        "halfD": 1.46
+      },
+      "clearance": 2.2,
+      "materialClass": "vegetation",
+      "shadowClass": "hero",
+      "maxTriangles": 553,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.scatter.grassA",
+      "pack": "nature",
+      "sourceNode": "PP_Grass_16",
+      "category": "scatter",
+      "targetHeight": 0.7,
+      "footprint": {
+        "halfW": 0.3,
+        "halfD": 0.23
+      },
+      "clearance": 0.4,
+      "materialClass": "vegetation",
+      "shadowClass": "hero",
+      "maxTriangles": 570,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.scatter.grassB",
+      "pack": "nature",
+      "sourceNode": "PP_Grass_18",
+      "category": "scatter",
+      "targetHeight": 0.78,
+      "footprint": {
+        "halfW": 0.41,
+        "halfD": 0.38
+      },
+      "clearance": 0.6,
+      "materialClass": "vegetation",
+      "shadowClass": "hero",
+      "maxTriangles": 616,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.scatter.hill",
+      "pack": "nature",
+      "sourceNode": "PP_Hill_Moss_01",
+      "category": "scatter",
+      "targetHeight": 9.17,
+      "footprint": {
+        "halfW": 14.68,
+        "halfD": 13.03
+      },
+      "clearance": 22,
+      "materialClass": "earth",
+      "shadowClass": "hero",
+      "maxTriangles": 1114,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.scatter.mysticStone",
+      "pack": "nature",
+      "sourceNode": "PP_Stone_Mystic_01",
+      "category": "scatter",
+      "targetHeight": 1.32,
+      "footprint": {
+        "halfW": 0.68,
+        "halfD": 0.56
+      },
+      "clearance": 1,
+      "materialClass": "stone",
+      "shadowClass": "hero",
+      "maxTriangles": 680,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.signpost",
+      "pack": "mining",
+      "sourceNode": "PP_Signpost_01",
+      "category": "structure",
+      "targetHeight": 2.4,
+      "footprint": {
+        "halfW": 0.59,
+        "halfD": 0.06
+      },
+      "clearance": 0.9,
+      "materialClass": "timber",
+      "shadowClass": "hero",
+      "maxTriangles": 322,
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.torch",
+      "pack": "mining",
+      "sourceNode": "PP_Torch_Standing_01",
+      "category": "utility",
+      "targetHeight": 1.92,
+      "footprint": {
+        "halfW": 0.1,
+        "halfD": 0.1
+      },
+      "clearance": 0.2,
+      "materialClass": "stone",
+      "shadowClass": "hero",
+      "maxTriangles": 956,
+      "sockets": {
+        "light": [
+          0,
+          1.54,
+          0
+        ],
+        "effect": [
+          0,
+          1.54,
+          0
+        ]
+      },
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    },
+    {
+      "id": "prop.warTable",
+      "pack": "mining",
+      "sourceNode": "PP_Wooden_Table_01",
+      "category": "structure",
+      "targetHeight": 0.83,
+      "footprint": {
+        "halfW": 0.93,
+        "halfD": 0.47
+      },
+      "clearance": 1.4,
+      "materialClass": "stone",
+      "shadowClass": "hero",
+      "maxTriangles": 183,
+      "sockets": {
+        "playerApproach": [
+          0,
+          0,
+          1.5
+        ],
+        "interaction": [
+          0,
+          0.9,
+          0
+        ]
+      },
+      "license": {
+        "status": "approved",
+        "evidence": "Poly Perfect CC-BY 4.0 (Sketchfab Low Poly Packs; attribution in CREDITS.md)"
+      }
+    }
+  ]
+}
