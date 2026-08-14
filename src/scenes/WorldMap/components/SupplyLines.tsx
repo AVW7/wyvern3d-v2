@@ -3,9 +3,17 @@
 import React, { useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Line } from '@react-three/drei'
-import { BufferGeometry, Float32BufferAttribute, Points, ShaderMaterial } from 'three'
+import { BufferGeometry, Color, Float32BufferAttribute, Points, ShaderMaterial } from 'three'
 import { MapEdge, edgePoints } from '../mapGraph'
 import { REGIONS } from '@/core/data/regions'
+import { regionDeckY } from '../terrain/mapTerrain'
+import { edgeColor, MAP_STATUS_COLORS } from '../nodeVisuals'
+
+/** Height at which a supply line meets a region node, in world space. */
+function edgeEndpointY(regionId: string): number {
+  const def = REGIONS[regionId]
+  return def ? regionDeckY(def) : 0
+}
 
 interface SupplyLinesProps {
   edges: MapEdge[]
@@ -30,19 +38,26 @@ const pulseVertexShader = `
 `
 
 const cleanPulseFragmentShader = `
+  uniform vec3 uColor;
   varying float vOpacity;
 
   void main() {
     float d = length(gl_PointCoord - vec2(0.5));
     if (d > 0.5) discard;
     float alpha = (1.0 - smoothstep(0.3, 0.5, d)) * vOpacity;
-    gl_FragColor = vec4(0.29, 0.87, 0.5, alpha * 0.85);
+    gl_FragColor = vec4(uColor, alpha * 0.85);
   }
 `
 
 export const SupplyLines = React.memo(function SupplyLines({ edges }: SupplyLinesProps) {
   const pointsRef = useRef<Points>(null)
   const matRef = useRef<ShaderMaterial>(null)
+
+  // Supply pulses run along owned edges, so they carry the "held" colour.
+  const pulseUniforms = useMemo(
+    () => ({ uTime: { value: 0 }, uColor: { value: new Color(MAP_STATUS_COLORS.held) } }),
+    []
+  )
 
   // Separate edges into locked, owned, and attackable
   const { activeEdges, ownedEdges } = useMemo(() => {
@@ -67,11 +82,7 @@ export const SupplyLines = React.memo(function SupplyLines({ edges }: SupplyLine
     for (const edge of edges) {
       if (edge.status === 'locked') {
         const [pA, pB] = edgePoints(edge)
-        const regA = REGIONS[edge.a]
-        const regB = REGIONS[edge.b]
-        const yA = 0.8 + (regA?.tier ?? 0) * 0.9 + 0.3
-        const yB = 0.8 + (regB?.tier ?? 0) * 0.9 + 0.3
-        coords.push(pA.x, yA, pA.z, pB.x, yB, pB.z)
+        coords.push(pA.x, edgeEndpointY(edge.a), pA.z, pB.x, edgeEndpointY(edge.b), pB.z)
       }
     }
     const geom = new BufferGeometry()
@@ -92,10 +103,8 @@ export const SupplyLines = React.memo(function SupplyLines({ edges }: SupplyLine
     let idx = 0
     for (const edge of ownedEdges) {
       const [pA, pB] = edgePoints(edge)
-      const regA = REGIONS[edge.a]
-      const regB = REGIONS[edge.b]
-      const yA = 0.8 + (regA?.tier ?? 0) * 0.9 + 0.3
-      const yB = 0.8 + (regB?.tier ?? 0) * 0.9 + 0.3
+      const yA = edgeEndpointY(edge.a)
+      const yB = edgeEndpointY(edge.b)
 
       for (let p = 0; p < numPulsesPerEdge; p++) {
         starts[idx * 3] = pA.x
@@ -132,18 +141,16 @@ export const SupplyLines = React.memo(function SupplyLines({ edges }: SupplyLine
     <group>
       {/* Locked Edges - 1 Draw Call */}
       <lineSegments geometry={lockedGeometry}>
-        <lineBasicMaterial color="#334155" opacity={0.3} transparent linewidth={1} />
+        <lineBasicMaterial color={edgeColor('locked')} opacity={0.3} transparent linewidth={1} />
       </lineSegments>
 
       {/* Owned & Attackable Frontier Edges - Fat Line per active edge */}
       {activeEdges.map((edge) => {
         const [pA, pB] = edgePoints(edge)
-        const regA = REGIONS[edge.a]
-        const regB = REGIONS[edge.b]
-        const yA = 0.8 + (regA?.tier ?? 0) * 0.9 + 0.3
-        const yB = 0.8 + (regB?.tier ?? 0) * 0.9 + 0.3
+        const yA = edgeEndpointY(edge.a)
+        const yB = edgeEndpointY(edge.b)
         const isOwned = edge.status === 'owned'
-        const color = isOwned ? '#4ade80' : '#fbbf24'
+        const color = edgeColor(edge.status)
 
         return (
           <Line
@@ -167,7 +174,7 @@ export const SupplyLines = React.memo(function SupplyLines({ edges }: SupplyLine
             ref={matRef}
             vertexShader={pulseVertexShader}
             fragmentShader={cleanPulseFragmentShader}
-            uniforms={{ uTime: { value: 0 } }}
+            uniforms={pulseUniforms}
             transparent
             depthWrite={false}
           />

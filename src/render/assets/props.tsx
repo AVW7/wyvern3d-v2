@@ -4,16 +4,20 @@ import { useLayoutEffect, useMemo, useRef } from 'react'
 import { useGLTF } from '@react-three/drei'
 import { Matrix4, Quaternion, Vector3 } from 'three'
 import type { BufferGeometry, InstancedMesh, Material, Mesh, MeshStandardMaterial, Object3D } from 'three'
-import { FOOD_PROP_ATLAS, PROP_ATLAS } from './manifest'
+import { BIOME_PROP_ATLAS, FOOD_PROP_ATLAS, PROP_ATLAS } from './manifest'
 
 /**
- * Static scenery props, drawn from the shared prop atlas.
+ * Static scenery props, drawn from a shared prop atlas.
  *
- * The atlas is one GLB built by scripts/extract-assets.py: every prop is a
- * top-level node named by its logical id, and all of them share a single
- * material and palette texture. That is what makes <PropInstances> worth
- * having — a hundred fir trees are one draw call, and the trees, the walls and
- * the anvil all batch against the same material.
+ * An atlas is one GLB in which every prop is a top-level node named by its
+ * logical id. That is what makes <PropInstances> worth having — a hundred fir
+ * trees are one draw call.
+ *
+ * There are two: the sanctuary atlas from scripts/extract-assets.py, where
+ * every prop additionally shares one material and palette texture so the trees,
+ * the walls and the anvil all batch together; and the biome atlas from
+ * scripts/build-biome-atlas.mjs, whose sources each bring their own materials,
+ * so a prop there can be several primitives and batches only against itself.
  *
  * This and GameModel.tsx are the only files that call useGLTF. They exist
  * separately because they solve opposite problems: GameModel clones skinned
@@ -28,17 +32,22 @@ export interface PropPlacement {
   scale?: number
 }
 
-interface PropTemplate {
+interface PropPrimitive {
   geometry: BufferGeometry
   material: Material
 }
 
+/** One prop: one primitive on the sanctuary atlas, one per material elsewhere. */
+interface PropTemplate {
+  primitives: PropPrimitive[]
+}
+
 /**
- * There is one static atlas for this module, so there must also be exactly one
- * derived template map. useMemo is local to a component; using it alone would
- * clone all 57 geometries once per <Prop> and exhaust the WebGL context.
+ * There is one derived template map per atlas, and it has to outlive any single
+ * component. useMemo is local to a component; using it alone would clone all 57
+ * sanctuary geometries once per <Prop> and exhaust the WebGL context.
  */
-let templateCache: Map<string, PropTemplate> | null = null
+const templateCaches = new Map<string, Map<string, PropTemplate>>()
 
 /**
  * Prop id -> geometry, with the node's own transform baked in.
@@ -47,32 +56,39 @@ let templateCache: Map<string, PropTemplate> | null = null
  * authored scale and ground-rest offset have to live in the geometry or every
  * caller would have to re-apply them.
  */
-function usePropTemplates(): Map<string, PropTemplate> {
-  const { scene } = useGLTF(PROP_ATLAS)
+function usePropTemplates(atlas: string = PROP_ATLAS): Map<string, PropTemplate> {
+  const { scene } = useGLTF(atlas)
 
   return useMemo(() => {
-    if (templateCache) return templateCache
+    const cached = templateCaches.get(atlas)
+    if (cached) return cached
 
     const templates = new Map<string, PropTemplate>()
     scene.updateMatrixWorld(true)
 
-    scene.traverse((object: Object3D) => {
-      const mesh = object as Mesh
-      if (!mesh.isMesh) return
-
-      const geometry = mesh.geometry.clone()
-      geometry.applyMatrix4(mesh.matrixWorld)
-      geometry.computeBoundingSphere()
+    for (const node of scene.children) {
       // GLTFLoader sanitizes Object3D.name (`prop.keep.wall` becomes
       // `propkeepwall`). It preserves the authored glTF node name verbatim in
-      // userData.name, which is the logical id callers use.
-      const id = typeof mesh.userData.name === 'string' ? mesh.userData.name : mesh.name
-      templates.set(id, { geometry, material: mesh.material as Material })
-    })
+      // userData.name, which is the logical id callers use. A multi-material
+      // prop arrives as a group of meshes under that one named node.
+      const id = typeof node.userData.name === 'string' ? node.userData.name : node.name
+      const primitives: PropPrimitive[] = []
 
-    templateCache = templates
+      node.traverse((object: Object3D) => {
+        const mesh = object as Mesh
+        if (!mesh.isMesh) return
+        const geometry = mesh.geometry.clone()
+        geometry.applyMatrix4(mesh.matrixWorld)
+        geometry.computeBoundingSphere()
+        primitives.push({ geometry, material: mesh.material as Material })
+      })
+
+      if (primitives.length) templates.set(id, { primitives })
+    }
+
+    templateCaches.set(atlas, templates)
     return templates
-  }, [scene])
+  }, [atlas, scene])
 }
 
 /**
@@ -193,6 +209,7 @@ function propMaterial(
 /** A single prop. For more than a handful of copies, use <PropInstances>. */
 export function Prop({
   id,
+  atlas,
   position,
   rotationY = 0,
   scale = 1,
@@ -202,28 +219,32 @@ export function Prop({
   wind,
 }: PropPlacement & {
   id: string
+  /** Defaults to the sanctuary atlas. */
+  atlas?: string
   castShadow?: boolean
   color?: string
   emissive?: PropEmissive
   wind?: number
 }) {
-  const template = usePropTemplates().get(id)
-  const material = useMemo(
-    () => (template ? propMaterial(template.material, color, emissive, wind) : undefined),
+  const template = usePropTemplates(atlas).get(id)
+  const materials = useMemo(
+    () => template?.primitives.map((primitive) => propMaterial(primitive.material, color, emissive, wind)),
     [template, color, emissive, wind],
   )
-  if (!template) return null
+  if (!template || !materials) return null
 
   return (
-    <mesh
-      geometry={template.geometry}
-      material={material}
-      position={position}
-      rotation={[0, rotationY, 0]}
-      scale={scale}
-      castShadow={castShadow}
-      receiveShadow
-    />
+    <group position={position} rotation={[0, rotationY, 0]} scale={scale}>
+      {template.primitives.map((primitive, index) => (
+        <mesh
+          key={index}
+          geometry={primitive.geometry}
+          material={materials[index] ?? primitive.material}
+          castShadow={castShadow}
+          receiveShadow
+        />
+      ))}
+    </group>
   )
 }
 
@@ -281,6 +302,7 @@ const UP = new Vector3(0, 1, 0)
  */
 export function PropInstances({
   id,
+  atlas,
   items,
   castShadow = true,
   color,
@@ -288,6 +310,8 @@ export function PropInstances({
   wind,
 }: {
   id: string
+  /** Defaults to the sanctuary atlas. */
+  atlas?: string
   items: PropPlacement[]
   castShadow?: boolean
   color?: string
@@ -295,12 +319,44 @@ export function PropInstances({
   /** Sway amplitude per metre of height. Omit for rigid props. */
   wind?: number
 }) {
-  const ref = useRef<InstancedMesh>(null)
-  const template = usePropTemplates().get(id)
-  const material = useMemo(
-    () => (template ? propMaterial(template.material, color, emissive, wind) : undefined),
+  const template = usePropTemplates(atlas).get(id)
+  const materials = useMemo(
+    () => template?.primitives.map((primitive) => propMaterial(primitive.material, color, emissive, wind)),
     [template, color, emissive, wind],
   )
+
+  if (!template || !materials || items.length === 0) return null
+
+  // A prop with several materials is several InstancedMeshes over one matrix
+  // list. They are siblings rather than a group with one transform because the
+  // placement transform is already baked into each instance matrix.
+  return (
+    <>
+      {template.primitives.map((primitive, index) => (
+        <PropInstancedMesh
+          key={index}
+          geometry={primitive.geometry}
+          material={materials[index] ?? primitive.material}
+          items={items}
+          castShadow={castShadow}
+        />
+      ))}
+    </>
+  )
+}
+
+function PropInstancedMesh({
+  geometry,
+  material,
+  items,
+  castShadow,
+}: {
+  geometry: BufferGeometry
+  material: Material
+  items: PropPlacement[]
+  castShadow: boolean
+}) {
+  const ref = useRef<InstancedMesh>(null)
 
   useLayoutEffect(() => {
     const mesh = ref.current
@@ -317,15 +373,13 @@ export function PropInstances({
     mesh.computeBoundingSphere()
   }, [items])
 
-  if (!template || items.length === 0) return null
-
   return (
     <instancedMesh
       ref={ref}
       // Remounting on a count change is intentional: InstancedMesh allocates its
       // matrix buffer from args and cannot grow in place.
       key={items.length}
-      args={[template.geometry, material, items.length]}
+      args={[geometry, material, items.length]}
       castShadow={castShadow}
       receiveShadow
     />
@@ -335,6 +389,7 @@ export function PropInstances({
 export function preloadProps(): void {
   useGLTF.preload(PROP_ATLAS)
   useGLTF.preload(FOOD_PROP_ATLAS)
+  useGLTF.preload(BIOME_PROP_ATLAS)
 }
 
 /**
@@ -347,4 +402,5 @@ export function preloadProps(): void {
 export function usePropAtlas(): void {
   useGLTF(PROP_ATLAS)
   useGLTF(FOOD_PROP_ATLAS)
+  useGLTF(BIOME_PROP_ATLAS)
 }

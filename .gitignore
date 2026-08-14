@@ -27,3 +27,6 @@ validation/drogon-uncompressed.glb
 # Python bytecode from the Blender authoring scripts
 __pycache__/
 *.pyc
+
+# Draft biome atlas builds (pnpm assets:biome-atlas --draft)
+.biome-atlas/

@@ -171,7 +171,7 @@ canvas {
   left: var(--sp-5);
   right: var(--sp-5);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--sp-4);
   pointer-events: none;
   z-index: var(--z-topbar);
@@ -188,7 +188,6 @@ canvas {
   flex-wrap: wrap;
   flex: 1 1 auto;
   min-width: 0;
-  max-width: calc(100vw - 440px);
 }
 
 .resources {
@@ -265,8 +264,26 @@ canvas {
   padding: 4px 6px;
   border-radius: 9999px;
   flex-shrink: 0;
+  max-width: 100%;
   margin-left: auto;
-  overflow: visible;
+  overflow-x: auto;
+  overflow-y: visible;
+  scrollbar-width: none;
+}
+
+.nav-island::-webkit-scrollbar {
+  display: none;
+}
+
+/* The pills keep the left of the row and the nav island the right, at every
+ * width. `align-items: flex-start` on .topbar is what pins the nav to the top
+ * edge when the pills wrap onto extra rows; the nav shrinks and scrolls
+ * horizontally rather than pushing anything down. */
+@media (max-width: 1200px) {
+  .nav-pill-btn {
+    padding: 5px 9px;
+    font-size: 10px;
+  }
 }
 
 .nav-divider {
@@ -293,6 +310,8 @@ canvas {
   transition: all 0.2s var(--ease-out-expo);
   white-space: nowrap;
   letter-spacing: 0.01em;
+  /* The menu entry is an <a>, the rest are <button>s — kill the UA underline. */
+  text-decoration: none;
 }
 
 .nav-pill-btn:hover {
@@ -1531,11 +1550,242 @@ kbd {
 .title-menu {
   position: relative;
   z-index: 1;
-  min-height: 100%;
+  /* A fixed height, not min-height: the menu has to be the scroll container
+   * itself, otherwise it simply grows past `.title-screen`, which clips. */
+  height: 100%;
   display: grid;
+  grid-template-columns: minmax(0, 540px) minmax(0, 400px);
+  gap: clamp(20px, 3vw, 44px);
   align-items: center;
-  padding: clamp(24px, 7vw, 96px);
-  pointer-events: none;
+  /* `safe` centring keeps the content centred while it fits and falls back to
+   * start-aligned once it is taller than the viewport, so nothing is clipped
+   * off the top. `.title-screen` clips, so the scroller has to live here — and
+   * a scroll container needs its own pointer events to get the wheel. */
+  align-content: safe center;
+  justify-content: space-between;
+  /* Vertical padding tracks the viewport height, not its width — the wide
+   * `7vw` gutter is right at the sides but wastes most of a short screen. */
+  padding: clamp(20px, 5vh, 56px) clamp(24px, 7vw, 96px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  pointer-events: auto;
+}
+
+.title-menu::-webkit-scrollbar {
+  display: none;
+}
+
+/* --- title section cards -------------------------------------------------- */
+
+.title-aside {
+  display: grid;
+  gap: 14px;
+  pointer-events: auto;
+  animation: title-panel-in 440ms 120ms var(--ease-out-expo) both;
+}
+
+.title-card {
+  border-radius: 20px;
+  padding: 18px 20px;
+  background:
+    linear-gradient(140deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.04) 46%, rgba(14, 21, 27, 0.5) 100%),
+    rgba(11, 17, 23, 0.44);
+  border-color: rgba(255, 239, 212, 0.2);
+  transition: transform 200ms var(--ease-out-expo), border-color 200ms ease-out, box-shadow 200ms ease-out;
+}
+
+.title-card__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.title-card__eyebrow {
+  color: rgba(255, 222, 165, 0.72);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.title-card h2 {
+  margin: 0;
+  color: #fff1d6;
+  font-family: var(--font-fantasy);
+  font-size: 19px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.title-card h3 {
+  margin: 0 0 4px;
+  color: #fdf0d8;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.title-card p {
+  margin: 0;
+  color: rgba(226, 235, 238, 0.7);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.title-card__note {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin-top: 12px !important;
+  color: rgba(226, 235, 238, 0.55) !important;
+  font-size: 11px !important;
+}
+
+.title-map {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  /* The map is square, so its height is set by its width. Cap the width in
+   * viewport-height units instead, or the aside outgrows short laptop
+   * screens and the section cards fall below the fold. */
+  max-width: min(100%, 30vh);
+  margin-inline: auto;
+  border-radius: 14px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 92%, rgba(240, 184, 111, 0.16), transparent 58%),
+    linear-gradient(180deg, rgba(24, 39, 48, 0.72), rgba(9, 14, 19, 0.82));
+  border: 1px solid rgba(255, 239, 212, 0.13);
+}
+
+.title-map__svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.title-map__edges line {
+  stroke: rgba(196, 223, 233, 0.24);
+  stroke-width: 0.4;
+}
+
+.title-map__node circle {
+  filter: drop-shadow(0 0 1.4px rgba(0, 0, 0, 0.6));
+}
+
+.title-map__halo {
+  fill: none;
+  stroke: rgba(255, 214, 150, 0.55);
+  stroke-width: 0.5;
+  animation: title-map-pulse 3.2s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.title-map__key {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: none;
+}
+
+.title-map__key--home {
+  background: #f5c46a;
+  box-shadow: 0 0 0 2px rgba(245, 196, 106, 0.22);
+}
+
+.title-map__key--far {
+  background: #ef8f6a;
+  margin-left: 8px;
+}
+
+.title-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.title-card--section {
+  padding: 13px 15px;
+}
+
+.title-card__glyph {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  margin-bottom: 7px;
+  place-items: center;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 239, 212, 0.16);
+  font-size: 14px;
+}
+
+@media (hover: hover) {
+  .title-card--section:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 222, 165, 0.4);
+    box-shadow: 0 16px 30px rgba(3, 7, 11, 0.4);
+  }
+}
+
+@keyframes title-map-pulse {
+  0%, 100% { opacity: 0.85; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(1.18); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .title-map__halo {
+    animation: none;
+  }
+}
+
+@media (max-width: 1080px) {
+  /* One column below this width. Flex column rather than a single-column
+   * grid: the rows must never share space, and `flex: none` children stack
+   * strictly in order however tall they get. */
+  .title-menu {
+    display: flex;
+    flex-direction: column;
+    justify-content: safe center;
+    align-items: stretch;
+    padding-block: clamp(24px, 6vh, 72px);
+  }
+
+  .title-menu > * {
+    flex: none;
+  }
+
+  .title-panel {
+    width: 100%;
+  }
+
+  /* Stacked, the menu is taller than the viewport; the scene stays put behind
+   * it and only the menu column scrolls. */
+  .title-menu {
+    height: 100%;
+    align-items: start;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    pointer-events: auto;
+  }
+
+  .title-map {
+    max-width: 320px;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 680px) {
+  .title-cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .title-panel {
@@ -3052,7 +3302,6 @@ input[type='range'] {
     left: 12px;
     right: 56px;
     gap: 8px;
-    flex-wrap: wrap;
   }
 
   .telemetry-group {
@@ -3087,8 +3336,19 @@ input[type='range'] {
   }
 
   .nav-pill-btn {
-    padding: 5px 10px;
+    padding: 6px 8px;
     font-size: 11px;
+  }
+
+  /* Icons only — the labels are what stop the island fitting beside the
+   * pills, and every button already carries its own glyph. */
+  .nav-pill-btn {
+    font-size: 0;
+    gap: 0;
+  }
+
+  .nav-pill-btn > span {
+    font-size: 13px;
   }
 
   .hud-toggle-btn {
@@ -3379,3 +3639,589 @@ button:active {
   transform: translate(calc(var(--dx) * var(--wheel) * 0.42), calc(var(--dy) * var(--wheel) * 0.42)) scale(1.08);
 }
 
+
+/* --- Region inspector (world map hover/select card) ----------------------- */
+
+.region-inspector {
+  position: absolute;
+  left: var(--sp-5);
+  bottom: var(--sp-5);
+  width: 280px;
+  max-height: min(52vh, 520px);
+  overflow-y: auto;
+  padding: var(--sp-4);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 12px;
+  line-height: 1.4;
+  pointer-events: auto;
+  z-index: var(--z-widget);
+}
+
+.region-inspector-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding-bottom: var(--sp-2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.region-inspector-title h3 {
+  margin: 0;
+  font-family: var(--font-fantasy);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+.region-inspector-title p {
+  margin: 2px 0 0;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.region-inspector-head-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex-shrink: 0;
+}
+
+.region-status {
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.region-status.held {
+  border-color: rgba(74, 222, 128, 0.45);
+  color: var(--good);
+}
+.region-status.reachable {
+  border-color: rgba(245, 200, 107, 0.45);
+  color: var(--gold);
+}
+.region-status.revealed {
+  border-color: rgba(96, 165, 250, 0.45);
+  color: #60a5fa;
+}
+/* Slate, matching MAP_STATUS_COLORS.locked on the 3D node badge. */
+.region-status.locked {
+  border-color: rgba(100, 116, 139, 0.45);
+  color: #64748b;
+}
+
+.region-inspector-close {
+  border: none;
+  background: none;
+  padding: 0 2px;
+  color: var(--muted);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.region-inspector-close:hover {
+  color: var(--text);
+}
+
+.region-inspector-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
+}
+
+.region-block {
+  padding: var(--sp-2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  background: rgba(10, 14, 22, 0.4);
+}
+
+.region-block-label {
+  display: block;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.region-yields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin-top: 4px;
+}
+
+.region-yield {
+  color: #ffe9bd;
+  font-weight: 600;
+}
+
+.region-yield-base {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.region-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+}
+
+.region-line-tight {
+  margin-top: 4px;
+}
+
+.region-value {
+  font-weight: 600;
+}
+.region-value.gold {
+  color: var(--gold);
+}
+.region-value.good {
+  color: var(--good);
+}
+
+.region-note {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+
+.region-note.warn {
+  color: var(--gold);
+  font-size: 10px;
+}
+
+.region-note-value {
+  color: var(--text);
+}
+
+.region-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: var(--sp-2);
+}
+
+.region-list-divided {
+  padding-top: var(--sp-2);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.region-list-label {
+  color: var(--muted);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.region-empty {
+  margin: 0;
+  color: var(--muted);
+  font-size: 10px;
+  font-style: italic;
+}
+
+.region-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  padding: 3px 6px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.28);
+  font-size: 11px;
+}
+
+.region-row-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.region-btn {
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.region-btn.primary {
+  border-color: rgba(245, 200, 107, 0.5);
+  background: var(--gold);
+  color: #3a2a08;
+}
+.region-btn.gold {
+  border-color: rgba(245, 200, 107, 0.5);
+  color: var(--gold);
+}
+.region-btn.confirm {
+  border-color: rgba(74, 222, 128, 0.45);
+  color: var(--good);
+}
+.region-btn.danger {
+  border-color: rgba(248, 113, 113, 0.45);
+  color: var(--bad);
+}
+
+.region-btn:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.region-assault-btn {
+  width: 100%;
+  margin-top: var(--sp-1);
+  padding: 9px 0;
+  border: none;
+  border-radius: 10px;
+  background: var(--gold);
+  color: #3a2a08;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.region-assault-btn:hover {
+  background: #ffd98a;
+}
+
+/* --- panel content blocks (economy, realm) -------------------------------- *
+ * These two panels render inside the shared `.panel` chrome like every other
+ * panel, so they own no scrim of their own — `.panel` has a backdrop-filter,
+ * which would trap any `position: fixed` child inside it anyway.
+ */
+
+.gp-crest {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: 13px;
+  border: 1px solid rgba(245, 200, 107, 0.4);
+  background: rgba(245, 200, 107, 0.14);
+  font-size: 21px;
+}
+
+.gp-head-left {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  min-width: 0;
+}
+
+.gp-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  margin-top: var(--sp-4);
+  font-size: 12px;
+}
+
+/* --- panel building blocks ----------------------------------------------- */
+
+.gp-card {
+  padding: var(--sp-4);
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.gp-card.inset {
+  background: rgba(6, 8, 13, 0.5);
+}
+
+.gp-card.active {
+  border-color: rgba(245, 200, 107, 0.6);
+  background: rgba(245, 200, 107, 0.1);
+}
+
+.gp-card.done {
+  border-color: rgba(74, 222, 128, 0.45);
+  background: rgba(74, 222, 128, 0.09);
+}
+
+.gp-card.column {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.gp-h3 {
+  margin: 0 0 var(--sp-2);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+.gp-h4 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.gp-note {
+  margin: var(--sp-2) 0 0;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.gp-note.bright {
+  color: var(--text);
+}
+
+/* Column count is a per-instance knob, not a class explosion. */
+.gp-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 2), minmax(0, 1fr));
+  gap: var(--sp-3);
+}
+
+.gp-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+
+.gp-row.tight {
+  gap: var(--sp-2);
+}
+
+.gp-stat {
+  padding: var(--sp-2);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(6, 8, 13, 0.55);
+  text-align: center;
+  font-size: 11px;
+}
+
+.gp-stat .k {
+  display: block;
+  color: var(--muted);
+  font-size: 10px;
+  text-transform: capitalize;
+}
+
+.gp-stat .v {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.gp-stat .v.good,
+.gp-value.good {
+  color: var(--good);
+}
+.gp-stat .v.bad,
+.gp-value.bad {
+  color: var(--bad);
+}
+.gp-stat .v.gold,
+.gp-value.gold {
+  color: var(--gold);
+}
+.gp-stat .v.info,
+.gp-value.info {
+  color: #7dd3fc;
+}
+
+.gp-value {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.gp-badge {
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.gp-badge.good {
+  border-color: rgba(74, 222, 128, 0.45);
+  color: var(--good);
+}
+.gp-badge.gold {
+  border-color: rgba(245, 200, 107, 0.45);
+  color: var(--gold);
+}
+
+.gp-btn {
+  flex-shrink: 0;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.gp-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.gp-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.gp-btn.gold {
+  border-color: transparent;
+  background: var(--gold);
+  color: #3a2a08;
+}
+.gp-btn.gold:hover:not(:disabled) {
+  background: #ffd98a;
+}
+
+.gp-btn.good {
+  border-color: transparent;
+  background: var(--good);
+  color: #08240f;
+}
+.gp-btn.good:hover:not(:disabled) {
+  background: #74e79c;
+}
+
+.gp-btn.block {
+  width: 100%;
+  margin-top: var(--sp-3);
+  text-align: center;
+}
+
+.gp-btn.step {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.gp-tabs {
+  display: flex;
+  gap: var(--sp-1);
+  padding-bottom: var(--sp-2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.gp-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.gp-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  padding: 7px 12px;
+  border-radius: 9px;
+  border: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.gp-tab:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.gp-tab.active {
+  background: var(--gold);
+  color: #3a2a08;
+}
+
+.gp-tab.active .gp-badge {
+  border-color: rgba(58, 42, 8, 0.3);
+  background: rgba(58, 42, 8, 0.16);
+  color: #3a2a08;
+}
+
+.gp-tile-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(6, 8, 13, 0.6);
+  font-size: 20px;
+}
+
+.gp-effect {
+  margin-top: var(--sp-2);
+  padding: var(--sp-2);
+  border-radius: 8px;
+  background: rgba(6, 8, 13, 0.55);
+  color: var(--good);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.gp-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.gp-list.scroll {
+  max-height: 320px;
+  overflow-y: auto;
+  padding-right: var(--sp-1);
+}
+
+.gp-affinity.fire { color: var(--bad); }
+.gp-affinity.water { color: #7dd3fc; }
+.gp-affinity.earth { color: var(--good); }
+.gp-affinity.air { color: var(--gold); }
+
+@media (max-width: 860px) {
+  .gp-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

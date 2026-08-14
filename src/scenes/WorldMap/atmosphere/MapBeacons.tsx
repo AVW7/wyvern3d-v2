@@ -5,7 +5,7 @@ import { useFrame } from '@react-three/fiber'
 import { AdditiveBlending, Color, PointLight, Sprite } from 'three'
 import { REGION_LIST } from '@/core/data/regions'
 import { useGameState } from '@/state/store'
-import { mapHeightAt } from '../terrain/mapTerrain'
+import { regionDeckY } from '../terrain/mapTerrain'
 import { mapSkyStateFor } from './mapSky'
 
 const LIGHT_BUDGET = 3
@@ -22,10 +22,10 @@ export function MapBeacons() {
       const isTier4 = def.tier === 4
 
       if (isPlayer || isTier4) {
-        const h = mapHeightAt(def.position.x, def.position.z)
         list.push({
           id: def.id,
-          position: [def.position.x, h + 1.8, def.position.z],
+          // Beacons burn on the node deck, not on the raw terrain under it.
+          position: [def.position.x, regionDeckY(def) + 1.8, def.position.z],
         })
       }
     }

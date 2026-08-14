@@ -38,6 +38,24 @@
 - **File:** `public/models/library/ancient-tree.glb` (meshopt + WebP compressed, 17,482 triangles)
 - **Modifications:** none to the mesh; manifest scale fitted numerically to 34 m overall height, and the root offset set to plant the trunk rather than the bounding box (the lowest geometry is a handful of dangling root tips)
 
+## Biome scenery atlas
+
+- **File:** `public/models/biomes.glb` (26 static props, 29,556 triangles, 3.16 MB)
+- **Build config:** `scripts/biome-library.json`; builder `scripts/build-biome-atlas.mjs`; system
+  overview `docs/BIOME_SYSTEM.md`; asset workflow `docs/BIOME_LIBRARY.md`
+- **Sources** (Sketchfab downloads held locally under `~/Desktop/world build`, one prop family each):
+  `low_poly_forest_tree_pack.glb`, `gnarly_trees.glb`, `grass_patches.glb`, `apple-tree.glb`,
+  `arborvitae-conifer.glb`, `rocks_set2.glb`, `cave_rocks.glb`,
+  `gemstone_crystals_-_asset_pack.glb`, `stylised_crystal_shrine.glb`, `obelisk.glb`,
+  `stone-well.glb`, `mudbrick-house.glb`, `amphora.glb`
+- **Licence:** redistribution rights confirmed by the project owner on 2026-08-14; the per-source
+  upstream licences are not yet recorded individually. Record them here before publishing, and note
+  that the builder refuses any entry not marked `approved` in `scripts/biome-library.json`.
+- **Modifications:** selected nodes extracted, world transforms baked, re-anchored (centred in x/z,
+  resting on y=0), scaled to authored metre heights, simplified to per-prop triangle budgets,
+  spec/gloss materials converted to metallic/roughness, textures re-encoded as 512 px WebP
+
 ---
 
-Add new third-party assets here with their licence and attribution. Do not commit assets whose licence is not recorded in this file.
+Add new third-party assets here with their licence and attribution. Do not commit assets whose
+licence is not recorded in this file.

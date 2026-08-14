@@ -31,6 +31,20 @@ Animated prey now ship separately from the static atlas:
 
 - `public/models/wildlife/doe.glb`: 19,950 triangles, 48 bones, 46 clips, numerically fitted to 1.35 m overall height; used by sanctuary deer and the Highlands hunt.
 - `public/models/wildlife/guineafowl.glb`: 9,105 triangles, 165 bones, 3 clips, numerically fitted to 0.55 m overall height; a deliberately small sanctuary flock representing bird prey.
+
+The explorable biomes ship a second generated atlas:
+
+- `public/models/biomes.glb`: 26 named static props, 29,556 triangles, 3.16 MB.
+- Sources: individual Sketchfab models held under `~/Desktop/world build` (trees, rocks,
+  crystals, obelisk, well, hut, shrine, amphora).
+- Rendering: multi-material — one `InstancedMesh` per prop primitive, drawn by the same
+  `src/render/assets/props.tsx` path as the sanctuary atlas.
+- Build map: `scripts/biome-library.json`; index `pnpm assets:index-biome-library`;
+  build `pnpm assets:biome-atlas`; gate `pnpm assets:validate-biome-atlas`.
+- Dressing: `src/render/assets/biomeLibrary.ts` and
+  `src/scenes/BiomeWorld/dressing/BiomeDressing.tsx`.
+- System overview: `docs/BIOME_SYSTEM.md`; contributor workflow: `docs/BIOME_LIBRARY.md`.
+
 Biome landmarks ship the same way:
 
 - `public/models/library/ancient-tree.glb`: 17,482 triangles, static, numerically fitted to 34 m overall height; the world tree at the centre of the Elderroot Grove region (`grove` biome), placed by `src/scenes/BiomeWorld/dressing/GroveLandmark.tsx`. Licence status pending — see `CREDITS.md`.
@@ -53,11 +67,11 @@ The 57 logical props are:
 | Wyvern perches | moss rocks (2), stump, trunk |
 | Grounds | fir trees (3), leafless tree, grass (2), moss hill, mystic stone |
 
-The environment is visually dressed but still mostly static. Interaction is
-currently proximity-based: the player enters a station radius and presses `E`
-to open its panel. Wyverns are still procedural placeholders, eggs are
-procedural, and assigned wyverns do not physically move to or perform actions
-at stations.
+The environment is visually dressed but much of the scenery remains cosmetic. Sanctuary station
+interaction is proximity-based: the player enters a station radius and presses `E` to open its
+panel. Wyverns use the skinned Drogon model and do move through assignment and command behaviours;
+eggs remain procedural. Full-size biome scatter is also cosmetic except for the Elderroot Grove
+landmark colliders.
 
 ## Library decisions
 
@@ -191,7 +205,7 @@ than five unrelated rigs.
 3. Bind sanctuary assignment state to station placement and animation.
 4. Add wyvern inspect/feed/bond interaction at perches.
 5. Add active-station VFX/audio and completion moments.
-6. Extract PP biome atlases for world map and battles.
+6. Extend biome collision and region-specific dressing beyond the shipped 26-prop atlas.
 7. Evaluate stylized fortress landmarks and distant generated settlements.
 
 Avoid converting the full library up front. A small, state-driven set of

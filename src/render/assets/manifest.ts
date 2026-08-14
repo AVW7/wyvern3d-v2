@@ -619,3 +619,13 @@ export const PROP_ATLAS = '/models/sanctuary.glb'
 
 /** Small original static models used by feeding and sanctuary hunting. */
 export const FOOD_PROP_ATLAS = '/models/wyvern-food.glb'
+
+/**
+ * Biome scenery atlas: trees, rocks, crystals and landmarks that dress the
+ * explorable biomes. Built by scripts/build-biome-atlas.mjs from the curated
+ * scripts/biome-library.json; see docs/BIOME_LIBRARY.md.
+ *
+ * Unlike the sanctuary atlas it is multi-material, so a prop here can be
+ * several primitives. props.tsx handles both.
+ */
+export const BIOME_PROP_ATLAS = '/models/biomes.glb'

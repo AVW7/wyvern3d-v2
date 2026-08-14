@@ -64,6 +64,7 @@ export function ModelLibrary({ initialId = 'character.player' }: { initialId?: A
         </div>
         <div className={styles.topbarActions}>
           <span className={styles.summary}>{COUNTS.ready} ready · {COUNTS.pending} awaiting art</span>
+          <Link href="/biomes" className={styles.secondaryLink}>Biomes</Link>
           <Link href="/play" className={styles.primaryLink}>Enter world</Link>
           <Link href="/" className={styles.secondaryLink}>Menu</Link>
         </div>

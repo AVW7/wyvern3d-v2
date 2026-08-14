@@ -4,6 +4,7 @@ import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { useCallback, useState } from 'react'
 import { BootScreen } from '@/ui/BootScreen'
+import { TitleWorldMap } from '@/ui/TitleWorldMap'
 
 const TitleScene = dynamic(() => import('@/scenes/Title/TitleScene').then((module) => module.TitleScene), {
   ssr: false,
@@ -11,6 +12,34 @@ const TitleScene = dynamic(() => import('@/scenes/Title/TitleScene').then((modul
 
 /** The menu has no link styling of its own; keep dev links out of the way. */
 const DEV_LINK = { color: 'inherit', textDecoration: 'underline' } as const
+
+/** The parts of the game the menu advertises. All of them live behind /play. */
+const SECTIONS = [
+  {
+    id: 'sanctuary',
+    glyph: '🥚',
+    name: 'Sanctuary',
+    blurb: 'Hatch, feed and train your brood. Place the roosts and stations yourself.',
+  },
+  {
+    id: 'world-map',
+    glyph: '🗺️',
+    name: 'World Map',
+    blurb: 'Twenty-two regions on a conquest graph. Strike only where you already hold ground.',
+  },
+  {
+    id: 'battle',
+    glyph: '⚔️',
+    name: 'Battle',
+    blurb: 'Fly your wyvern in, or let the same simulation resolve the fight for you.',
+  },
+  {
+    id: 'highlands',
+    glyph: '🏔️',
+    name: 'Highlands',
+    blurb: 'Hunt in the open uplands to keep the sanctuary fed between campaigns.',
+  },
+] as const
 
 export default function MenuPage() {
   const [canvasReady, setCanvasReady] = useState(false)
@@ -38,6 +67,10 @@ export default function MenuPage() {
               assets ·{' '}
               <Link href="/models" style={DEV_LINK}>
                 model library
+              </Link>{' '}
+              ·{' '}
+              <Link href="/biomes" style={DEV_LINK}>
+                biome library
               </Link>
             </p>
             {/* Development tools are stripped from production builds, so this link
@@ -55,6 +88,34 @@ export default function MenuPage() {
               </p>
             )}
           </section>
+
+          <div className="title-aside">
+            <section className="title-card title-card--map liquid-glass" aria-labelledby="title-map-heading">
+              <header className="title-card__head">
+                <span className="title-card__eyebrow">The realm</span>
+                <h2 id="title-map-heading">Conquest map</h2>
+              </header>
+              <div className="title-map">
+                <TitleWorldMap />
+              </div>
+              <p className="title-card__note">
+                <span className="title-map__key title-map__key--home" /> Hearthvale, home
+                <span className="title-map__key title-map__key--far" /> Duskspire, the last spire
+              </p>
+            </section>
+
+            <ul className="title-cards">
+              {SECTIONS.map((section) => (
+                <li key={section.id} className="title-card title-card--section liquid-glass">
+                  <span className="title-card__glyph" aria-hidden="true">
+                    {section.glyph}
+                  </span>
+                  <h3>{section.name}</h3>
+                  <p>{section.blurb}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       )}
       {!bootComplete && <BootScreen phase="title" armed={canvasReady} onSettled={completeBoot} />}

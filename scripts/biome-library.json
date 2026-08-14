@@ -1,0 +1,234 @@
+{
+  "_readme": [
+    "Which source model backs each logical biome prop. Consumed by scripts/build-biome-atlas.mjs.",
+    "",
+    "`nodes` are source mesh node names. Omit it to take every mesh node in the file.",
+    "To find them: docs/BIOME_LIBRARY_INDEX.json, field glb.meshNodeNames. Rebuild that",
+    "index with `pnpm assets:index-biome-library`.",
+    "",
+    "`targetHeight` is the authored world height in metres — one world unit is one metre.",
+    "The builder measures the selected geometry and derives scale from it; nothing is",
+    "inferred from the source file's unit setting. `sink` (metres) pushes a prop below",
+    "y=0 for props that should bed into the ground.",
+    "",
+    "`maxTriangles` is the budget for the whole prop. These are instanced scatter props,",
+    "so the budget is what keeps a hundred of them affordable, not the file size.",
+    "",
+    "Licence: the builder refuses to write an unapproved prop into public/models —",
+    "use --draft to inspect one first. A new entry starts `pending`; record evidence",
+    "in CREDITS.md before flipping it to `approved`."
+  ],
+
+  "sourceRoots": {
+    "world": "~/Desktop/world build",
+    "animals": "~/Desktop/3d models animals"
+  },
+
+  "out": "biomes",
+
+  "props": [
+    {
+      "id": "prop.biome.tree.canopy",
+      "source": { "root": "world", "file": "low_poly_forest_tree_pack.glb" },
+      "nodes": ["Tree_Trunk_01.001_Tree_Trunk_01_0", "Tree_Branches_01_Tree_Branches_01_0"],
+      "targetHeight": 21,
+      "maxTriangles": 900,
+      "license": { "status": "approved", "evidence": "Project owner confirmation: redistribution rights cleared (2026-08-14)" }
+    },
+    {
+      "id": "prop.biome.tree.broadleaf",
+      "source": { "root": "world", "file": "low_poly_forest_tree_pack.glb" },
+      "nodes": ["Tree_Trunk_01.002_Tree_Trunk_01_0", "Tree_Branches_01.002_Tree_Branches_01_0"],
+      "targetHeight": 15,
+      "maxTriangles": 900,
+      "license": { "status": "approved", "evidence": "Project owner confirmation: redistribution rights cleared (2026-08-14)" }
+    },
+    {
+      "id": "prop.biome.tree.sapling",
+      "source": { "root": "world", "file": "low_poly_forest_tree_pack.glb" },
+      "nodes": ["Tree_Trunk_01_Tree_Trunk_01_0", "Tree_Branches_01.001_Tree_Branches_01_0"],
+      "targetHeight": 7.5,
+      "maxTriangles": 700,
+      "license": { "status": "approved", "evidence": "Project owner confirmation: redistribution rights cleared (2026-08-14)" }
+    },
+    {
+      "id": "prop.biome.tree.crown",
+      "source": { "root": "world", "file": "low_poly_forest_tree_pack.glb" },
+      "nodes": ["Tree_Trunk_02_Tree_Trunk_02_0", "Tree_Branches_02_Tree_Branches_02_0"],
+      "targetHeight": 10,
+      "maxTriangles": 700,
+      "license": { "status": "approved", "evidence": "Project owner confirmation: redistribution rights cleared (2026-08-14)" }
+    },
+    {
+      "id": "prop.biome.tree.hero",
+      "source": { "root": "world", "file": "low_poly_forest_tree_pack.glb" },
+      "nodes": ["Background_Tree_Atlas_Background_Tree_Atlas_0"],
+      "targetHeight": 24,
+      "maxTriangles": 400,
+      "license": { "status": "approved", "evidence": "Project owner confirmation: redistribution rights cleared (2026-08-14)" }
+    },
+    {
+      "id": "prop.biome.tree.gnarlA",
+      "source": { "root": "world", "file": "gnarly_trees.glb" },
+      "nodes": ["tree3_tree3_0", "branches_2_branches1_0"],
+      "targetHeight": 11,
+      "maxTriangles": 2400,
+      "license": { "status": "approved", "evidence": "Project owner confirmation: redistribution rights cleared (2026-08-14)" }
+    },
+    {
+      "id": "prop.biome.tree.gnarlB",
+      "source": { "root": "world", "file": "gnarly_trees.glb" },
+      "nodes": ["tree2_tree2_0", "branches_3_branches1_0"],
+      "targetHeight": 14,
+      "maxTriangles": 2400,
+      "license": { "status": "approved", "evidence": "Project owner confirmation: redistribution rights cleared (2026-08-14)" }
+    },
+    {
+      "id": "prop.biome.tree.apple",
+      "source": { "root": "world", "file": "apple-tree.glb" },
+      "targetHeight": 5.5,
+      "maxTriangles": 600,
+      "license": { "status": "approved", "evidence": "Project owner confirmation: redistribution rights cleared (2026-08-14)" }
+    },
+    {
+      "id": "prop.biome.tree.conifer",
+      "source": { "root": "world", "file": "arborvitae-conifer.glb" },
+      "targetHeight": 6.5,
+      "maxTriangles": 600,
+      "license": { "status": "approved", "evidence": "Project owner confirmation: redistribution rights cleared (2026-08-14)" }
+    },
+    {
+      "id": "prop.biome.grass.tuftA",
+      "source": { "root": "world", "file": "grass_patches.glb" },
+      "nodes": ["grasspatch1_grass1_0"],
+      "targetHeight": 0.55,
+      "maxTriangles": 700,
+      "license": { "status": "approved", "evidence": "Project owner confirmation: redistribution rights cleared (2026-08-14)" }
+    },
+    {
+      "id": "prop.biome.grass.tuftB",
+      "source": { "root": "world", "file": "grass_patches.glb" },
+      "nodes": ["grasspatch3_grass1_0"],
+      "targetHeight": 0.7,
+      "maxTriangles": 700,
+      "license": { "status": "approved", "evidence": "Project owner confirmation: redistribution rights cleared (2026-08-14)" }
+    },
+    {
+      "id": "prop.biome.rock.pebble",
+      "source": { "root": "world", "file": "low_poly_forest_tree_pack.glb" },
+      "nodes": ["Rocks.001_Rocks_0"],
+      "targetHeight": 0.8,
+      "maxTriangles": 300,
+      "license": { "status": "approved", "evidence": "Project owner confirmation: redistribution rights cleared (2026-08-14)" }
+    },
+    {
+      "id": "prop.biome.rock.smallA",
+      "source": { "root": "world", "file": "rocks_set2.glb" },
+      "nodes": ["smallrock2_cliffs_0"],
+      "targetHeight": 0.9,
+      "maxTriangles": 200,
+      "license": { "status": "approved", "evidence": "Project owner confirmation: redistribution rights cleared (2026-08-14)" }
+    },
+    {
+      "id": "prop.biome.rock.smallB",
+      "source": { "root": "world", "file": "rocks_set2.glb" },
+      "nodes": ["smallrock1_cliffs_0"],
+      "targetHeight": 1.1,
+      "maxTriangles": 600,
+      "license": { "status": "approved", "evidence": "Project owner confirmation: redistribution rights cleared (2026-08-14)" }
+    },
+    {
+      "id": "prop.biome.rock.cluster",
+      "source": { "root": "world", "file": "rocks_set2.glb" },
+      "nodes": ["smallrockcluster_cliffs_0"],
+      "targetHeight": 2.4,
+      "maxTriangles": 1200,
+      "license": { "status": "approved", "evidence": "Project owner confirmation: redistribution rights cleared (2026-08-14)" }
+    },
+    {
+      "id": "prop.biome.rock.cliff",
+      "source": { "root": "world", "file": "rocks_set2.glb" },
+      "nodes": ["cliff1_cliffs_0"],
+      "targetHeight": 12,
+      "sink": 0.6,
+      "maxTriangles": 2500,
+      "license": { "status": "approved", "evidence": "Project owner confirmation: redistribution rights cleared (2026-08-14)" }
+    },
+    {
+      "id": "prop.biome.cave.pillar",
+      "source": { "root": "world", "file": "cave_rocks.glb" },
+      "nodes": ["pilar1_1_pilars_0"],
+      "targetHeight": 16,
+      "sink": 0.4,
+      "maxTriangles": 1200,
+      "license": { "status": "approved", "evidence": "Project owner confirmation: redistribution rights cleared (2026-08-14)" }
+    },
+    {
+      "id": "prop.biome.cave.stump",
+      "source": { "root": "world", "file": "cave_rocks.glb" },
+      "nodes": ["pilar4_pilars_0"],
+      "targetHeight": 5.5,
+      "maxTriangles": 400,
+      "license": { "status": "approved", "evidence": "Project owner confirmation: redistribution rights cleared (2026-08-14)" }
+    },
+    {
+      "id": "prop.biome.cave.rubble",
+      "source": { "root": "world", "file": "cave_rocks.glb" },
+      "nodes": ["smallrock5_cliffs_0"],
+      "targetHeight": 1.4,
+      "maxTriangles": 800,
+      "license": { "status": "approved", "evidence": "Project owner confirmation: redistribution rights cleared (2026-08-14)" }
+    },
+    {
+      "id": "prop.biome.crystal.cluster",
+      "source": { "root": "world", "file": "gemstone_crystals_-_asset_pack.glb" },
+      "nodes": ["Object_6"],
+      "targetHeight": 2.6,
+      "maxTriangles": 200,
+      "license": { "status": "approved", "evidence": "Project owner confirmation: redistribution rights cleared (2026-08-14)" }
+    },
+    {
+      "id": "prop.biome.crystal.shard",
+      "source": { "root": "world", "file": "gemstone_crystals_-_asset_pack.glb" },
+      "nodes": ["Object_4"],
+      "targetHeight": 1.3,
+      "maxTriangles": 200,
+      "license": { "status": "approved", "evidence": "Project owner confirmation: redistribution rights cleared (2026-08-14)" }
+    },
+    {
+      "id": "prop.biome.landmark.obelisk",
+      "source": { "root": "world", "file": "obelisk.glb" },
+      "targetHeight": 7,
+      "maxTriangles": 800,
+      "license": { "status": "approved", "evidence": "Project owner confirmation: redistribution rights cleared (2026-08-14)" }
+    },
+    {
+      "id": "prop.biome.landmark.shrine",
+      "source": { "root": "world", "file": "stylised_crystal_shrine.glb" },
+      "targetHeight": 5.5,
+      "maxTriangles": 9500,
+      "license": { "status": "approved", "evidence": "Project owner confirmation: redistribution rights cleared (2026-08-14)" }
+    },
+    {
+      "id": "prop.biome.landmark.well",
+      "source": { "root": "world", "file": "stone-well.glb" },
+      "targetHeight": 1.8,
+      "maxTriangles": 900,
+      "license": { "status": "approved", "evidence": "Project owner confirmation: redistribution rights cleared (2026-08-14)" }
+    },
+    {
+      "id": "prop.biome.landmark.hut",
+      "source": { "root": "world", "file": "mudbrick-house.glb" },
+      "targetHeight": 4.2,
+      "maxTriangles": 1600,
+      "license": { "status": "approved", "evidence": "Project owner confirmation: redistribution rights cleared (2026-08-14)" }
+    },
+    {
+      "id": "prop.biome.prop.amphora",
+      "source": { "root": "world", "file": "amphora.glb" },
+      "targetHeight": 1.1,
+      "maxTriangles": 650,
+      "license": { "status": "approved", "evidence": "Project owner confirmation: redistribution rights cleared (2026-08-14)" }
+    }
+  ]
+}

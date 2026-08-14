@@ -2,16 +2,41 @@ import { Color } from 'three'
 import { REGION_LIST } from '../../../core/data/regions'
 import { RegionDef } from '../../../core/types'
 import { BIOME_PALETTES } from '../../BiomeWorld/atmosphere/biomePalettes'
-import { nodeRadius } from '../nodeVisuals'
+import { nodeRadius, nodePedestalHeight } from '../nodeVisuals'
 import { smoothNoise } from '../../../render/math/valueNoise'
 
-export const LAND_RADIUS = 130
 export const SEA_RADIUS = 300
 export const SEA_LEVEL = 0
+
+/** Width of the band over which land height eases down to sea level. */
+export const COAST_FALLOFF = 20
 
 export function plateauRadius(def: RegionDef): number {
   return nodeRadius(def.tier) + 2.0
 }
+
+/**
+ * How far a region's dressing scatter can reach from its centre. Mirrors the
+ * radius `planDressing` samples, so the coastline is always outside the props.
+ */
+const DRESSING_REACH = 16
+
+/**
+ * Derived from the region graph rather than hand-tuned: the outermost region
+ * plus its dressing must sit inboard of where the coastal falloff begins, or
+ * that region's crest is crushed into the surf. Duskspire (z = -125, tier 4)
+ * did exactly that under the old hard-coded 130 — the map's capital rendered
+ * 1.6 units tall instead of 10.3.
+ */
+export const LAND_RADIUS = (() => {
+  let outermost = 0
+  for (const def of REGION_LIST) {
+    const reach =
+      Math.hypot(def.position.x, def.position.z) + plateauRadius(def) + DRESSING_REACH
+    if (reach > outermost) outermost = reach
+  }
+  return Math.ceil(outermost + COAST_FALLOFF)
+})()
 
 function smoothstep(min: number, max: number, value: number): number {
   const x = Math.max(0, Math.min(1, (value - min) / (max - min)))
@@ -46,14 +71,14 @@ export function landmassAt(x: number, z: number): number {
   }
 
   let height = maxBump
-  if (!insidePlateau && distFromCenter < LAND_RADIUS + 20) {
+  if (!insidePlateau && distFromCenter < LAND_RADIUS + COAST_FALLOFF) {
     const ridge = smoothNoise(x * 0.04, z * 0.04) * 3.5
     height += ridge
   }
 
   // Coastal falloff
-  if (distFromCenter > LAND_RADIUS - 20) {
-    const falloff = 1 - smoothstep(LAND_RADIUS - 20, LAND_RADIUS, distFromCenter)
+  if (distFromCenter > LAND_RADIUS - COAST_FALLOFF) {
+    const falloff = 1 - smoothstep(LAND_RADIUS - COAST_FALLOFF, LAND_RADIUS, distFromCenter)
     height *= falloff
   }
 
@@ -73,6 +98,19 @@ export function regionCrestHeight(def: RegionDef): number {
   const h = mapHeightAt(def.position.x, def.position.z)
   crestCache[def.id] = h
   return h
+}
+
+/** Thickness of the biome cap sitting on top of a region's pedestal. */
+const CAP_THICKNESS = 0.6
+
+/**
+ * The single anchor height for everything that belongs to a region node: the
+ * top of its biome cap, in world space. Region nodes stand on the terrain
+ * crest, so supply lines, the camera target and beacons must read this rather
+ * than re-deriving a pedestal height from the tier and assuming y = 0.
+ */
+export function regionDeckY(def: RegionDef): number {
+  return regionCrestHeight(def) + nodePedestalHeight(def.tier) + CAP_THICKNESS
 }
 
 const parsedColorsCache: Record<string, Color> = {}

@@ -2,9 +2,8 @@
 
 Wyvern3D — a 3D browser game: raise and train wyverns at a sanctuary, then use them plus armies to
 conquer regions on a world map. Next.js + react-three-fiber. Mechanics work end to end. The
-sanctuary uses a curated low-poly scenery atlas and wyverns use a real skinned model; units, the
-world map, and battle terrain still use procedural placeholders until their model pipelines are
-wired.
+sanctuary and explorable biomes use curated scenery atlases, and wyverns use a real skinned model;
+units and battle terrain still use procedural placeholders until their model pipelines are wired.
 
 ## Start here
 
@@ -16,6 +15,9 @@ wired.
 | Change what happens each tick | `src/core/systems/`, dispatched by `src/core/state/tick.ts` |
 | Change how battles play out | `src/core/combat/encounter.ts` (+ `ai.ts`) |
 | Browse, preview, or wire up a real 3D model | `docs/MODEL_LIBRARY.md`, then `src/render/assets/manifest.ts` |
+| Add biome scenery from the external model library | `docs/BIOME_LIBRARY.md`, then `scripts/biome-library.json` |
+| Browse biome props and per-biome dressing | `/biomes` (`src/app/biomes/`) |
+| Understand or change the biome system | `docs/BIOME_SYSTEM.md` |
 | Develop or review wyvern flight animation | `docs/WYVERN_ANIMATION_BASELINE.md`, then `docs/FLIGHT_ANIMATION_DEVELOPMENT.md` |
 | Know what an animation actually measures | `validation/wyvern-animations/clip-signatures.json`; regenerate with `pnpm assets:analyze-clips` |
 | Edit a clip on the new `WyvernRig` (wing axes, loop seams) | `docs/WYVERN_CLIP_AUDIT.md`; check with `pnpm assets:wyvern-audit` and `pnpm assets:validate-wyvern` |
@@ -213,8 +215,8 @@ plain rAF loop at the app root (`state/GameClock.tsx`), outside R3F, so the worl
 regardless of which scene is mounted.
 
 Active scenes: **Sanctuary** (walkable, station interactions, layout editor, wyvern director),
-**WorldMap** (region graph), **Battle** (playable and auto-resolved), **Highlands** (hunt scenario),
-**Title**.
+**WorldMap** (region graph), **Biome** (walkable selected region, on-foot/wyvern control), **Battle**
+(playable and auto-resolved), **Highlands** (hunt scenario), **Title**.
 
 ## Commands
 
@@ -226,6 +228,9 @@ pnpm dev
 pnpm typecheck                      # strict
 pnpm lint                           # includes the core-purity + determinism gates
 pnpm test                           # core and render-side unit tests, plus the animation gate
+pnpm assets:index-biome-library     # inventory external GLBs into docs/BIOME_LIBRARY_INDEX.*
+pnpm assets:biome-atlas             # build approved static biome props
+pnpm assets:validate-biome-atlas    # numeric gate for public/models/biomes.glb
 pnpm sim:battle [runs]              # balance harness: win rate per region per loadout
 pnpm sim:replay <replay.json> [n]   # replay a session and assert determinism
 ```
@@ -259,6 +264,18 @@ camera presets and sensitivity in `state/cameraStore.ts`, and a HUD hide toggle 
 The sanctuary is dressed with the generated `public/models/sanctuary.glb` atlas. Its source mapping
 and extraction settings live in `scripts/asset-sources.json`; rebuild it with
 `python3 scripts/extract-assets.py`. See `CREDITS.md` for third-party asset attribution.
+
+The explorable biomes are dressed from a second generated atlas, `public/models/biomes.glb`: 26
+static props (trees, rocks, crystals, landmarks) curated in `scripts/biome-library.json` and built
+by `pnpm assets:biome-atlas`, with `pnpm assets:index-biome-library` cataloguing the external source
+library first and `pnpm assets:validate-biome-atlas` gating the result. Unlike the sanctuary atlas
+it is multi-material, so a prop there can be several primitives — `props.tsx` keys its template
+cache by atlas and handles both. Which biome scatters what lives in
+`src/render/assets/biomeLibrary.ts`; the placement maths is the deterministic, index-derived
+`scenes/BiomeWorld/dressing/biomeScatter.ts`. The `/biomes` page (`src/app/biomes/`) is the
+inspection surface — props previewed at true scale against a 1.6 m figure, plus a per-biome view of
+every dressing layer. System map in `docs/BIOME_SYSTEM.md`; asset workflow in
+`docs/BIOME_LIBRARY.md`.
 
 Wyverns render from `public/models/drogon.glb` (15 MB, meshopt + WebP, 52 clips, 39 k tris) in both
 the sanctuary and battle. `GameModel` plays whichever clip the manifest maps to the requested

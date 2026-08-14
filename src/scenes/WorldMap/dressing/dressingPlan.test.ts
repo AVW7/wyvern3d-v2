@@ -35,26 +35,37 @@ describe('dressingPlan', () => {
 
   it('no placement lands inside plateauRadius of any region center', () => {
     const plan = planDressing(42)
-    for (const [propId, placements] of Object.entries(plan)) {
-      for (const p of placements) {
+    for (const [key, group] of Object.entries(plan)) {
+      for (const p of group.items) {
         const [px, , pz] = p.position
         for (const def of REGION_LIST) {
           const dist = Math.hypot(px - def.position.x, pz - def.position.z)
           const minAllowed = plateauRadius(def)
-          expect(dist, `Placement for ${propId} encroached on ${def.id} plateau`).toBeGreaterThanOrEqual(minAllowed - 0.01)
+          expect(dist, `Placement for ${key} encroached on ${def.id} plateau`).toBeGreaterThanOrEqual(minAllowed - 0.01)
         }
       }
     }
   })
 
-  it('every y equals mapHeightAt at x,z', () => {
+  it('every y sits on the terrain, less the config sink', () => {
     const plan = planDressing(42)
-    for (const placements of Object.values(plan)) {
-      for (const p of placements) {
+    const sinkFor = new Map<string, number>()
+    for (const configs of Object.values(BIOME_DRESSING)) {
+      for (const cfg of configs) sinkFor.set(cfg.propId, cfg.sink ?? 0)
+    }
+
+    for (const group of Object.values(plan)) {
+      for (const p of group.items) {
         const [px, py, pz] = p.position
-        const expectedY = mapHeightAt(px, pz)
+        const expectedY = mapHeightAt(px, pz) - (sinkFor.get(group.propId) ?? 0)
         expect(py).toBeCloseTo(expectedY, 5)
       }
+    }
+  })
+
+  it('tints every group with a biome colour', () => {
+    for (const group of Object.values(planDressing(42))) {
+      expect(group.color).toMatch(/^#[0-9a-f]{6}$/i)
     }
   })
 

@@ -11,16 +11,25 @@ export function MapDressing() {
 
   return (
     <group>
-      {Object.entries(plan).map(([propId, placements]) => {
-        const items = placements.map((p) => ({
+      {Object.entries(plan).map(([key, group]) => {
+        const items = group.items.map((p) => ({
           position: p.position,
           rotationY: p.rotationY,
           scale: p.scale,
         }))
 
-        const wind = placements[0]?.wind
+        const wind = group.items[0]?.wind
 
-        return <PropInstances key={propId} id={propId} items={items} wind={wind} castShadow={false} />
+        return (
+          <PropInstances
+            key={key}
+            id={group.propId}
+            items={items}
+            color={group.color}
+            wind={wind}
+            castShadow={false}
+          />
+        )
       })}
     </group>
   )

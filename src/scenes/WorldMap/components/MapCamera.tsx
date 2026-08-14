@@ -9,6 +9,7 @@ import { useGame } from '@/state/store'
 import { REGIONS } from '@/core/data/regions'
 import { clampPitch, clampDistance, calculateOrbitPosition } from '../camera/mapCameraRig'
 import { MAP_CAMERA_PRESETS } from '../camera/mapPresets'
+import { regionDeckY } from '../terrain/mapTerrain'
 
 export function MapCamera() {
   const camera = useThree((s) => s.camera)
@@ -43,8 +44,8 @@ export function MapCamera() {
     }
 
     if (selectedRegion && REGIONS[selectedRegion]) {
-      const reg = REGIONS[selectedRegion]
-      const targetHeight = 0.8 + reg.tier * 0.9
+      const reg = REGIONS[selectedRegion]!
+      const targetHeight = regionDeckY(reg)
       target.x = MathUtils.lerp(target.x, reg.position.x, dt * 4)
       target.y = MathUtils.lerp(target.y, targetHeight, dt * 4)
       target.z = MathUtils.lerp(target.z, reg.position.z, dt * 4)

@@ -7,7 +7,8 @@ import { WorldLabel } from '@/render/labels/WorldLabel'
 import { SPECIES } from '@/core/data/species'
 import { GROUND_DECAL } from '@/scenes/Sanctuary/groundDecal'
 import { MapNode } from '../mapGraph'
-import { nodeRadius, statusColor, nodeGroundColor } from '../nodeVisuals'
+import { nodeRadius, nodePedestalHeight, statusColor, regionStatus, nodeGroundColor } from '../nodeVisuals'
+import { regionCrestHeight } from '../terrain/mapTerrain'
 import { getTierGeometries, getSharedNodeMaterial } from '../mapResources'
 import { wasDrag } from '../interaction'
 
@@ -32,7 +33,7 @@ export function RegionNode({
   const ringRef = useRef<Mesh>(null)
 
   const { def, owner, attackable, unrest, garrisonStrength } = node
-  const baseHeight = 0.8 + def.tier * 0.9
+  const baseHeight = nodePedestalHeight(def.tier)
   const radius = nodeRadius(def.tier)
   const speciesColor = SPECIES[def.nativeSpecies]?.color ?? '#888'
   const isHeld = owner === 'player'
@@ -40,6 +41,7 @@ export function RegionNode({
   const tierGeom = getTierGeometries(def.tier)
   const sharedMaterial = getSharedNodeMaterial()
   const groundColor = nodeGroundColor(def.biome)
+  const status = regionStatus(owner, attackable)
   const badgeColor = statusColor(owner, attackable)
 
   useFrame((frameState, delta) => {
@@ -59,7 +61,7 @@ export function RegionNode({
   })
 
   return (
-    <group position={[def.position.x, 0, def.position.z]} ref={groupRef}>
+    <group position={[def.position.x, regionCrestHeight(def), def.position.z]} ref={groupRef}>
       {/* Terrain Elevation Pedestal */}
       <mesh
         position={[0, baseHeight / 2, 0]}
@@ -116,7 +118,7 @@ export function RegionNode({
           renderOrder={11}
         >
           <ringGeometry args={[radius + 0.6, radius + 1.2, 32]} />
-          <meshBasicMaterial color="#22c55e" opacity={0.25} {...GROUND_DECAL} />
+          <meshBasicMaterial color={badgeColor} opacity={0.25} {...GROUND_DECAL} />
         </mesh>
       )}
 
@@ -139,7 +141,7 @@ export function RegionNode({
       {/* World Labels */}
       <WorldLabel text={def.name} position={[0, baseHeight + 7.5, 0]} size={3.6} variant="map" />
       <WorldLabel
-        text={isHeld ? 'HELD' : attackable ? 'REACHABLE' : `TIER ${def.tier}`}
+        text={status === 'locked' ? `LOCKED • TIER ${def.tier}` : status.toUpperCase()}
         position={[0, baseHeight + 4.8, 0]}
         size={2.1}
         variant="default"
