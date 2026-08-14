@@ -13,6 +13,9 @@ import { GROVE_COLLIDERS } from './dressing/GroveLandmark'
 import { getRegionColliders, BIOME_SPAWN_ANCHOR } from './terrain/biomeTraversal'
 import { BiomeExplorer } from './BiomeExplorer'
 import { BiomeFlightActor } from './flight/BiomeFlightActor'
+import { BiomeDiscoveryDirector } from './discovery/BiomeDiscoveryDirector'
+import { AmbientEcology } from './ecology/AmbientEcology'
+import { ObservationDirector } from './ecology/ObservationDirector'
 import { WorldLabel } from '@/render/labels/WorldLabel'
 import { biomeAudio } from './audio/biomeAudio'
 
@@ -92,6 +95,13 @@ export function BiomeScene() {
 
       {/* Biome Scatter Props */}
       <BiomeDressing biome={biome} regionId={regionId} seed={state.seed} onColliders={onColliders} />
+
+      {/* Atlas visits, landmark surveys and discovery flourishes */}
+      <BiomeDiscoveryDirector />
+
+      {/* Ambient ecology and the region's observation activity (Stage 4) */}
+      <AmbientEcology biome={biome} regionId={regionId} seed={state.seed} />
+      <ObservationDirector />
 
       {/* Region Landmark Title Banner */}
       <WorldLabel

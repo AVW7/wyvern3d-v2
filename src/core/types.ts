@@ -255,6 +255,8 @@ export interface RegionKnowledge {
   mapped: boolean
   visited: boolean
   discoveredLandmarkIds: string[]
+  /** Phenomena the player has deliberately observed here (Biome Stage 4). */
+  observedPhenomenonIds: string[]
   firstVisitedTick: number | null
 }
 
@@ -293,6 +295,7 @@ export type GameEventKind =
   | 'sanctuary_duty_completed'
   | 'region_visited'
   | 'landmark_discovered'
+  | 'phenomenon_observed'
 
 export interface GameEvent {
   seq: number

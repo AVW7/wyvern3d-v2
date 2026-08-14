@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useGame, useGameState } from '@/state/store'
 import { useUi } from '@/state/uiStore'
+import { useMapUiStore } from '@/state/mapUiStore'
 import { RESOURCE_IDS } from '@/core/state/game'
 import { netIncome } from '@/core/systems/economy'
 import { Panels } from './Panels'
@@ -16,6 +17,7 @@ import { ControlShiftWidget } from './ControlShiftWidget'
 import { useCameraStore } from '@/state/cameraStore'
 import { InteractionNotice } from './InteractionNotice'
 import { RegionInspector } from './RegionInspector'
+import { AtlasDirectory } from './AtlasDirectory/AtlasDirectory'
 import { HighlandsHud } from './HighlandsHud'
 import { useHighlandsHunt } from '@/state/highlandsHuntStore'
 import { BiomeTransitionOverlay } from '@/scenes/BiomeWorld/transitions/BiomeTransitionOverlay'
@@ -34,6 +36,8 @@ export function Hud() {
 
   const isEditing = useSanctuaryEditor((s) => s.isEditing)
   const toggleEditMode = useSanctuaryEditor((s) => s.toggleEditMode)
+  const atlasOpen = useMapUiStore((s) => s.atlasOpen)
+  const toggleAtlas = useMapUiStore((s) => s.toggleAtlas)
   const [isEventLogCollapsed, setIsEventLogCollapsed] = useState(false)
   const [isWyvernDetailsCollapsed, setIsWyvernDetailsCollapsed] = useState(false)
 
@@ -146,6 +150,15 @@ export function Hud() {
                 >
                   <MapIcon /> Map
                 </button>
+                {mode === 'worldmap' && (
+                  <button
+                    className={`nav-pill-btn ${atlasOpen ? 'active' : ''}`}
+                    onClick={toggleAtlas}
+                    title="World Atlas (A)"
+                  >
+                    <span style={{ fontSize: 13, marginRight: 2 }}>📖</span> Atlas
+                  </button>
+                )}
                 {mode === 'biome' && (
                   <button
                     className="nav-pill-btn active"
@@ -205,6 +218,8 @@ export function Hud() {
                   <kbd>E</kbd> <span>{nearby.label}</span>
                 </div>
               )}
+
+              {mode === 'worldmap' && <AtlasDirectory />}
 
               {/* Bottom-Left Stack — Wyvern Status Card & Event Log with matching widths */}
               {mode !== 'highlands' && !isEditing && !openPanel && (

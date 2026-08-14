@@ -1586,6 +1586,9 @@ kbd {
 }
 
 .title-card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
   border-radius: 20px;
   padding: 18px 20px;
   background:
@@ -1593,6 +1596,11 @@ kbd {
     rgba(11, 17, 23, 0.44);
   border-color: rgba(255, 239, 212, 0.2);
   transition: transform 200ms var(--ease-out-expo), border-color 200ms ease-out, box-shadow 200ms ease-out;
+}
+
+.title-card:focus-visible {
+  outline: 2px solid rgba(255, 222, 165, 0.8);
+  outline-offset: 2px;
 }
 
 .title-card__head {
@@ -1711,6 +1719,14 @@ kbd {
   list-style: none;
 }
 
+.title-cards li {
+  display: flex;
+}
+
+.title-cards li > .title-card--section {
+  width: 100%;
+}
+
 .title-card--section {
   padding: 13px 15px;
 }
@@ -1728,7 +1744,8 @@ kbd {
 }
 
 @media (hover: hover) {
-  .title-card--section:hover {
+  .title-card--section:hover,
+  .title-card--map:hover {
     transform: translateY(-2px);
     border-color: rgba(255, 222, 165, 0.4);
     box-shadow: 0 16px 30px rgba(3, 7, 11, 0.4);
@@ -4223,5 +4240,231 @@ button:active {
 @media (max-width: 860px) {
   .gp-grid {
     grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ============================================================
+   World Atlas directory drawer (Atlas Stage 1)
+   ============================================================ */
+
+.atlas-drawer {
+  position: absolute;
+  top: 64px;
+  left: var(--sp-5);
+  width: 340px;
+  max-height: calc(100vh - 200px);
+  display: flex;
+  flex-direction: column;
+  padding: var(--sp-4);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 12px;
+  line-height: 1.4;
+  pointer-events: auto;
+  z-index: var(--z-widget);
+}
+
+.atlas-drawer-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding-bottom: var(--sp-2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  flex-shrink: 0;
+}
+
+.atlas-drawer-title h3 {
+  margin: 0;
+  font-family: var(--font-fantasy);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+.atlas-result-count {
+  margin: 2px 0 0;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.atlas-filters {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: var(--sp-2) 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  flex-shrink: 0;
+}
+
+.atlas-search-row {
+  display: flex;
+  gap: var(--sp-2);
+}
+
+.atlas-search {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 10px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  font-size: 12px;
+}
+
+.atlas-search:focus-visible {
+  outline: 1px solid var(--gold);
+  outline-offset: 1px;
+}
+
+.atlas-clear-btn {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  font-size: 11px;
+}
+
+.atlas-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.atlas-chip {
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+
+.atlas-chip:hover {
+  color: var(--text);
+}
+
+.atlas-chip.active {
+  border-color: rgba(245, 200, 107, 0.55);
+  color: var(--gold);
+  background: rgba(245, 200, 107, 0.1);
+}
+
+.atlas-select {
+  flex: 1 1 40%;
+  min-width: 0;
+  padding: 4px 6px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  font-size: 11px;
+}
+
+.atlas-select:focus-visible {
+  outline: 1px solid var(--gold);
+  outline-offset: 1px;
+}
+
+.atlas-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin-top: var(--sp-2);
+  padding-right: 2px;
+}
+
+.atlas-row {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--radius);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.atlas-row:hover,
+.atlas-row:focus-visible {
+  border-color: rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.atlas-row.selected {
+  border-color: rgba(245, 200, 107, 0.6);
+  background: rgba(245, 200, 107, 0.08);
+}
+
+.atlas-row-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+}
+
+.atlas-row-name {
+  font-family: var(--font-fantasy);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+.atlas-row-meta {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+}
+
+.atlas-row-detail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 8px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.atlas-row-species {
+  color: var(--text);
+}
+
+.atlas-row-locked {
+  font-style: italic;
+  opacity: 0.75;
+}
+
+.atlas-empty {
+  padding: var(--sp-4) var(--sp-2);
+  text-align: center;
+  color: var(--muted);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  align-items: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .atlas-row,
+  .atlas-chip {
+    transition: none;
+  }
+}
+
+@media (max-width: 860px) {
+  .atlas-drawer {
+    left: var(--sp-3);
+    right: var(--sp-3);
+    width: auto;
+    max-height: 55vh;
   }
 }

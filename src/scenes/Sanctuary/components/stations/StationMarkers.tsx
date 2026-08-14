@@ -33,6 +33,37 @@ export function getStationSubtitle(id: string, panel?: string): string {
   }
 }
 
+/**
+ * Calculates a comfortable floating height for station plaque labels
+ * so that they clear the top of the 3D structures and never overlap the asset.
+ */
+export function getStationLabelHeight(id: string): number {
+  switch (id) {
+    case 'hatchery':
+      return 7.0
+    case 'flightRing':
+      return 7.0
+    case 'scaleForge':
+      return 6.6
+    case 'burnRange':
+      return 6.2
+    case 'breeding':
+      return 5.8
+    case 'enduranceRun':
+      return 6.0
+    case 'barracks':
+      return 5.2
+    case 'huntingPen':
+      return 5.0
+    case 'warTable':
+    case 'roster':
+    case 'infirmary':
+      return 4.8
+    default:
+      return 5.2
+  }
+}
+
 /** Floating labels and ground decal rings so the player can find stations. */
 export function InteractableMarkers({
   interactables,
@@ -43,6 +74,7 @@ export function InteractableMarkers({
     <group>
       {interactables.map((item) => {
         const subtitle = getStationSubtitle(item.id, item.panel)
+        const labelHeight = getStationLabelHeight(item.id)
         return (
           <group key={item.id} position={[item.position[0], 0, item.position[1]]}>
             {/* Outer Ground Ring */}
@@ -60,7 +92,7 @@ export function InteractableMarkers({
               text={item.label}
               subtitle={subtitle}
               variant="station"
-              position={[0, 3.8, 0]}
+              position={[0, labelHeight, 0]}
               size={1.5}
               color="#fff4e0"
             />
@@ -70,3 +102,4 @@ export function InteractableMarkers({
     </group>
   )
 }
+

@@ -32,6 +32,7 @@ export function useFlightLabState() {
   const [poseEdits, setPoseEdits] = useState<FlightLabPoseEdits>(NEUTRAL_POSE_EDITS)
   const [activeLoop, setActiveLoop] = useState<FlightLoopState>('cruise')
   const [panelOpen, setPanelOpen] = useState(true)
+  const [hideUI, setHideUI] = useState(false)
   const [copied, setCopied] = useState(false)
 
   const [centerTrigger, setCenterTrigger] = useState(0)
@@ -293,6 +294,8 @@ export function useFlightLabState() {
     setActiveLoop,
     panelOpen,
     setPanelOpen,
+    hideUI,
+    setHideUI,
     copied,
     centerTrigger,
     setCenterTrigger,

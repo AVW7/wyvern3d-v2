@@ -6,6 +6,7 @@ import { CAMERA_KEYS, type ThemeStyle } from '../constants'
 import { LabButton } from './AppleControls'
 import {
   IconContrast,
+  IconEyeOff,
   IconFrameFit,
   IconMoon,
   IconPanel,
@@ -28,6 +29,8 @@ interface FlightLabTopbarProps {
   setFrozen: React.Dispatch<React.SetStateAction<boolean>>
   panelOpen: boolean
   setPanelOpen: React.Dispatch<React.SetStateAction<boolean>>
+  hideUI?: boolean
+  setHideUI?: React.Dispatch<React.SetStateAction<boolean>>
   setCenterTrigger: React.Dispatch<React.SetStateAction<number>>
   setZoomFitTrigger: React.Dispatch<React.SetStateAction<number>>
   setZoomInTrigger: React.Dispatch<React.SetStateAction<number>>
@@ -45,33 +48,36 @@ export function FlightLabTopbar({
   setFrozen,
   panelOpen,
   setPanelOpen,
+  setHideUI,
   setCenterTrigger,
   setZoomFitTrigger,
   setZoomInTrigger,
   setZoomOutTrigger,
   setResetCamTrigger,
 }: FlightLabTopbarProps) {
+  const btnStyle = { padding: '3px 8px', fontSize: 10 }
+
   return (
-    <div className="topbar flight-lab-topbar liquid-glass">
-      <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexWrap: 'wrap' }}>
+    <div className="flight-lab-topbar liquid-glass">
+      <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
         <span
           style={{
-            fontSize: 10,
+            fontSize: 9,
             fontWeight: 700,
             color: t.muted,
             textTransform: 'uppercase',
             letterSpacing: '0.06em',
-            marginRight: 2,
+            marginRight: 1,
           }}
         >
-          Camera
+          Cam
         </span>
         <div
           style={{
             display: 'inline-flex',
             background: t.segmentedBg,
-            padding: 2,
-            borderRadius: 8,
+            padding: 1.5,
+            borderRadius: 6,
             border: `1px solid ${t.border}`,
             gap: 2,
           }}
@@ -81,6 +87,7 @@ export function FlightLabTopbar({
               key={preset}
               active={preset === camera}
               themeStyle={t}
+              style={btnStyle}
               onClick={() => setCamera(preset)}
             >
               {preset}
@@ -93,29 +100,17 @@ export function FlightLabTopbar({
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: 4,
+          gap: 3,
           flexWrap: 'wrap',
           borderLeft: `1px solid ${t.border}`,
-          paddingLeft: 10,
+          paddingLeft: 8,
         }}
       >
-        <span
-          style={{
-            fontSize: 10,
-            fontWeight: 700,
-            color: t.muted,
-            textTransform: 'uppercase',
-            letterSpacing: '0.06em',
-            marginRight: 2,
-          }}
-        >
-          Actions
-        </span>
         <LabButton
           onClick={() => setCenterTrigger((trig) => trig + 1)}
           themeStyle={t}
           title="Center camera on wyvern model (HotKey: C)"
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}
+          style={{ ...btnStyle, display: 'inline-flex', alignItems: 'center', gap: 3 }}
         >
           <IconTarget />
           <span>Center</span>
@@ -125,7 +120,7 @@ export function FlightLabTopbar({
           onClick={() => setZoomFitTrigger((trig) => trig + 1)}
           themeStyle={t}
           title="Zoom to fit wyvern silhouette (HotKey: F)"
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}
+          style={{ ...btnStyle, display: 'inline-flex', alignItems: 'center', gap: 3 }}
         >
           <IconFrameFit />
           <span>Fit</span>
@@ -135,27 +130,25 @@ export function FlightLabTopbar({
           onClick={() => setZoomInTrigger((trig) => trig + 1)}
           themeStyle={t}
           title="Zoom camera in (HotKey: +)"
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
+          style={{ ...btnStyle, display: 'inline-flex', alignItems: 'center', gap: 2 }}
         >
           <IconZoomIn />
           <span>In</span>
-          <kbd className="apple-kbd">+</kbd>
         </LabButton>
         <LabButton
           onClick={() => setZoomOutTrigger((trig) => trig + 1)}
           themeStyle={t}
           title="Zoom camera out (HotKey: -)"
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
+          style={{ ...btnStyle, display: 'inline-flex', alignItems: 'center', gap: 2 }}
         >
           <IconZoomOut />
           <span>Out</span>
-          <kbd className="apple-kbd">-</kbd>
         </LabButton>
         <LabButton
           onClick={() => setResetCamTrigger((trig) => trig + 1)}
           themeStyle={t}
           title="Reset camera preset framing"
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
+          style={{ ...btnStyle, display: 'inline-flex', alignItems: 'center', gap: 3 }}
         >
           <IconReset />
           <span>Reset</span>
@@ -165,7 +158,7 @@ export function FlightLabTopbar({
           themeStyle={t}
           onClick={() => setFrozen((f) => !f)}
           title="Pause or resume rig animation (HotKey: Space)"
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}
+          style={{ ...btnStyle, display: 'inline-flex', alignItems: 'center', gap: 3 }}
         >
           {frozen ? <IconPlay /> : <IconPause />}
           <span>{frozen ? 'Resume' : 'Pause'}</span>
@@ -177,29 +170,17 @@ export function FlightLabTopbar({
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: 4,
+          gap: 3,
           borderLeft: `1px solid ${t.border}`,
-          paddingLeft: 10,
+          paddingLeft: 8,
         }}
       >
-        <span
-          style={{
-            fontSize: 10,
-            fontWeight: 700,
-            color: t.muted,
-            textTransform: 'uppercase',
-            letterSpacing: '0.06em',
-            marginRight: 2,
-          }}
-        >
-          Theme
-        </span>
         <div
           style={{
             display: 'flex',
             background: t.segmentedBg,
-            padding: 2,
-            borderRadius: 8,
+            padding: 1.5,
+            borderRadius: 6,
             border: `1px solid ${t.border}`,
             gap: 2,
           }}
@@ -209,7 +190,7 @@ export function FlightLabTopbar({
             themeStyle={t}
             onClick={() => setTheme('dark')}
             title="Dark Theme"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
+            style={{ ...btnStyle, display: 'inline-flex', alignItems: 'center', gap: 3 }}
           >
             <IconMoon />
             <span>Dark</span>
@@ -219,7 +200,7 @@ export function FlightLabTopbar({
             themeStyle={t}
             onClick={() => setTheme('light')}
             title="Light Theme"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
+            style={{ ...btnStyle, display: 'inline-flex', alignItems: 'center', gap: 3 }}
           >
             <IconSun />
             <span>Light</span>
@@ -229,7 +210,7 @@ export function FlightLabTopbar({
             themeStyle={t}
             onClick={() => setTheme('monochrome')}
             title="Monochrome Theme"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
+            style={{ ...btnStyle, display: 'inline-flex', alignItems: 'center', gap: 3 }}
           >
             <IconContrast />
             <span>Mono</span>
@@ -239,25 +220,38 @@ export function FlightLabTopbar({
           active={panelOpen}
           themeStyle={t}
           onClick={() => setPanelOpen((open) => !open)}
-          title="Toggle Control Panel (HotKey: P)"
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 4, marginLeft: 4 }}
+          title="Toggle Side Panels (HotKey: P)"
+          style={{ ...btnStyle, display: 'inline-flex', alignItems: 'center', gap: 3, marginLeft: 2 }}
         >
           <IconPanel />
-          <span>{panelOpen ? 'Panel On' : 'Panel Off'}</span>
+          <span>{panelOpen ? 'Panels' : 'Panels Off'}</span>
+          <kbd className="apple-kbd">P</kbd>
         </LabButton>
+        {setHideUI && (
+          <LabButton
+            themeStyle={t}
+            onClick={() => setHideUI(true)}
+            title="Hide All UI (HotKey: H)"
+            style={{ ...btnStyle, display: 'inline-flex', alignItems: 'center', gap: 3, marginLeft: 2 }}
+          >
+            <IconEyeOff />
+            <span>Hide UI</span>
+            <kbd className="apple-kbd">H</kbd>
+          </LabButton>
+        )}
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
         <span
           style={{
             background: t.badgeBg,
             color: t.badgeText,
             border: `1px solid ${t.badgeBorder}`,
-            fontSize: 10,
+            fontSize: 9,
             fontWeight: 600,
             letterSpacing: '0.04em',
-            padding: '3px 9px',
-            borderRadius: 12,
+            padding: '2px 6px',
+            borderRadius: 10,
             boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1)',
           }}
         >
@@ -266,7 +260,7 @@ export function FlightLabTopbar({
         <Link
           href="/"
           style={{
-            fontSize: 12,
+            fontSize: 11,
             fontWeight: 500,
             opacity: 0.8,
             textDecoration: 'none',

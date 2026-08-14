@@ -87,52 +87,42 @@ export function FlightLabControlPanel({
 
   return (
     <div
-      className="panel flight-lab-panel liquid-glass"
+      className="flight-lab-panel liquid-glass"
       style={{
-        position: 'absolute',
-        top: 78,
-        right: 16,
-        left: 'auto',
-        transform: 'none',
-        width: 360,
-        maxHeight: 'calc(100vh - 94px)',
-        overflowY: 'auto',
         display: 'flex',
         flexDirection: 'column',
-        gap: 10,
+        gap: 8,
       }}
     >
       {/* Presets & Behavior Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: `1px solid ${t.border}`, paddingBottom: 6 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: `1px solid ${t.border}`, paddingBottom: 4 }}>
         <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: t.accentColor }}>
           Presets & Behavior Lab
         </div>
         <span style={{ fontSize: 9, color: t.muted, textTransform: 'uppercase' }}>Develop & Test</span>
       </div>
 
-      {/* Core Principle Banner */}
-      <div
+      {/* Core Principle Banner - Compact Collapsible */}
+      <details
         style={{
           fontSize: 10,
           color: t.text,
-          background: `linear-gradient(135deg, ${t.accentColor}15, ${t.cardBg})`,
-          padding: '8px 10px',
+          background: `linear-gradient(135deg, ${t.accentColor}12, ${t.cardBg})`,
+          padding: '5px 8px',
           borderRadius: 8,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 4,
-          border: `1px solid ${t.accentColor}30`,
+          border: `1px solid ${t.accentColor}25`,
         }}
       >
-        <div style={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
+        <summary style={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer', userSelect: 'none' }}>
           <span style={{ color: t.accentColor }}>◆</span> Core Flight Principles
-        </div>
-        <div style={{ color: t.muted, lineHeight: 1.4 }}>
-          • <strong style={{ color: t.text }}>Head always steers</strong> — like a house, the head points where you're going<br/>
+          <span style={{ fontSize: 9, color: t.muted, marginLeft: 'auto', fontWeight: 400 }}>tap for notes</span>
+        </summary>
+        <div style={{ color: t.muted, lineHeight: 1.4, marginTop: 4, paddingTop: 4, borderTop: `1px solid ${t.border}` }}>
+          • <strong style={{ color: t.text }}>Head always steers</strong> — head points direction of travel<br/>
           • <strong style={{ color: t.text }}>Body follows speed</strong> — tuck legs for aerodynamics at high speed<br/>
           • <strong style={{ color: t.text }}>Actions chain</strong> — takeoff → search → engage → return
         </div>
-      </div>
+      </details>
 
       {/* Animation Clips Card - Grounded Presets */}
       {groundedPresets && onSelectPreset && (
@@ -158,10 +148,10 @@ export function FlightLabControlPanel({
           fontSize: 10,
           color: t.muted,
           background: t.cardBg,
-          padding: '6px 10px',
+          padding: '5px 8px',
           borderRadius: 8,
           display: 'flex',
-          gap: 6,
+          gap: 5,
           flexWrap: 'wrap',
           alignItems: 'center',
           border: `1px solid ${t.border}`,
@@ -174,7 +164,8 @@ export function FlightLabControlPanel({
         <span>Space freeze</span>
         <span>C center</span>
         <span>F fit</span>
-        <span>+/- zoom</span>
+        <span>P panels</span>
+        <span>H hide UI</span>
       </div>
 
       {/* Behavior Actions Card - Develop & Test Presets */}

@@ -50,7 +50,7 @@ Each explored region should answer:
 | Stage | Title | Status | Depends on |
 |---|---|---|---|
 | 0 | Region-specific deterministic identity | DONE | World Atlas 0 |
-| 1 | Authored landmarks and discovery | NOT STARTED | World Atlas 2, Biome 0 |
+| 1 | Authored landmarks and discovery | DONE | World Atlas 2, Biome 0 |
 | 2 | Traversal, collision, and landing | DONE | 0 |
 | 3 | Weather and environmental dynamics | DONE | 2 |
 | 4 | Ambient ecology and region activities | NOT STARTED | 1, 2 |
@@ -84,7 +84,7 @@ stable across remount, save/load and replay.
 
 # STAGE 1 — Authored landmarks and discovery
 
-**Status:** NOT STARTED · **Depends on:** World Atlas Stage 2 and Biome Stage 0
+**Status:** DONE — 2026-08-14 · **Depends on:** World Atlas Stage 2 and Biome Stage 0
 
 **Goal.** Every region contains deliberate places worth finding, connected to the atlas knowledge
 contract.

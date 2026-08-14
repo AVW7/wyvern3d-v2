@@ -24,4 +24,26 @@ describe('mapUiStore', () => {
     const state2 = useMapUiStore.getState()
     expect(state1).toBe(state2)
   })
+
+  it('manages atlas drawer open state', () => {
+    const store = useMapUiStore.getState()
+    expect(store.atlasOpen).toBe(false)
+
+    store.toggleAtlas()
+    expect(useMapUiStore.getState().atlasOpen).toBe(true)
+
+    // Same-value set is a no-op
+    const state1 = useMapUiStore.getState()
+    useMapUiStore.getState().setAtlasOpen(true)
+    expect(useMapUiStore.getState()).toBe(state1)
+
+    useMapUiStore.getState().setAtlasOpen(false)
+    expect(useMapUiStore.getState().atlasOpen).toBe(false)
+  })
+
+  it('clear() also closes the atlas drawer', () => {
+    useMapUiStore.getState().toggleAtlas()
+    useMapUiStore.getState().clear()
+    expect(useMapUiStore.getState().atlasOpen).toBe(false)
+  })
 })

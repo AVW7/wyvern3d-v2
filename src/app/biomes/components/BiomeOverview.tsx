@@ -5,6 +5,7 @@ import styles from '../biomes.module.css'
 import { labelFor, type BiomeSummary } from '../catalog'
 import { REGION_LIST } from '@/core/data/regions'
 import { getRegionBiomeModifiers } from '@/scenes/BiomeWorld/terrain/regionModifiers'
+import { getRegionLandmarkProps } from '@/scenes/BiomeWorld/discovery/landmarkProps'
 
 /**
  * The per-biome view: every biome, the layers it dresses with, and region-specific
@@ -67,6 +68,20 @@ export function BiomeOverview({
                     <span>Terrain Rot: <strong>{((modifiers.terrainRotation * 180) / Math.PI).toFixed(0)}°</strong></span>
                     <span>Scatter Rot: <strong>{((modifiers.scatterRotation * 180) / Math.PI).toFixed(0)}°</strong></span>
                     <span>Radius Shift: <strong>{modifiers.radiusBandShift > 0 ? `+${modifiers.radiusBandShift.toFixed(1)}` : modifiers.radiusBandShift.toFixed(1)}m</strong></span>
+                  </div>
+                )}
+                {activeRegion && (
+                  <div style={{ display: 'flex', gap: '1rem', color: 'rgba(255,255,255,0.7)', fontSize: '0.75rem', flexWrap: 'wrap', marginTop: '0.3rem' }}>
+                    <span>
+                      Landmarks:{' '}
+                      {getRegionLandmarkProps(activeRegion.id, 42).map((p, i) => (
+                        <span key={p.anchor.landmarkId} style={{ color: 'rgba(255,255,255,0.85)' }}>
+                          {i > 0 ? ' · ' : ''}
+                          {p.anchor.name} ({p.anchor.category}
+                          {p.propId ? `, ${labelFor(p.propId)} @ ${Math.round(Math.hypot(p.anchor.x, p.anchor.z))} m` : ', existing composition'})
+                        </span>
+                      ))}
+                    </span>
                   </div>
                 )}
               </div>

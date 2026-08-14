@@ -47,6 +47,11 @@ export function BiomeExplorer({
     useSanctuaryCommands.getState().setPlayerLocomotion(
       character.running ? 'run' : character.moving ? 'walk' : 'idle',
     )
+    // Published for the discovery director's proximity checks; the setter is
+    // change-guarded so this per-frame write never re-renders subscribers.
+    useSanctuaryCommands
+      .getState()
+      .setPlayerPosition([character.position.x, character.position.z])
   }
 
   return (

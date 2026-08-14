@@ -3,14 +3,19 @@ import { create } from 'zustand'
 export interface MapUiState {
   hovered: string | null
   inspected: string | null
+  /** Atlas drawer open state (presentation-only; not in GameState). */
+  atlasOpen: boolean
   setHovered: (id: string | null) => void
   setInspected: (id: string | null) => void
+  setAtlasOpen: (open: boolean) => void
+  toggleAtlas: () => void
   clear: () => void
 }
 
 export const useMapUiStore = create<MapUiState>((set) => ({
   hovered: null,
   inspected: null,
+  atlasOpen: false,
 
   setHovered: (id) =>
     set((state) => {
@@ -24,9 +29,20 @@ export const useMapUiStore = create<MapUiState>((set) => ({
       return { inspected: id }
     }),
 
+  setAtlasOpen: (open) =>
+    set((state) => {
+      if (state.atlasOpen === open) return state
+      return { atlasOpen: open }
+    }),
+
+  toggleAtlas: () =>
+    set((state) => {
+      return { atlasOpen: !state.atlasOpen }
+    }),
+
   clear: () =>
     set((state) => {
-      if (state.hovered === null && state.inspected === null) return state
-      return { hovered: null, inspected: null }
+      if (state.hovered === null && state.inspected === null && !state.atlasOpen) return state
+      return { hovered: null, inspected: null, atlasOpen: false }
     }),
 }))

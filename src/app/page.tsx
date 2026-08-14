@@ -20,24 +20,28 @@ const SECTIONS = [
     glyph: '🥚',
     name: 'Sanctuary',
     blurb: 'Hatch, feed and train your brood. Place the roosts and stations yourself.',
+    href: '/play?mode=sanctuary',
   },
   {
     id: 'world-map',
     glyph: '🗺️',
     name: 'World Map',
     blurb: 'Twenty-two regions on a conquest graph. Strike only where you already hold ground.',
+    href: '/play?mode=worldmap',
   },
   {
     id: 'battle',
     glyph: '⚔️',
     name: 'Battle',
     blurb: 'Fly your wyvern in, or let the same simulation resolve the fight for you.',
+    href: '/play?mode=battle',
   },
   {
     id: 'highlands',
     glyph: '🏔️',
     name: 'Highlands',
     blurb: 'Hunt in the open uplands to keep the sanctuary fed between campaigns.',
+    href: '/play?mode=highlands',
   },
 ] as const
 
@@ -90,7 +94,11 @@ export default function MenuPage() {
           </section>
 
           <div className="title-aside">
-            <section className="title-card title-card--map liquid-glass" aria-labelledby="title-map-heading">
+            <Link
+              href="/play?mode=worldmap"
+              className="title-card title-card--map liquid-glass"
+              aria-labelledby="title-map-heading"
+            >
               <header className="title-card__head">
                 <span className="title-card__eyebrow">The realm</span>
                 <h2 id="title-map-heading">Conquest map</h2>
@@ -102,16 +110,21 @@ export default function MenuPage() {
                 <span className="title-map__key title-map__key--home" /> Hearthvale, home
                 <span className="title-map__key title-map__key--far" /> Duskspire, the last spire
               </p>
-            </section>
+            </Link>
 
             <ul className="title-cards">
               {SECTIONS.map((section) => (
-                <li key={section.id} className="title-card title-card--section liquid-glass">
-                  <span className="title-card__glyph" aria-hidden="true">
-                    {section.glyph}
-                  </span>
-                  <h3>{section.name}</h3>
-                  <p>{section.blurb}</p>
+                <li key={section.id}>
+                  <Link
+                    href={section.href}
+                    className="title-card title-card--section liquid-glass"
+                  >
+                    <span className="title-card__glyph" aria-hidden="true">
+                      {section.glyph}
+                    </span>
+                    <h3>{section.name}</h3>
+                    <p>{section.blurb}</p>
+                  </Link>
                 </li>
               ))}
             </ul>

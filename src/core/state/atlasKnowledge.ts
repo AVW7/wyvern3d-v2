@@ -1,6 +1,7 @@
 import type { GameState, LandmarkDef, RegionKnowledge } from '../types'
 import { REGIONS, REGION_LIST } from '../data/regions'
 import { REGION_ATLAS_DATA } from '../data/atlas'
+import { PHENOMENA, type PhenomenonDef } from '../data/phenomena'
 
 /**
  * Ensures that `state.atlasKnowledge` is populated for all known regions.
@@ -27,6 +28,7 @@ export function ensureAtlasKnowledge(state: GameState): GameState {
         mapped,
         visited,
         discoveredLandmarkIds: [],
+        observedPhenomenonIds: [],
         firstVisitedTick: visited ? (regionState?.conqueredAtTick ?? 0) : null,
       }
     }
@@ -72,6 +74,19 @@ export function getDiscoveredLandmarks(state: GameState, regionId: string): Land
 
   const discoveredSet = new Set(knowledge.discoveredLandmarkIds)
   return atlas.landmarks.filter((lm) => discoveredSet.has(lm.id))
+}
+
+/**
+ * Phenomena observed in a region, as definitions. Empty until the player
+ * deliberately observes them (Biome Stage 4).
+ */
+export function getObservedPhenomena(state: GameState, regionId: string): PhenomenonDef[] {
+  ensureAtlasKnowledge(state)
+  const knowledge = state.atlasKnowledge[regionId]
+  const observed = knowledge?.observedPhenomenonIds ?? []
+  if (observed.length === 0) return []
+  const set = new Set(observed)
+  return PHENOMENA.filter((p) => set.has(p.id))
 }
 
 /**

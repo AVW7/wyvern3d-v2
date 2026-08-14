@@ -52,31 +52,15 @@ export function FlightLabUI({
 
   return (
     <div
+      className="flight-lab-left-panel liquid-glass"
       style={{
-        position: 'absolute',
-        top: 78,
-        left: 16,
-        width: 360,
-        maxHeight: 'calc(100vh - 94px)',
-        overflowY: 'auto',
-        background: t.panelBg,
-        backdropFilter: 'blur(24px) saturate(190%)',
-        WebkitBackdropFilter: 'blur(24px) saturate(190%)',
-        border: `1px solid ${t.border}`,
-        borderTop: `1px solid ${t.borderTop}`,
-        borderRadius: 14,
-        boxShadow: '0 20px 48px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
-        padding: 12,
-        color: t.text,
-        zIndex: 10,
         display: 'flex',
         flexDirection: 'column',
-        gap: 10,
-        pointerEvents: 'auto',
+        gap: 8,
       }}
     >
       {/* Manual Control Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: `1px solid ${t.border}`, paddingBottom: 6 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: `1px solid ${t.border}`, paddingBottom: 4 }}>
         <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: t.accentColor }}>
           Manual Control Studio
         </div>
@@ -86,17 +70,16 @@ export function FlightLabUI({
       {/* Instructions Banner */}
       <div
         style={{
-          fontSize: 10,
+          fontSize: 9.5,
           color: t.muted,
           background: t.cardBg,
-          padding: '6px 10px',
-          borderRadius: 8,
+          padding: '4px 8px',
+          borderRadius: 6,
           border: `1px solid ${t.border}`,
-          lineHeight: 1.4,
+          lineHeight: 1.3,
         }}
       >
-        Use these controls to <strong style={{ color: t.text }}>craft poses</strong> and test speed dynamics. 
-        Export to presets on the right panel when ready.
+        Craft poses & test dynamics. Export to right panel.
       </div>
 
       {/* Dock Tabs */}

@@ -43,8 +43,8 @@ The atlas answers four questions without opening several panels:
 | Stage | Title | Status | Depends on |
 |---|---|---|---|
 | 0 | Atlas content and knowledge contract | DONE | Animation Stage 6 |
-| 1 | Searchable directory and camera focus | NOT STARTED | 0 |
-| 2 | Region visits, discoveries, and landmarks | NOT STARTED | 1 |
+| 1 | Searchable directory and camera focus | DONE | 0 |
+| 2 | Region visits, discoveries, and landmarks | DONE | 1 |
 | 3 | Strategic map layers and legend | NOT STARTED | 1 |
 | 4 | Region dossier and campaign journal | NOT STARTED | 2, 3 |
 | 5 | Accessibility, navigation, and performance | NOT STARTED | 4 |
@@ -78,7 +78,7 @@ idempotent visit/discovery; unknown-field selectors; completion count; unchanged
 
 # STAGE 1 — Searchable directory and camera focus
 
-**Status:** NOT STARTED · **Depends on:** Stage 0
+**Status:** DONE — 2026-08-14 · **Depends on:** Stage 0
 
 **Goal.** Add a responsive atlas directory synchronized with the existing 3D map and inspector.
 
@@ -101,7 +101,7 @@ the directory and 3D node always agreeing.
 
 # STAGE 2 — Region visits, discoveries, and landmarks
 
-**Status:** NOT STARTED · **Depends on:** Stage 1
+**Status:** DONE — 2026-08-14 · **Depends on:** Stage 1
 
 **Goal.** Exploration in `BiomeWorld` produces durable atlas progress.
 

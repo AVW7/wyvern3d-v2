@@ -3,12 +3,14 @@
 import dynamic from 'next/dynamic'
 import { Suspense } from 'react'
 import type { FlightLoopState } from '@/render/flightPose'
+import { ASSETS, type ClipSpec, type ModelState } from '@/render/assets/manifest'
 import { SPECIES, THEME_STYLES } from './constants'
 import { FlightLabUI } from './components/FlightLabUI'
 import { FlightLabTopbar } from './components/FlightLabTopbar'
 import { FlightLabControlPanel } from './components/FlightLabControlPanel'
 import { useFlightLabState } from './hooks/useFlightLabState'
 import { useFlightLabShortcuts } from './hooks/useFlightLabShortcuts'
+import { IconEye } from './components/Icons'
 
 const FlightLab = dynamic(() => import('./FlightLab').then((m) => m.FlightLab), { ssr: false })
 
@@ -51,6 +53,39 @@ const GROUNDED_PRESETS = [
   { id: 'attackAir', label: 'AttackAir' },
 ]
 
+/**
+ * Which clip each preset actually plays, read from the manifest rather than
+ * assumed — several states share one clip, and a panel that hides that reads as
+ * "the animation is broken" when the mapping is simply many-to-one.
+ *
+ * Measured on the shipped rig: 35 presets resolve to 16 distinct clips. `rest`
+ * backs seven of them (rest/sleep/sit/eat/drink/groom/seated) and `attack` six
+ * (attack/attackAir/pickUp/huntGrip/drop/huntFinish), because the 26-clip
+ * sanctuary sidecar targets the old vendor rig's `Bip001-*` bones and cannot
+ * bind to the rebuilt `WyvernRig`.
+ */
+function resolveClip(id: string): string | undefined {
+  const asset = ASSETS['wyvern.mirefang']
+  if (!asset) return undefined
+  const spec = asset.animations[id as ModelState] as
+    | ClipSpec
+    | ClipSpec[]
+    | undefined
+  if (!spec) return undefined
+  if (Array.isArray(spec)) return spec[0]?.clip
+  return spec.clip
+}
+
+const PRESET_CLIPS = GROUNDED_PRESETS.map((p) => ({ ...p, clip: resolveClip(p.id) }))
+const CLIP_USES = PRESET_CLIPS.reduce<Record<string, number>>((acc, p) => {
+  if (p.clip) acc[p.clip] = (acc[p.clip] ?? 0) + 1
+  return acc
+}, {})
+const ANNOTATED_PRESETS = PRESET_CLIPS.map((p) => ({
+  ...p,
+  shared: p.clip ? CLIP_USES[p.clip] : 1,
+}))
+
 export default function FlightLabPage() {
   const state = useFlightLabState()
 
@@ -63,6 +98,7 @@ export default function FlightLabPage() {
     setZoomInTrigger: state.setZoomInTrigger,
     setZoomOutTrigger: state.setZoomOutTrigger,
     setPanelOpen: state.setPanelOpen,
+    setHideUI: state.setHideUI,
   })
 
   if (process.env.NODE_ENV === 'production') {
@@ -108,25 +144,37 @@ export default function FlightLabPage() {
           box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.3) !important;
           color: currentColor !important;
         }
+        .flight-lab-overlay {
+          position: fixed;
+          inset: 0;
+          pointer-events: none;
+          display: flex;
+          flex-direction: column;
+          padding: 8px 12px 12px;
+          gap: 8px;
+          z-index: 10;
+          box-sizing: border-box;
+        }
         .flight-lab-topbar {
-          position: absolute !important;
-          top: 12px !important;
-          left: 12px !important;
-          right: 12px !important;
+          position: relative !important;
           display: flex !important;
           align-items: center !important;
           justify-content: space-between !important;
-          gap: 10px !important;
-          padding: 8px 14px !important;
+          gap: 6px !important;
+          flex-wrap: wrap !important;
+          padding: 5px 10px !important;
           background: ${t.bg} !important;
           backdrop-filter: blur(24px) saturate(190%) !important;
           -webkit-backdrop-filter: blur(24px) saturate(190%) !important;
           border: 1px solid ${t.border} !important;
           border-top: 1px solid ${t.borderTop} !important;
-          border-radius: 14px !important;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+          border-radius: 10px !important;
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
           z-index: 20 !important;
           pointer-events: auto !important;
+          width: 100% !important;
+          box-sizing: border-box !important;
+          flex-shrink: 0 !important;
         }
         .flight-lab-topbar::before {
           content: '';
@@ -139,16 +187,27 @@ export default function FlightLabPage() {
           opacity: 0.5;
           pointer-events: none;
         }
-        .flight-lab-panel {
-          position: absolute !important;
-          top: 78px !important;
-          right: 16px !important;
+        .flight-lab-panels-container {
+          display: flex !important;
+          justify-content: space-between !important;
+          align-items: stretch !important;
+          flex: 1 1 0% !important;
+          min-height: 0 !important;
+          pointer-events: none !important;
+          gap: 12px !important;
+          width: 100% !important;
+          box-sizing: border-box !important;
+        }
+        .flight-lab-panel,
+        .flight-lab-left-panel {
+          position: relative !important;
+          top: auto !important;
+          bottom: auto !important;
           left: auto !important;
-          bottom: 16px !important;
+          right: auto !important;
           transform: none !important;
-          width: 330px !important;
-          max-width: calc(100vw - 32px) !important;
-          max-height: calc(100vh - 94px) !important;
+          animation: none !important;
+          max-height: 100% !important;
           overflow-y: auto !important;
           pointer-events: auto !important;
           background: ${t.panelBg} !important;
@@ -158,22 +217,37 @@ export default function FlightLabPage() {
           border-top: 1px solid ${t.borderTop} !important;
           border-radius: 14px !important;
           box-shadow: 0 20px 48px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
-          padding: 14px !important;
+          padding: 10px !important;
           color: ${t.text} !important;
           z-index: 10 !important;
-          transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+          box-sizing: border-box !important;
+          transition: border-color 0.2s ease, background-color 0.2s ease !important;
         }
-        .flight-lab-panel::-webkit-scrollbar {
+        .flight-lab-panel {
+          width: 360px !important;
+          max-width: min(360px, calc(50vw - 20px)) !important;
+          flex-shrink: 0 !important;
+        }
+        .flight-lab-left-panel {
+          width: 360px !important;
+          max-width: min(360px, calc(50vw - 20px)) !important;
+          flex-shrink: 0 !important;
+        }
+        .flight-lab-panel::-webkit-scrollbar,
+        .flight-lab-left-panel::-webkit-scrollbar {
           width: 6px;
         }
-        .flight-lab-panel::-webkit-scrollbar-track {
+        .flight-lab-panel::-webkit-scrollbar-track,
+        .flight-lab-left-panel::-webkit-scrollbar-track {
           background: transparent;
         }
-        .flight-lab-panel::-webkit-scrollbar-thumb {
+        .flight-lab-panel::-webkit-scrollbar-thumb,
+        .flight-lab-left-panel::-webkit-scrollbar-thumb {
           background: ${t.border};
           border-radius: 3px;
         }
-        .flight-lab-panel::before {
+        .flight-lab-panel::before,
+        .flight-lab-left-panel::before {
           content: '';
           position: absolute;
           top: 0;
@@ -184,28 +258,28 @@ export default function FlightLabPage() {
           opacity: 0.4;
           pointer-events: none;
         }
-        @media (max-width: 900px) {
-          .flight-lab-topbar {
-            flex-wrap: wrap !important;
-            gap: 8px !important;
+        @media (max-width: 768px) {
+          .flight-lab-panels-container {
+            flex-direction: column !important;
+            overflow-y: auto !important;
+            pointer-events: auto !important;
           }
-          .flight-lab-panel {
-            top: 116px !important;
-            bottom: 16px !important;
-            left: 16px !important;
-            right: 16px !important;
-            width: auto !important;
-            max-height: calc(100vh - 132px) !important;
+          .flight-lab-panel,
+          .flight-lab-left-panel {
+            width: 100% !important;
+            max-width: 100% !important;
+            flex-shrink: 1 !important;
+            max-height: none !important;
           }
         }
         @media (prefers-reduced-motion: reduce) {
-          .apple-button, .flight-lab-panel, .flight-lab-topbar {
+          .apple-button, .flight-lab-panel, .flight-lab-left-panel, .flight-lab-topbar {
             transition: none !important;
             transform: none !important;
           }
         }
         @media (prefers-reduced-transparency: reduce) {
-          .flight-lab-topbar, .flight-lab-panel {
+          .flight-lab-topbar, .flight-lab-panel, .flight-lab-left-panel {
             backdrop-filter: none !important;
             -webkit-backdrop-filter: none !important;
             background: ${t.panelBgSolid} !important;
@@ -244,75 +318,118 @@ export default function FlightLabPage() {
         />
       </Suspense>
 
-      <div className="overlay">
-        <FlightLabUI
-          t={t}
-          telemetry={state.telemetry}
-          logs={state.logs}
-          speedDynamics={state.speedDynamics}
-          onChangeSpeedDynamics={state.handleChangeSpeedDynamics}
-          controllerIsolation={state.controllerIsolation}
-          onToggleController={state.handleToggleController}
-          onApplyPreset={state.handleApplySpeedPreset}
-          onClearLogs={() => state.setLogs([])}
-          poseEdits={state.poseEdits}
-          poseComposer={state.poseComposer}
-          onTogglePoseComposer={state.setPoseComposer}
-          onChangePoseEdit={state.handleChangePoseEdit}
-          onResetPoseEdits={state.handleResetPoseEdits}
-          onSelectPreset={state.handleSelectPreset}
-          transitionDuration={state.transitionDuration}
-          onChangeTransitionDuration={state.setTransitionDuration}
-        />
-        <FlightLabTopbar
-          t={t}
-          camera={state.camera}
-          setCamera={state.setCamera}
-          theme={state.theme}
-          setTheme={state.setTheme}
-          frozen={state.frozen}
-          setFrozen={state.setFrozen}
-          panelOpen={state.panelOpen}
-          setPanelOpen={state.setPanelOpen}
-          setCenterTrigger={state.setCenterTrigger}
-          setZoomFitTrigger={state.setZoomFitTrigger}
-          setZoomInTrigger={state.setZoomInTrigger}
-          setZoomOutTrigger={state.setZoomOutTrigger}
-          setResetCamTrigger={state.setResetCamTrigger}
-        />
+      <div className="flight-lab-overlay">
+        {!state.hideUI && (
+          <>
+            <FlightLabTopbar
+              t={t}
+              camera={state.camera}
+              setCamera={state.setCamera}
+              theme={state.theme}
+              setTheme={state.setTheme}
+              frozen={state.frozen}
+              setFrozen={state.setFrozen}
+              panelOpen={state.panelOpen}
+              setPanelOpen={state.setPanelOpen}
+              hideUI={state.hideUI}
+              setHideUI={state.setHideUI}
+              setCenterTrigger={state.setCenterTrigger}
+              setZoomFitTrigger={state.setZoomFitTrigger}
+              setZoomInTrigger={state.setZoomInTrigger}
+              setZoomOutTrigger={state.setZoomOutTrigger}
+              setResetCamTrigger={state.setResetCamTrigger}
+            />
 
-        {state.panelOpen && (
-          <FlightLabControlPanel
-            t={t}
-            readout={state.readout}
-            copied={state.copied}
-            handleCopyReadout={state.handleCopyReadout}
-            onTriggerScoutMode={state.handleTriggerScoutMode}
-            onTriggerSpeedSprint={state.handleTriggerSpeedSprint}
-            onTriggerFireAttack={state.handleTriggerFireAttack}
-            propsList={state.propsList}
-            onSpawnDoe={state.handleSpawnDoe}
-            onSpawnBird={state.handleSpawnBird}
-            onClearProps={state.handleClearProps}
-            procedural={state.procedural}
-            setProcedural={state.setProcedural}
-            frozen={state.frozen}
-            setFrozen={state.setFrozen}
-            scrub={state.scrub}
-            setScrub={state.setScrub}
-            fireBreath={state.fireBreath}
-            setFireBreath={state.setFireBreath}
-            overlays={state.overlays}
-            setOverlays={state.setOverlays}
-            speciesIndex={state.speciesIndex}
-            setSpeciesIndex={state.setSpeciesIndex}
-            species={species}
-            extraScale={state.extraScale}
-            setExtraScale={state.setExtraScale}
-            groundedPresets={GROUNDED_PRESETS}
-            activePreset={GROUNDED_PRESETS.find(p => p.id === state.state)?.id}
-            onSelectPreset={state.handleSelectPreset}
-          />
+            {state.panelOpen && (
+              <div className="flight-lab-panels-container">
+                <FlightLabUI
+                  t={t}
+                  telemetry={state.telemetry}
+                  logs={state.logs}
+                  speedDynamics={state.speedDynamics}
+                  onChangeSpeedDynamics={state.handleChangeSpeedDynamics}
+                  controllerIsolation={state.controllerIsolation}
+                  onToggleController={state.handleToggleController}
+                  onApplyPreset={state.handleApplySpeedPreset}
+                  onClearLogs={() => state.setLogs([])}
+                  poseEdits={state.poseEdits}
+                  poseComposer={state.poseComposer}
+                  onTogglePoseComposer={state.setPoseComposer}
+                  onChangePoseEdit={state.handleChangePoseEdit}
+                  onResetPoseEdits={state.handleResetPoseEdits}
+                  onSelectPreset={state.handleSelectPreset}
+                  transitionDuration={state.transitionDuration}
+                  onChangeTransitionDuration={state.setTransitionDuration}
+                />
+
+                <FlightLabControlPanel
+                  t={t}
+                  readout={state.readout}
+                  copied={state.copied}
+                  handleCopyReadout={state.handleCopyReadout}
+                  onTriggerScoutMode={state.handleTriggerScoutMode}
+                  onTriggerSpeedSprint={state.handleTriggerSpeedSprint}
+                  onTriggerFireAttack={state.handleTriggerFireAttack}
+                  propsList={state.propsList}
+                  onSpawnDoe={state.handleSpawnDoe}
+                  onSpawnBird={state.handleSpawnBird}
+                  onClearProps={state.handleClearProps}
+                  procedural={state.procedural}
+                  setProcedural={state.setProcedural}
+                  frozen={state.frozen}
+                  setFrozen={state.setFrozen}
+                  scrub={state.scrub}
+                  setScrub={state.setScrub}
+                  fireBreath={state.fireBreath}
+                  setFireBreath={state.setFireBreath}
+                  overlays={state.overlays}
+                  setOverlays={state.setOverlays}
+                  speciesIndex={state.speciesIndex}
+                  setSpeciesIndex={state.setSpeciesIndex}
+                  species={species}
+                  extraScale={state.extraScale}
+                  setExtraScale={state.setExtraScale}
+                  groundedPresets={ANNOTATED_PRESETS}
+                  activePreset={ANNOTATED_PRESETS.find(p => p.id === state.state)?.id}
+                  onSelectPreset={state.handleSelectPreset}
+                />
+              </div>
+            )}
+          </>
+        )}
+
+        {state.hideUI && (
+          <button
+            onClick={() => state.setHideUI(false)}
+            className="apple-button liquid-glass"
+            title="Show UI (HotKey: H or P or Esc)"
+            style={{
+              position: 'absolute',
+              top: 10,
+              right: 12,
+              zIndex: 30,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 5,
+              padding: '4px 10px',
+              fontSize: 10.5,
+              fontWeight: 600,
+              background: t.panelBg,
+              color: t.text,
+              border: `1px solid ${t.border}`,
+              borderTop: `1px solid ${t.borderTop}`,
+              borderRadius: 14,
+              backdropFilter: 'blur(24px) saturate(190%)',
+              WebkitBackdropFilter: 'blur(24px) saturate(190%)',
+              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.35)',
+              cursor: 'pointer',
+              pointerEvents: 'auto',
+            }}
+          >
+            <IconEye />
+            <span>Show UI</span>
+            <kbd className="apple-kbd">H</kbd>
+          </button>
         )}
       </div>
     </div>

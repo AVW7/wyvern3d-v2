@@ -34,6 +34,7 @@ export type Intent =
   | { type: 'USE_ELIXIR'; elixirType: 'vitality_salve' | 'dragon_tonic' | 'growth_elixir'; wyvernId: string }
   | { type: 'RECORD_REGION_VISIT'; regionId: string }
   | { type: 'DISCOVER_LANDMARK'; regionId: string; landmarkId: string }
+  | { type: 'OBSERVE_PHENOMENON'; regionId: string; phenomenonId: string }
   | { type: 'TAKE_DUTY_ITEM'; dutyId: number }
   | { type: 'ABANDON_DUTY_ITEM'; dutyId: number }
   | { type: 'COMPLETE_DUTY'; dutyId: number }

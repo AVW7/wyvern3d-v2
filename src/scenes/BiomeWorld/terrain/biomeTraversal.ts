@@ -3,6 +3,10 @@ import { BIOME_DRESSING } from '@/render/assets/biomeLibrary'
 import { scatterLayer } from '../dressing/biomeScatter'
 import { biomeHeightAt } from './biomeHeight'
 import { GROVE_COLLIDERS } from '../dressing/GroveLandmark'
+import {
+  filterScatterNearLandmarks,
+  getRegionLandmarkProps,
+} from '../discovery/landmarkProps'
 
 /** Solid prop collision half-widths / radii in metres. */
 export const SOLID_PROP_RADII: Record<string, number> = {
@@ -141,6 +145,19 @@ export function getRegionColliders(
     colliders.push(...GROVE_COLLIDERS)
   }
 
+  // 1b. Authored landmark props (Biome Stage 1): solid at their anchors,
+  // using the authored radius data rather than loaded model bounds.
+  const landmarkPlan = getRegionLandmarkProps(regionId, seed)
+  for (const landmark of landmarkPlan) {
+    if (landmark.colliderRadius <= 0) continue
+    colliders.push({
+      x: landmark.anchor.x,
+      z: landmark.anchor.z,
+      halfW: landmark.colliderRadius * landmark.scale,
+      halfD: landmark.colliderRadius * landmark.scale,
+    })
+  }
+
   // 2. Derive solid colliders from dressing layers
   const layers = BIOME_DRESSING[biome] ?? []
   const heightAt = (x: number, z: number) => biomeHeightAt(biome, x, z, regionId, seed)
@@ -150,13 +167,16 @@ export function getRegionColliders(
     const baseRadius = SOLID_PROP_RADII[layer.prop]
     if (!baseRadius) continue // Low vegetation/pebbles are not blocking
 
-    const placements = scatterLayer(layer, {
-      heightAt,
-      regionId,
-      seed,
-      offset: layerIdx * 0.7,
-      clearing: biome === 'grove' ? 14 : 4,
-    })
+    const placements = filterScatterNearLandmarks(
+      scatterLayer(layer, {
+        heightAt,
+        regionId,
+        seed,
+        offset: layerIdx * 0.7,
+        clearing: biome === 'grove' ? 14 : 4,
+      }),
+      landmarkPlan,
+    )
 
     for (const p of placements) {
       const [x, , z] = p.position

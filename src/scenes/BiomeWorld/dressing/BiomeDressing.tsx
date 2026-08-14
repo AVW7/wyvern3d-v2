@@ -7,6 +7,8 @@ import type { Collider } from '@/render/controllers/CharacterController'
 import { biomeHeightAt } from '../terrain/BiomeTerrain'
 import { scatterBiome } from './biomeScatter'
 import { GroveLandmark } from './GroveLandmark'
+import { LandmarkPropInstances } from '../discovery/LandmarkPropInstances'
+import { filterScatterNearLandmarks, getRegionLandmarkProps } from '../discovery/landmarkProps'
 
 /**
  * The biome atlas is a generated file (scripts/build-biome-atlas.mjs) and an
@@ -36,6 +38,12 @@ interface BiomeDressingProps {
 
 export function BiomeDressing({ biome, regionId, seed = 42, onColliders }: BiomeDressingProps) {
   const layers: BiomeLayer[] = BIOME_DRESSING[biome] ?? []
+  // Landmark props share the discovery anchors; their approach rings must
+  // stay readable, so scatter never lands inside them.
+  const landmarkPlan = useMemo(
+    () => (regionId ? getRegionLandmarkProps(regionId, seed) : []),
+    [regionId, seed],
+  )
 
   const placements = useMemo(
     () =>
@@ -46,8 +54,10 @@ export function BiomeDressing({ biome, regionId, seed = 42, onColliders }: Biome
         clearing: biome === 'grove' ? 32 : 0,
         regionId,
         seed,
-      }),
-    [biome, layers, regionId, seed],
+      }).map((layerPlacements) =>
+        filterScatterNearLandmarks(layerPlacements, landmarkPlan),
+      ),
+    [biome, layers, regionId, seed, landmarkPlan],
   )
 
   return (
@@ -55,6 +65,7 @@ export function BiomeDressing({ biome, regionId, seed = 42, onColliders }: Biome
       {biome === 'grove' && <GroveLandmark onColliders={onColliders} />}
 
       <BiomePropsBoundary>
+        <LandmarkPropInstances biome={biome} regionId={regionId} seed={seed} />
         {layers.map((layer, index) => (
           <PropInstances
             key={`${layer.prop}:${index}`}

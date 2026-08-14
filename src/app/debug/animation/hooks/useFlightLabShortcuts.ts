@@ -9,6 +9,7 @@ interface UseFlightLabShortcutsOptions {
   setZoomInTrigger: React.Dispatch<React.SetStateAction<number>>
   setZoomOutTrigger: React.Dispatch<React.SetStateAction<number>>
   setPanelOpen: React.Dispatch<React.SetStateAction<boolean>>
+  setHideUI?: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export function useFlightLabShortcuts({
@@ -20,6 +21,7 @@ export function useFlightLabShortcuts({
   setZoomInTrigger,
   setZoomOutTrigger,
   setPanelOpen,
+  setHideUI,
 }: UseFlightLabShortcutsOptions) {
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -49,9 +51,13 @@ export function useFlightLabShortcuts({
         setZoomOutTrigger((trig) => trig + 1)
       } else if (event.key === 'p' || event.key === 'P') {
         setPanelOpen((open) => !open)
+      } else if (event.key === 'h' || event.key === 'H') {
+        setHideUI?.((hidden) => !hidden)
+      } else if (event.key === 'Escape') {
+        setHideUI?.(false)
       }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [step, setAuto, setFrozen, setCenterTrigger, setZoomFitTrigger, setZoomInTrigger, setZoomOutTrigger, setPanelOpen])
+  }, [step, setAuto, setFrozen, setCenterTrigger, setZoomFitTrigger, setZoomInTrigger, setZoomOutTrigger, setPanelOpen, setHideUI])
 }

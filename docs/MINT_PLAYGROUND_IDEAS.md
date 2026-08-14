@@ -2,8 +2,9 @@
 
 **Status: OPEN (ideas backlog — not a staged work order).**
 
-This document has two parts: **Part A — Sanctuary** (Tier 1–3 ideas) and
-**Part B — World Atlas / World Map**. Nothing here is committed work. When an
+This document has three parts: **Part A — Sanctuary**, **Part B — World
+Atlas / World Map**, and **Part C — War game (battle & campaign combat)**.
+Nothing here is committed work. When an
 idea is picked up, it should either be folded into an existing staged plan
 (`docs/SANCTUARY_GAMEPLAY_PLAN.md`, `docs/WORLD_ATLAS_PLAN.md`,
 `docs/WYVERN_ANIMATION_PLAN.md`, `docs/BATTLE_TRIALS_PLAN.md`) or promoted into
@@ -282,3 +283,238 @@ These reinforce stages already written; read the source before building.
 - Splat/particle transitions must use deterministic seeds; no `Math.random()`.
 - The orbital campaign view (B2.5) is presentation-only and must never become
   a second authority for assault scheduling.
+
+---
+
+# Part C — War game (battle & campaign combat)
+
+**Scope.** The deterministic encounter sim (`src/core/combat/encounter.ts` —
+actors, breath cone, obedience rolls, tame attempts), the playable battle scene
+(`src/scenes/Battle/BattleScene.tsx` + `battleStore.ts`), auto-resolve, and the
+deferred `docs/BATTLE_TRIALS_PLAN.md`. The combat-adjacent Mint experiences are
+Mossbound (first-person melee, wave escalation), Kirby Smash (platform fighter),
+Breakline (trick/scoring chase), Reef Rivals (turn-based artillery duel),
+Dead Reckoning (fog-of-war chess), Final Whistle (arcade football),
+Project Forge-5 (robotics sim with replay), Vanguard Protocol (character
+showcase), and Kirby's per-difficulty AI presets.
+
+## C1. Tier 1 — combat feel and feedback 🥇
+
+### C1.1 Damage-scaled knockback and hitstun (Kirby Smash)
+
+**Source.** `kirby-smash/src/game/combat.ts` (`computeKnockback`).
+
+```ts
+magnitude = (baseKnockback + knockbackGrowth * victimPercentAfterHit)
+            * (1 / victimWeight)
+hitstunFrames = min(60, magnitude * 3)
+```
+
+**Idea.** Launch velocity grows with accumulated damage and shrinks with the
+victim's weight; hitstun grows with launch magnitude. Heavier targets get
+visibly harder to move — weight becomes *felt*, not just a stat-sheet number.
+
+**Fit.** Your encounter has stats (weight-relevant species differences) and
+bite/breath attacks but no knockback/hitstun vocabulary. A pure
+`computeKnockback(hit, victimStats, facing)` in `src/core/combat/` would give
+both bite and breath launching behaviour with one formula: heavy wyverns shrug
+off hits, light ones get thrown. This is deterministic math — replay-safe by
+construction. It also creates tactical depth: hit-stunned actors can't obey
+orders or flap, so timing an attack to interrupt an enemy breath wind-up
+becomes a real play pattern.
+
+### C1.2 Single-hit marking (no multi-hit per swing) (Kirby Smash)
+
+**Source.** `kirby-smash/src/game/CombatSystem.ts` — `attacker.markHit(playerId)`
+per attack instance; a move cannot hit the same target twice.
+
+**Idea.** Every attack instance carries a hit-set; once a target is struck it
+is immune for the remainder of that swing/projectile life.
+
+**Fit.** Your breath cone is active over multiple ticks within
+`BREATH_INTERVAL`; an explicit per-activation hit-set (rather than relying on
+cooldown gating alone) makes "one breath = at most N applications per victim"
+an enforced invariant rather than an emergent one. Same for the planned aerial
+attack action (animation plan Stage 4.95).
+
+### C1.3 Combat floaters + projected DOM text (Mossbound)
+
+**Source.** `mossbound/src/systems/CombatTextSystem.ts`.
+
+**Idea.** A fixed pool of 14 preallocated `div`s; on `show()` pick an inactive
+one (or evict the oldest), project the world position to screen each frame
+(`THREE.Vector3.project`), drift x by a deterministic serial-based offset
+(`((serial % 5) - 2) * 7`), and hide on expiry. Kinds: damage / kill / xp /
+heal with distinct durations.
+
+**Fit.** Battle damage feedback. The serial-based drift is exactly the kind of
+deterministic-presentational trick this repo likes: no `Math.random()`, no
+allocation churn, and text stays crisp DOM rather than blurry WebGL sprites.
+Maps naturally onto breath (damage), tame success (heal/kind), kill (kill).
+
+### C1.4 Instanced VFX vocabulary (Mossbound)
+
+**Source.** `mossbound/src/systems/VfxSystem.ts`.
+
+**Idea.** One `InstancedMesh` of 144 tetrahedra with additive blending for all
+spark/debris particles, plus a 12-slot ring-mesh shockwave pool and a shader
+explosion dome (fresnel + ripple + crown falloff). Everything preallocated;
+"inactive" = scale-0 matrix.
+
+**Fit.** Breath impacts, bite hits, tame attempts, knockdown dust. The
+explosion-dome shader is a strong candidate for breath-impact ground bursts;
+the shockwave rings read perfectly for melee connect frames. All
+allocation-free, so it drops into the battle scene without GC pressure during
+fights. (Sanctuary reactions/dust could reuse the same particle approach.)
+
+### C1.5 Charged shot with visible meter (Final Whistle)
+
+**Source.** `final-whistle/src/WorldCupFinal.tsx` — `shotCharge` ramps while
+held (`min(1, charge + dt * 0.78)`), release fires with speed/curve scaled by
+charge, UI syncs only when the value changes by > 0.04.
+
+**Idea.** Hold-to-charge with change-guarded meter updates.
+
+**Fit.** Breath already costs stamina on an interval; a *held* breath that
+trades charge time for cone width/range/damage would add skill expression
+using the existing `BREATH_CONE_HALF_ANGLE`/stamina economics. The 0.04
+change-guard is the exact pattern for keeping a React meter out of per-frame
+churn — matches the house "never setState in useFrame" rule.
+
+## C2. Tier 2 — structure, AI, and match shape 🥈
+
+### C2.1 Per-difficulty AI reaction budgets (Kirby Smash)
+
+**Source.** `kirby-smash/src/game/AIController.ts`.
+
+```ts
+easy:   { reactionMs: 300, attackChance: 0.50, approachGap: 1.30 }
+medium: { reactionMs: 140, attackChance: 0.72, approachGap: 1.10 }
+hard:   { reactionMs:  65, attackChance: 0.92, approachGap: 0.95 }
+```
+
+**Idea.** AI skill = how often it re-decides plus how aggressively it closes;
+movement is *held* between decisions and attacks fire as edges.
+
+**Fit.** `updateAi` in `src/core/combat/ai.ts` presumably re-targets every
+tick. Introducing a deterministic reaction budget (decision cadence driven by
+the encounter RNG, already seeded) would let region tier / garrison strength
+map onto enemy skill without touching balance maths: higher-tier regions field
+AI that reacts faster and closes harder. Deterministic because the sim RNG
+drives the timers.
+
+### C2.2 Multi-hit combat events as the single action vocabulary (Kirby Smash)
+
+**Source.** `kirby-smash/src/config/moves.ts` + `game/Fighter.ts` — moves are
+data (frames, hitboxes, knockback params) shared by player, AI, and animation.
+
+**Idea.** One move table drives collision, knockback, animation, and AI intent
+selection for every fighter.
+
+**Fit.** This is the generalisation of what BATTLE_TRIALS_PLAN already starts:
+"extract battle constants and pure mechanics so battle and trial share actor
+construction, melee, breath cone, damage jitter". Finishing that extraction as
+a *move/attack data table* (bite, breath, the planned aerial attack, future
+tail-sweep) means new attacks become data additions validated by
+`pnpm sim:battle`, not bespoke code paths.
+
+### C2.3 Turn-based artillery aiming (Reef Rivals)
+
+**Source.** `reef-rivals/src/ReefRivals.tsx` — phase alternation
+(`player → projectile → enemy`), angle + power aiming, ammo types, between-round
+upgrades.
+
+**Idea.** Deliberate, readable, turn-shaped combat where the *projectile phase*
+is its own spectator moment.
+
+**Fit.** Auto-resolve currently runs the same sim at full speed. A
+"watch the auto-resolve" presentation mode that steps the sim in discrete,
+camera-directed beats (per-projectile/per-exchange, like Reef's projectile
+phase) would make auto-resolved sieges watchable instead of instant — pure
+presentation over the unchanged deterministic sim. Ammo-type thinking
+(coconut/pineapple/volley) also rhymes with breath variants by species.
+
+### C2.4 Fog-of-war visibility as a pure rule layer (Dead Reckoning)
+
+**Source.** `dead-reckoning/lib/visibility.js` (pure, no three imports —
+"visibility = own squares + attacked squares") + `Fog.jsx`/`FogShader.jsx`
+(shader fog consuming the pure result) + themes.
+
+**Idea.** Compute what each side *can know* purely, render concealment
+separately; fog is a first-class game state, not a visual effect.
+
+**Fit.** Already half-adopted by the atlas knowledge contract. The battle-side
+application: night/ambush encounters where defender composition is only
+revealed inside the attacker's sight radius — a pure visibility helper over
+encounter actors (position + perception stat), rendered as fog on the battle
+scene, with scouting outcomes feeding atlas knowledge. A new tactical reason
+to bring fast scouts (Stage 4.9) to a fight.
+
+### C2.5 Replay recorder with periodic keyframes (Project Forge-5)
+
+**Source.** `project-forge-5/src/replay/ReplayRecorder.ts` — versioned
+`ReplayData` (seed, fixedDt, identity contract, frames, events), per-frame
+input intents, and periodic `keyframe` blocks carrying position/yaw/battery/
+collisions/stateHash for drift detection.
+
+**Idea.** Input-stream replay + rolling state hash; keyframes bound divergence
+and enable mid-replay seeking.
+
+**Fit.** The core already replays via the intent log; battles replay through
+the seeded encounter. What Forge-5 adds worth stealing is *instrumentation*:
+a state-hash scrub during battle sims (`pnpm sim:battle`) would catch
+simulation drift between the playable and auto-resolve paths automatically —
+"both paths share this code and this RNG, they cannot drift" becomes
+*verified*, not asserted. Also the natural saved-battle-replay feature:
+record pilot input + seed, replay any past battle cinematically.
+
+### C2.6 Streak-based trick scoring (Breakline)
+
+**Source.** `breakline/src/systems/TrickSystem.ts` — combo counter,
+multiplier, repeat-detection (`repeats` map devaluing re-landed tricks),
+`bestTrick`/`longestCombo` records, special meter charged by stylish play.
+
+**Idea.** Skill judged by *variety and chaining*, with explicit devaluation of
+repetition and persistent personal bests.
+
+**Fit.** Battle trials (the deferred plan) measure "flight time, observed
+attacks" factually. A Breakline-style scoring overlay — chain gates passed,
+varied attacks landed, no repeats — would make trials *replayable practice*
+with clear improvement targets, still derived from the same sim events (never
+fabricated grades). Also fits a future stunt/flight-lab mode naturally.
+
+## C3. Tier 3 — presentation and polish 🥉
+
+- **C3.1 Cinematic character showcase (Vanguard Protocol).**
+  `showcase.ts` implements slow damped accent/fog/key/fill colour *targets*
+  lerped toward per-character palettes, exposure/bloom targets, scanline and
+  dust field shaders, invisible pick-proxy boxes for reliable raycast
+  selection, and pinch/orbit gesture handling. Direct candidate: the battle
+  intro "war council" — your attacker roster presented before deployment with
+  per-species accent lighting — and the Model Library inspector.
+- **C3.2 Post-attack camera micro-behaviour (Mossbound/Breakline).**
+  Both games nudge the chase camera on heavy events (explosions, landings).
+  A small deterministic impulse on breath impact / knockdown sells weight
+  without gameplay effect; must respect reduced-motion.
+- **C3.3 AudioDirector (Dynasty Index).** Already noted in Part A (2.8) for
+  palettes; the same director concept scores battle phases (approach vs clash
+  vs victory sting) — pairs with C2.3's watchable auto-resolve.
+- **C3.4 Minimap (Mossbound).** Battle-space top-down with actor blips using
+  the existing `MAP_STATUS_COLORS` vocabulary from the world map — one palette
+  across map and battle. Especially valuable once fog-of-war (C2.4) exists:
+  the minimap shows only what visibility allows.
+- **C3.5 Fixed-pool HUD text (Breakline/Mossbound HUD controllers).**
+  Trick callouts use a small rotating callout slot rather than stacking DOM —
+  the battle equivalent of the catch-banner vocabulary in Part A 3.6; one
+  shared "combat callout" component could serve both scenes.
+
+## Explicit non-goals for Part C
+
+- No second combat authority: every idea must consume `EncounterSim` / its
+  RNG, never re-derive outcomes in presentation code.
+- No `Math.random()` in any VFX/AI cadence — drive from seeded sim RNG or
+  serial counters.
+- No platformer physics, percent-based KO blast zones, or literal Smash-style
+  movement; only the *formulas and vocabularies* transfer.
+- Scoring overlays must derive from real sim events, never fabricate grades.
+- Fog-of-war, if added, is a pure helper with tests before any shader fog.

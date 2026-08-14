@@ -5,6 +5,7 @@ import { CONFIG } from '../data/config'
 import { PHILOSOPHIES } from '../data/philosophies'
 import { REGIONS } from '../data/regions'
 import { REGION_ATLAS_DATA } from '../data/atlas'
+import { PHENOMENA, isPhenomenonOfRegion } from '../data/phenomena'
 import { SPECIES } from '../data/species'
 import { STATIONS } from '../data/stations'
 import { UNITS } from '../data/units'
@@ -48,6 +49,8 @@ export function execute(state: GameState, intent: Intent): void {
       return recordRegionVisit(state, intent.regionId)
     case 'DISCOVER_LANDMARK':
       return discoverLandmark(state, intent.regionId, intent.landmarkId)
+    case 'OBSERVE_PHENOMENON':
+      return observePhenomenon(state, intent.regionId, intent.phenomenonId)
     case 'TAKE_DUTY_ITEM':
       return takeDutyItem(state, intent.dutyId)
     case 'ABANDON_DUTY_ITEM':
@@ -740,6 +743,34 @@ function discoverLandmark(state: GameState, regionId: string, landmarkId: string
 
   emit(state, 'landmark_discovered', regionId, landmarkId)
   log(state, 'good', `Discovered landmark: ${landmarkDef.name} in ${def.name}.`)
+}
+
+function observePhenomenon(state: GameState, regionId: string, phenomenonId: string): void {
+  const def = REGIONS[regionId]
+  if (!def) return
+  // The phenomenon must belong to this region's biome family.
+  if (!isPhenomenonOfRegion(regionId, phenomenonId)) return
+  const phenomenon = PHENOMENA.find((p) => p.id === phenomenonId)
+  if (!phenomenon) return
+
+  ensureAtlasKnowledge(state)
+  const knowledge = state.atlasKnowledge[regionId]
+  if (!knowledge) return
+  // Backfill the field for pre-Stage-4 saves.
+  if (!knowledge.observedPhenomenonIds) knowledge.observedPhenomenonIds = []
+
+  // Idempotent: a repeated observation adds nothing.
+  if (knowledge.observedPhenomenonIds.includes(phenomenonId)) return
+
+  knowledge.observedPhenomenonIds.push(phenomenonId)
+  knowledge.visited = true
+  knowledge.mapped = true
+  if (knowledge.firstVisitedTick === null) {
+    knowledge.firstVisitedTick = state.tick
+  }
+
+  emit(state, 'phenomenon_observed', regionId, phenomenonId)
+  log(state, 'good', `Observed ${phenomenon.name} in ${def.name}.`)
 }
 
 function createTamed(speciesId: string, id: string, n: number, rng: Rng) {
