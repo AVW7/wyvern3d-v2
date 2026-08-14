@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import { create } from 'zustand'
 
 const STORAGE_KEY = 'wyvern3d.sanctuaryColors'
@@ -36,8 +37,17 @@ function persist(colors: { grass: string; soil: string; roost: string }): void {
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(colors))
 }
 
+/**
+ * The store starts on the defaults on both the server and the client's first
+ * render; `useSanctuaryColorsHydration` applies the saved palette after mount.
+ *
+ * Seeding from localStorage at module init would make those two disagree the
+ * moment anything server-rendered reads a colour — the same hydration mismatch
+ * that `modelLibraryStore` shipped with. Nothing renders these on the server
+ * today, so this is a structural guard rather than a live bug fix.
+ */
 export const useSanctuaryColors = create<SanctuaryColorsStore>()((set, get) => ({
-  ...loadInitial(),
+  ...DEFAULT_SANCTUARY_COLORS,
 
   setGrass(color) {
     set({ grass: color })
@@ -56,3 +66,20 @@ export const useSanctuaryColors = create<SanctuaryColorsStore>()((set, get) => (
     persist(DEFAULT_SANCTUARY_COLORS)
   },
 }))
+
+let hydrated = false
+
+/**
+ * Applies the saved palette once, after mount. Repeat calls are no-ops.
+ *
+ * Call it from any tree that reads a sanctuary colour — the play route covers
+ * the scene, the ground and the editor HUD.
+ */
+export function useSanctuaryColorsHydration(): void {
+  useEffect(() => {
+    if (hydrated) return
+    hydrated = true
+    const stored = loadInitial()
+    useSanctuaryColors.setState(stored)
+  }, [])
+}

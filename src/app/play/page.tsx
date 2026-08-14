@@ -7,6 +7,7 @@ import { Hud } from '@/ui/Hud'
 import { BootScreen } from '@/ui/BootScreen'
 import { useInputListeners } from '@/render/controllers/input'
 import { useModelLibraryHydration } from '@/state/modelLibraryStore'
+import { useSanctuaryColorsHydration } from '@/state/sanctuaryColorsStore'
 
 // The canvas must never render on the server — WebGL has no SSR equivalent,
 // and three.js touches `window` on import.
@@ -18,6 +19,7 @@ const GameCanvas = dynamic(() => import('@/scenes/GameCanvas').then((m) => m.Gam
 export default function PlayPage() {
   useInputListeners()
   useModelLibraryHydration()
+  useSanctuaryColorsHydration()
   const [canvasReady, setCanvasReady] = useState(false)
   const [bootComplete, setBootComplete] = useState(false)
   const markCanvasReady = useCallback(() => setCanvasReady(true), [])
