@@ -29,13 +29,13 @@ function TitleCamera() {
   useFrame((state) => {
     if (reducedMotion) return
     const t = state.clock.elapsedTime
-    camera.position.x = Math.sin(t * 0.075) * 1.2
-    camera.position.y = 8.6 + Math.sin(t * 0.12) * 0.35
-    camera.lookAt(1.8, 4.5, -2)
+    camera.position.x = Math.sin(t * 0.075) * 1.5
+    camera.position.y = 10 + Math.sin(t * 0.12) * 0.4
+    camera.lookAt(1.8, 7.5, -2)
   })
 
   useEffect(() => {
-    camera.lookAt(1.8, 4.5, -2)
+    camera.lookAt(1.8, 7.5, -2)
   }, [camera])
 
   return null
@@ -50,7 +50,7 @@ function SanctuaryVignette() {
 
   useFrame((state) => {
     if (reducedMotion || !wyvern.current) return
-    wyvern.current.position.y = 6.2 + Math.sin(state.clock.elapsedTime * 0.42) * 0.26
+    wyvern.current.position.y = 13 + Math.sin(state.clock.elapsedTime * 0.42) * 0.3
     wyvern.current.rotation.y = -0.44 + Math.sin(state.clock.elapsedTime * 0.1) * 0.035
   })
 

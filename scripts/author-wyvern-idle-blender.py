@@ -406,10 +406,27 @@ def build(arm: bpy.types.Object) -> bpy.types.Action:
     return action
 
 
+def sanitize_materials() -> None:
+    for mat in bpy.data.materials:
+        if hasattr(mat, "blend_method"):
+            mat.blend_method = "OPAQUE"
+        if hasattr(mat, "shadow_method"):
+            mat.shadow_method = "OPAQUE"
+        if mat.use_nodes and mat.node_tree:
+            for n in mat.node_tree.nodes:
+                if n.type == "BSDF_PRINCIPLED":
+                    for inp in n.inputs:
+                        if inp.name == "Alpha":
+                            for link in list(inp.links):
+                                mat.node_tree.links.remove(link)
+                            inp.default_value = 1.0
+
+
 def export(path: str) -> None:
     """Write the GLB. Only the wyvern rig and its mesh — the file also holds the
     old 291-bone vendor armature and two scratch armatures, and exporting those
     would change the joint set the manifest and `rigBones.ts` are written to."""
+    sanitize_materials()
     for obj in bpy.context.scene.objects:
         obj.select_set(obj.name in (ARMATURE, "WyvernMesh"))
     bpy.context.view_layer.objects.active = armature()

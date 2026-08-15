@@ -43,6 +43,12 @@ import {
   DynamicSanctuaryObjects,
   InteractableMarkers,
 } from './components/StationHeroBuildings'
+import { useContextActionStore } from '@/state/contextActions'
+import { resolveContextAction } from './context/actionResolver'
+import { CarriedItem } from './CarriedItem'
+import { allocateStablePerches } from './commandLogic'
+import { baseFor } from './director/wyvernDirector'
+import type { PanelId } from '@/state/uiStore'
 
 /**
  * The sanctuary hub: the player's walkable base inside the keep, and the
@@ -79,26 +85,47 @@ export function SanctuaryScene() {
       .getState()
       .setPlayerPosition([char.position.x, char.position.z])
 
-    let closest: (typeof interactables)[number] | null = null
-    let closestDist = Infinity
-    for (const item of interactables) {
-      const d = Math.hypot(char.position.x - item.position[0], char.position.z - item.position[1])
-      if (d <= item.radius && d < closestDist) {
-        closestDist = d
-        closest = item
-      }
+    const perchAssignments = allocateStablePerches(
+      wyverns.map((w) => w.id),
+      8,
+    )
+    const wyvernPositions: Record<string, [number, number]> = {}
+    for (const w of wyverns) {
+      const basePos = baseFor(w, perchAssignments).position
+      wyvernPositions[w.id] = [basePos[0], basePos[1]]
     }
+
+    const action = resolveContextAction({
+      playerPosition: [char.position.x, char.position.z],
+      state,
+      interactables,
+      wyvernPositions,
+      isEditing,
+      targetMode,
+    })
+
+    useContextActionStore.getState().setCurrentAction(action)
 
     const ui = useUi.getState()
     ui.setNearby(
-      closest ? { id: closest.id, label: closest.label, panel: closest.panel } : null,
+      action
+        ? {
+            id: action.id,
+            label: action.label,
+            panel: (action.panel as PanelId) ?? 'roster',
+          }
+        : null,
     )
 
-    // Edge-triggered: hold E must not re-open the panel every frame.
+    // Edge-triggered: hold E must not re-trigger every frame.
     const pressed = isDown(...CONTROLS.interact)
-    if (pressed && !interactLatch.current && closest && !ui.openPanel && !isEditing) {
-      ui.open(closest.panel, closest.station)
-      if (closest.panel === 'warTable') useGame.getState().setMode('worldmap')
+    if (pressed && !interactLatch.current && action && !ui.openPanel && !isEditing) {
+      if (action.intent) {
+        useGame.getState().dispatch(action.intent)
+      } else if (action.panel) {
+        ui.open(action.panel as PanelId, action.station)
+        if (action.panel === 'warTable') useGame.getState().setMode('worldmap')
+      }
     }
     interactLatch.current = pressed
   }
@@ -161,6 +188,7 @@ export function SanctuaryScene() {
 
       <SanctuaryWyverns wyverns={wyverns} colliders={colliders} seed={state.seed} />
       <EventFlourishManager />
+      <CarriedItem />
 
       <InteractableMarkers interactables={interactables} />
 

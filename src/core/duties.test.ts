@@ -14,6 +14,8 @@ describe('Sanctuary Gameplay Stage 0: Feed-Duty Vertical Slice', () => {
 
     // Not hungry enough (hunger 20 drops to 14, still < 30)
     wyvern.hunger = 20
+    wyvern.bond = 100
+    wyvern.assignment = { kind: 'training', stationId: 'flightRing', ticksLeft: 10 }
     advanceTicks(state, 1)
     expect(state.duties.active).toHaveLength(0)
 
@@ -171,6 +173,83 @@ describe('Sanctuary Gameplay Stage 0: Feed-Duty Vertical Slice', () => {
 
     expect(state.rngState).toBe(rngBefore)
     expect(state.nextId).toBe(nextIdBefore)
+  })
+
+  it('generates medicine duty for injured wyvern and applies injury relief and resource costs', () => {
+    const state = createInitialState(42)
+    const wyvern = Object.values(state.wyverns)[0]!
+    wyvern.hunger = 0 // not hungry
+    wyvern.injury = 50
+    state.resources.water = 100
+    state.resources.arcane = 20
+
+    advanceTicks(state, 1)
+    expect(state.duties.active).toHaveLength(1)
+    const duty = state.duties.active[0]!
+    expect(duty.kind).toBe('medicine')
+    expect(duty.subjectId).toBe(wyvern.id)
+
+    execute(state, { type: 'TAKE_DUTY_ITEM', dutyId: duty.id })
+    expect(duty.status).toBe('carrying')
+
+    const waterBefore = state.resources.water
+    const arcaneBefore = state.resources.arcane
+    const injuryBefore = wyvern.injury
+    const bondBefore = wyvern.bond
+
+    execute(state, { type: 'COMPLETE_DUTY', dutyId: duty.id })
+
+    expect(state.duties.active).toHaveLength(0)
+    expect(state.resources.water).toBe(waterBefore - CONFIG.duties.medicine.costWater)
+    expect(state.resources.arcane).toBe(arcaneBefore - CONFIG.duties.medicine.costArcane)
+    expect(wyvern.injury).toBe(injuryBefore - CONFIG.duties.medicine.injuryRelief)
+    expect(wyvern.bond).toBe(bondBefore + CONFIG.duties.medicine.bondBonus)
+    expect(state.duties.completed).toBe(1)
+  })
+
+  it('generates companionship duty for low-bond idle wyvern and awards bond without resource cost', () => {
+    const state = createInitialState(42)
+    const wyvern = Object.values(state.wyverns)[0]!
+    wyvern.hunger = 0
+    wyvern.injury = 0
+    wyvern.bond = 40
+    wyvern.assignment = { kind: 'idle' }
+
+    advanceTicks(state, 1)
+    expect(state.duties.active).toHaveLength(1)
+    const duty = state.duties.active[0]!
+    expect(duty.kind).toBe('companionship')
+
+    const bondBefore = wyvern.bond
+    execute(state, { type: 'COMPLETE_DUTY', dutyId: duty.id })
+
+    expect(state.duties.active).toHaveLength(0)
+    expect(wyvern.bond).toBe(bondBefore + CONFIG.duties.companionship.bondBonus)
+    expect(state.duties.completed).toBe(1)
+  })
+
+  it('generates flight exercise duty for flight-capable idle wyvern and awards stamina and bond', () => {
+    const state = createInitialState(42)
+    const wyvern = Object.values(state.wyverns)[0]!
+    wyvern.hunger = 0
+    wyvern.injury = 0
+    wyvern.bond = 90 // high bond, so not companionship
+    wyvern.stage = 'adult'
+    wyvern.assignment = { kind: 'idle' }
+
+    advanceTicks(state, 1)
+    expect(state.duties.active).toHaveLength(1)
+    const duty = state.duties.active[0]!
+    expect(duty.kind).toBe('flightExercise')
+
+    const staminaBefore = wyvern.stats.stamina
+    const bondBefore = wyvern.bond
+    execute(state, { type: 'COMPLETE_DUTY', dutyId: duty.id })
+
+    expect(state.duties.active).toHaveLength(0)
+    expect(wyvern.stats.stamina).toBe(staminaBefore + CONFIG.duties.flightExercise.staminaGain)
+    expect(wyvern.bond).toBe(Math.min(CONFIG.wyvern.maxBond, bondBefore + CONFIG.duties.flightExercise.bondBonus))
+    expect(state.duties.completed).toBe(1)
   })
 
   it('migrates older save version 10 by initializing duties state', () => {

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, type MutableRefObject } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
-import { PlaneGeometry, Quaternion, Vector3, type Group, type Object3D } from 'three'
+import { PlaneGeometry, Quaternion, Vector3, type Group } from 'three'
 import type { WyvernInstance } from '@/core/types'
 import { SPECIES } from '@/core/data/species'
 import { GameModel, type ModelActionRequest } from '@/render/assets/GameModel'
@@ -11,27 +11,8 @@ import { PlaceholderWyvern } from '@/render/placeholders/PlaceholderWyvern'
 import { WorldLabel } from '@/render/labels/WorldLabel'
 import { consumeDrag, consumeWheel } from '@/render/controllers/input'
 import { readDirectWyvernFlightInput, stepDirectWyvernFlight } from '@/render/controllers/wyvernFlight'
-import { applyBoneOffset, applyLegTuck, applyNeckOffset } from '@/render/boneOffsets'
-import {
-  HEAD_BONE,
-  HIND_LEG_CHAINS,
-  JAW_BONE,
-  NECK_CHAIN,
-  TAIL_CHAIN,
-  findBone,
-  findChain,
-} from '@/render/rigBones'
-import { createTailState, dynamicTailController, type TailState } from '@/render/tailController'
-import { createLegsState, dynamicLegController, type LegsState } from '@/render/legPhysics'
-import { captureClosedJawPose, sealFlightJaw, shouldSealFlightJaw, type ClosedJawPose } from '@/render/flightMouth'
-import {
-  angleDelta,
-  dampHeadNeckPose,
-  dampLegTuck,
-  headNeckTargets,
-  legTuckTarget,
-  type HeadNeckPose,
-} from '@/render/flightPose'
+import { angleDelta } from '@/render/flightPose'
+import { createWyvernFlightRig, type WyvernFlightRig } from '@/render/wyvernFlightRig'
 import { useGameState } from '@/state/store'
 import { usePlayerControlStore } from '@/state/playerControlStore'
 import {
@@ -65,16 +46,7 @@ interface HighlandsAgent {
   guidedStage: 'takeoff' | 'transit' | 'search'
   attackHeld: boolean
   transitionQueued: boolean
-  jaw: Object3D | null
-  jawClosed: ClosedJawPose | null
-  headBone: Object3D | null
-  neckBones: Object3D[]
-  legBones: Object3D[][]
-  tailBones: Object3D[]
-  tail: TailState
-  legs: LegsState
-  headNeckPose: HeadNeckPose
-  legTuck: number
+  rig: WyvernFlightRig
   previousPosition: Vector3
   previousYaw: number
   carriedDoe: Group | null
@@ -93,16 +65,7 @@ function createAgent(): HighlandsAgent {
     guidedStage: 'takeoff',
     attackHeld: false,
     transitionQueued: false,
-    jaw: null,
-    jawClosed: null,
-    headBone: null,
-    neckBones: [],
-    legBones: [],
-    tailBones: [],
-    tail: createTailState(),
-    legs: createLegsState(),
-    headNeckPose: { neckPitch: 0, neckYaw: 0, headPitch: 0, headYaw: 0, headRoll: 0 },
-    legTuck: 0,
+    rig: createWyvernFlightRig(null, { referenceSpeed: HUNT_REFERENCE_SPEED }),
     previousPosition: new Vector3(-42, 0, -34),
     previousYaw: Math.PI * 0.25,
     carriedDoe: null,
@@ -524,22 +487,19 @@ function HighlandsHuntDirector({
     body.previousPosition.copy(body.position)
     body.previousYaw = body.yaw
 
-    const targetHeadNeck = body.airborne
-      ? headNeckTargets(
-          horizontalSpeed,
-          verticalSpeed,
-          yawRate,
-          body.pitch,
-          body.bank,
-          HUNT_REFERENCE_SPEED,
-        )
-      : { neckPitch: 0, neckYaw: 0, headPitch: 0, headYaw: 0, headRoll: 0 }
-    body.headNeckPose = dampHeadNeckPose(body.headNeckPose, targetHeadNeck, dt)
-    body.legTuck = dampLegTuck(
-      body.legTuck,
-      body.airborne ? legTuckTarget(horizontalSpeed, HUNT_REFERENCE_SPEED) : 0,
-      dt,
-    )
+    body.rig.step(dt, {
+      position: body.position,
+      yaw: body.yaw,
+      pitch: body.pitch,
+      bank: body.bank,
+      airborne: body.airborne,
+      flightMode: 'cruise',
+      horizontalSpeed,
+      verticalSpeed,
+      yawRate,
+      phaseTime: body.phaseElapsed,
+    })
+    body.rig.sealJaw(session.wyvernAction ?? session.wyvernState)
 
     if (body.group) {
       body.group.position.copy(body.position)
@@ -547,60 +507,9 @@ function HighlandsHuntDirector({
       body.group.rotation.set(body.pitch, body.yaw, body.bank)
     }
 
-    if (body.airborne) {
-      // High-level hunt motion owns the world trajectory. The local layer only
-      // decorates the mixer's authored posture, preserving the speed/hover
-      // neck line and leg carriage from the sidecar.
-      applyNeckOffset(
-        body.neckBones,
-        body.headNeckPose.neckPitch,
-        body.headNeckPose.neckYaw,
-      )
-      applyBoneOffset(
-        body.headBone,
-        body.headNeckPose.headPitch,
-        body.headNeckPose.headYaw,
-        body.headNeckPose.headRoll,
-      )
-      for (const chain of body.legBones) {
-        applyLegTuck(chain, body.legTuck)
-      }
-
-      // Per-manoeuvre tail and legs, same layering as the sanctuary and battle.
-      // The hunt has no flight-mode selector of its own, so this reads cruise —
-      // the controllers' neutral case — and carries only the turn response.
-      body.tail = dynamicTailController(
-        body.tailBones,
-        yawRate,
-        body.bank,
-        horizontalSpeed,
-        'cruise',
-        0.5,
-        body.phaseElapsed,
-        body.tail,
-        dt,
-      )
-      body.legs = dynamicLegController(
-        body.legBones[0] ?? [],
-        body.legBones[1] ?? [],
-        yawRate,
-        horizontalSpeed,
-        verticalSpeed,
-        body.position.y,
-        'cruise',
-        0,
-        body.phaseElapsed,
-        body.legs,
-        dt,
-      )
-      if (shouldSealFlightJaw(session.wyvernState, session.wyvernAction)) {
-        sealFlightJaw(body.jaw, body.jawClosed)
-      }
-    }
-
-    if (body.jaw && body.carriedDoe && (phase === 'carry' || phase === 'landing') && body.group) {
-      body.jaw.getWorldPosition(carryPosition.current)
-      body.jaw.getWorldQuaternion(carryWorldRotation.current)
+    if (body.rig.bones.jaw && body.carriedDoe && (phase === 'carry' || phase === 'landing') && body.group) {
+      body.rig.bones.jaw.getWorldPosition(carryPosition.current)
+      body.rig.bones.jaw.getWorldQuaternion(carryWorldRotation.current)
       carryPosition.current.add(
         carryOffset.current.clone().applyQuaternion(carryWorldRotation.current),
       )
@@ -636,12 +545,7 @@ function HighlandsHuntDirector({
         seed={wyvern.name.charCodeAt(0) ?? 0}
         scale={1}
         onReady={(root) => {
-          agent.current.jaw = findBone(root, JAW_BONE)
-          agent.current.jawClosed = captureClosedJawPose(agent.current.jaw, agent.current.jawClosed)
-          agent.current.headBone = findBone(root, HEAD_BONE)
-          agent.current.neckBones = findChain(root, NECK_CHAIN)
-          agent.current.legBones = HIND_LEG_CHAINS.map((chain) => findChain(root, chain))
-          agent.current.tailBones = findChain(root, TAIL_CHAIN)
+          agent.current.rig.mount(root)
         }}
         onActionFinished={handleActionFinished}
         fallback={<PlaceholderWyvern color={SPECIES[wyvern.speciesId]?.color} scale={1} />}

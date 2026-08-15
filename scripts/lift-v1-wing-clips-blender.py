@@ -88,6 +88,13 @@ from mathutils import Quaternion, Vector
 ARMATURE = "WyvernRig"
 MESH = "WyvernMesh"
 PREFIX = "v1_"
+
+# Airborne captures are excluded. The lift solves each frame's lowest wing
+# vertex up to the plane the feet stand on, which is meaningless for a clip with
+# no feet on the ground -- and these are wing *sources*: the graft stage copies
+# their shoulder/elbow/wrist rotations onto the flight loops, so lifting them
+# would fold a cruise wing up toward a floor that is not there.
+AIRBORNE = {"v1_flightBeat", "v1_skyMoveL", "v1_skyMoveR"}
 SHOULDERS = ("L_WingShoulder", "R_WingShoulder")
 # Lift is distributed along this chain, per side, in this order.
 # Shoulder only.  Spreading the lift down shoulder -> elbow -> wrist was tried
@@ -171,6 +178,14 @@ def main():
     argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
     ap = argparse.ArgumentParser()
     ap.add_argument("--save", action="store_true")
+    # The gothic pipeline lifts *after* grafting, on its own rig, and needs both
+    # of these. A lift solved on the capture rig does not survive the graft: the
+    # graft copies rotation quaternions, and the rebuilt spars have different
+    # rest orientations, so the same quaternion lands the wing somewhere else.
+    # Lifting the sources instead of the results measured 1774 units of wing
+    # below the foot plane on `walk` before and 2119 after.
+    ap.add_argument("--clips", help="comma-separated action names; default every v1_ ground capture")
+    ap.add_argument("--out", help="save to this path instead of in place")
     args, _ = ap.parse_known_args(argv)
 
     arm = bpy.data.objects[ARMATURE]
@@ -237,7 +252,16 @@ def main():
             kp.handle_left.y = q[c]
             kp.handle_right.y = q[c]
 
-    clips = sorted(a.name for a in bpy.data.actions if a.name.startswith(PREFIX))
+    if args.clips:
+        clips = [c for c in args.clips.split(",") if c]
+        missing = [c for c in clips if c not in bpy.data.actions]
+        if missing:
+            raise SystemExit(f"no such action(s): {', '.join(missing)}")
+    else:
+        clips = sorted(
+            a.name for a in bpy.data.actions
+            if a.name.startswith(PREFIX) and a.name not in AIRBORNE
+        )
 
     print(f"\n{'clip':<14}{'plane':>10}{'wing was':>10}{'wing now':>10}"
           f"{'max lift':>10}{'mean lift':>11}{'short':>7}")
@@ -328,7 +352,12 @@ def main():
     for name, plane, *_ in report:
         print(f"  {name:<14}{-plane:>10.1f}")
 
-    if args.save:
+    if args.out:
+        for a in bpy.data.actions:
+            a.use_fake_user = True
+        bpy.ops.wm.save_as_mainfile(filepath=args.out)
+        print(f"\nsaved {args.out}")
+    elif args.save:
         for a in bpy.data.actions:
             a.use_fake_user = True
         bpy.ops.wm.save_mainfile()

@@ -282,13 +282,32 @@ inspection surface — props previewed at true scale against a 1.6 m figure, plu
 every dressing layer. System map in `docs/BIOME_SYSTEM.md`; asset workflow in
 `docs/BIOME_LIBRARY.md`.
 
-Wyverns render from `public/models/drogon.glb` (15 MB, meshopt + WebP, 52 clips, 39 k tris) in both
-the sanctuary and battle. `GameModel` plays whichever clip the manifest maps to the requested
+Wyverns render from `public/models/wyvern-gothic.glb` (22 MB, 92 joints, 16 clips) in the sanctuary,
+battle and biomes. `GameModel` plays whichever clip the manifest maps to the requested
 `ModelState`, crossfading between them; the compression recipe is documented at the top of
 `manifest.ts`. All five species share this one model and
 differ by `scale` — swapping in per-species models is a manifest edit and touches nothing else. The
 near-black surface comes from a cosmetic `material` override in the manifest, applied to cloned
 materials at load; it is the one place to art-direct the finish without rebuilding the GLB.
+
+That file is the rebuilt wing, promoted from Flight-Lab candidate to the gameplay asset. It restores
+v1's six three-phalanx wing digits — the 56-joint `wyvern.glb` it replaces collapsed them to three
+and hung the membrane off the elbow, so the sheet could not follow a fold and the wing read as a
+rigid card the spars swung through. `wyvern.glb` remains the authoring baseline and the pipeline's
+retarget reference; do not point gameplay back at it, and do not overwrite it with a gothic build
+(`build-gothic-wing.py` reads it as `REFERENCE`). Rebuild with `pnpm assets:gothic-wing`, gate with
+`node scripts/validate-wyvern-clips.mjs public/models/wyvern-gothic.glb`, then copy the candidate
+out of `.gothic/` by hand.
+
+**The powered flight loops are cut from one measured v1 wingbeat.** `Battle_Down02` f40–f66 is the
+only airborne v1 capture measured symmetric, and `cruise`, `scout`, `hover`, `speed` and `dive` are
+all that one cycle repeated at v1's own cadences — three beats in 6.000 s for cruise and the banks,
+two for scout, four for hover, four in 5.000 s for speed. Keep them that way. `phaseGroup: "flight"`
+is only coherent when its members share a duration *and* a beat count, because `GameModel` resumes a
+crossfaded loop at `normalizedPhase * clip.duration`: equal cadence at unequal length still hands
+off mid-stroke. The shipped model got this wrong in both directions at once — cruise beat 1.000 Hz
+against the banks' 1.532, and cruise's own stroke measured 5.3° of wing elevation against v1's
+107.8, with a one-frame 10-metre wingtip drop at each loop seam.
 
 `docs/WYVERN_ANIMATIONS.md` catalogues all 52 clips with measured frame counts, ground clearance,
 loopability and a rendered pose sheet, and stages the animation work. Read it before mapping a new
@@ -300,7 +319,9 @@ mixer reports it finished, so gameplay keeps asking only for `fly`. It also carr
 plants exactly one clip. Compatible loops may share a `phaseGroup`, preserving normalized playback
 time through a crossfade; the cruise and bank loops use it so steering never restarts a wingbeat. A state
 can map to an array of clips, chosen by `GameModel`'s `seed` prop, which is how perched wyverns avoid
-idling in lockstep.
+idling in lockstep — and, since the attack re-author, how they avoid striking in lockstep: `attack`
+and `attackAir` are both pools of an authored 1.5 s snap plus a v1 capture. See
+`docs/WYVERN_CLIP_AUDIT.md`.
 
 `docs/WYVERN_ANIMATION_BASELINE.md` is the measured capability envelope: what the rig demonstrably
 does across all 52 artist clips, how the authored sidecar clips were built out of that, and the

@@ -183,6 +183,24 @@ export function EventFlourishManager() {
             duration: LEVELUP_DURATION,
           },
         ])
+      } else if (event.kind === 'sanctuary_duty_completed') {
+        const pos = resolveWyvernPosition(event.subjectId)
+        const wyvernName = state.wyverns[event.subjectId]?.name ?? 'Wyvern'
+        const bondBonus = (event.payload?.bondBonus as number) ?? 1
+
+        setFlourishes((prev) => [
+          ...prev,
+          {
+            id,
+            type: 'training',
+            position: [pos[0], pos[1] + 1.5, pos[2]],
+            label: `✦ FED & CARED FOR ✦`,
+            subtitle: `${wyvernName.toUpperCase()} (+${bondBonus} BOND)`,
+            color: '#60a5fa',
+            startTime: now,
+            duration: LEVELUP_DURATION,
+          },
+        ])
       }
     },
     [resolveWyvernPosition, state.wyverns],

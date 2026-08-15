@@ -1,12 +1,42 @@
 import { create } from 'zustand'
+import type { AtlasLayerId } from '@/core/state/atlasLayers'
+
+const STORAGE_KEY_LAYER = 'wyvern_atlas_layer'
+
+function getInitialLayer(): AtlasLayerId {
+  if (typeof window === 'undefined') return 'political'
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY_LAYER) as AtlasLayerId | null
+    if (
+      saved &&
+      [
+        'political',
+        'biome',
+        'yields',
+        'unrest',
+        'garrison',
+        'species',
+        'exploration',
+      ].includes(saved)
+    ) {
+      return saved
+    }
+  } catch {
+    // Ignore storage read failures in private/isolated contexts
+  }
+  return 'political'
+}
 
 export interface MapUiState {
   hovered: string | null
   inspected: string | null
+  /** Strategic map layer (presentation-only; not in GameState). */
+  activeLayer: AtlasLayerId
   /** Atlas drawer open state (presentation-only; not in GameState). */
   atlasOpen: boolean
   setHovered: (id: string | null) => void
   setInspected: (id: string | null) => void
+  setActiveLayer: (layer: AtlasLayerId) => void
   setAtlasOpen: (open: boolean) => void
   toggleAtlas: () => void
   clear: () => void
@@ -15,6 +45,7 @@ export interface MapUiState {
 export const useMapUiStore = create<MapUiState>((set) => ({
   hovered: null,
   inspected: null,
+  activeLayer: getInitialLayer(),
   atlasOpen: false,
 
   setHovered: (id) =>
@@ -27,6 +58,19 @@ export const useMapUiStore = create<MapUiState>((set) => ({
     set((state) => {
       if (state.inspected === id) return state
       return { inspected: id }
+    }),
+
+  setActiveLayer: (layer) =>
+    set((state) => {
+      if (state.activeLayer === layer) return state
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem(STORAGE_KEY_LAYER, layer)
+        } catch {
+          // Ignore write failure
+        }
+      }
+      return { activeLayer: layer }
     }),
 
   setAtlasOpen: (open) =>
@@ -46,3 +90,4 @@ export const useMapUiStore = create<MapUiState>((set) => ({
       return { hovered: null, inspected: null, atlasOpen: false }
     }),
 }))
+

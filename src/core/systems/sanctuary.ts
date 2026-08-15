@@ -182,12 +182,13 @@ function dutiesTick(state: GameState): void {
   // If active duty cap is reached, do not generate new ones
   if (state.duties.active.length >= CONFIG.duties.maxActive) return
 
-  // Deterministically find eligible hungry wyverns sorted by ID
   const existingSubjects = new Set(state.duties.active.map((d) => d.subjectId))
-  const hungryWyverns = Object.values(state.wyverns)
-    .filter((w) => w.hunger >= CONFIG.duties.feedThreshold && !existingSubjects.has(w.id))
-    .sort((a, b) => a.id.localeCompare(b.id))
+  const allWyverns = Object.values(state.wyverns).sort((a, b) => a.id.localeCompare(b.id))
 
+  // 1. Feed duty: hungry wyverns (hunger >= 30)
+  const hungryWyverns = allWyverns.filter(
+    (w) => w.hunger >= CONFIG.duties.feed.threshold && !existingSubjects.has(w.id),
+  )
   if (hungryWyverns.length > 0) {
     const candidate = hungryWyverns[0]!
     const dutyId = state.duties.nextSeq++
@@ -199,5 +200,66 @@ function dutiesTick(state: GameState): void {
       status: 'available',
     })
     log(state, 'info', `${candidate.name} is hungry and awaits feeding.`)
+    return
+  }
+
+  // 2. Medicine duty: injured wyverns (injury >= 30)
+  const injuredWyverns = allWyverns.filter(
+    (w) => w.injury >= CONFIG.duties.medicine.injuryThreshold && !existingSubjects.has(w.id),
+  )
+  if (injuredWyverns.length > 0) {
+    const candidate = injuredWyverns[0]!
+    const dutyId = state.duties.nextSeq++
+    state.duties.active.push({
+      id: dutyId,
+      kind: 'medicine',
+      subjectId: candidate.id,
+      createdTick: state.tick,
+      status: 'available',
+    })
+    log(state, 'info', `${candidate.name} is injured and needs medicine.`)
+    return
+  }
+
+  // 3. Companionship duty: idle wyverns with lower bond (bond <= 70)
+  const lonelyWyverns = allWyverns.filter(
+    (w) =>
+      w.assignment.kind === 'idle' &&
+      w.bond <= CONFIG.duties.companionship.maxBondThreshold &&
+      !existingSubjects.has(w.id),
+  )
+  if (lonelyWyverns.length > 0) {
+    const candidate = lonelyWyverns[0]!
+    const dutyId = state.duties.nextSeq++
+    state.duties.active.push({
+      id: dutyId,
+      kind: 'companionship',
+      subjectId: candidate.id,
+      createdTick: state.tick,
+      status: 'available',
+    })
+    log(state, 'info', `${candidate.name} seeks companionship.`)
+    return
+  }
+
+  // 4. Flight exercise duty: idle flight-capable wyverns (juvenile or adult)
+  const flightWyverns = allWyverns.filter(
+    (w) =>
+      w.assignment.kind === 'idle' &&
+      (w.stage === 'juvenile' || w.stage === 'adult') &&
+      !existingSubjects.has(w.id),
+  )
+  if (flightWyverns.length > 0) {
+    const candidate = flightWyverns[0]!
+    const dutyId = state.duties.nextSeq++
+    state.duties.active.push({
+      id: dutyId,
+      kind: 'flightExercise',
+      subjectId: candidate.id,
+      createdTick: state.tick,
+      status: 'available',
+    })
+    log(state, 'info', `${candidate.name} is ready for flight ring exercise.`)
+    return
   }
 }

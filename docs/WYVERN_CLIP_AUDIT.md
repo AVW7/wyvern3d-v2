@@ -53,7 +53,7 @@ difference between the first and last frame, over rotation *and* position.
 
 | clip | mirror before | mirror after | seam before | seam after | loops |
 |---|---|---|---|---|---|
-| `attack` | 15.673 | **0.0009** | 0.785 | 0.785 ¹ | no ⁴ |
+| `attack` | 15.673 | **0.0009** | 0.785 | **0.0004** ⁵ | no ⁴ |
 | `breath` | 5.443 | **0.0009** | 0.001 | 0.001 | no ⁴ |
 | `death` | 27.146 | **0.0009** | 300.0 | 300.0 ¹ | no |
 | `land` | 23.885 | **0.0009** | 300.0 | 300.0 ¹ | no |
@@ -72,6 +72,9 @@ wound-up pose and resolves to neutral.
 ² Asymmetric on purpose — see below.
 ³ `idle` runs its two wings on the same carrier at slightly different amplitudes
 so they drift independently, which is deliberate.
+⁵ `attack` was re-authored after this audit (see below), which closed its seam
+as a side effect: it now opens *and* closes on the neutral pose.
+
 ⁴ Both used to loop and no longer do — see the action-channel section below.
 `breath` closes cleanly and *could* loop; it is a one-shot because of how it is
 dispatched, not because of anything in the clip.
@@ -175,3 +178,54 @@ back to rigid, synchronized wings without confusing it with a bank.
 - **A rotation-only seam check misses the body bob.** All three loop seams
   repaired here — `speed` 5.500, `walk` 0.928, `rest` 0.419 — were on
   `Body.location`, and score a clean zero if only quaternions are compared.
+
+
+---
+
+## The `attack` re-author, and the strike pool
+
+`attack` as audited was v1's `Battle_Attack06` at its capture length: 81 frames,
+3.333 s, of which the last 40 were a drift back to neutral, with 11.1 degrees of
+wing elevation across the whole clip. As a battle tell that is too slow — the sim
+resolves the blow on one tick while the clip is still winding up — and it opened
+on a wound-up pose, which is what its 0.785 seam was, and what popped on
+`attackAir`'s 0.16 s fade-in.
+
+`scripts/author-wyvern-attack-blender.py` replaces it with a 36-frame (1.500 s)
+strike on the same rig: neutral → wind-up (f9) → strike (f15) → bite (f18) →
+neutral (f33, held to f36). Measured against the clip it replaces:
+
+| | before | after |
+|---|---|---|
+| duration | 3.333 s | 1.500 s |
+| head path | 15.20 | 15.61 |
+| head pitch swing | 131.9° | 137.9° |
+| wing elevation | 11.1° | 44.0° |
+| mirror | 0.0009 m | 0.0010 m |
+| seam | 0.785 | 0.0004 |
+
+The same head travel in 45% of the time, with the wings actually mantling. Only
+local X is authored, so the antisymmetric Z channel keeps its bind value and the
+left/right mirror is symmetric by construction rather than by repair. The script
+runs against **both** authoring blends — `wyvern-rig.blend` feeds `wyvern.glb`,
+and `wyvern-rig-v1wing.blend` is what `pnpm assets:gothic-wing` retargets into
+the shipped `wyvern-gothic.glb`, so authoring only the first leaves gameplay on
+the old performance.
+
+Two v1 captures ship beside it as a pool, promoted by
+`scripts/author-wyvern-attack-variants-blender.py` after
+`retarget-v1-ground-clips-blender.py`:
+
+| clip | source | length | used by |
+|---|---|---|---|
+| `attack` | authored | 1.500 s | `attack`, `attackAir` |
+| `attack2` | v1 `Battle_Attack06` | 3.333 s | `attack` |
+| `attackAir2` | v1 `Battle_Attack04` | 3.333 s | `attackAir` |
+
+`GameModel` picks from the pool by the model's `seed`, so the choice is stable
+per wyvern and a rank of them does not strike in lockstep. The two v1 clips lead
+with one side — 15.4 and 16.2 m of wingtip asymmetry — and are listed in
+`validate-wyvern-clips.mjs`'s asymmetric-by-design set for that reason, the same
+exemption the banks and `walk` carry. v1's `Battle_Attack01` is deliberately not
+promoted: at 195 frames it is 8.1 s, and the only way to fit it as a tell is a 3×
+retime that reads as a fast-forward.

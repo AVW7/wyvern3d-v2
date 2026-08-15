@@ -1,5 +1,6 @@
 /**
- * Bone names for the clean wyvern rig (`public/models/wyvern.glb`).
+ * Bone names for the clean wyvern rig (`public/models/wyvern-gothic.glb`,
+ * and `wyvern.glb` for the three-bone hand it replaced).
  *
  * These used to be spelled out at four call sites as the vendor rig's CAT
  * names (`Bip002-Head_015`, `Bip002-Tail1_0215`, …). Those bones do not exist
@@ -80,12 +81,41 @@ export const LEFT_WING_CHAIN = [
   'L_WingShoulder',
   'L_WingElbow',
   'L_WingWrist',
+  'L_WingHand',
+  'L_WingD0P0',
+  'L_WingD0P1',
+  'L_WingD0P2',
+] as const
+export const RIGHT_WING_CHAIN = [
+  'R_WingShoulder',
+  'R_WingElbow',
+  'R_WingWrist',
+  'R_WingHand',
+  'R_WingD0P0',
+  'R_WingD0P1',
+  'R_WingD0P2',
+] as const
+
+/**
+ * The three-bone hand these replaced, still shipped by `wyvern.glb` and by any
+ * rig built before the v1 hand was grafted back on.
+ *
+ * `findChain` drops names a model lacks *silently*, which is exactly how the
+ * vendor names above went unnoticed — so a rig carrying the older hand would
+ * resolve three bones out of seven and read as a working chain. Callers go
+ * through `wingChains`, which picks whichever hand the model actually has
+ * rather than letting a short chain pass for a whole one.
+ */
+export const LEFT_WING_CHAIN_LEGACY = [
+  'L_WingShoulder',
+  'L_WingElbow',
+  'L_WingWrist',
   'L_WingFinger1',
   'L_WingFinger2',
   'L_WingFinger3',
   'L_WingFinger3_end',
 ] as const
-export const RIGHT_WING_CHAIN = [
+export const RIGHT_WING_CHAIN_LEGACY = [
   'R_WingShoulder',
   'R_WingElbow',
   'R_WingWrist',
@@ -95,13 +125,38 @@ export const RIGHT_WING_CHAIN = [
   'R_WingFinger3_end',
 ] as const
 
-/** Trailing-edge membrane support, root → tip. Not part of the spar chain. */
-export const LEFT_WING_MEMBRANE = ['L_WingMembrane1', 'L_WingMembrane2'] as const
-export const RIGHT_WING_MEMBRANE = ['R_WingMembrane1', 'R_WingMembrane2'] as const
+/**
+ * Trailing-edge membrane support, root → tip. Not part of the spar chain.
+ *
+ * The grafted wing spreads the membrane across four panels a side, each a
+ * two-bone chain off its digit, where the rig it replaced had one two-bone
+ * chain hung off the elbow. Only the first bone of each panel is listed: it is
+ * the one a flight loop flutters, and it is the probe `validate-wyvern-clips`
+ * measures membrane response on.
+ */
+export const LEFT_WING_MEMBRANE = [
+  'L_WingPanel0_0',
+  'L_WingPanel1_0',
+  'L_WingPanel2_0',
+  'L_WingPanel3_0',
+] as const
+export const RIGHT_WING_MEMBRANE = [
+  'R_WingPanel0_0',
+  'R_WingPanel1_0',
+  'R_WingPanel2_0',
+  'R_WingPanel3_0',
+] as const
+export const LEFT_WING_MEMBRANE_LEGACY = ['L_WingMembrane1', 'L_WingMembrane2'] as const
+export const RIGHT_WING_MEMBRANE_LEGACY = ['R_WingMembrane1', 'R_WingMembrane2'] as const
 
-/** The hooked thumb at the wrist. */
-export const LEFT_WING_CLAW = 'L_WingClaw'
-export const RIGHT_WING_CLAW = 'R_WingClaw'
+/**
+ * The hooked thumb at the wrist. `WingD5P0` on the grafted hand, which restores
+ * v1's own thumb digit; `WingClaw` on the rig it replaced.
+ */
+export const LEFT_WING_CLAW = 'L_WingD5P0'
+export const RIGHT_WING_CLAW = 'R_WingD5P0'
+export const LEFT_WING_CLAW_LEGACY = 'L_WingClaw'
+export const RIGHT_WING_CLAW_LEGACY = 'R_WingClaw'
 
 /** One bone by name, or null when the model has no such bone. */
 export function findBone(root: Object3D, name: string): Object3D | null {
@@ -119,4 +174,34 @@ export function findChain(root: Object3D, names: readonly string[]): Object3D[] 
   return names
     .map((name) => root.getObjectByName(name))
     .filter((bone): bone is Object3D => bone !== null && bone !== undefined)
+}
+
+/**
+ * Resolve the spar and membrane chains for whichever hand this model carries.
+ *
+ * Preference, not fallback-on-empty: the grafted names are tried first and the
+ * legacy ones only when the model has none of them, so a rig that happens to
+ * share a bone name with both cannot end up with a chain spliced out of the
+ * two. Returns empty chains for a model with neither — a placeholder, or a
+ * species on its own rig — which is the same no-op the callers already handle.
+ */
+export function wingChains(root: Object3D): {
+  left: Object3D[]
+  right: Object3D[]
+  leftMembrane: Object3D[]
+  rightMembrane: Object3D[]
+} {
+  const grafted = findBone(root, 'L_WingD0P2') !== null
+  return {
+    left: findChain(root, grafted ? LEFT_WING_CHAIN : LEFT_WING_CHAIN_LEGACY),
+    right: findChain(root, grafted ? RIGHT_WING_CHAIN : RIGHT_WING_CHAIN_LEGACY),
+    leftMembrane: findChain(
+      root,
+      grafted ? LEFT_WING_MEMBRANE : LEFT_WING_MEMBRANE_LEGACY,
+    ),
+    rightMembrane: findChain(
+      root,
+      grafted ? RIGHT_WING_MEMBRANE : RIGHT_WING_MEMBRANE_LEGACY,
+    ),
+  }
 }

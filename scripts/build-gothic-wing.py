@@ -10,6 +10,7 @@ the stage it happened rather than re-run from the top:
     gothic-weighted   membrane reweighted, dead vertex groups dropped
     gothic-retargeted the 16 gameplay clips reconnected to the new spars
     gothic-grafted    v1's wing performances on the five grounded clips
+    gothic-lifted     those folds raised to the foot plane they stand on
     wyvern-gothic.glb the candidate export
 
 Nothing here writes to public/models. The candidate lands in .gothic/ and is
@@ -66,7 +67,15 @@ def main() -> None:
     run(WORK / "gothic-retargeted.blend", "graft-v1-wing-clips-blender.py",
         "--out", str(WORK / "gothic-grafted.blend"),
         "--report", str(WORK / "gothic-graft.json"))
-    run(WORK / "gothic-grafted.blend", "export-gothic-wing-blender.py",
+    # v1's grounded captures hang the folded wing well below the foot line --
+    # measured on the graft output, 2119 units under it on `walk`. This project
+    # plants ground clips on the foot, so the fold is raised here instead, after
+    # the graft and on this rig: the solve is geometric and does not survive a
+    # transfer onto differently-oriented spars.
+    run(WORK / "gothic-grafted.blend", "lift-v1-wing-clips-blender.py",
+        "--clips", "idle,rest,walk,takeoff,land",
+        "--out", str(WORK / "gothic-lifted.blend"))
+    run(WORK / "gothic-lifted.blend", "export-gothic-wing-blender.py",
         "--out", str(WORK / "wyvern-gothic.glb"))
 
     candidate = WORK / "wyvern-gothic.glb"

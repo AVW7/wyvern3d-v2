@@ -287,7 +287,7 @@ function completeDuty(state: GameState, dutyId: number): void {
 
     state.resources.food -= CONFIG.wyvern.feedCost
     wyvern.hunger = clamp(wyvern.hunger - CONFIG.wyvern.feedRelief, 0, 100)
-    wyvern.bond = clamp(wyvern.bond + CONFIG.duties.feedBondBonus, 0, CONFIG.wyvern.maxBond)
+    wyvern.bond = clamp(wyvern.bond + CONFIG.duties.feed.bondBonus, 0, CONFIG.wyvern.maxBond)
 
     state.duties.active.splice(dutyIndex, 1)
     if (state.duties.carriedDutyId === duty.id) {
@@ -298,9 +298,90 @@ function completeDuty(state: GameState, dutyId: number): void {
     emit(state, 'sanctuary_duty_completed', wyvern.id, undefined, {
       dutyId: duty.id,
       kind: duty.kind,
-      bondGain: CONFIG.duties.feedBondBonus,
+      bondGain: CONFIG.duties.feed.bondBonus,
     })
-    log(state, 'good', `Completed feed duty for ${wyvern.name}. Hunger relieved & bond +${CONFIG.duties.feedBondBonus}.`)
+    log(state, 'good', `Completed feed duty for ${wyvern.name}. Hunger relieved & bond +${CONFIG.duties.feed.bondBonus}.`)
+    return
+  }
+
+  if (duty.kind === 'medicine') {
+    if (
+      state.resources.water < CONFIG.duties.medicine.costWater ||
+      state.resources.arcane < CONFIG.duties.medicine.costArcane
+    ) {
+      return log(state, 'bad', 'Not enough water/arcane supplies for medicine.')
+    }
+
+    state.resources.water -= CONFIG.duties.medicine.costWater
+    state.resources.arcane -= CONFIG.duties.medicine.costArcane
+    wyvern.injury = clamp(wyvern.injury - CONFIG.duties.medicine.injuryRelief, 0, 100)
+    wyvern.bond = clamp(wyvern.bond + CONFIG.duties.medicine.bondBonus, 0, CONFIG.wyvern.maxBond)
+
+    state.duties.active.splice(dutyIndex, 1)
+    if (state.duties.carriedDutyId === duty.id) {
+      state.duties.carriedDutyId = null
+    }
+    state.duties.completed += 1
+
+    emit(state, 'sanctuary_duty_completed', wyvern.id, undefined, {
+      dutyId: duty.id,
+      kind: duty.kind,
+      bondGain: CONFIG.duties.medicine.bondBonus,
+    })
+    log(state, 'good', `Treated injuries for ${wyvern.name}. Injury relieved & bond +${CONFIG.duties.medicine.bondBonus}.`)
+    return
+  }
+
+  if (duty.kind === 'companionship') {
+    if (wyvern.assignment.kind !== 'idle') {
+      return log(state, 'bad', `${wyvern.name} is currently busy.`)
+    }
+
+    wyvern.bond = clamp(wyvern.bond + CONFIG.duties.companionship.bondBonus, 0, CONFIG.wyvern.maxBond)
+
+    state.duties.active.splice(dutyIndex, 1)
+    if (state.duties.carriedDutyId === duty.id) {
+      state.duties.carriedDutyId = null
+    }
+    state.duties.completed += 1
+
+    emit(state, 'sanctuary_duty_completed', wyvern.id, undefined, {
+      dutyId: duty.id,
+      kind: duty.kind,
+      bondGain: CONFIG.duties.companionship.bondBonus,
+    })
+    log(state, 'good', `Reassured ${wyvern.name}. Bond +${CONFIG.duties.companionship.bondBonus}.`)
+    return
+  }
+
+  if (duty.kind === 'flightExercise') {
+    if (wyvern.stage === 'hatchling') {
+      return log(state, 'bad', 'Hatchlings cannot perform flight exercises.')
+    }
+    if (wyvern.assignment.kind !== 'idle') {
+      return log(state, 'bad', `${wyvern.name} is currently busy.`)
+    }
+
+    wyvern.bond = clamp(wyvern.bond + CONFIG.duties.flightExercise.bondBonus, 0, CONFIG.wyvern.maxBond)
+    wyvern.stats.stamina += CONFIG.duties.flightExercise.staminaGain
+
+    state.duties.active.splice(dutyIndex, 1)
+    if (state.duties.carriedDutyId === duty.id) {
+      state.duties.carriedDutyId = null
+    }
+    state.duties.completed += 1
+
+    emit(state, 'sanctuary_duty_completed', wyvern.id, undefined, {
+      dutyId: duty.id,
+      kind: duty.kind,
+      bondGain: CONFIG.duties.flightExercise.bondBonus,
+    })
+    log(
+      state,
+      'good',
+      `Completed flight ring exercise with ${wyvern.name}. Stamina +${CONFIG.duties.flightExercise.staminaGain} & bond +${CONFIG.duties.flightExercise.bondBonus}.`,
+    )
+    return
   }
 }
 

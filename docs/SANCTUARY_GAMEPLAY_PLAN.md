@@ -139,9 +139,9 @@ Keep all numbers in `src/core/data/config.ts`. Initial guidance, subject to test
 | Stage | Title | Status | Depends on | Completion note |
 |---|---|---|---|---|
 | 0 | Feed-duty vertical slice | DONE | Animation plan Stage 6 | Deterministic feed duties in core, save migration 10->11, TAKE/ABANDON/COMPLETE intents, typed completion events, accessible UI controls in RosterPanel, 10 unit tests in `duties.test.ts`. |
-| 1 | Context action and physical carry | NOT STARTED | 0 | — |
-| 2 | Request readability and wyvern reactions | NOT STARTED | 1 | — |
-| 3 | Medicine, companionship, and flight exercise | NOT STARTED | 2 | — |
+| 1 | Context action and physical carry | DONE | 0 | Pure proximity & priority resolver in `actionResolver.ts`, change-guarded `useContextActionStore`, 3D `CarriedItem` visual bundle, click/touch and E key trigger, fully tested in `actionResolver.test.ts`. |
+| 2 | Request readability and wyvern reactions | DONE | 1 | `SanctuaryDutiesHud` chips, 3D `DutyRequestBadge`, `director.playReaction(..., 'eat')`, spectral completion flourish in `EventFlourishManager`, 3 unit tests in `sanctuaryDutiesPresentation.test.ts`. |
+| 3 | Medicine, companionship, and flight exercise | DONE | 2 | Implemented 4-duty care vocabulary in core & presentation (`feed`, `medicine`, `companionship`, `flightExercise`), deterministic candidate priority generator, config costs & relief, tested in `duties.test.ts` and `actionResolver.test.ts`. |
 | 4 | Sanctuary improvement unlocks | NOT STARTED | 3 | — |
 | 5 | Sanctuary audio layer | NOT STARTED | 2 | — |
 | 6 | Layout snapshots and editor feedback | NOT STARTED | 4 | — |
@@ -192,7 +192,7 @@ typed event, without moving any player/wyvern transform into core or altering RN
 
 # STAGE 1 — Context action and physical carry
 
-**Status:** NOT STARTED · **Depends on:** Stage 0
+**Status:** DONE · **Depends on:** Stage 0
 
 **Goal.** The feed duty is completed by walking to a supply source, taking a visible ration, and
 returning to the requesting wyvern using one context action.
@@ -229,7 +229,7 @@ receive the exact Stage 0 result without opening the command wheel or a manageme
 
 # STAGE 2 — Request readability and wyvern reactions
 
-**Status:** NOT STARTED · **Depends on:** Stage 1
+**Status:** DONE · **Depends on:** Stage 1
 
 **Goal.** Duties are understandable without hunting through menus, and completion produces an
 immediate, entity-specific reaction.
@@ -260,7 +260,7 @@ visibly attributable to the correct wyvern exactly once.
 
 # STAGE 3 — Medicine, companionship, and flight exercise
 
-**Status:** NOT STARTED · **Depends on:** Stage 2
+**Status:** DONE · **Depends on:** Stage 2
 
 **Goal.** Expand duties into a small care vocabulary that uses existing sanctuary locations and
 wyvern commands rather than becoming a generic quest engine.

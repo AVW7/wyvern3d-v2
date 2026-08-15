@@ -57,7 +57,14 @@ const LOOPING = new Set([
 // its wing-knuckle contacts like the vendor's quadrupedal gait. Neither should
 // be held to a static left/right mirror. The banks are checked as a pair below;
 // walk has a positive lower bound so an accidental locked carrier cannot ship.
-const ASYMMETRIC_BY_DESIGN = new Set(['bankLeft', 'bankRight', 'walk'])
+// `attack2` and `attackAir2` are v1 artist captures (`Battle_Attack06` and
+// `Battle_Attack04`) retargeted whole. A real strike leads with one side, so
+// their 15-16 m of wingtip asymmetry is the performance, not the mirroring bug
+// the authored clips were repaired for -- the authored `attack` beside them is
+// symmetric to the rig's 0.0009 m floor.
+const ASYMMETRIC_BY_DESIGN = new Set([
+  'bankLeft', 'bankRight', 'walk', 'attack2', 'attackAir2',
+])
 const WALK_GAIT_MIN_ASYMMETRY = 0.1
 // These actions deliberately use the wing's surface rig.  `rest` is excluded:
 // a resting animal's folded membrane should be still, not continually twitch.

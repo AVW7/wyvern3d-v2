@@ -1,5 +1,8 @@
 import { BIOME_PALETTES } from '../BiomeWorld/atmosphere/biomePalettes'
-import type { MapEdge } from './mapGraph'
+import type { MapEdge, MapNode } from './mapGraph'
+import type { GameState } from '@/core/types'
+import { getRegionLayerValue, type AtlasLayerId } from '@/core/state/atlasLayers'
+import { SPECIES } from '@/core/data/species'
 
 /**
  * The one palette the world map reads from. Node badges, ring glows, supply
@@ -44,3 +47,44 @@ export function nodeGroundColor(biome: string): string {
   const palette = BIOME_PALETTES[biome]
   return palette?.groundColor ?? '#475569'
 }
+
+/**
+ * Computes the emblem ring accent color based on the active strategic layer.
+ */
+export function layerEmblemColor(
+  layer: AtlasLayerId,
+  node: MapNode,
+  state: GameState,
+): string {
+  if (layer === 'political') {
+    return SPECIES[node.def.nativeSpecies]?.color ?? '#888'
+  }
+  const layerVal = getRegionLayerValue(state, node.def.id, layer)
+  return layerVal.color
+}
+
+/**
+ * Returns badge label and color for the region under the active layer.
+ */
+export function layerBadgeInfo(
+  layer: AtlasLayerId,
+  node: MapNode,
+  state: GameState,
+): { text: string; color: string } {
+  const status = regionStatus(node.owner, node.attackable)
+  const defaultBadgeColor = statusColor(node.owner, node.attackable)
+
+  if (layer === 'political') {
+    return {
+      text: status === 'locked' ? `LOCKED • TIER ${node.def.tier}` : status.toUpperCase(),
+      color: defaultBadgeColor,
+    }
+  }
+
+  const layerVal = getRegionLayerValue(state, node.def.id, layer)
+  return {
+    text: layerVal.displayValue.toUpperCase(),
+    color: layerVal.color,
+  }
+}
+

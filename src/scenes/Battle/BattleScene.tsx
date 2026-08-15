@@ -23,35 +23,15 @@ import { PlaceholderWyvern } from '@/render/placeholders/PlaceholderWyvern'
 import { BreathVFX } from '@/render/vfx/BreathVFX'
 import { GameModel, type ModelActionRequest } from '@/render/assets/GameModel'
 import type { ModelState } from '@/render/assets/manifest'
-import {
-  HEAD_BONE,
-  HIND_LEG_CHAINS,
-  JAW_BONE,
-  NECK_CHAIN,
-  TAIL_CHAIN,
-  findBone,
-  findChain,
-} from '@/render/rigBones'
-import { applyBoneOffset, applyLegTuck, applyNeckOffset } from '@/render/boneOffsets'
-import { createTailState, dynamicTailController, type TailState } from '@/render/tailController'
-import { createLegsState, dynamicLegController, type LegsState } from '@/render/legPhysics'
-import { captureClosedJawPose, sealFlightJaw, shouldSealFlightJaw, type ClosedJawPose } from '@/render/flightMouth'
+import { createWyvernFlightRig, type WyvernFlightRig } from '@/render/wyvernFlightRig'
 import { GroundDustVFX } from '@/render/vfx/GroundDustVFX'
 import { CameraShake } from '@/render/cameraShake'
 import { CONTROLS, axis, isDown, pointer } from '@/render/controllers/input'
 import { useCameraStore } from '@/state/cameraStore'
 import {
   angleDelta,
-  dampFlightPose,
-  dampHeadNeckPose,
-  dampLegTuck,
   flightAnimationState,
-  flightPoseTargets,
-  headNeckTargets,
-  legTuckTarget,
   type FlightLoopState,
-  type FlightPose,
-  type HeadNeckPose,
 } from '@/render/flightPose'
 import { getGameState, useGame, useGameState } from '@/state/store'
 import { useBattle } from './battleStore'
@@ -307,23 +287,7 @@ function collectMaterials(root: Group): MeshStandardMaterial[] {
 function WyvernActorView({ actor, index, piloted }: { actor: Actor; index: number; piloted: boolean }) {
   const group = useRef<Group>(null)
   const lastYaw = useRef(actor.yaw)
-  const flightPose = useRef<FlightPose>({ pitch: 0, bank: 0 })
-  const headNeck = useRef<HeadNeckPose>({
-    neckPitch: 0,
-    neckYaw: 0,
-    headPitch: 0,
-    headYaw: 0,
-    headRoll: 0,
-  })
-  const neckBones = useRef<Object3D[]>([])
-  const headBone = useRef<Object3D | null>(null)
-  const jawBone = useRef<Object3D | null>(null)
-  const closedJaw = useRef<ClosedJawPose | null>(null)
-  const legBones = useRef<Object3D[][]>([])
-  const tailBones = useRef<Object3D[]>([])
-  const tailState = useRef<TailState>(createTailState())
-  const legsState = useRef<LegsState>(createLegsState())
-  const legTuck = useRef(0)
+  const rig = useRef<WyvernFlightRig>(createWyvernFlightRig(null, { referenceSpeed: actor.speed }))
   // The selector's own previous answer, kept out of React state so hysteresis
   // survives every frame rather than only the frames that re-render. The
   // sanctuary persists the same thing on its agent.
@@ -345,14 +309,14 @@ function WyvernActorView({ actor, index, piloted }: { actor: Actor; index: numbe
   const [frozen, setFrozen] = useState(false)
   const materials = useRef<MeshStandardMaterial[]>([])
   const flashElapsed = useRef<number | null>(null)
+  const headBone = useRef<Object3D | null>(null)
+  const neckBones = useRef<Object3D[]>([])
+
   const handleReady = useCallback((root: Group) => {
     materials.current = collectMaterials(root)
-    neckBones.current = findChain(root, NECK_CHAIN)
-    headBone.current = findBone(root, HEAD_BONE)
-    jawBone.current = findBone(root, JAW_BONE)
-    closedJaw.current = captureClosedJawPose(jawBone.current, closedJaw.current)
-    legBones.current = HIND_LEG_CHAINS.map((chain) => findChain(root, chain))
-    tailBones.current = findChain(root, TAIL_CHAIN)
+    rig.current.mount(root)
+    headBone.current = rig.current.bones.head
+    neckBones.current = rig.current.bones.neck
   }, [])
 
   useFrame((state, rawDelta) => {
@@ -393,82 +357,18 @@ function WyvernActorView({ actor, index, piloted }: { actor: Actor; index: numbe
 
     const yawRate = angleDelta(actor.yaw, lastYaw.current) / Math.max(dt, 1e-4)
     lastYaw.current = actor.yaw
-    const target = actor.flying
-      ? flightPoseTargets(
-          verticalSpeed,
-          horizontalSpeed,
-          yawRate,
-          state.clock.elapsedTime,
-          actor.speed,
-        )
-      : { pitch: 0, bank: 0 }
-    flightPose.current = dampFlightPose(flightPose.current, target, dt)
 
-    const targetHeadNeck = actor.flying
-      ? headNeckTargets(
-          horizontalSpeed,
-          verticalSpeed,
-          yawRate,
-          flightPose.current.pitch,
-          flightPose.current.bank,
-          actor.speed,
-        )
-      : { neckPitch: 0, neckYaw: 0, headPitch: 0, headYaw: 0, headRoll: 0 }
-    headNeck.current = dampHeadNeckPose(headNeck.current, targetHeadNeck, dt)
-    legTuck.current = dampLegTuck(
-      legTuck.current,
-      actor.flying ? legTuckTarget(horizontalSpeed, actor.speed) : 0,
-      dt,
-    )
-
-    if (actor.flying) {
-      // Preserve the sidecar's mode-specific neck, head and foot carriage;
-      // these are local-axis offsets, not replacement Euler rotations.
-      applyNeckOffset(
-        neckBones.current,
-        headNeck.current.neckPitch,
-        headNeck.current.neckYaw,
-      )
-      applyBoneOffset(
-        headBone.current,
-        headNeck.current.headPitch,
-        headNeck.current.headYaw,
-        headNeck.current.headRoll,
-      )
-      for (const chain of legBones.current) {
-        applyLegTuck(chain, legTuck.current)
-      }
-
-      // Per-manoeuvre tail and legs, same layering as the sanctuary: the clip
-      // owns the mode's carriage, `legTuckTarget` owns the airspeed response,
-      // and these add the turn's counterweight, anticipation and centrifugal
-      // swing. `baseTuck` is zero because `applyLegTuck` above already folds
-      // the limb on the measured weights.
-      tailState.current = dynamicTailController(
-        tailBones.current,
-        yawRate,
-        flightPose.current.bank,
-        horizontalSpeed,
-        loopState.current,
-        0.5,
-        state.clock.elapsedTime,
-        tailState.current,
-        dt,
-      )
-      legsState.current = dynamicLegController(
-        legBones.current[0] ?? [],
-        legBones.current[1] ?? [],
-        yawRate,
-        horizontalSpeed,
-        verticalSpeed,
-        actor.position.y,
-        loopState.current,
-        0,
-        state.clock.elapsedTime,
-        legsState.current,
-        dt,
-      )
-    }
+    rig.current.step(dt, {
+      position: actor.position,
+      yaw: actor.yaw,
+      airborne: actor.flying,
+      flightMode: loopState.current,
+      horizontalSpeed,
+      verticalSpeed,
+      yawRate,
+      elapsedTime: state.clock.elapsedTime,
+    })
+    rig.current.sealJaw(action?.state ?? anim)
 
     // `updateAi` flips approach/engage at exactly `distance <= actor.range`
     // with no hysteresis, so at that boundary the intent alternates every tick.
@@ -485,7 +385,7 @@ function WyvernActorView({ actor, index, piloted }: { actor: Actor; index: numbe
     // every other mode on every frame, which made hover unreachable in battle
     // and would have done the same to speed, glide and dive.
     const next: ModelState = actor.flying
-      ? flightAnimationState(loopState.current, flightPose.current.bank, {
+      ? flightAnimationState(loopState.current, rig.current.flightPose.bank, {
           horizontalSpeed,
           verticalSpeed,
           referenceSpeed: actor.speed,
@@ -500,7 +400,7 @@ function WyvernActorView({ actor, index, piloted }: { actor: Actor; index: numbe
 
     // YXZ keeps bank and pitch relative to the wyvern after world-space yaw.
     g.rotation.order = 'YXZ'
-    g.rotation.set(flightPose.current.pitch, actor.yaw, flightPose.current.bank)
+    g.rotation.set(rig.current.flightPose.pitch, actor.yaw, rig.current.flightPose.bank)
 
     // Attack/breath tells: frame-diff the sim's own cooldown resets rather
     // than adding any event to the combat sim. One frame of lag behind the
@@ -532,10 +432,6 @@ function WyvernActorView({ actor, index, piloted }: { actor: Actor; index: numbe
       const intensity = t >= 1 ? 1 : 1 + (HIT_FLASH_PEAK - 1) * (1 - t)
       for (const material of materials.current) material.emissiveIntensity = intensity
       if (t >= 1) flashElapsed.current = null
-    }
-
-    if (shouldSealFlightJaw(anim, action?.state ?? null)) {
-      sealFlightJaw(jawBone.current, closedJaw.current)
     }
   })
 

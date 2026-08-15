@@ -41,4 +41,25 @@ describe('manifest asset files', () => {
       ).toBe(false)
     }
   })
+
+  it('ensures all wyvern models have opaque skin materials (not alphaMode BLEND)', async () => {
+    const wyvernAssets = (Object.entries(ASSETS) as [AssetId, (typeof ASSETS)[AssetId]][])
+      .filter(([id, entry]) => id.startsWith('wyvern.') && entry?.url)
+      .map(([id, entry]) => [id, entry!.url!] as const)
+
+    const { readFileSync } = await import('node:fs')
+    for (const [id, url] of wyvernAssets) {
+      const filePath = publicPath(url)
+      const data = readFileSync(filePath)
+      const jsonLength = data.readUInt32LE(12)
+      const gltf = JSON.parse(data.subarray(20, 20 + jsonLength).toString('utf8'))
+      const materials = gltf.materials ?? []
+      for (const mat of materials) {
+        expect(
+          mat.alphaMode,
+          `${id} material "${mat.name}" in ${url} must not use alphaMode BLEND (causes transparent/see-through rendering)`,
+        ).not.toBe('BLEND')
+      }
+    }
+  })
 })

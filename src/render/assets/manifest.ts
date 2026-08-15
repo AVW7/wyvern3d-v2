@@ -204,20 +204,16 @@ const WYVERN_FIT = 0.0072
 const WYVERN_CLIPS: AssetEntry['animations'] = {
   // Ground loops, planted on the measured low point of each pose.
   //
-  // idle is re-authored — `pnpm assets:wyvern-idle` regenerates it, and
-  // scripts/author-wyvern-idle-blender.py carries the parameters and the rig's
-  // measured axis conventions. It needs no lift: its lowest skinned vertex is a
-  // toe at +0.10..+0.13 m above the rig origin through the whole 6 s loop. The
-  // clip it replaced sank its left wingtip 0.99 m BELOW the origin, because the
-  // fold was mirrored wrong and put that wing forward across the chest.
-  idle: { clip: 'idle', yOffset: 0 },
-  // The relaxed carrier clears its leading spar; a toe is now the low point
-  // (-7.31 rig units), so this small lift plants the gait rather than floating
-  // the whole animal on the old, wingtip-based 314-unit offset.
-  walk: { clip: 'walk', yOffset: 7.5 },
-  // Rebuilt after the jaw-hinge repair: the folded, planted rest loop reaches
-  // -331.00 rig units at f32, rather than the old spread-wing clip's -1104.
-  rest: { clip: 'rest', yOffset: 331 },
+  // Re-measured on the promoted wing (`pnpm assets:gothic-wing`), where all
+  // three carry v1's own grounded wing performance. That performance hangs the
+  // folded wing far below the foot line — v1 authored it that way, and the raw
+  // graft put `walk`'s wing 2119 rig units under the plane its feet stand on —
+  // so the pipeline's lift pass raises each fold back onto that plane before
+  // export. What is left below the origin afterwards is tail and belly, not
+  // wing, and these are those depths negated.
+  idle: { clip: 'idle', yOffset: 152.89 },
+  walk: { clip: 'walk', yOffset: 85.57 },
+  rest: { clip: 'rest', yOffset: 368.8 },
 
   // One-shots. `fly` is the takeoff and chains to the cruise loop, so gameplay
   // only ever asks for `fly`.
@@ -239,8 +235,8 @@ const WYVERN_CLIPS: AssetEntry['animations'] = {
   dive: { clip: 'dive', yOffset: 0 },
   speed: { clip: 'speed', yOffset: 0 },
 
-  // The rig has no separate air-attack clip; the ground one reads acceptably
-  // airborne because it is all forequarters.
+  // The authored strike has no separate air variant; it reads acceptably
+  // airborne because it is all forequarters. The v1 pool member does have one.
   //
   // All three are one-shots, and they have to be: these are the only states the
   // action channel plays, and GameModel emits `onActionFinished` — the single
@@ -255,22 +251,39 @@ const WYVERN_CLIPS: AssetEntry['animations'] = {
   //
   // manifest.action-channel.test.ts locks this: every action-channel state
   // must carry `loop: false`.
-  attack: { clip: 'attack', loop: false, yOffset: 0 },
-  attackAir: { clip: 'attack', loop: false, yOffset: 0, fadeIn: 0.16 },
+  //
+  // Both strikes are pools, picked per model by `seed` (see `resolveClipSpec`),
+  // so a rank of wyverns attacking together does not swing as one animal. The
+  // two sources are different in kind on purpose: `attack` is the authored
+  // 1.500 s snap (`scripts/author-wyvern-attack-blender.py`), symmetric to the
+  // rig's 0.0009 m floor and starting and ending on the neutral pose; `attack2`
+  // and `attackAir2` are v1's own `Battle_Attack06` and `Battle_Attack04`
+  // captures retargeted whole at 3.333 s, which lead with one side and are
+  // listed in `validate-wyvern-clips.mjs`'s asymmetric-by-design set for that
+  // reason. The pick is per model, not per swing — `seed` is stable for the
+  // lifetime of an instance.
+  attack: [
+    { clip: 'attack', loop: false, yOffset: 0 },
+    { clip: 'attack2', loop: false, yOffset: 0 },
+  ],
+  attackAir: [
+    { clip: 'attack', loop: false, yOffset: 0, fadeIn: 0.16 },
+    { clip: 'attackAir2', loop: false, yOffset: 0, fadeIn: 0.16 },
+  ],
   breathe: { clip: 'breath', loop: false, yOffset: 0 },
   breatheAir: { clip: 'breath', loop: false, yOffset: 0 },
 
   // Grounded and hunting behavior fallbacks (prevent T-pose fallback)
-  sleep: { clip: 'rest', yOffset: 331 },
-  sit: { clip: 'rest', yOffset: 331 },
-  eat: { clip: 'idle', yOffset: 0 },
-  drink: { clip: 'rest', yOffset: 0 },
-  groom: { clip: 'rest', yOffset: 331 },
-  nuzzle: { clip: 'idle', yOffset: 0 },
-  calm: { clip: 'idle', yOffset: 0 },
-  perch: { clip: 'idle', yOffset: 0 },
-  hop: { clip: 'walk', yOffset: 0 },
-  seated: { clip: 'rest', yOffset: 331 },
+  sleep: { clip: 'rest', yOffset: 368.8 },
+  sit: { clip: 'rest', yOffset: 368.8 },
+  eat: { clip: 'idle', yOffset: 152.89 },
+  drink: { clip: 'rest', yOffset: 368.8 },
+  groom: { clip: 'rest', yOffset: 368.8 },
+  nuzzle: { clip: 'idle', yOffset: 152.89 },
+  calm: { clip: 'idle', yOffset: 152.89 },
+  perch: { clip: 'idle', yOffset: 152.89 },
+  hop: { clip: 'walk', yOffset: 85.57 },
+  seated: { clip: 'rest', yOffset: 368.8 },
   rise: { clip: 'takeoff', loop: false, next: 'idle', yOffset: 0 },
   pickUp: { clip: 'attack', loop: false, yOffset: 0 },
   huntGrip: { clip: 'attack', loop: false, yOffset: 0 },
@@ -327,7 +340,7 @@ const DROGON_CLIPS: AssetEntry['animations'] = {
 /** One species' entry. `size` is its relative bulk, ordered by tier. */
 function wyvernAsset(size: number): AssetEntry {
   return {
-    url: '/models/wyvern.glb',
+    url: '/models/wyvern-gothic.glb',
     scale: WYVERN_FIT * size,
     yOffset: 0,
     animations: WYVERN_CLIPS,
@@ -468,17 +481,20 @@ const THORNWING_CLIPS = {
  */
 export const ASSETS: Record<AssetId, AssetEntry> = {
   /**
-   * The rebuilt gothic wing, for Flight Lab only.
+   * The rebuilt gothic wing. Promoted: `wyvernAsset` now points every playable
+   * species here, and this id is the Flight Lab / Model Library handle for the
+   * same file.
    *
-   * Deliberately its own asset id rather than a swap inside `wyvernAsset`:
-   * that helper backs all five playable species across battle and the
-   * sanctuary, so editing it would change the model for the whole game. This
-   * keeps the comparison to the one route that exists to make it.
+   * Built by `pnpm assets:gothic-wing`, which restores v1's six three-phalanx
+   * digits and grafts v1's own performances onto the clips. What promotion
+   * bought, measured through `validate-wyvern-clips`: the flight loops beat as
+   * one family at v1's cadence, and the membrane folds with the digits instead
+   * of swinging as a rigid card — distal wing motion on `cruise` goes 8.4° to
+   * 54.7°.
    *
-   * Built by `pnpm assets:gothic-wing`. It gates better than the shipped model
-   * -- one validator problem against five, and it fixes the four static-membrane
-   * failures `idle` has -- but its clips are retargeted rather than re-authored,
-   * and the gothic silhouette is not yet cut into the mesh.
+   * Still open: the gothic silhouette is not cut into the mesh, and `bankLeft`
+   * (65.9° of wing elevation) against `bankRight` (127.5°) is a wider spread
+   * than v1's own 85.2/118.4.
    */
   'wyvern.gothic': {
     url: '/models/wyvern-gothic.glb',

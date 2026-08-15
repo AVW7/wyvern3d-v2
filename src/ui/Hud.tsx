@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useGame, useGameState } from '@/state/store'
-import { useUi } from '@/state/uiStore'
+import { useUi, type PanelId } from '@/state/uiStore'
 import { useMapUiStore } from '@/state/mapUiStore'
 import { RESOURCE_IDS } from '@/core/state/game'
 import { netIncome } from '@/core/systems/economy'
@@ -21,6 +21,8 @@ import { AtlasDirectory } from './AtlasDirectory/AtlasDirectory'
 import { HighlandsHud } from './HighlandsHud'
 import { useHighlandsHunt } from '@/state/highlandsHuntStore'
 import { BiomeTransitionOverlay } from '@/scenes/BiomeWorld/transitions/BiomeTransitionOverlay'
+import { useContextActionStore } from '@/state/contextActions'
+import { SanctuaryDutiesHud } from './SanctuaryDutiesHud'
 
 /** DOM overlay HUD. Kept out of the canvas so it stays accessible and cheap. */
 export function Hud() {
@@ -214,8 +216,30 @@ export function Hud() {
           ) : (
             <>
               {mode !== 'highlands' && nearby && !openPanel && !isEditing && (
-                <div className="prompt liquid-glass">
-                  <kbd>E</kbd> <span>{nearby.label}</span>
+                <div
+                  className={`prompt liquid-glass ${useContextActionStore.getState().currentAction?.disabledReason ? 'disabled' : 'interactive'}`}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => {
+                    const action = useContextActionStore.getState().currentAction
+                    if (action?.disabledReason) return
+                    if (action?.intent) {
+                      useGame.getState().dispatch(action.intent)
+                    } else if (action?.panel) {
+                      open(action.panel as PanelId, action.station)
+                      if (action.panel === 'warTable') useGame.getState().setMode('worldmap')
+                    }
+                  }}
+                >
+                  <kbd>E</kbd>{' '}
+                  <span>
+                    {nearby.label}
+                    {useContextActionStore.getState().currentAction?.disabledReason && (
+                      <span className="prompt-disabled-reason" style={{ opacity: 0.7, marginLeft: 6, fontSize: '0.85em' }}>
+                        ({useContextActionStore.getState().currentAction?.disabledReason})
+                      </span>
+                    )}
+                  </span>
                 </div>
               )}
 
@@ -224,6 +248,7 @@ export function Hud() {
               {/* Bottom-Left Stack — Wyvern Status Card & Event Log with matching widths */}
               {mode !== 'highlands' && !isEditing && !openPanel && (
                 <div className="left-dock-stack">
+                  {mode === 'sanctuary' && <SanctuaryDutiesHud />}
                   <RegionInspector />
                   <QuickLevelWidget
                     eventLogCollapsed={isEventLogCollapsed}

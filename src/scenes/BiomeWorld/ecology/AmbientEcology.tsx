@@ -32,6 +32,8 @@ const VISUALS: Record<AmbientAgentSpec['ambient'], { color: string; size: number
   deer: { color: '#d6c4a8', size: 0.45 },
 }
 
+const DEFAULT_VISUAL = VISUALS.spores
+
 export function AmbientEcology({ biome, regionId, seed = 42 }: { biome: string; regionId?: string; seed?: number }) {
   const { camera } = useThree()
   const pointsRef = useRef<Points>(null)
@@ -100,7 +102,7 @@ export function AmbientEcology({ biome, regionId, seed = 42 }: { biome: string; 
   })
 
   if (!spec || !geometry) return null
-  const visual = VISUALS[spec.ambient] ?? VISUALS.spores
+  const visual = VISUALS[spec.ambient] ?? DEFAULT_VISUAL
 
   return (
     <points ref={pointsRef} geometry={geometry} position={[spec.x, 0, spec.z]}>

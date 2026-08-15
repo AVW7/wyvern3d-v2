@@ -4468,3 +4468,96 @@ button:active {
     max-height: 55vh;
   }
 }
+
+/* --- Sanctuary Duties HUD ---------------------------------------------- */
+.sanctuary-duties-hud {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: var(--sp-3);
+  border-radius: var(--radius);
+  background: var(--glass-bg-liquid);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border-light);
+  box-shadow: var(--glass-shadow-sm);
+  pointer-events: auto;
+}
+
+.duties-header {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-family: var(--font-fantasy);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--gold);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+.duties-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+
+.duty-chip {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease-out;
+  color: var(--text);
+  font-family: var(--font);
+}
+
+.duty-chip:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+.duty-chip.status-carrying {
+  border-color: rgba(96, 165, 250, 0.4);
+  background: rgba(96, 165, 250, 0.1);
+}
+
+.duty-chip.status-available {
+  border-color: rgba(245, 158, 11, 0.35);
+  background: rgba(245, 158, 11, 0.08);
+}
+
+.duty-chip.status-disabled {
+  border-color: rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.06);
+  opacity: 0.8;
+}
+
+.duty-icon-badge {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.duty-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.duty-subject {
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.duty-instruction {
+  font-size: 10px;
+  color: var(--muted);
+}
+

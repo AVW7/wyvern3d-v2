@@ -159,9 +159,38 @@ export const CONFIG = {
   duties: {
     /** Maximum active duties at any one time. */
     maxActive: 3,
-    /** Minimum hunger for a wyvern to trigger a feed duty. */
+    feed: {
+      /** Minimum hunger for a wyvern to trigger a feed duty. */
+      threshold: 30,
+      /** Bonus bond granted when completing a feed duty. */
+      bondBonus: 1,
+    },
+    medicine: {
+      /** Minimum injury for a wyvern to trigger a medicine duty. */
+      injuryThreshold: 30,
+      /** Resource costs for preparing medicinal salve. */
+      costWater: 15,
+      costArcane: 2,
+      /** Injury relieved upon administering medicine. */
+      injuryRelief: 30,
+      /** Bonus bond granted when completing a medicine duty. */
+      bondBonus: 1,
+    },
+    companionship: {
+      /** Maximum bond above which wyverns do not trigger companionship duties. */
+      maxBondThreshold: 70,
+      /** Bonus bond granted upon completing companionship routine. */
+      bondBonus: 2,
+    },
+    flightExercise: {
+      /** Bonus bond granted upon completing flight ring exercise. */
+      bondBonus: 2,
+      /** Stamina stat gain upon completing flight exercise. */
+      staminaGain: 1,
+    },
+    /** Minimum hunger for a wyvern to trigger a feed duty (legacy/direct lookup). */
     feedThreshold: 30,
-    /** Bonus bond granted when completing a feed duty. */
+    /** Bonus bond granted when completing a feed duty (legacy/direct lookup). */
     feedBondBonus: 1,
   },
 

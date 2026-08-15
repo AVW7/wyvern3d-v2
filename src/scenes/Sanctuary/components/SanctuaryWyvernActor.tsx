@@ -5,22 +5,11 @@ import type { WyvernInstance } from '@/core/types'
 import { SPECIES } from '@/core/data/species'
 import { GameModel, type ModelActionRequest } from '@/render/assets/GameModel'
 import { type ModelState } from '@/render/assets/manifest'
-import {
-  HEAD_BONE,
-  HIND_LEG_CHAINS,
-  JAW_BONE,
-  NECK_CHAIN,
-  SPINE_CHAIN,
-  TAIL_CHAIN,
-  findBone,
-  findChain,
-} from '@/render/rigBones'
 import { PlaceholderWyvern } from '@/render/placeholders/PlaceholderWyvern'
 import { WorldLabel } from '@/render/labels/WorldLabel'
 import { FoodProp } from '@/render/assets/props'
+import { DutyRequestBadge } from './DutyRequestBadge'
 
-const JAW = JAW_BONE
-const HEAD = HEAD_BONE
 const TRANSIT_ALTITUDE = 22
 
 export interface VisualState {
@@ -70,12 +59,7 @@ export interface SanctuaryWyvernActorProps {
   selected: boolean
   airborne: boolean
   onGroupReady: (group: Group) => void
-  onJawReady: (jaw: Object3D | null) => void
-  onHeadReady: (head: Object3D | null) => void
-  onNeckBonesReady?: (neckBones: Object3D[]) => void
-  onSpineBonesReady?: (spineBones: Object3D[]) => void
-  onLegBonesReady?: (legBones: Object3D[][]) => void
-  onTailBonesReady?: (tailBones: Object3D[]) => void
+  onModelReady?: (root: Object3D) => void
   onActionFinished?: (request: ModelActionRequest) => void
   onSelect: () => void
 }
@@ -86,12 +70,7 @@ export function SanctuaryWyvernActor({
   selected,
   airborne,
   onGroupReady,
-  onJawReady,
-  onHeadReady,
-  onNeckBonesReady,
-  onSpineBonesReady,
-  onLegBonesReady,
-  onTailBonesReady,
+  onModelReady,
   onActionFinished,
   onSelect,
 }: SanctuaryWyvernActorProps) {
@@ -118,16 +97,7 @@ export function SanctuaryWyvernActor({
         seed={wyvern.name.charCodeAt(0) ?? 0}
         scale={scale}
         onReady={(root) => {
-          onJawReady(findBone(root, JAW))
-          onHeadReady(findBone(root, HEAD))
-          onNeckBonesReady?.(findChain(root, NECK_CHAIN))
-          onSpineBonesReady?.(findChain(root, SPINE_CHAIN))
-
-          onLegBonesReady?.(
-            HIND_LEG_CHAINS.map((chain) => findChain(root, chain)),
-          )
-
-          onTailBonesReady?.(findChain(root, TAIL_CHAIN))
+          onModelReady?.(root)
         }}
         onActionFinished={onActionFinished}
         fallback={<PlaceholderWyvern color={species?.color} scale={scale} />}
@@ -137,6 +107,12 @@ export function SanctuaryWyvernActor({
         position={[0, modelHeight(wyvern) + (airborne ? 4 : 2), 0]}
         text={`${wyvern.name} (${species?.name ?? 'Wyvern'})`}
         color={species?.color ?? '#d4af37'}
+      />
+
+      <DutyRequestBadge
+        wyvernId={wyvern.id}
+        height={modelHeight(wyvern)}
+        airborne={airborne}
       />
 
       {selected && <SelectionRing scale={scale} airborne={airborne} />}

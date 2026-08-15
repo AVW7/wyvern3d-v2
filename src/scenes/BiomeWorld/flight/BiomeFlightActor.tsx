@@ -2,7 +2,7 @@
 
 import { useRef, type MutableRefObject } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
-import { Vector3, type Group, type Object3D } from 'three'
+import { Vector3, type Group } from 'three'
 import type { WyvernInstance } from '@/core/types'
 import { SPECIES } from '@/core/data/species'
 import { GameModel } from '@/render/assets/GameModel'
@@ -10,12 +10,8 @@ import { PlaceholderWyvern } from '@/render/placeholders/PlaceholderWyvern'
 import { WorldLabel } from '@/render/labels/WorldLabel'
 import { readDirectWyvernFlightInput, stepDirectWyvernFlight } from '@/render/controllers/wyvernFlight'
 import { consumeDrag, consumeWheel } from '@/render/controllers/input'
-import { applyBoneOffset, applyLegTuck, applyNeckOffset } from '@/render/boneOffsets'
-import { HEAD_BONE, HIND_LEG_CHAINS, JAW_BONE, NECK_CHAIN, TAIL_CHAIN, findBone, findChain } from '@/render/rigBones'
-import { createTailState, dynamicTailController, type TailState } from '@/render/tailController'
-import { createLegsState, type LegsState } from '@/render/legPhysics'
-import { captureClosedJawPose, type ClosedJawPose } from '@/render/flightMouth'
-import { angleDelta, dampHeadNeckPose, dampLegTuck, headNeckTargets, legTuckTarget, type HeadNeckPose } from '@/render/flightPose'
+import { angleDelta } from '@/render/flightPose'
+import { createWyvernFlightRig, type WyvernFlightRig } from '@/render/wyvernFlightRig'
 import { BIOME_WORLD_RADIUS } from '../terrain/BiomeTerrain'
 
 const FLIGHT_REF_SPEED = 20
@@ -27,16 +23,7 @@ export interface BiomeFlightAgent {
   bank: number
   airborne: boolean
   group: Group | null
-  jaw: Object3D | null
-  jawClosed: ClosedJawPose | null
-  headBone: Object3D | null
-  neckBones: Object3D[]
-  legBones: Object3D[][]
-  tailBones: Object3D[]
-  tail: TailState
-  legs: LegsState
-  headNeckPose: HeadNeckPose
-  legTuck: number
+  rig: WyvernFlightRig
   previousPosition: Vector3
   previousYaw: number
 }
@@ -49,16 +36,7 @@ export function createBiomeFlightAgent(): BiomeFlightAgent {
     bank: 0,
     airborne: false,
     group: null,
-    jaw: null,
-    jawClosed: null,
-    headBone: null,
-    neckBones: [],
-    legBones: [],
-    tailBones: [],
-    tail: createTailState(),
-    legs: createLegsState(),
-    headNeckPose: { neckPitch: 0, neckYaw: 0, headPitch: 0, headYaw: 0, headRoll: 0 },
-    legTuck: 0,
+    rig: createWyvernFlightRig(null, { referenceSpeed: FLIGHT_REF_SPEED }),
     previousPosition: new Vector3(0, 0, 0),
     previousYaw: 0,
   }
@@ -145,49 +123,25 @@ function BiomeFlightModel({
     agent.previousPosition.copy(agent.position)
     agent.previousYaw = agent.yaw
 
-    const targetHeadNeck = agent.airborne
-      ? headNeckTargets(horizontalSpeed, verticalSpeed, yawRate, agent.pitch, agent.bank, FLIGHT_REF_SPEED)
-      : { neckPitch: 0, neckYaw: 0, headPitch: 0, headYaw: 0, headRoll: 0 }
+    const flightMode =
+      result.locomotion === 'idle' || result.locomotion === 'walk' ? 'cruise' : result.locomotion
 
-    agent.headNeckPose = dampHeadNeckPose(agent.headNeckPose, targetHeadNeck, dt)
-    agent.legTuck = dampLegTuck(
-      agent.legTuck,
-      agent.airborne ? legTuckTarget(horizontalSpeed, FLIGHT_REF_SPEED) : 0,
-      dt,
-    )
+    agent.rig.step(dt, {
+      position: agent.position,
+      yaw: agent.yaw,
+      pitch: agent.pitch,
+      bank: agent.bank,
+      airborne: agent.airborne,
+      flightMode,
+      horizontalSpeed,
+      verticalSpeed,
+      yawRate,
+    })
 
     if (agent.group) {
       agent.group.position.copy(agent.position)
       agent.group.rotation.order = 'YXZ'
       agent.group.rotation.set(agent.pitch, agent.yaw, agent.bank)
-    }
-
-    if (agent.airborne) {
-      applyNeckOffset(agent.neckBones, agent.headNeckPose.neckPitch, agent.headNeckPose.neckYaw)
-      applyBoneOffset(
-        agent.headBone,
-        agent.headNeckPose.headPitch,
-        agent.headNeckPose.headYaw,
-        agent.headNeckPose.headRoll,
-      )
-      for (const chain of agent.legBones) {
-        applyLegTuck(chain, agent.legTuck)
-      }
-
-      const flightMode =
-        result.locomotion === 'idle' || result.locomotion === 'walk' ? 'cruise' : result.locomotion
-
-      agent.tail = dynamicTailController(
-        agent.tailBones,
-        yawRate,
-        agent.bank,
-        horizontalSpeed,
-        flightMode,
-        0.5,
-        0,
-        agent.tail,
-        dt,
-      )
     }
   })
 
@@ -203,12 +157,7 @@ function BiomeFlightModel({
         seed={wyvern.name.charCodeAt(0) ?? 0}
         scale={1}
         onReady={(root) => {
-          agentRef.current.jaw = findBone(root, JAW_BONE)
-          agentRef.current.jawClosed = captureClosedJawPose(agentRef.current.jaw, agentRef.current.jawClosed)
-          agentRef.current.headBone = findBone(root, HEAD_BONE)
-          agentRef.current.neckBones = findChain(root, NECK_CHAIN)
-          agentRef.current.legBones = HIND_LEG_CHAINS.map((chain) => findChain(root, chain))
-          agentRef.current.tailBones = findChain(root, TAIL_CHAIN)
+          agentRef.current.rig.mount(root)
         }}
         fallback={<PlaceholderWyvern color={SPECIES[wyvern.speciesId]?.color} scale={1} />}
       />

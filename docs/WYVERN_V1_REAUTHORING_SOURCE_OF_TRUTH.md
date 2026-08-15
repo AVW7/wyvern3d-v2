@@ -216,6 +216,25 @@ batch merely because names are reserved.
 5. **E — Sanctuary life and prey interaction:** sleep/sit/eat/drink/groom,
    nuzzle/calm/perch grip, and pickup/hunt/carry/drop.
 
+   **Batch E is an authoring job, not a capture job — tested, 2026-08-15.** The
+   obvious shortcut is to run the `Sanct_*` actions through the same
+   pair-by-rest-position retarget that produced the `v1_*` captures. It does not
+   work: those captures render as a torn mesh (`v1_stand` f60 — torso inverted,
+   hind legs past the skull, membrane in shards), and their bounding boxes are
+   tallest along Y where a standing dragon is tallest along Z. Only the *wing
+   chain* of a v1 capture transfers, because the grafted wing bones were built
+   from v1's own head/tail/roll and align to under 10 degrees while the original
+   v2 bones sit ~90 degrees off theirs. Every Batch E action is a body
+   performance — jaw, neck, torso, legs — so the part that transfers is the part
+   they do not need. Author them with generator recipes against the v1 measured
+   envelopes in `clip-signatures.json`, the way `idle`, `rest` and `walk` were
+   built. Two further notes for whoever starts: `drogon-sanctuary.glb` imports
+   into Blender as **298 empties, not an armature** (it is meshless and carries
+   no skin), so its actions drive object transforms and cannot be read through
+   `pose.bones[…]` without a name-mapped bridge; and fixing the full-body
+   transfer first would unblock Batches B, C and D as well, which is the larger
+   prize if anyone wants to spend the time there instead.
+
 ## Verification and promotion
 
 For every rebuilt action:

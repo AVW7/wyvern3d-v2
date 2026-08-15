@@ -59,6 +59,8 @@ It does not save.
 
 from __future__ import annotations
 
+import sys
+
 import bpy
 from mathutils import Matrix, Vector
 
@@ -82,6 +84,30 @@ GROUND_CLIPS = {
     "Neutural_Watch": "watch",
     "Neutural_Roar": "roar",
     "Neutural_BackKick": "backKick",
+    # The two strike captures the gameplay `attack` variants are cut from.
+    # `Battle_Attack06` is v1's clean planted snap-bite -- rear, thrust the head
+    # forward and low, recover, 3.333 s -- and `Battle_Attack01` its rearing
+    # two-beat version. Both are grounded; the airborne one is below.
+    "Battle_Attack06": "attackSnap",
+    "Battle_Attack01": "attackRear",
+}
+
+# v1's airborne sources, captured the same way.  These are not ground clips and
+# are never used whole: ``Battle_Down02`` is a *landing*, and only the one
+# measured wingbeat inside it (f40-f66) is a cruise cycle -- the rest of the
+# clip arrives welded to a 37-degree torso flare.  The graft stage windows them;
+# see ``graft-v1-wing-clips-blender.py``.
+#
+# ``Battle_Down02`` is the cruise source rather than any of the skill clips
+# because it is the one airborne capture measured symmetric: 1.49 left/right
+# wingtip error against ``Battle_Skill11_L``'s 18.9, an 83-degree stroke, and a
+# pelvis that does not move on any of its 112 frames.
+AIR_CLIPS = {
+    "Battle_Down02": "flightBeat",
+    "Battle_SkyMoveL": "skyMoveL",
+    "Battle_SkyMoveR": "skyMoveR",
+    # v1's airborne strike, 3.333 s, used whole for the aerial attack variant.
+    "Battle_Attack04": "attackAir",
 }
 
 
@@ -169,6 +195,24 @@ ROOT_TRANSLATION = "Bip002-Pelvis"
 # is mangled.  That points at the transfer itself, not at a missing constant,
 # and the next person here should start from a render of a single frame rather
 # than from any positional residual.
+#
+# That render has now been done, and it confirms the diagnosis rather than
+# lifting it.  ``v1_stand`` at f60 renders as a torn mesh: torso inverted, hind
+# legs projecting upward past the skull, wing membrane shredded into
+# disconnected shards.  The bounding box says the same thing without the
+# picture -- 1920 x 4180 x 1319, tallest along Y, where a standing dragon is
+# tallest along Z.  Every full-body capture in this blend has that signature.
+#
+# THE USABLE PART IS THE WING CHAIN ALONE.  ``graft-v1-wing-clips-blender.py``
+# takes only the shoulder/elbow/wrist/digit quaternions from these captures and
+# mirrors one side onto the other, and the result renders as a coherent animal
+# and gates clean -- because the grafted wing bones were built from v1's own
+# transformed head/tail/roll and align to under 10 degrees, while the 34
+# original v2 bones sit roughly 90 degrees off their v1 counterparts.  The body
+# half of the transfer is what fails.  Do not widen the graft to torso, neck,
+# tail or legs on the strength of the wings working, and do not plan a
+# sanctuary-life capture (Batch E) on this path: sleep, sit, eat, drink and
+# groom are body performances, so they need authoring, not transfer.
 R_FIX = Matrix(((1, 0, 0), (0, 0, -1), (0, 1, 0)))
 
 
@@ -206,6 +250,21 @@ def pair_bones(v1_arm, v2_arm):
             dist = (head - v2_arm.data.bones[v2_name].head_local).length
             pairs[v2_name] = (v1_name, round(dist, 2))
     return pairs
+
+
+def wanted_slugs():
+    """``-- --clips flightBeat,skyMoveL`` limits the rebuild to those slugs.
+
+    Without it every slug is rebuilt, which is right for a first capture but
+    wrong afterwards: Blender suffixes a colliding action rather than replacing
+    it, so a second full run leaves ``v1_walk.001`` beside the capture the graft
+    stage already reads.
+    """
+    argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
+    for index, arg in enumerate(argv):
+        if arg == "--clips" and index + 1 < len(argv):
+            return {s for s in argv[index + 1].split(",") if s}
+    return None
 
 
 def hierarchy_order(arm):
@@ -250,7 +309,13 @@ def run():
         pb.rotation_mode = "QUATERNION"
 
     built = []
-    for needle, slug in GROUND_CLIPS.items():
+    only = wanted_slugs()
+    for needle, slug in {**GROUND_CLIPS, **AIR_CLIPS}.items():
+        if only is not None and slug not in only:
+            continue
+        if PREFIX + slug in bpy.data.actions:
+            built.append({"clip": PREFIX + slug, "status": "already present"})
+            continue
         src = find_clip(v1_actions, needle)
         if src is None:
             built.append({"clip": slug, "status": "v1 clip not found"})
