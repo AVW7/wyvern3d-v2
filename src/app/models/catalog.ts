@@ -13,6 +13,8 @@ export interface ModelLibraryEntry {
 
 const LABELS: Partial<Record<AssetId, string>> = {
   'character.player': 'Arcane Handler',
+  'wyvern.gothic': 'Gothic Wing Candidate',
+  'wyvern.drogon': 'Drogon V1 (Blender)',
   'wyvern.emberback': 'Emberback',
   'wyvern.cragwing': 'Cragwing',
   'wyvern.mirefang': 'Mirefang',

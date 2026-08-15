@@ -79,6 +79,34 @@ function flightLabAltitude(state: ModelState): number {
   return AIRBORNE_STATES.has(state) ? FLIGHT_LAB_ALTITUDE : 0
 }
 
+const MARKER_ALIASES: Record<string, string[]> = {
+  head: ['Head', 'Bip002-Head_015'],
+  pelvis: ['Body', 'Bip002_06', 'Bip002-Pelvis_07', 'Bip002-Spine_08'],
+  tail: ['Tail6', 'Tail10', 'Bip002-Tail6_01', 'Bip002-Tail8_03'],
+  footL: ['L_Foot', 'Bip002-L-Foot_0188', 'Bip001-L-Foot_0178', 'Bip002-L-Foot_0226'],
+  footR: ['R_Foot', 'Bip002-R-Foot_0202', 'Bip001-R-Foot_0182', 'Bip002-R-Foot_0234'],
+  wingL: ['L_WingFinger3_end', 'L_WingD3P2', 'L_WingFinger3', 'Bip002-L-Hand_052', 'Bip002-L-Finger3_055'],
+  wingR: ['R_WingFinger3_end', 'R_WingD3P2', 'R_WingFinger3', 'Bip002-R-Hand_089', 'Bip002-R-Finger3_090'],
+}
+
+function resolveFirstBone(root: Object3D, names: string[]): Object3D | null {
+  for (const name of names) {
+    const obj = root.getObjectByName(name)
+    if (obj) return obj
+  }
+  return null
+}
+
+function resolveBoneChain(root: Object3D, candidates: (readonly string[])[]): Object3D[] {
+  for (const chain of candidates) {
+    const chainBones = chain
+      .map((name) => root.getObjectByName(name))
+      .filter((b): b is Object3D => b !== null && b !== undefined)
+    if (chainBones.length > 0) return chainBones
+  }
+  return []
+}
+
 export function FlightLabRigContainer({
   speciesId,
   requestedState,
@@ -163,44 +191,59 @@ export function FlightLabRigContainer({
     mixerRef.current = mixer
     const found = new Map<string, Object3D>()
     for (const marker of MARKERS) {
-      const bone = root.getObjectByName(marker.bone)
+      const candidates = MARKER_ALIASES[marker.key] ?? [marker.bone]
+      const bone = resolveFirstBone(root, candidates)
       if (bone) found.set(marker.key, bone)
     }
     bones.current = found
-    neckBones.current = [
-      root.getObjectByName('Neck1'),
-      root.getObjectByName('Neck2'),
-    ].filter((b): b is Object3D => b !== null && b !== undefined)
-    headBone.current = root.getObjectByName('Head') ?? null
-    spineBones.current = [
-      root.getObjectByName('Spine1'),
-      root.getObjectByName('Spine2'),
-      root.getObjectByName('Spine3'),
-      root.getObjectByName('Body'),
-    ].filter((b): b is Object3D => b !== null && b !== undefined)
-    jawBone.current = root.getObjectByName('Jaw') ?? null
+
+    neckBones.current = resolveBoneChain(root, [
+      ['Neck1', 'Neck2'],
+      ['Bip002-Neck_012', 'Bip002-Neck1_013', 'Bip002-Neck2_014'],
+    ])
+    headBone.current = resolveFirstBone(root, ['Head', 'Bip002-Head_015'])
+    spineBones.current = resolveBoneChain(root, [
+      ['Spine1', 'Spine2', 'Spine3', 'Body'],
+      ['Bip002-Spine_08', 'Bip002-Spine1_09', 'Bip002-Spine2_010', 'Bip002-Spine3_011', 'Bip002_06'],
+    ])
+    jawBone.current = resolveFirstBone(root, ['Jaw', 'Bip002-Ponytail1_016'])
     closedJaw.current = captureClosedJawPose(jawBone.current, closedJaw.current)
     neckHeadChain.current = [
       ...neckBones.current,
       headBone.current,
     ].filter((bone): bone is Object3D => bone !== null && bone !== undefined)
-    legBones.current = [LEG_CHAIN.L, LEG_CHAIN.R].map((chain: readonly string[]) =>
-      chain
-        .map((name: string) => root.getObjectByName(name))
-        .filter((b: Object3D | null | undefined): b is Object3D => b !== null && b !== undefined),
-    )
-    footBones.current = [LEG_CHAIN.L[2], LEG_CHAIN.R[2]]
-      .map((name: string) => root.getObjectByName(name))
-      .filter((b: Object3D | null | undefined): b is Object3D => b !== null && b !== undefined)
-    tailBones.current = TAIL_CHAIN.map((name: string) => root.getObjectByName(name)).filter(
-      (b: Object3D | null | undefined): b is Object3D => b !== null && b !== undefined,
-    )
-    wingBonesL.current = getLeftWingBoneNames()
-      .map((name: string) => root.getObjectByName(name))
-      .filter((b: Object3D | null | undefined): b is Object3D => b !== null && b !== undefined)
-    wingBonesR.current = getRightWingBoneNames()
-      .map((name: string) => root.getObjectByName(name))
-      .filter((b: Object3D | null | undefined): b is Object3D => b !== null && b !== undefined)
+
+    const leftLegChain = resolveBoneChain(root, [
+      LEG_CHAIN.L,
+      ['Bip002-L-Thigh_0186', 'Bip002-L-Calf_0187', 'Bip002-L-Foot_0188'],
+      ['Bip001-L-Thigh_0176', 'Bip001-L-Calf_0177', 'Bip001-L-Foot_0178'],
+    ])
+    const rightLegChain = resolveBoneChain(root, [
+      LEG_CHAIN.R,
+      ['Bip002-R-Thigh_0201', 'Bip002-R-Calf_00', 'Bip002-R-Foot_0202'],
+      ['Bip001-R-Thigh_0180', 'Bip001-R-Calf_0181', 'Bip001-R-Foot_0182'],
+    ])
+    legBones.current = [leftLegChain, rightLegChain].filter((c) => c.length > 0)
+    footBones.current = [
+      leftLegChain[leftLegChain.length - 1],
+      rightLegChain[rightLegChain.length - 1],
+    ].filter((b): b is Object3D => b !== null && b !== undefined)
+
+    tailBones.current = resolveBoneChain(root, [
+      TAIL_CHAIN,
+      ['Bip002-Tail1_0215', 'Bip002-Tail2_0216', 'Bip002-Tail3_0217', 'Bip002-Tail4_0218', 'Bip002-Tail5_0219', 'Bip002-Tail6_01', 'Bip002-Tail7_02', 'Bip002-Tail8_03'],
+    ])
+
+    wingBonesL.current = resolveBoneChain(root, [
+      getLeftWingBoneNames(),
+      ['L_WingShoulder', 'L_WingElbow', 'L_WingWrist', 'L_WingHand', 'L_WingD0P0', 'L_WingD1P0', 'L_WingD2P0', 'L_WingD3P0'],
+      ['Bip002-L-Clavicle_049', 'Bip002-L-UpperArm_050', 'Bip002-L-Forearm_051', 'Bip002-L-Hand_052', 'Bip002-L-Finger0_073', 'Bip002-L-Finger1_067', 'Bip002-L-Finger2_061', 'Bip002-L-Finger3_055'],
+    ])
+    wingBonesR.current = resolveBoneChain(root, [
+      getRightWingBoneNames(),
+      ['R_WingShoulder', 'R_WingElbow', 'R_WingWrist', 'R_WingHand', 'R_WingD0P0', 'R_WingD1P0', 'R_WingD2P0', 'R_WingD3P0'],
+      ['Bip002-R-Clavicle_086', 'Bip002-R-UpperArm_087', 'Bip002-R-Forearm_088', 'Bip002-R-Hand_089', 'Bip002-R-Finger0_0108', 'Bip002-R-Finger1_0102', 'Bip002-R-Finger2_096', 'Bip002-R-Finger3_090'],
+    ])
 
     // Store all rig bone names directly in bones map
     root.traverse((obj) => {
@@ -598,13 +641,13 @@ export function FlightLabRigContainer({
       }
 
       // Wing Height & Wing Fold Master Adjustments
-      const wingShoulderL = bones.current.get('L_WingShoulder') ?? bones.current.get('wingL1')
-      const wingElbowL = bones.current.get('L_WingElbow') ?? bones.current.get('wingL2')
-      const wingWristL = bones.current.get('L_WingWrist')
+      const wingShoulderL = bones.current.get('L_WingShoulder') ?? bones.current.get('Bip002-L-Clavicle_049') ?? bones.current.get('Bip002-L-UpperArm_050') ?? bones.current.get('wingL1')
+      const wingElbowL = bones.current.get('L_WingElbow') ?? bones.current.get('Bip002-L-Forearm_051') ?? bones.current.get('wingL2')
+      const wingWristL = bones.current.get('L_WingWrist') ?? bones.current.get('Bip002-L-Hand_052')
 
-      const wingShoulderR = bones.current.get('R_WingShoulder') ?? bones.current.get('wingR1')
-      const wingElbowR = bones.current.get('R_WingElbow') ?? bones.current.get('wingR2')
-      const wingWristR = bones.current.get('R_WingWrist')
+      const wingShoulderR = bones.current.get('R_WingShoulder') ?? bones.current.get('Bip002-R-Clavicle_086') ?? bones.current.get('Bip002-R-UpperArm_087') ?? bones.current.get('wingR1')
+      const wingElbowR = bones.current.get('R_WingElbow') ?? bones.current.get('Bip002-R-Forearm_088') ?? bones.current.get('wingR2')
+      const wingWristR = bones.current.get('R_WingWrist') ?? bones.current.get('Bip002-R-Hand_089')
 
       // 1. Wing Height (Up / Down) -> Local X pitch
       applyBoneOffset(wingShoulderL, pe.wingHeight + pe.leftWingPitch, pe.leftWingYaw, pe.leftWingRoll)
@@ -634,16 +677,17 @@ export function FlightLabRigContainer({
       })
 
       // Left & Right Leg Rotations
-      const legL = bones.current.get('L_Thigh') ?? bones.current.get('legL')
+      const legL = bones.current.get('L_Thigh') ?? bones.current.get('Bip002-L-Thigh_0186') ?? bones.current.get('Bip001-L-Thigh_0176') ?? bones.current.get('legL')
       if (legL) {
         applyBoneOffset(legL, 0, pe.leftLegYaw, pe.leftLegPitch)
       }
 
-      const legR = bones.current.get('R_Thigh') ?? bones.current.get('legR')
+      const legR = bones.current.get('R_Thigh') ?? bones.current.get('Bip002-R-Thigh_0201') ?? bones.current.get('Bip001-R-Thigh_0180') ?? bones.current.get('legR')
       if (legR) {
         applyBoneOffset(legR, 0, pe.rightLegYaw, pe.rightLegPitch)
       }
     }
+
     if (shouldSealFlightJaw(state)) {
       sealFlightJaw(jawBone.current, closedJaw.current)
     }

@@ -53,9 +53,9 @@ Each explored region should answer:
 | 1 | Authored landmarks and discovery | DONE | World Atlas 2, Biome 0 |
 | 2 | Traversal, collision, and landing | DONE | 0 |
 | 3 | Weather and environmental dynamics | DONE | 2 |
-| 4 | Ambient ecology and region activities | NOT STARTED | 1, 2 |
+| 4 | Ambient ecology and region activities | DONE — 2026-08-14 | 1, 2 |
 | 5 | Audio and scene transitions | DONE | 3 |
-| 6 | Streaming, LOD, and numeric quality gates | NOT STARTED | 1–5 |
+| 6 | Streaming, LOD, and numeric quality gates | DONE — 2026-08-15 | 1–5 |
 
 # STAGE 0 — Region-specific deterministic identity
 
@@ -156,7 +156,7 @@ deterministic transitions and no gameplay divergence.
 
 # STAGE 4 — Ambient ecology and region activities
 
-**Status:** NOT STARTED · **Depends on:** Stages 1 and 2
+**Status:** DONE — 2026-08-14 · **Depends on:** Stages 1 and 2
 
 **Goal.** Add bounded reasons to observe and revisit regions without duplicating Highlands hunts.
 
@@ -203,7 +203,7 @@ audio nor state across repeated map/biome switches.
 
 # STAGE 6 — Streaming, LOD, and numeric quality gates
 
-**Status:** NOT STARTED · **Depends on:** Stages 1–5
+**Status:** DONE — 2026-08-15 · **Depends on:** Stages 1–5
 
 **Goal.** Lock the enhanced system to measurable correctness and frame budgets.
 

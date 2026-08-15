@@ -30,3 +30,6 @@ __pycache__/
 
 # Draft biome atlas builds (pnpm assets:biome-atlas --draft)
 .biome-atlas/
+
+# Gothic wing rebuild working files (scripts/build-gothic-wing-blender.py)
+.gothic/

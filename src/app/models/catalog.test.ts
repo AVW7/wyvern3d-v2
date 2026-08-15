@@ -29,7 +29,10 @@ describe('Model Library catalog helpers', () => {
     const counts = modelCounts(MODEL_LIBRARY_ENTRIES)
     expect(counts.total).toBe(MODEL_LIBRARY_ENTRIES.length)
     expect(counts.ready + counts.pending).toBe(counts.total)
-    expect(counts.categories.Wyvern).toBe(6)
+    // Five playable species, Thornwing, Drogon V1, and the gothic-wing rebuild candidate
+    // that Flight Lab renders. The candidate is a real library entry, not a
+    // fixture: it has a shipped GLB and its own manifest id.
+    expect(counts.categories.Wyvern).toBe(8)
     expect(MODEL_LIBRARY_ENTRIES.find((entry) => entry.id === 'wyvern.thornwing')?.label).toBe('Thornwing')
   })
 

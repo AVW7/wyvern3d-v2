@@ -18,6 +18,8 @@ import { AmbientEcology } from './ecology/AmbientEcology'
 import { ObservationDirector } from './ecology/ObservationDirector'
 import { WorldLabel } from '@/render/labels/WorldLabel'
 import { biomeAudio } from './audio/biomeAudio'
+import { LodDirector } from './lod/LodDirector'
+import { useBiomeLod } from './lod/biomeLodStore'
 
 /**
  * Where the player lands when they enter a region. Negative Z with the default
@@ -38,6 +40,7 @@ export function BiomeScene() {
   const palette = useMemo(() => getBiomePalette(biome), [biome])
   const activeWyvern = useMemo(() => Object.values(state.wyverns)[0], [state.wyverns])
   const controlMode = usePlayerControlStore((control) => control.controlMode)
+  const audioScale = useBiomeLod((s) => s.capabilities.audioScale)
   // The grove's landmark measures its own footprint once its GLB loads; until
   // then the placeholder box keeps the player out of the trunk. This is a
   // load-time swap, not a per-frame one, so React state is the right home.
@@ -62,6 +65,12 @@ export function BiomeScene() {
     }
   }, [biome])
 
+  // Synchronize LOD audio scale
+  useEffect(() => {
+    biomeAudio.setLodAudioScale(audioScale)
+  }, [audioScale])
+
+
   // The expedition starts on foot; Tab shifts between the explorer and the
   // wyvern, exactly as it does in the sanctuary.
   useEffect(() => {
@@ -82,6 +91,9 @@ export function BiomeScene() {
 
   return (
     <>
+      {/* LOD Distance Director */}
+      <LodDirector />
+
       {/* Dynamic Weather & Lighting Atmosphere */}
       <BiomeAtmosphere
         biome={biome}

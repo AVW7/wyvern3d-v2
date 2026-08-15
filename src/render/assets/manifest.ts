@@ -263,13 +263,13 @@ const WYVERN_CLIPS: AssetEntry['animations'] = {
   // Grounded and hunting behavior fallbacks (prevent T-pose fallback)
   sleep: { clip: 'rest', yOffset: 331 },
   sit: { clip: 'rest', yOffset: 331 },
-  eat: { clip: 'rest', yOffset: 331 },
-  drink: { clip: 'rest', yOffset: 331 },
+  eat: { clip: 'idle', yOffset: 0 },
+  drink: { clip: 'rest', yOffset: 0 },
   groom: { clip: 'rest', yOffset: 331 },
   nuzzle: { clip: 'idle', yOffset: 0 },
   calm: { clip: 'idle', yOffset: 0 },
   perch: { clip: 'idle', yOffset: 0 },
-  hop: { clip: 'walk', yOffset: 7.5 },
+  hop: { clip: 'walk', yOffset: 0 },
   seated: { clip: 'rest', yOffset: 331 },
   rise: { clip: 'takeoff', loop: false, next: 'idle', yOffset: 0 },
   pickUp: { clip: 'attack', loop: false, yOffset: 0 },
@@ -277,6 +277,51 @@ const WYVERN_CLIPS: AssetEntry['animations'] = {
   huntCarry: { clip: 'cruise', yOffset: 0, phaseGroup: 'flight' },
   drop: { clip: 'attack', loop: false, yOffset: 0 },
   huntFinish: { clip: 'attack', loop: false, yOffset: 0 },
+}
+
+/**
+ * 52-clip animation set for the vendor/Blender Drogon model (drogon.glb).
+ */
+const DROGON_CLIPS: AssetEntry['animations'] = {
+  idle: { clip: 'SKM_DaenerysDragon|AA_DaenerysDragon_Battle_Stand', yOffset: 0 },
+  walk: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Battle_Walk', yOffset: 0 },
+  rest: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Damage_GroggyLoop', yOffset: 0 },
+
+  fly: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Battle_Up', loop: false, next: 'airborne', yOffset: 0 },
+  land: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Battle_Down', loop: false, next: 'idle', yOffset: 0 },
+  death: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Death', loop: false, yOffset: 0 },
+
+  airborne: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Battle_Down02', yOffset: 0, phaseGroup: 'flight' },
+  cruise: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Battle_Down02', yOffset: 0, phaseGroup: 'flight' },
+  scout: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Battle_Down02', yOffset: 0 },
+  bankLeft: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Battle_SkyMoveL', yOffset: 0, phaseGroup: 'flight' },
+  bankRight: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Battle_SkyMoveR', yOffset: 0, phaseGroup: 'flight' },
+  hover: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Battle_Down02', yOffset: 0 },
+  glide: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Battle_Down02', yOffset: 0 },
+  dive: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Battle_Down02', yOffset: 0 },
+  speed: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Battle_Down02', yOffset: 0 },
+
+  attack: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Battle_Attack06', loop: false, yOffset: 0 },
+  attackAir: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Battle_Attack06', loop: false, yOffset: 0, fadeIn: 0.16 },
+  breathe: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Battle_Skill03', loop: false, yOffset: 0 },
+  breatheAir: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Battle_Skill03', loop: false, yOffset: 0 },
+
+  sleep: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Damage_GroggyLoop', yOffset: 0, timeScale: 0.6 },
+  sit: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Damage_GroggyLoop', yOffset: 0 },
+  eat: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Battle_Attack06', yOffset: 0, timeScale: 0.75, loop: true },
+  drink: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Neutural_Watch', yOffset: 0, timeScale: 0.7 },
+  groom: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Neutural_Watch', yOffset: 0 },
+  nuzzle: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Neutural_Watch', yOffset: 0 },
+  calm: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Neutural_Watch', yOffset: 0 },
+  perch: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Neutural_Watch', yOffset: 0 },
+  hop: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Battle_Skill07', yOffset: 0 },
+  seated: { clip: 'SKM_DaenerysDragon|AA_DaenerysDragon_Battle_Stand', yOffset: 0 },
+  rise: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Battle_Up', loop: false, next: 'idle', yOffset: 0 },
+  pickUp: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Battle_Attack06', loop: false, yOffset: 0 },
+  huntGrip: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Battle_Attack06', loop: false, yOffset: 0 },
+  huntCarry: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Battle_Down02', yOffset: 0, phaseGroup: 'flight' },
+  drop: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Battle_Attack06', loop: false, yOffset: 0 },
+  huntFinish: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Battle_Attack06', loop: false, yOffset: 0 },
 }
 
 /** One species' entry. `size` is its relative bulk, ordered by tier. */
@@ -422,6 +467,31 @@ const THORNWING_CLIPS = {
  * procedural placeholder.
  */
 export const ASSETS: Record<AssetId, AssetEntry> = {
+  /**
+   * The rebuilt gothic wing, for Flight Lab only.
+   *
+   * Deliberately its own asset id rather than a swap inside `wyvernAsset`:
+   * that helper backs all five playable species across battle and the
+   * sanctuary, so editing it would change the model for the whole game. This
+   * keeps the comparison to the one route that exists to make it.
+   *
+   * Built by `pnpm assets:gothic-wing`. It gates better than the shipped model
+   * -- one validator problem against five, and it fixes the four static-membrane
+   * failures `idle` has -- but its clips are retargeted rather than re-authored,
+   * and the gothic silhouette is not yet cut into the mesh.
+   */
+  'wyvern.gothic': {
+    url: '/models/wyvern-gothic.glb',
+    scale: WYVERN_FIT,
+    yOffset: 0,
+    animations: WYVERN_CLIPS,
+  },
+  'wyvern.drogon': {
+    url: '/models/drogon.glb',
+    scale: 0.72,
+    yOffset: 0,
+    animations: DROGON_CLIPS,
+  },
   'wyvern.emberback': wyvernAsset(0.85),
   'wyvern.cragwing': wyvernAsset(0.9),
   'wyvern.mirefang': wyvernAsset(1),

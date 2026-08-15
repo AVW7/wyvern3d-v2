@@ -1,8 +1,10 @@
 'use client'
 
+import { useMemo, useState } from 'react'
 import type { PropBase } from '../props/PropBase'
 import {
   EXTRA_SCALES,
+  GROUPS,
   SPECIES,
   type ThemeStyle,
 } from '../constants'
@@ -17,6 +19,13 @@ import {
   IconTrash,
   IconWind,
 } from './Icons'
+
+export interface GroundedPreset {
+  id: string
+  label: string
+  clip?: string
+  shared?: number
+}
 
 interface FlightLabControlPanelProps {
   t: ThemeStyle
@@ -46,7 +55,7 @@ interface FlightLabControlPanelProps {
   extraScale: number
   setExtraScale: (scale: number) => void
   /** Grounded animation presets */
-  groundedPresets?: { id: string; label: string }[]
+  groundedPresets?: GroundedPreset[]
   activePreset?: string
   onSelectPreset?: (presetId: string) => void
 }
@@ -82,8 +91,47 @@ export function FlightLabControlPanel({
   activePreset,
   onSelectPreset,
 }: FlightLabControlPanelProps) {
+  const [presetCategory, setPresetCategory] = useState<string>('all')
   const doeCount = propsList.filter(p => p.type === 'prey_doe').length
   const birdCount = propsList.filter(p => p.type === 'prey_bird').length
+
+  const groupMap = useMemo(() => {
+    const map = new Map<string, string>()
+    for (const group of GROUPS) {
+      for (const st of group.states) {
+        map.set(st, group.label)
+      }
+    }
+    return map
+  }, [])
+
+  const uniqueClipsCount = useMemo(() => {
+    if (!groundedPresets) return 0
+    return new Set(groundedPresets.map((p) => p.clip ?? p.id)).size
+  }, [groundedPresets])
+
+  const aliasCount = useMemo(() => {
+    if (!groundedPresets) return 0
+    return groundedPresets.filter(
+      (p) => (p.clip && p.clip !== p.id) || (p.shared && p.shared > 1)
+    ).length
+  }, [groundedPresets])
+
+  const filteredPresets = useMemo(() => {
+    if (!groundedPresets) return []
+    if (presetCategory === 'all') return groundedPresets
+    if (presetCategory === 'aliases') {
+      return groundedPresets.filter(
+        (p) => (p.clip && p.clip !== p.id) || (p.shared && p.shared > 1)
+      )
+    }
+    return groundedPresets.filter(
+      (p) => groupMap.get(p.id)?.toLowerCase() === presetCategory.toLowerCase()
+    )
+  }, [groundedPresets, presetCategory, groupMap])
+
+  const activePresetObj = groundedPresets?.find((p) => p.id === activePreset)
+  const activeClipName = activePresetObj?.clip ?? activePreset
 
   return (
     <div
@@ -126,19 +174,178 @@ export function FlightLabControlPanel({
 
       {/* Animation Clips Card - Grounded Presets */}
       {groundedPresets && onSelectPreset && (
-        <AppleCard title="Animation Clips" subtitle="Grounded behavior presets" themeStyle={t}>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-            {groundedPresets.map((preset) => (
-              <LabButton
-                key={preset.id}
-                active={activePreset === preset.id}
-                themeStyle={t}
-                onClick={() => onSelectPreset(preset.id)}
+        <AppleCard
+          title="Animation Clips"
+          subtitle={`${groundedPresets.length} presets · ${uniqueClipsCount} distinct clips (${aliasCount} shared)`}
+          themeStyle={t}
+        >
+          {/* Active Preset & Clip Readout */}
+          {activePresetObj && (
+            <div
+              style={{
+                fontSize: 10,
+                padding: '4px 8px',
+                borderRadius: 6,
+                background: t.cardBg,
+                border: `1px solid ${t.border}`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 6,
+                marginBottom: 6,
+              }}
+            >
+              <div>
+                <span>Preset: </span>
+                <strong style={{ color: t.text }}>{activePresetObj.label}</strong>
+                <span> → Clip: </span>
+                <span
+                  style={{
+                    color: t.accentColor,
+                    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+                    fontWeight: 600,
+                  }}
+                >
+                  {activeClipName}
+                </span>
+              </div>
+              {activePresetObj.clip && activePresetObj.clip !== activePresetObj.id ? (
+                <span
+                  style={{
+                    fontSize: 8.5,
+                    padding: '1px 5px',
+                    borderRadius: 4,
+                    background: 'rgba(234, 179, 8, 0.15)',
+                    border: '1px solid rgba(234, 179, 8, 0.3)',
+                    color: '#eab308',
+                    fontWeight: 600,
+                  }}
+                  title={`Shares '${activePresetObj.clip}' with ${activePresetObj.shared ?? 1} states`}
+                >
+                  Alias ({activePresetObj.shared}x)
+                </span>
+              ) : (
+                <span
+                  style={{
+                    fontSize: 8.5,
+                    padding: '1px 5px',
+                    borderRadius: 4,
+                    background: 'rgba(34, 197, 94, 0.15)',
+                    border: '1px solid rgba(34, 197, 94, 0.3)',
+                    color: '#22c55e',
+                    fontWeight: 600,
+                  }}
+                >
+                  Unique
+                </span>
+              )}
+            </div>
+          )}
+
+          {/* Preset Category Filter Tabs */}
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 3,
+              marginBottom: 6,
+              padding: 2,
+              background: t.segmentedBg,
+              borderRadius: 6,
+              border: `1px solid ${t.border}`,
+            }}
+          >
+            {[
+              { id: 'all', label: `All (${groundedPresets.length})` },
+              { id: 'flight', label: 'Flight' },
+              { id: 'ground', label: 'Ground' },
+              { id: 'hunt', label: 'Hunt' },
+              { id: 'ambient', label: 'Ambient' },
+              { id: 'aliases', label: `Shared (${aliasCount})` },
+            ].map((cat) => (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => setPresetCategory(cat.id)}
+                style={{
+                  fontSize: 9,
+                  fontWeight: presetCategory === cat.id ? 700 : 500,
+                  padding: '2px 6px',
+                  borderRadius: 4,
+                  border: 'none',
+                  background: presetCategory === cat.id ? t.accentColor : 'transparent',
+                  color: presetCategory === cat.id ? t.buttonActiveText : t.muted,
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                }}
               >
-                {preset.label}
-              </LabButton>
+                {cat.label}
+              </button>
             ))}
           </div>
+
+          {/* Preset Buttons Grid */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+            {filteredPresets.map((preset) => {
+              const isAlias = preset.clip && preset.clip !== preset.id
+              const isSelected = activePreset === preset.id
+              return (
+                <LabButton
+                  key={preset.id}
+                  active={isSelected}
+                  themeStyle={t}
+                  onClick={() => onSelectPreset(preset.id)}
+                  title={`Preset: ${preset.label} → Plays clip: ${preset.clip ?? preset.id}${
+                    preset.shared && preset.shared > 1 ? ` (${preset.shared} states share this)` : ''
+                  }`}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 3,
+                    fontSize: 10,
+                    padding: '3px 6px',
+                  }}
+                >
+                  <span>{preset.label}</span>
+                  {isAlias && (
+                    <span
+                      style={{
+                        fontSize: 8,
+                        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+                        opacity: isSelected ? 0.9 : 0.65,
+                        background: isSelected ? 'rgba(0, 0, 0, 0.2)' : t.cardBg,
+                        padding: '0 3px',
+                        borderRadius: 3,
+                        border: `1px solid ${t.border}`,
+                      }}
+                    >
+                      →{preset.clip}
+                    </span>
+                  )}
+                </LabButton>
+              )
+            })}
+          </div>
+
+          {/* Rig Clip Mapping Explanation */}
+          <details
+            style={{
+              fontSize: 9.5,
+              color: t.muted,
+              padding: '4px 6px',
+              borderRadius: 6,
+              border: `1px solid ${t.border}`,
+              background: t.cardBg,
+              marginTop: 6,
+            }}
+          >
+            <summary style={{ cursor: 'pointer', fontWeight: 600, userSelect: 'none' }}>
+              ℹ️ Rig Clip Mapping (35 states → 16 authored clips)
+            </summary>
+            <div style={{ marginTop: 4, lineHeight: 1.4 }}>
+              The WyvernRig currently has 16 authored clips. 19 behavior presets map to shared base clips (e.g. sleep/sit/eat/drink/groom → <code style={{ color: t.text }}>rest</code>, hunt actions → <code style={{ color: t.text }}>attack</code>) because the legacy 26-clip sanctuary sidecar targeted <code style={{ color: t.text }}>Bip001-*</code> bones.
+            </div>
+          </details>
         </AppleCard>
       )}
 

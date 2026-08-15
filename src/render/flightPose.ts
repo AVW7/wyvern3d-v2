@@ -162,18 +162,21 @@ export function speedPitchTrim(horizontalSpeed: number, referenceSpeed: number =
   const ratio = horizontalSpeed / Math.max(referenceSpeed, 1)
   if (ratio < 0.65) {
     // Slow speeds (e.g. < 11.7 u/s at ref 18): +0.04 to +0.12 rad nose-up (~2.3° to 6.9°)
-    // More lift needed at slow speeds
+    // More lift needed at slow speeds, smooth cubic easing
     const t = clamp((0.65 - ratio) / 0.65, 0, 1)
-    return t * 0.12
+    const smoothT = t * t * (3 - 2 * t)
+    return smoothT * 0.12
   } else if (ratio > 1.0) {
-    // Fast speeds (sprint): -0.06 to -0.22 rad nose-down (~-3.4° to -12.6°)
-    // Aggressive streamline position for maximum speed
+    // Fast speeds (sprint): -0.04 to -0.24 rad nose-down (~-2.3° to -13.7°)
+    // Aggressive streamline stoop posture for predatory speed
     const t = clamp((ratio - 1.0) / 0.8, 0, 1)
-    return -t * 0.22
+    const smoothT = t * t * (3 - 2 * t)
+    return -0.03 - smoothT * 0.21
   }
   // Medium cruise speed range (0.65 <= ratio <= 1.0): smooth gradient near neutral
   const t = (ratio - 0.65) / (1.0 - 0.65)
-  return 0.04 * (1 - t) - 0.03 * t
+  const smoothT = t * t * (3 - 2 * t)
+  return 0.04 * (1 - smoothT) - 0.03 * smoothT
 }
 
 /**

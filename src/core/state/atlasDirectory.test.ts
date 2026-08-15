@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { createInitialState } from './game'
 import { STARTING_REGION, REGIONS } from '../data/regions'
 import { getAllAuthoredLandmarks } from '../data/atlas'
+import { PHENOMENA } from '../data/phenomena'
+import { execute } from '../executions'
 import {
   EMPTY_ATLAS_QUERY,
   buildAtlasDirectory,
@@ -216,5 +218,47 @@ describe('directory stays consistent with authored content', () => {
     const entries = buildAtlasDirectory(freshState())
     expect(entries.length).toBe(Object.keys(REGIONS).length)
     expect(getAllAuthoredLandmarks().length).toBeGreaterThanOrEqual(entries.length)
+  })
+})
+
+describe('observed phenomena surface (Biome Stage 4)', () => {
+  it('is null everywhere on a fresh save', () => {
+    for (const entry of buildAtlasDirectory(freshState())) {
+      expect(entry.observedPhenomenon).toBeNull()
+    }
+  })
+
+  it('names the phenomenon once observed, in any knowledge state', () => {
+    const state = freshState()
+    const phenomenon = PHENOMENA.find((p) => p.biomes.includes('valley'))!
+    // hearthvale is the valley starting region.
+    execute(state, { type: 'OBSERVE_PHENOMENON', regionId: STARTING_REGION, phenomenonId: phenomenon.id })
+
+    const entries = buildAtlasDirectory(state)
+    const heard = entries.find((e) => e.id === STARTING_REGION)!
+    expect(heard.observedPhenomenon).toBe(phenomenon.name)
+    // Everyone else is still null.
+    for (const entry of entries) {
+      if (entry.id !== STARTING_REGION) expect(entry.observedPhenomenon).toBeNull()
+    }
+  })
+
+  it('is searchable by phenomenon name, and never leaks unobserved ones', () => {
+    const state = freshState()
+    const phenomenon = PHENOMENA.find((p) => p.biomes.includes('valley'))!
+    execute(state, { type: 'OBSERVE_PHENOMENON', regionId: STARTING_REGION, phenomenonId: phenomenon.id })
+    const entries = buildAtlasDirectory(state)
+
+    // Observed: findable by name.
+    const found = filterAtlasDirectory(entries, { ...EMPTY_ATLAS_QUERY, search: 'meadowlark' })
+    expect(found.map((e) => e.id)).toContain(STARTING_REGION)
+
+    // Unobserved phenomenon names never match — even for mapped regions.
+    const unobserved = PHENOMENA.find((p) => p.biomes.includes('coast'))!
+    const leaked = filterAtlasDirectory(entries, {
+      ...EMPTY_ATLAS_QUERY,
+      search: unobserved.name,
+    })
+    expect(leaked).toEqual([])
   })
 })

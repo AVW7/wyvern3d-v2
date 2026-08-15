@@ -121,6 +121,11 @@ export const GROUPS: { label: string; states: ModelState[] }[] = [
 ]
 
 export const SPECIES: { id: `wyvern.${string}`; label: string; scale: number }[] = [
+  // First, so the lab opens on it. The rebuilt wing is the thing under review;
+  // the five species below it all share the shipped model and differ only by
+  // scale, so any of them is the before-picture.
+  { id: 'wyvern.gothic', label: 'gothic wing 1.00', scale: 1 },
+  { id: 'wyvern.drogon', label: 'drogon v1 (blender) 1.00', scale: 1 },
   { id: 'wyvern.emberback', label: 'emberback 0.85', scale: 0.85 },
   { id: 'wyvern.cragwing', label: 'cragwing 0.90', scale: 0.9 },
   { id: 'wyvern.mirefang', label: 'mirefang 1.00', scale: 1 },

@@ -5,15 +5,16 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { AdditiveBlending, BufferAttribute, BufferGeometry, Points } from 'three'
 import { biomeHeightAt } from '../terrain/BiomeTerrain'
 import { ambientAgentPosition, getRegionAmbientSpec, type AmbientAgentSpec } from './ambientPaths'
+import { useBiomeLod } from '../lod/biomeLodStore'
 
 /**
- * Ambient ecology renderer (Biome Enhancement Stage 4).
+ * Ambient ecology renderer (Biome Enhancement Stage 4 & 6).
  *
  * Draws a region's characteristic phenomenon as one pooled Points cloud:
  * birds, fireflies, spores or embers circling on deterministic paths.
  * Distance LOD fades the whole system out beyond LOD_FAR, and the update
- * loop is skipped entirely when fully faded — no per-agent objects, no
- * per-frame allocations, positions mutate a single buffer.
+ * loop is skipped entirely when fully faded or culled by the LOD store —
+ * no per-agent objects, no per-frame allocations, positions mutate a single buffer.
  */
 
 /** Beyond this distance the ambient system stops updating and rendering. */
@@ -34,6 +35,9 @@ const VISUALS: Record<AmbientAgentSpec['ambient'], { color: string; size: number
 export function AmbientEcology({ biome, regionId, seed = 42 }: { biome: string; regionId?: string; seed?: number }) {
   const { camera } = useThree()
   const pointsRef = useRef<Points>(null)
+  const agentsCulled = useBiomeLod((s) => s.capabilities.agentsCulled)
+  const agentUpdateRate = useBiomeLod((s) => s.capabilities.agentUpdateRate)
+  const frameCount = useRef(0)
 
   const spec = useMemo(
     () => (regionId ? getRegionAmbientSpec(regionId, seed) : null),
@@ -57,7 +61,17 @@ export function AmbientEcology({ biome, regionId, seed = 42 }: { biome: string; 
   useFrame((frameState) => {
     if (!spec || !geometry || !pointsRef.current) return
     const material = pointsRef.current.material as { opacity: number }
+    if (agentsCulled) {
+      material.opacity = 0
+      pointsRef.current.visible = false
+      return
+    }
+
+    frameCount.current += 1
+    if (frameCount.current % agentUpdateRate !== 0) return
+
     const t = frameState.clock.elapsedTime
+
 
     // Distance LOD: fade with distance, stop updating when fully faded.
     const dist = camera.position.distanceTo(pointsRef.current.position)

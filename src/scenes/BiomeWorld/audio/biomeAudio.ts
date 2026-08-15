@@ -154,6 +154,15 @@ class BiomeAudioManager {
     this.currentBiome = null
   }
 
+  public setLodAudioScale(scale: number): void {
+    if (!this.isRunning || !this.ctx || !this.gainNode || !this.currentBiome) return
+    const { masterVolume, ambienceVolume, muted } = useAudioStore.getState()
+    const baseTarget = muted ? 0 : masterVolume * ambienceVolume
+    const acoustics = BIOME_ACOUSTICS[this.currentBiome] ?? BIOME_ACOUSTICS.valley!
+    const effectiveGain = baseTarget * acoustics.gain * Math.max(0, Math.min(1, scale))
+    this.gainNode.gain.setTargetAtTime(effectiveGain, this.ctx.currentTime, 0.2)
+  }
+
   public playCue(type: 'arrival' | 'chime' | 'gust'): void {
     const ctx = this.initContext()
     if (!ctx) return

@@ -8,6 +8,7 @@ import {
   getEffectiveWeatherPalette,
   type WeatherType,
 } from './biomeWeather'
+import { useBiomeLod } from '../lod/biomeLodStore'
 import { BiomeWeatherParticles } from './BiomeWeatherParticles'
 
 interface BiomeAtmosphereProps {
@@ -36,6 +37,8 @@ export function BiomeAtmosphere({
     () => getEffectiveWeatherPalette(basePalette, weatherProfile),
     [basePalette, weatherProfile],
   )
+  const shadows = useBiomeLod((s) => s.capabilities.shadows)
+  const particleScale = useBiomeLod((s) => s.capabilities.particleScale)
 
   return (
     <>
@@ -53,7 +56,7 @@ export function BiomeAtmosphere({
         position={effectivePalette.sunPosition}
         intensity={effectivePalette.sunIntensity}
         color={effectivePalette.sunColor}
-        castShadow
+        castShadow={shadows}
         shadow-mapSize={[1024, 1024]}
         shadow-camera-left={-120}
         shadow-camera-right={120}
@@ -71,11 +74,14 @@ export function BiomeAtmosphere({
       <color attach="background" args={[effectivePalette.background]} />
 
       {/* Ambient Weather Particle Cloud */}
-      <BiomeWeatherParticles
-        kind={weatherProfile.particleKind}
-        count={weatherProfile.particleCount}
-        windSpeed={weatherProfile.windSpeed}
-      />
+      {particleScale > 0 && (
+        <BiomeWeatherParticles
+          kind={weatherProfile.particleKind}
+          count={Math.round(weatherProfile.particleCount * particleScale)}
+          windSpeed={weatherProfile.windSpeed}
+        />
+      )}
     </>
   )
 }
+
