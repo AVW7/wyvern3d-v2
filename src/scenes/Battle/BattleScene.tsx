@@ -455,6 +455,10 @@ function WyvernActorView({ actor, index, piloted }: { actor: Actor; index: numbe
         action={action}
         scale={1.6}
         frozen={frozen}
+        // Picks this wyvern's member of the `attack`/`attackAir` clip pools, so
+        // a line of them does not strike in lockstep. Index within the wyvern
+        // list, which is stable — dead actors stay in `sim.actors`.
+        seed={index}
         onReady={handleReady}
         onActionFinished={(completed) => {
           setAction((current) => (current?.token === completed.token ? null : current))
