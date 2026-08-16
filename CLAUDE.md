@@ -130,8 +130,8 @@ UI displays**. Never reverse this flow.
   `flightPose.ts`, gaze in `gazeController.ts`, mouth in `flightMouth.ts` — each independently
   testable. Follow this pattern for new features: one concern per file, co-located test.
 - **Debug/development tools must be componentized.** When building Flight Lab style test scenes
-  or debug panels, split into separate UI panels (e.g. `AnimationPanel`, `CombatPanel`,
-  `PropPanel`), isolated systems (e.g. `AnimationDebugger`, `CombatSimulator`, `PropManager`),
+  or debug panels, split into separate UI panels (e.g. `AnimationControls`, `PoseTransitionPanel`,
+  `ReadoutLogPanel`), isolated systems (e.g. `AnimationDebugger`, `CombatSimulator`, `PropManager`),
   and clear prop hierarchies — never a monolithic single-file debug scene. The
   `/debug/animation` route already follows this pattern with its `components/`, `hooks/`, and
   `systems/` subdirectories.
