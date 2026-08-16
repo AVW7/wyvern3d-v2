@@ -21,6 +21,10 @@ import {
   HatcheryHeroStation,
   ScaleForgeHeroStation,
 } from './CareAndCraftStations'
+import { InteractiveSupplyContainer } from '../interactive/InteractiveSupplyContainer'
+import { InteractiveTrough } from '../interactive/InteractiveTrough'
+import { InteractiveAnvil } from '../interactive/InteractiveAnvil'
+import { InteractivePerch } from '../interactive/InteractivePerch'
 
 /**
  * Dynamic Sanctuary layout objects rendered from GameState.
@@ -74,7 +78,50 @@ export function DynamicSanctuaryObject({ object }: { object: SanctuaryPlacedObje
       return <BreedingHeroStation {...heroProps} />
     case 'flightRing':
       return <FlightRingHeroStation {...heroProps} />
-    default:
+    default: {
+      if (object.propId === 'prop.barrel' || object.propId === 'prop.crate') {
+        return (
+          <InteractiveSupplyContainer
+            type={object.propId === 'prop.barrel' ? 'barrel' : 'crate'}
+            position={object.position}
+            rotationY={object.rotationY}
+            scale={object.scale ?? 1}
+          />
+        )
+      }
+      if (object.propId === 'prop.forge.trough') {
+        return (
+          <InteractiveTrough
+            position={object.position}
+            rotationY={object.rotationY}
+            scale={object.scale ?? 1}
+          />
+        )
+      }
+      if (object.propId === 'prop.forge.anvil') {
+        return (
+          <InteractiveAnvil
+            position={object.position}
+            rotationY={object.rotationY}
+            scale={object.scale ?? 0.55}
+          />
+        )
+      }
+      if (
+        object.propId === 'prop.perch.trunk' ||
+        object.propId === 'prop.perch.stump' ||
+        object.propId === 'prop.perch.rockA' ||
+        object.propId === 'prop.perch.rockB'
+      ) {
+        return (
+          <InteractivePerch
+            propId={object.propId}
+            position={object.position}
+            rotationY={object.rotationY}
+            scale={object.scale ?? 1}
+          />
+        )
+      }
       return (
         <group position={object.position} rotation={[0, object.rotationY, 0]}>
           <Prop
@@ -85,5 +132,6 @@ export function DynamicSanctuaryObject({ object }: { object: SanctuaryPlacedObje
           />
         </group>
       )
+    }
   }
 }

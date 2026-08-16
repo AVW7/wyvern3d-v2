@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import type { AssetEntry, AssetId, ModelState } from '@/render/assets/manifest'
-import { animationDetails, statusFor, type ModelLibraryEntry } from '../catalog'
+import { animationDetails, formatBytes, statusFor, type ModelLibraryEntry } from '../catalog'
 import type { ModelStats } from './PreviewStage'
 import styles from '../models.module.css'
 
@@ -18,6 +18,8 @@ interface InspectorPanelProps {
   states: ModelState[]
   previewState: ModelState
   modelStats: ModelStats | null
+  /** Sum of the base GLB plus any animation sidecars, fetched via HEAD. */
+  payloadBytes: number
   isDisabled: boolean
   onRequestState: (state: ModelState) => void
   onEnabled: (id: AssetId, enabled: boolean) => void
@@ -31,6 +33,7 @@ export function InspectorPanel({
   states,
   previewState,
   modelStats,
+  payloadBytes,
   isDisabled,
   onRequestState,
   onEnabled,
@@ -85,6 +88,7 @@ export function InspectorPanel({
         {tab === 'info' && (
           <dl className={styles.details}>
             <div><dt>Source</dt><dd>{asset.url ?? 'No GLB assigned'}</dd></div>
+            <div><dt>Payload</dt><dd>{formatBytes(payloadBytes)}</dd></div>
             <div><dt>World scale</dt><dd>{asset.scale.toFixed(4)}</dd></div>
             <div><dt>Root offset</dt><dd>{asset.yOffset ?? 0}</dd></div>
             <div><dt>Model states</dt><dd>{states.length}</dd></div>

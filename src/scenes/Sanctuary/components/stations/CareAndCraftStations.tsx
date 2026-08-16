@@ -3,6 +3,9 @@
 import { Prop } from '@/render/assets/props'
 import { emissiveFor } from '../../atmosphere/fireSources'
 import { useSanctuaryColors } from '@/state/sanctuaryColorsStore'
+import { InteractiveTrough } from '../interactive/InteractiveTrough'
+import { InteractiveAnvil } from '../interactive/InteractiveAnvil'
+import { InteractiveHatcheryNest } from '../interactive/InteractiveHatcheryNest'
 import type { StationHeroProps } from './types'
 
 /**
@@ -23,8 +26,8 @@ export function ScaleForgeHeroStation({
       <Prop id="prop.forge.chimney" position={[1.7, 0, -0.2]} />
       <Prop id="prop.forge.toolHolder" position={[-1.9, 0, 0.8]} rotationY={Math.PI / 2} />
       <Prop id="prop.forge.sign" position={[2.2, 0, 3.4]} rotationY={-0.6} />
-      <Prop id="prop.forge.anvil" position={[0, 0, 2.2]} scale={0.55} rotationY={0.4} />
-      <Prop id="prop.forge.trough" position={[-1.8, 0, 2.0]} />
+      <InteractiveAnvil position={[0, 0, 2.2]} scale={0.55} rotationY={0.4} isWorking />
+      <InteractiveTrough position={[-1.8, 0, 2.0]} isQuenching />
       <Prop id="prop.forge.grindstone" position={[1.8, 0, 1.8]} rotationY={-0.5} />
     </group>
   )
@@ -40,8 +43,7 @@ export function HatcheryHeroStation({
 }: StationHeroProps) {
   return (
     <group position={position} rotation={[0, rotationY, 0]} scale={scale}>
-      <Prop
-        id="prop.hatchery.cave"
+      <InteractiveHatcheryNest
         position={[0, 0, 0]}
         rotationY={Math.PI}
         scale={0.75}

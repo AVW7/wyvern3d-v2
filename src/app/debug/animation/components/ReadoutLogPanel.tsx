@@ -4,19 +4,9 @@ import { useCallback, useState } from 'react'
 import type { ThemeStyle } from '../constants'
 import { AppleCard, LabButton } from './AppleControls'
 import { IconCheck, IconCopy, IconFilter } from './Icons'
+import { formatPoseExport, type LabTelemetry } from '../labTelemetry'
 
-export interface TelemetrySnapshot {
-  timestamp: number
-  airspeed: number
-  pitchAngle: number
-  headOrientation: { pitch: number; yaw: number; roll: number }
-  neckCurve: number
-  tailExtent: number
-  tailFlexAngles: number[]
-  activeControllers: string[]
-  contractStatus: 'pass' | 'warn' | 'fail'
-  loopState: string
-}
+export type TelemetrySnapshot = LabTelemetry
 
 export interface LogEntry {
   id: string
@@ -57,23 +47,7 @@ export function ReadoutLogPanel({
   }, [])
 
   const handleCopyPoseCode = useCallback(() => {
-    const codeSnippet = `// Flight Pose Preset (Generated from Flight Lab)
-export const CUSTOM_FLIGHT_POSE = {
-  pitchAngle: ${telemetry.pitchAngle.toFixed(2)},
-  headNeck: {
-    pitch: ${telemetry.headOrientation.pitch.toFixed(3)},
-    yaw: ${telemetry.headOrientation.yaw.toFixed(3)},
-    roll: ${telemetry.headOrientation.roll.toFixed(3)},
-    curve: ${telemetry.neckCurve.toFixed(3)},
-  },
-  tail: {
-    extent: ${telemetry.tailExtent.toFixed(3)},
-    flexAngles: [${telemetry.tailFlexAngles.map(a => a.toFixed(3)).join(', ')}],
-  },
-  speed: ${telemetry.airspeed.toFixed(1)},
-  loopState: '${telemetry.loopState}',
-}`
-    copyToClipboard(codeSnippet, 'code')
+    copyToClipboard(formatPoseExport(telemetry), 'code')
   }, [telemetry, copyToClipboard])
 
   const handleCopyTelemetryJSON = useCallback(() => {
@@ -175,8 +149,19 @@ export const CUSTOM_FLIGHT_POSE = {
 
             <div>
               <span style={{ color: t.muted }}>Tail Extent: </span>
-              <span style={{ color: t.text }}>{telemetry.tailExtent.toFixed(2)} u</span>
+              <span style={{ color: t.text }}>{Number.isNaN(telemetry.tailExtent) ? '—' : `${telemetry.tailExtent.toFixed(2)} u`}</span>
             </div>
+            <div>
+              <span style={{ color: t.muted }}>Wing span: </span>
+              <span style={{ color: t.text }}>{Number.isNaN(telemetry.wingSpan) ? '—' : `${telemetry.wingSpan.toFixed(1)} u`}</span>
+            </div>
+            <div>
+              <span style={{ color: t.muted }}>Clip: </span>
+              <span style={{ color: t.text }}>{telemetry.clipName}</span>
+            </div>
+            {telemetry.contractNotes.map((note) => (
+              <div key={note} style={{ color: t.muted }}>{note}</div>
+            ))}
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>

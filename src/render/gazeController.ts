@@ -101,7 +101,7 @@ export const GAZE_CONFIG = {
   DIVE_HEAD_PITCH_OFFSET: -0.15,
   HOVER_HEAD_PITCH_OFFSET: 0.08,
   GLIDE_HEAD_PITCH_OFFSET: 0.03,
-  SPEED_HEAD_PITCH_OFFSET: -0.08,
+  SPEED_HEAD_PITCH_OFFSET: 0,
   
   /** Neck cascade weights (head leads, neck follows) */
   NECK_WEIGHTS: [0.25, 0.35, 0.40], // Neck, Neck1, Neck2

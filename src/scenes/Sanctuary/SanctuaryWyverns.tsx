@@ -15,6 +15,7 @@ import { useGame } from '@/state/store'
 import { useHighlandsHunt } from '@/state/highlandsHuntStore'
 import { GROUND_RADIUS } from './layout'
 import { useGameEventStream } from './events/useGameEventStream'
+import { sanctuaryAudio } from './audio/sanctuaryAudio'
 import {
   findSafeAttackLanding,
   type SanctuaryCollider,
@@ -87,6 +88,11 @@ export function SanctuaryWyverns({ wyverns, colliders, placedObjects, seed }: Sa
         const wyvernId = event.subjectId
         if (wyvernId) {
           directorRef.current.playReaction(wyvernId, 'eat', 4.5)
+          const wyvern = wyverns.find((w) => w.id === wyvernId)
+          sanctuaryAudio.playWyvernVocalization('eat', {
+            stage: wyvern?.stage,
+            speciesId: wyvern?.speciesId,
+          })
         }
       }
     },

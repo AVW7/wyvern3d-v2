@@ -2,6 +2,7 @@ import type { GameState, LandmarkDef, RegionKnowledge } from '../types'
 import { REGIONS, REGION_LIST } from '../data/regions'
 import { REGION_ATLAS_DATA } from '../data/atlas'
 import { PHENOMENA, type PhenomenonDef } from '../data/phenomena'
+import { EXPEDITION_ACTIVITIES, type ExpeditionActivityDef } from '../data/expeditionActivities'
 
 /**
  * Ensures that `state.atlasKnowledge` is populated for all known regions.
@@ -13,7 +14,8 @@ export function ensureAtlasKnowledge(state: GameState): GameState {
   }
 
   for (const def of REGION_LIST) {
-    if (!state.atlasKnowledge[def.id]) {
+    const existing = state.atlasKnowledge[def.id]
+    if (!existing) {
       const regionState = state.regions[def.id]
       const isOwned = regionState?.owner === 'player'
       const isStarting = !!def.starting
@@ -29,8 +31,11 @@ export function ensureAtlasKnowledge(state: GameState): GameState {
         visited,
         discoveredLandmarkIds: [],
         observedPhenomenonIds: [],
+        completedActivityIds: [],
         firstVisitedTick: visited ? (regionState?.conqueredAtTick ?? 0) : null,
       }
+    } else if (!existing.completedActivityIds) {
+      existing.completedActivityIds = []
     }
   }
 
@@ -90,6 +95,18 @@ export function getObservedPhenomena(state: GameState, regionId: string): Phenom
 }
 
 /**
+ * Expedition activities and ecological mysteries solved in a region.
+ */
+export function getCompletedActivities(state: GameState, regionId: string): ExpeditionActivityDef[] {
+  ensureAtlasKnowledge(state)
+  const knowledge = state.atlasKnowledge[regionId]
+  const completed = knowledge?.completedActivityIds ?? []
+  if (completed.length === 0) return []
+  const set = new Set(completed)
+  return EXPEDITION_ACTIVITIES.filter((a) => set.has(a.id))
+}
+
+/**
  * Returns the region summary if mapped; returns a locked message or null if unmapped.
  */
 export function getKnownRegionSummary(state: GameState, regionId: string): string | null {
@@ -127,6 +144,7 @@ export interface AtlasCompletionStats {
   totalRegions: number
   discoveredLandmarks: number
   totalLandmarks: number
+  completedActivities: number
   percent: number
 }
 
@@ -140,21 +158,26 @@ export function getAtlasCompletionStats(state: GameState): AtlasCompletionStats 
   let visitedRegions = 0
   let discoveredLandmarks = 0
   let totalLandmarks = 0
+  let completedActivities = 0
 
   for (const def of REGION_LIST) {
     const knowledge = state.atlasKnowledge[def.id]
     if (knowledge?.mapped) mappedRegions += 1
     if (knowledge?.visited) visitedRegions += 1
-    if (knowledge) discoveredLandmarks += knowledge.discoveredLandmarkIds.length
+    if (knowledge) {
+      discoveredLandmarks += knowledge.discoveredLandmarkIds.length
+      completedActivities += knowledge.completedActivityIds?.length ?? 0
+    }
 
     const atlas = REGION_ATLAS_DATA[def.id]
     if (atlas) totalLandmarks += atlas.landmarks.length
   }
 
-  // Weight: visited regions (50%) + discovered landmarks (50%)
+  // Weight: visited regions (40%) + discovered landmarks (40%) + completed activities (20%)
   const regionScore = totalRegions > 0 ? visitedRegions / totalRegions : 0
   const landmarkScore = totalLandmarks > 0 ? discoveredLandmarks / totalLandmarks : 0
-  const percent = Math.round(((regionScore + landmarkScore) / 2) * 100)
+  const activityScore = totalRegions > 0 ? Math.min(1, completedActivities / totalRegions) : 0
+  const percent = Math.round((regionScore * 0.4 + landmarkScore * 0.4 + activityScore * 0.2) * 100)
 
   return {
     mappedRegions,
@@ -162,6 +185,7 @@ export function getAtlasCompletionStats(state: GameState): AtlasCompletionStats 
     totalRegions,
     discoveredLandmarks,
     totalLandmarks,
+    completedActivities,
     percent,
   }
 }

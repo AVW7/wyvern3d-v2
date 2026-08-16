@@ -158,6 +158,7 @@ export function Hud() {
                 {mode === 'worldmap' && (
                   <button
                     className={`nav-pill-btn ${atlasOpen ? 'active' : ''}`}
+                    data-atlas-toggle
                     onClick={toggleAtlas}
                     title="World Atlas (A)"
                   >

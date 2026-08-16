@@ -125,9 +125,9 @@ describe('modeSpecificHeadPitch', () => {
     expect(pitch).toBe(GAZE_CONFIG.GLIDE_HEAD_PITCH_OFFSET)
   })
 
-  it('returns negative pitch for speed mode', () => {
+  it('returns zero/straight pitch for speed mode', () => {
     const pitch = modeSpecificHeadPitch('speed')
-    expect(pitch).toBeLessThan(0)
+    expect(pitch).toBe(0)
     expect(pitch).toBe(GAZE_CONFIG.SPEED_HEAD_PITCH_OFFSET)
   })
 

@@ -286,7 +286,7 @@ export function headNeckTargets(
   const speedRatio = horizontalSpeed / Math.max(referenceSpeed, 1)
 
   // 1. Neck Straightening (Matching Meleys reference: long horizontal neck out of chest)
-  // At speed, the neck extends forward aggressively for aerodynamic streamlining
+  // At faster speed, the neck extends forward aggressively into the body line for aerodynamic streamlining
   let neckStraighten = 0
   if (horizontalSpeed < 0.5) {
     // Hover: alert posture, slight upward curve for scanning
@@ -295,10 +295,11 @@ export function headNeckTargets(
     // Very slow (loitering/scout): transitioning from hover alert to forward
     neckStraighten = clamp(-0.08 + (speedRatio - 0.1) * 0.2, -0.08, 0.04)
   } else {
-    // Cruise and faster: aggressive forward extension
-    // -0.12 rad at slow cruise, -0.28 rad at fast cruise, -0.40 rad at sprint
+    // Cruise and faster: aggressive forward extension aligned with torso line
+    // Smooth cubic curve from -0.12 rad at slow cruise to -0.42 rad at sprint/fast flight
     const t = clamp((speedRatio - 0.4) / 1.0, 0, 1)
-    neckStraighten = -0.12 - t * 0.28
+    const smoothT = t * t * (3 - 2 * t)
+    neckStraighten = -0.12 - smoothT * 0.30
   }
 
   // 2. Gaze pitch: hold the horizon near a standstill, follow the path in flight.
@@ -322,14 +323,12 @@ export function headNeckTargets(
   // one. They never both apply at full strength.
   const gazePitch = -bodyPitch * horizonHold + pathAngle * FLIGHT_PATH_LEAD * (1 - horizonHold)
 
-  // Distribute neck pitch across the 3 neck bones (Neck_012, Neck1_013, Neck2_014)
-  // Neck bones closer to body get more of the straightening
-  const neckPitch = (neckStraighten * 1.2 + gazePitch * 0.40) / 3
+  // Distribute neck pitch across the 2 neck bones in the clean rig (Neck1, Neck2)
+  // Neck bones take the straightening into the body line plus gaze share
+  const neckPitch = (neckStraighten + gazePitch * 0.35) / 2
 
   // Head pitch takes remaining compensation so snout points parallel to flight vector
-  // Add slight downward tuck at high speeds for streamlined appearance
-  const speedTuck = speedRatio > 1.0 ? -(speedRatio - 1.0) * 0.08 : 0
-  const headPitch = gazePitch * 0.60 - neckStraighten * 0.20 + speedTuck
+  const headPitch = gazePitch * 0.60 - neckStraighten * 0.15
 
   // 3. Turn Leading & Roll Compensation (Head Anticipates Turns)
   // Head leads into turns more prominently at speed

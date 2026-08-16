@@ -5229,3 +5229,96 @@ button:active {
 
 
 
+
+/* ============================================================
+   World Atlas Stage 5 — accessibility & diagnostics
+   ============================================================ */
+
+/* Visually hidden but screen-reader available (live region). */
+.atlas-sr-live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* Shape cue inside a legend swatch: readable at color-blind contrast. */
+.legend-swatch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(0, 0, 0, 0.75);
+  font-size: 10px;
+  line-height: 1;
+}
+
+/* Touch targets: interactive atlas controls meet the 44px minimum. */
+.atlas-chip,
+.atlas-layer-bar .layer-btn,
+.atlas-legend .widget-icon-btn,
+.atlas-legend-expand-btn {
+  min-height: 28px;
+  min-width: 36px;
+}
+
+@media (pointer: coarse) {
+  .atlas-chip,
+  .atlas-layer-bar .layer-btn,
+  .atlas-row,
+  .atlas-search,
+  .atlas-select,
+  .atlas-legend .widget-icon-btn,
+  .atlas-legend-expand-btn {
+    min-height: 44px;
+  }
+
+  .atlas-row {
+    padding-top: var(--sp-2);
+    padding-bottom: var(--sp-2);
+  }
+}
+
+/* Dev diagnostic (?reveal=1): compact monospaced state readout. */
+.atlas-diagnostic {
+  position: static;
+  display: grid;
+  gap: 2px;
+  margin: var(--sp-2) 0;
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px solid rgba(96, 165, 250, 0.35);
+  border-radius: var(--radius);
+  font-size: 10px;
+  font-family: var(--font-mono, monospace);
+  color: var(--muted);
+}
+
+.atlas-diag-row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sp-2);
+}
+
+.atlas-diag-row span {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.atlas-diag-row code {
+  color: #60a5fa;
+}
+
+/* Narrow viewport: the data-atlas-layout attribute mirrors the CSS media
+   query (asserted by atlasLayoutMode tests) so both rules can never drift. */
+[data-atlas-layout='narrow'] .atlas-drawer {
+  left: var(--sp-3);
+  right: var(--sp-3);
+  width: auto;
+  max-height: 55vh;
+}

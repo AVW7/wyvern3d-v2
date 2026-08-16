@@ -6,6 +6,7 @@ import { REGIONS, REGION_LIST, STARTING_REGION } from '@/core/data/regions'
 import { useGameState, useGame } from '@/state/store'
 import { usePlayerControlStore } from '@/state/playerControlStore'
 import { getBiomePalette } from './atmosphere/biomePalettes'
+import { getDeterministicRegionWeather } from './atmosphere/biomeWeather'
 import { BiomeAtmosphere } from './atmosphere/BiomeAtmosphere'
 import { BiomeTerrain } from './terrain/BiomeTerrain'
 import { BiomeDressing } from './dressing/BiomeDressing'
@@ -16,6 +17,7 @@ import { BiomeFlightActor } from './flight/BiomeFlightActor'
 import { BiomeDiscoveryDirector } from './discovery/BiomeDiscoveryDirector'
 import { AmbientEcology } from './ecology/AmbientEcology'
 import { ObservationDirector } from './ecology/ObservationDirector'
+import { ExpeditionActivityDirector } from './ecology/ExpeditionActivityDirector'
 import { WorldLabel } from '@/render/labels/WorldLabel'
 import { biomeAudio } from './audio/biomeAudio'
 import { LodDirector } from './lod/LodDirector'
@@ -38,6 +40,12 @@ export function BiomeScene() {
   const biome = regionDef.biome
 
   const palette = useMemo(() => getBiomePalette(biome), [biome])
+  // One weather derivation for the whole scene, so the atmosphere the player
+  // sees and the fog/churn the water renders cannot disagree.
+  const weather = useMemo(
+    () => getDeterministicRegionWeather(biome, regionId, state.tick, state.seed),
+    [biome, regionId, state.tick, state.seed],
+  )
   const activeWyvern = useMemo(() => Object.values(state.wyverns)[0], [state.wyverns])
   const controlMode = usePlayerControlStore((control) => control.controlMode)
   const audioScale = useBiomeLod((s) => s.capabilities.audioScale)
@@ -102,8 +110,8 @@ export function BiomeScene() {
         tick={state.tick}
       />
 
-      {/* Procedural Biome Terrain */}
-      <BiomeTerrain biome={biome} regionId={regionId} seed={state.seed} />
+      {/* Procedural Biome Terrain (incl. animated water for water biomes) */}
+      <BiomeTerrain biome={biome} regionId={regionId} seed={state.seed} weather={weather} />
 
       {/* Biome Scatter Props */}
       <BiomeDressing biome={biome} regionId={regionId} seed={state.seed} onColliders={onColliders} />
@@ -114,6 +122,9 @@ export function BiomeScene() {
       {/* Ambient ecology and the region's observation activity (Stage 4) */}
       <AmbientEcology biome={biome} regionId={regionId} seed={state.seed} />
       <ObservationDirector />
+
+      {/* Interactive expedition puzzles & environmental hazards */}
+      <ExpeditionActivityDirector />
 
       {/* Region Landmark Title Banner */}
       <WorldLabel

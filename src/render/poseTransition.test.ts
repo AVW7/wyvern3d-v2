@@ -311,6 +311,25 @@ describe('triggerModeTransition', () => {
     expect(updated.pitch.duration).toBe(MODE_TRANSITIONS.speed.duration)
     expect(updated.pitch.easing).toBe(MODE_TRANSITIONS.speed.easing)
   })
+
+  it('honours a duration override on every channel', () => {
+    const state = createPoseTransitionState()
+    const updated = triggerModeTransition(state, 'speed', {
+      pitch: 0.2,
+      bank: 0,
+      neckPitch: 0,
+      neckYaw: 0,
+      headPitch: -0.1,
+      headYaw: 0,
+      headRoll: 0,
+      legTuck: 0.2,
+      tailSwing: 0,
+      tailLift: 0,
+    }, 1.25)
+    expect(updated.pitch.duration).toBe(1.25)
+    expect(updated.neckPitch.duration).toBe(1.25)
+    expect(updated.tailLift.duration).toBe(1.25)
+  })
 })
 
 describe('isTransitioning', () => {

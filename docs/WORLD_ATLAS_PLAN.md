@@ -1,6 +1,6 @@
 # World Atlas — staged work orders
 
-**Status: PLANNED — start only after Stage 6 of `docs/WYVERN_ANIMATION_PLAN.md` is DONE.**
+**Status: COMPLETE — all six stages landed 2026-08-15.**
 
 The current World Map is a strong tactical graph: regions, reachability, yields, garrisons, biome
 color, camera focus and assault entry all work. The World Atlas adds the missing information and
@@ -47,7 +47,7 @@ The atlas answers four questions without opening several panels:
 | 2 | Region visits, discoveries, and landmarks | DONE | 1 |
 | 3 | Strategic map layers and legend | DONE | 1 |
 | 4 | Region dossier and campaign journal | DONE | 2, 3 |
-| 5 | Accessibility, navigation, and performance | NOT STARTED | 4 |
+| 5 | Accessibility, navigation, and performance | DONE | 4 |
 
 # STAGE 0 — Atlas content and knowledge contract
 
@@ -172,7 +172,7 @@ the quick inspector remains compact.
 
 # STAGE 5 — Accessibility, navigation, and performance
 
-**Status:** NOT STARTED · **Depends on:** Stage 4
+**Status:** DONE — 2026-08-15 · **Depends on:** Stage 4
 
 **Goal.** Make the atlas usable with large region counts, constrained devices and reduced motion.
 

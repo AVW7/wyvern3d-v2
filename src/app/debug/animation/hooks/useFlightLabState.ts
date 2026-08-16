@@ -1,31 +1,53 @@
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Vector3 } from 'three'
 import { getAsset, type ModelState } from '@/render/assets/manifest'
 import type { FlightLoopState } from '@/render/flightPose'
 import type { FlightLabPoseEdits, LabCamera, LabTheme } from '../FlightLab'
-import { GROUPS, NEUTRAL_POSE_EDITS } from '../constants'
+import { GROUPS, NEUTRAL_POSE_EDITS, SPECIES } from '../constants'
 import type { SpeedDynamicsState, ControllerIsolationState } from '../components/AnimationControls'
-import type { TelemetrySnapshot, LogEntry } from '../components/ReadoutLogPanel'
+import type { LogEntry } from '../components/ReadoutLogPanel'
 import { PropManager } from '../systems/PropManager'
 import type { PropBase } from '../props/PropBase'
+import {
+  DEFAULT_CONTROLLER_ISOLATION,
+  DEFAULT_SPEED_DYNAMICS,
+  applySpeedPreset,
+  type SpeedPresetName,
+} from '../labDynamics'
+import { annotatePresets, flightLabAltitude, parseLabSearch, resolveRequestedState, serializeLabSearch } from '../labPresets'
+import { EMPTY_TELEMETRY, type LabTelemetry } from '../labTelemetry'
 
-export function useFlightLabState() {
-  const [speciesIndex, setSpeciesIndex] = useState(0)
+function nextLogId(serial: number): string {
+  return `log-${serial}`
+}
+
+import type { LabSearch } from '../labPresets'
+
+export function useFlightLabState(initialOverride?: Partial<LabSearch>) {
+  const initial = useMemo(() => {
+    if (initialOverride && Object.keys(initialOverride).length > 0) {
+      return initialOverride
+    }
+    if (typeof window === 'undefined') return {}
+    return parseLabSearch(new URLSearchParams(window.location.search))
+  }, [initialOverride])
+
+  const [speciesIndex, setSpeciesIndex] = useState(initial.speciesIndex ?? 0)
   const [extraScale, setExtraScale] = useState(1)
-  const [state, setState] = useState<ModelState>('idle')
-  const [auto, setAuto] = useState(false)
-  const [horizontalSpeed, setHorizontalSpeed] = useState(0)
+  const [state, setState] = useState<ModelState>(initial.state ?? 'idle')
+  const [auto, setAuto] = useState(initial.auto ?? false)
+  const [horizontalSpeed, setHorizontalSpeed] = useState(initial.speed ?? 0)
   const [verticalSpeed, setVerticalSpeed] = useState(0)
   const [yawRate, setYawRate] = useState(0)
   const [referenceSpeed, setReferenceSpeed] = useState(18)
   const [powered, setPowered] = useState(true)
   const [boosting, setBoosting] = useState(false)
   const [searching, setSearching] = useState(false)
-  const [procedural, setProcedural] = useState(false)
+  const [procedural, setProcedural] = useState(initial.procedural ?? false)
   const [frozen, setFrozen] = useState(false)
   const [scrub, setScrub] = useState(0)
-  const [camera, setCamera] = useState<LabCamera>('side')
-  const [theme, setTheme] = useState<LabTheme>('dark')
+  const [camera, setCamera] = useState<LabCamera>(initial.camera ?? 'side')
+  const [theme, setTheme] = useState<LabTheme>(initial.theme ?? 'dark')
   const [overlays, setOverlays] = useState(true)
   const [fireBreath, setFireBreath] = useState(false)
   const [poseComposer, setPoseComposer] = useState(false)
@@ -34,45 +56,47 @@ export function useFlightLabState() {
   const [panelOpen, setPanelOpen] = useState(true)
   const [hideUI, setHideUI] = useState(false)
   const [copied, setCopied] = useState(false)
-
   const [centerTrigger, setCenterTrigger] = useState(0)
   const [zoomFitTrigger, setZoomFitTrigger] = useState(0)
   const [zoomInTrigger, setZoomInTrigger] = useState(0)
   const [zoomOutTrigger, setZoomOutTrigger] = useState(0)
   const [resetCamTrigger, setResetCamTrigger] = useState(0)
   const [transitionDuration, setTransitionDuration] = useState(0.4)
+  const [telemetry, setTelemetry] = useState<LabTelemetry>(EMPTY_TELEMETRY)
+  const logSerial = useRef(2)
 
   const [logs, setLogs] = useState<LogEntry[]>([
     {
       id: 'init-1',
-      timestamp: new Date().toLocaleTimeString(),
+      timestamp: '00:00:00',
       category: 'SYSTEM',
       level: 'info',
-      message: 'Flight Lab modular architecture initialized.',
+      message: 'Flight Lab ready. Isolation, speed sliders, and telemetry now read the live rig.',
     },
     {
       id: 'init-2',
-      timestamp: new Date().toLocaleTimeString(),
-      category: 'SPEED',
+      timestamp: '00:00:00',
+      category: 'SYSTEM',
       level: 'info',
-      message: 'Speed-dependent Head, Neck & Tail dynamics active at 18.0 u/s.',
+      message: 'Share a view with ?species=&state=&procedural=&auto=&speed=&camera=&theme=',
     },
   ])
 
   const addLogEntry = useCallback((category: LogEntry['category'], level: LogEntry['level'], message: string, details?: Record<string, unknown>) => {
+    logSerial.current += 1
     const entry: LogEntry = {
-      id: `log-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-      timestamp: new Date().toLocaleTimeString(),
+      id: nextLogId(logSerial.current),
+      timestamp: `${logSerial.current}`,
       category,
       level,
       message,
       details,
     }
-    setLogs(prev => [entry, ...prev.slice(0, 99)])
+    setLogs((prev) => [entry, ...prev.slice(0, 99)])
   }, [])
 
   const handleChangePoseEdit = useCallback((key: keyof FlightLabPoseEdits, val: number) => {
-    setPoseEdits(prev => ({ ...prev, [key]: val }))
+    setPoseEdits((prev) => ({ ...prev, [key]: val }))
   }, [])
 
   const handleResetPoseEdits = useCallback(() => {
@@ -80,174 +104,156 @@ export function useFlightLabState() {
   }, [])
 
   const handleSelectPreset = useCallback((presetName: string) => {
-    setState(presetName as ModelState)
-    addLogEntry('POSE', 'info', `Transitioned to pose preset [${presetName}]`, { duration: transitionDuration })
+    const resolved = resolveRequestedState(presetName)
+    if (!resolved) {
+      addLogEntry('POSE', 'warn', `Ignored unknown preset [${presetName}]`)
+      return
+    }
+    setAuto(false)
+    setState(resolved)
+    addLogEntry('POSE', 'info', `Requested pose [${resolved}]`, { duration: transitionDuration })
   }, [addLogEntry, transitionDuration])
 
   const propManager = useMemo(() => new PropManager(), [])
   const [propsList, setPropsList] = useState<PropBase[]>([])
   const [speedDynamics, setSpeedDynamics] = useState<SpeedDynamicsState>({
-    airspeed: 18,
-    pitchAngle: 0,
-    headGazeWeight: 0.8,
-    neckStreamFactor: 0.5,
-    tailStiffness: 1.0,
-    tailWaveAmp: 0.15,
-    legTuckWeight: 1.0,
-    wingFlutterFreq: 3.0,
+    ...DEFAULT_SPEED_DYNAMICS,
+    airspeed: initial.speed ?? DEFAULT_SPEED_DYNAMICS.airspeed,
   })
+  const [controllerIsolation, setControllerIsolation] = useState<ControllerIsolationState>(DEFAULT_CONTROLLER_ISOLATION)
 
-  const [controllerIsolation, setControllerIsolation] = useState<ControllerIsolationState>({
-    spineWave: true,
-    dynamicTail: true,
-    gazeController: true,
-    dynamicLegs: true,
-    wingRefinement: true,
-    jawSeal: true,
-  })
-
-  const handleChangeSpeedDynamics = useCallback((updates: Partial<SpeedDynamicsState>) => {
-    setSpeedDynamics(prev => {
-      const next = { ...prev, ...updates }
-      if (updates.airspeed !== undefined) {
-        setHorizontalSpeed(updates.airspeed)
-      }
-      return next
-    })
-    addLogEntry('SPEED', 'info', `Updated speed dynamics parameters`, updates as Record<string, unknown>)
+  const handleLiveTelemetry = useCallback((sample: LabTelemetry) => {
+    setTelemetry(sample)
+    if (sample.contractStatus === 'fail') {
+      addLogEntry('CONTRACT', 'error', sample.contractNotes[0] ?? 'Contract failed')
+    }
   }, [addLogEntry])
 
+  const handleChangeSpeedDynamics = useCallback((updates: Partial<SpeedDynamicsState>) => {
+    setSpeedDynamics((prev) => {
+      const next = { ...prev, ...updates }
+      if (updates.airspeed !== undefined) setHorizontalSpeed(updates.airspeed)
+      return next
+    })
+  }, [])
+
   const handleToggleController = useCallback((key: keyof ControllerIsolationState) => {
-    setControllerIsolation(prev => {
+    setControllerIsolation((prev) => {
       const next = { ...prev, [key]: !prev[key] }
       addLogEntry('SYSTEM', 'info', `Toggled controller [${key}]: ${next[key] ? 'ENABLED' : 'DISABLED'}`)
       return next
     })
   }, [addLogEntry])
 
-  const handleApplySpeedPreset = useCallback((presetName: 'hover' | 'glide' | 'cruise' | 'dive') => {
-    const presets = {
-      hover: { airspeed: 0, pitchAngle: 0, headGazeWeight: 0.9, neckStreamFactor: 0.1, tailStiffness: 0.5, tailWaveAmp: 0.25 },
-      glide: { airspeed: 12, pitchAngle: 2, headGazeWeight: 0.8, neckStreamFactor: 0.4, tailStiffness: 0.8, tailWaveAmp: 0.15 },
-      cruise: { airspeed: 22, pitchAngle: 5, headGazeWeight: 0.7, neckStreamFactor: 0.6, tailStiffness: 1.1, tailWaveAmp: 0.12 },
-      dive: { airspeed: 50, pitchAngle: -25, headGazeWeight: 0.95, neckStreamFactor: 0.95, tailStiffness: 1.8, tailWaveAmp: 0.05 },
-    }
-    const update = presets[presetName]
-    setSpeedDynamics(prev => ({ ...prev, ...update }))
-    setHorizontalSpeed(update.airspeed)
-    addLogEntry('SPEED', 'info', `Applied speed preset [${presetName.toUpperCase()}] at ${update.airspeed} u/s`, update)
+  const handleApplySpeedPreset = useCallback((presetName: SpeedPresetName) => {
+    setSpeedDynamics((prev) => {
+      const next = applySpeedPreset(prev, presetName)
+      setHorizontalSpeed(next.airspeed)
+      return next
+    })
+    addLogEntry('SPEED', 'info', `Applied speed preset [${presetName}]`)
   }, [addLogEntry])
 
   const handleSpawnDoe = useCallback(() => {
     propManager.spawnDoe()
     setPropsList(propManager.getAllProps())
-    addLogEntry('PREY', 'info', 'Spawned Big-Doe (Large Ground Prey, +50 Food value)')
+    addLogEntry('PREY', 'info', 'Spawned doe (visible ground prey)')
   }, [propManager, addLogEntry])
 
   const handleSpawnBird = useCallback(() => {
     propManager.spawnBird()
     setPropsList(propManager.getAllProps())
-    addLogEntry('PREY', 'info', 'Spawned Small-Bird (Flying Prey, +15 Food value)')
+    addLogEntry('PREY', 'info', 'Spawned bird (visible aerial prey)')
   }, [propManager, addLogEntry])
 
   const handleClearProps = useCallback(() => {
     propManager.clearAllProps()
     setPropsList([])
-    addLogEntry('PREY', 'info', 'Cleared all active prey props.')
+    addLogEntry('PREY', 'info', 'Cleared prey.')
   }, [propManager, addLogEntry])
 
   const handleTriggerFireAttack = useCallback(() => {
-    const wyvernPos = new Vector3(0, 15, 0)
-    const hitProps = propManager.applyFireDamage(wyvernPos, 30.0, 40.0, 0.4)
+    const origin = new Vector3(0, flightLabAltitude(state), 0)
+    const hitProps = propManager.applyFireDamage(origin, 30, 40, 0.4)
     setPropsList(propManager.getAllProps())
-    addLogEntry('ATTACK', 'warn', `Ignited Fire Breath Stream! Hit ${hitProps.length} prey props.`, {
+    addLogEntry('ATTACK', 'warn', `Fire breath from live wyvern hit ${hitProps.length} prey.`, {
       hitCount: hitProps.length,
-      affectedProps: hitProps.map(p => p.id),
+      affectedProps: hitProps.map((prop) => prop.id),
     })
-  }, [propManager, addLogEntry])
+  }, [propManager, addLogEntry, state])
 
   const handleTriggerScoutMode = useCallback(() => {
     setState('scout')
     setHorizontalSpeed(12)
+    setSpeedDynamics((prev) => ({ ...prev, airspeed: 12, pitchAngle: 2 }))
     setReferenceSpeed(18)
     setSearching(true)
     setBoosting(false)
-    addLogEntry('POSE', 'info', 'Triggered Scout Flight Mode: Takeoff & Aerial Search Loiter (searching for food/enemies/resources)')
+    setAuto(false)
+    addLogEntry('POSE', 'info', 'Scout: searching gaze + 12 u/s loiter')
   }, [addLogEntry])
 
   const handleTriggerSpeedSprint = useCallback(() => {
     setState('speed')
     setHorizontalSpeed(42)
+    setSpeedDynamics((prev) => ({ ...prev, airspeed: 42, pitchAngle: -8, neckStreamFactor: 1, tailStiffness: 1.6 }))
     setBoosting(true)
     setSearching(false)
-    setPoseEdits(prev => ({ ...prev, legTuck: 0.8, footTuck: 0.9, neckPitch: 0, neckYaw: 0, neckAlignment: 1 }))
-    addLogEntry('SPEED', 'warn', 'Triggered High-Speed Sprint: Hind legs & feet tucked, neck streamlined with torso at 42.0 u/s')
+    setAuto(false)
+    setPoseEdits((prev) => ({ ...prev, legTuck: 0.8, footTuck: 0.9, neckPitch: 0, neckYaw: 0, neckAlignment: 1 }))
+    addLogEntry('SPEED', 'warn', 'Sprint: 42 u/s, legs tucked, neck streamlined')
   }, [addLogEntry])
-
-  const telemetry: TelemetrySnapshot = useMemo(() => ({
-    timestamp: Date.now(),
-    airspeed: speedDynamics.airspeed,
-    pitchAngle: speedDynamics.pitchAngle,
-    headOrientation: {
-      pitch: (speedDynamics.pitchAngle * Math.PI) / 180,
-      yaw: 0,
-      roll: 0,
-    },
-    neckCurve: 1.0 - speedDynamics.neckStreamFactor * 0.5,
-    tailExtent: 8.5 * (1.0 + (speedDynamics.airspeed / 60) * 0.4),
-    tailFlexAngles: [0.1, 0.15, 0.2, 0.18, 0.12, 0.08].map(a => a * speedDynamics.tailStiffness),
-    activeControllers: Object.entries(controllerIsolation)
-      .filter(([, enabled]) => enabled)
-      .map(([key]) => key),
-    contractStatus: 'pass',
-    loopState: state,
-  }), [speedDynamics, controllerIsolation, state])
 
   const readout = useRef<HTMLPreElement>(null)
 
   const handleCopyReadout = useCallback(() => {
-    if (readout.current) {
-      const text = readout.current.innerText || readout.current.textContent || ''
-      if (text) {
-        navigator.clipboard
-          .writeText(text)
-          .then(() => {
-            setCopied(true)
-            setTimeout(() => setCopied(false), 2000)
-          })
-          .catch(() => {
-            const textarea = document.createElement('textarea')
-            textarea.value = text
-            document.body.appendChild(textarea)
-            textarea.select()
-            document.execCommand('copy')
-            document.body.removeChild(textarea)
-            setCopied(true)
-            setTimeout(() => setCopied(false), 2000)
-          })
-      }
-    }
+    if (!readout.current) return
+    const text = readout.current.innerText || readout.current.textContent || ''
+    if (!text) return
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true)
+      window.setTimeout(() => setCopied(false), 2000)
+    }).catch(() => {
+      setCopied(false)
+    })
   }, [])
 
+  const species = SPECIES[speciesIndex] ?? SPECIES[0]!
+  const annotatedPresets = useMemo(() => annotatePresets(species.id), [species.id])
+
   const groups = useMemo(() => {
-    const mapped = getAsset('wyvern.emberback')?.animations ?? {}
+    const mapped = getAsset(species.id)?.animations ?? {}
     const listed = new Set(GROUPS.flatMap((group) => group.states))
     const missing = (Object.keys(mapped) as ModelState[]).filter((key) => !listed.has(key))
     return missing.length ? [...GROUPS, { label: 'Unlisted', states: missing }] : GROUPS
-  }, [])
+  }, [species.id])
 
   const order = useMemo(() => groups.flatMap((group) => group.states), [groups])
 
-  const step = useCallback(
-    (delta: number) => {
-      setState((current) => {
-        const index = order.indexOf(current)
-        const next = (index + delta + order.length) % order.length
-        return order[next] ?? current
-      })
-    },
-    [order],
-  )
+  const step = useCallback((delta: number) => {
+    setState((current) => {
+      const index = order.indexOf(current)
+      const next = (index + delta + order.length) % order.length
+      return order[next] ?? current
+    })
+  }, [order])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const query = serializeLabSearch({
+      speciesIndex,
+      state,
+      procedural,
+      auto,
+      speed: horizontalSpeed,
+      camera,
+      theme,
+    })
+    const next = `${window.location.pathname}${query}`
+    if (`${window.location.pathname}${window.location.search}` !== next) {
+      window.history.replaceState(null, '', next)
+    }
+  }, [speciesIndex, state, procedural, auto, horizontalSpeed, camera, theme])
 
   return {
     speciesIndex,
@@ -327,11 +333,14 @@ export function useFlightLabState() {
     handleTriggerFireAttack,
     handleTriggerScoutMode,
     handleTriggerSpeedSprint,
+    handleLiveTelemetry,
     telemetry,
     readout,
     handleCopyReadout,
     groups,
     order,
     step,
+    annotatedPresets,
+    propManager,
   }
 }

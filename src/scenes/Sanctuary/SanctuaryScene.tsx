@@ -49,6 +49,7 @@ import { resolveContextAction } from './context/actionResolver'
 import { CarriedItem } from './CarriedItem'
 import { allocateStablePerches } from './commandLogic'
 import { baseFor } from './director/wyvernDirector'
+import { sanctuaryAudio } from './audio/sanctuaryAudio'
 import type { PanelId } from '@/state/uiStore'
 
 /**
@@ -73,15 +74,23 @@ export function SanctuaryScene() {
   const wyverns = Object.values(state.wyverns)
   const incubating = Object.values(state.eggs).filter((e) => e.incubatingTicksLeft !== null)
 
+  useEffect(() => {
+    sanctuaryAudio.startAmbience()
+    return () => {
+      sanctuaryAudio.dispose()
+    }
+  }, [])
+
   /**
    * Runs every frame but only touches React state when the nearest station
    * actually changes — `setNearby` is a no-op for an unchanged id.
    */
   const onCharacterUpdate = (char: CharacterState) => {
     moving.current = char.moving
-    useSanctuaryCommands.getState().setPlayerLocomotion(
-      char.running ? 'run' : char.moving ? 'walk' : 'idle',
-    )
+    const locomotion = char.running ? 'run' : char.moving ? 'walk' : 'idle'
+    useSanctuaryCommands.getState().setPlayerLocomotion(locomotion)
+    sanctuaryAudio.setPlayerLocomotion(locomotion)
+    sanctuaryAudio.updateListenerPosition([char.position.x, char.position.z])
     useSanctuaryCommands
       .getState()
       .setPlayerPosition([char.position.x, char.position.z])
@@ -122,6 +131,11 @@ export function SanctuaryScene() {
     const pressed = isDown(...CONTROLS.interact)
     if (pressed && !interactLatch.current && action && !ui.openPanel && !isEditing) {
       if (action.intent) {
+        if (action.intent.type === 'TAKE_DUTY_ITEM') {
+          sanctuaryAudio.playCue('collect')
+        } else if (action.intent.type === 'COMPLETE_DUTY') {
+          sanctuaryAudio.playCue('delivery')
+        }
         useGame.getState().dispatch(action.intent)
       } else if (action.panel) {
         ui.open(action.panel as PanelId, action.station)

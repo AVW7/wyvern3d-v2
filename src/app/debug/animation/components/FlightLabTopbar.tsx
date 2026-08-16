@@ -27,6 +27,8 @@ interface FlightLabTopbarProps {
   setTheme: (theme: LabTheme) => void
   frozen: boolean
   setFrozen: React.Dispatch<React.SetStateAction<boolean>>
+  auto: boolean
+  setAuto: (auto: boolean) => void
   panelOpen: boolean
   setPanelOpen: React.Dispatch<React.SetStateAction<boolean>>
   hideUI?: boolean
@@ -46,6 +48,8 @@ export function FlightLabTopbar({
   setTheme,
   frozen,
   setFrozen,
+  auto,
+  setAuto,
   panelOpen,
   setPanelOpen,
   setHideUI,
@@ -152,6 +156,15 @@ export function FlightLabTopbar({
         >
           <IconReset />
           <span>Reset</span>
+        </LabButton>
+        <LabButton
+          active={auto}
+          themeStyle={t}
+          onClick={() => setAuto(!auto)}
+          title="Auto flight director — picks cruise/scout/speed/glide/dive/bank/hover from airspeed"
+          style={{ ...btnStyle, display: 'inline-flex', alignItems: 'center', gap: 3 }}
+        >
+          <span>{auto ? 'Auto On' : 'Auto'}</span>
         </LabButton>
         <LabButton
           active={frozen}

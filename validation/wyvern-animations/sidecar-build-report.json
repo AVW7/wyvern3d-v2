@@ -63,8 +63,8 @@
   "all_targets_exist_in_base": true,
   "meshless": true,
   "skinless": true,
-  "sidecar_node_count": 298,
-  "size_bytes": 16562128,
+  "sidecar_node_count": 293,
+  "size_bytes": 16565564,
   "hemisphere_flips_repaired": 520,
   "loop_seams_smoothed": 1369
 }

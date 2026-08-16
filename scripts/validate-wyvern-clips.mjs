@@ -40,7 +40,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 // candidate export, or at a known-bad one to confirm it still fails.
 const MODEL = process.argv[2]
   ? new URL(process.argv[2], `file://${process.cwd()}/`)
-  : new URL('../public/models/wyvern.glb', import.meta.url)
+  : new URL('../public/models/wyvern-gothic.glb', import.meta.url)
 
 // Mirrors LOOPING / ASYMMETRIC_BY_DESIGN in scripts/audit-wyvern-clips-blender.py,
 // which in turn mirror src/render/assets/manifest.ts. `loop` defaults to true

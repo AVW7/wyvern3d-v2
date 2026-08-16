@@ -5,6 +5,7 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { Vector3, MathUtils } from 'three'
 import { consumeDrag, consumeWheel, isDown } from '@/render/controllers/input'
 import { useCameraStore } from '@/state/cameraStore'
+import { useAudioStore } from '@/state/audioStore'
 import { useGame } from '@/state/store'
 import { REGIONS } from '@/core/data/regions'
 import { clampPitch, clampDistance, calculateOrbitPosition } from '../camera/mapCameraRig'
@@ -37,6 +38,9 @@ export function MapCamera() {
   useFrame((_, rawDelta) => {
     const dt = Math.min(rawDelta, 0.05)
     const camSettings = useCameraStore.getState()
+    // Reduced motion (Atlas Stage 5): camera focus snaps rather than eases,
+    // so selecting a region doesn't sweep the world past the player.
+    const reducedMotion = useAudioStore.getState().reducedMotion
 
     if ('fov' in camera && typeof camera.fov === 'number' && camera.fov !== camSettings.fov) {
       camera.fov = camSettings.fov
@@ -46,13 +50,15 @@ export function MapCamera() {
     if (selectedRegion && REGIONS[selectedRegion]) {
       const reg = REGIONS[selectedRegion]!
       const targetHeight = regionDeckY(reg)
-      target.x = MathUtils.lerp(target.x, reg.position.x, dt * 4)
-      target.y = MathUtils.lerp(target.y, targetHeight, dt * 4)
-      target.z = MathUtils.lerp(target.z, reg.position.z, dt * 4)
+      const lerpT = reducedMotion ? 1 : dt * 4
+      target.x = MathUtils.lerp(target.x, reg.position.x, lerpT)
+      target.y = MathUtils.lerp(target.y, targetHeight, lerpT)
+      target.z = MathUtils.lerp(target.z, reg.position.z, lerpT)
     } else {
-      target.x = MathUtils.lerp(target.x, 0, dt * 2)
-      target.y = MathUtils.lerp(target.y, 0.8, dt * 2)
-      target.z = MathUtils.lerp(target.z, -15, dt * 2)
+      const lerpT = reducedMotion ? 1 : dt * 2
+      target.x = MathUtils.lerp(target.x, 0, lerpT)
+      target.y = MathUtils.lerp(target.y, 0.8, lerpT)
+      target.z = MathUtils.lerp(target.z, -15, lerpT)
     }
 
     const drag = consumeDrag()

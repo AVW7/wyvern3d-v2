@@ -13,7 +13,14 @@ import {
   findChain,
   wingChains,
 } from './rigBones'
-import { applyBoneOffset, applyLegTuck } from './boneOffsets'
+import {
+  alignChainToBody,
+  alignTailToBody,
+  applyBoneOffset,
+  applyLegTuck,
+  applyNeckOffset,
+  holdStreamlinedHeadPose,
+} from './boneOffsets'
 import {
   captureClosedJawPose,
   isMouthAction,
@@ -100,6 +107,7 @@ export interface SkeletonBones {
   rightLeg: Object3D[]
   leftWing: Object3D[]
   rightWing: Object3D[]
+  pelvis?: Object3D | null
 }
 
 export class WyvernFlightRig {
@@ -114,6 +122,7 @@ export class WyvernFlightRig {
     rightLeg: [],
     leftWing: [],
     rightWing: [],
+    pelvis: null,
   }
 
   public jawClosed: ClosedJawPose | null = null
@@ -156,6 +165,7 @@ export class WyvernFlightRig {
       tail: findChain(root, TAIL_CHAIN),
       leftLeg: findChain(root, LEFT_LEG_CHAIN),
       rightLeg: findChain(root, RIGHT_LEG_CHAIN),
+      pelvis: findBone(root, 'Pelvis') ?? findBone(root, 'Body') ?? findBone(root, 'Bip002') ?? findBone(root, 'Spine1'),
       // Whichever wing hand this model carries. Asking for one hand's names
       // directly would resolve three bones out of seven on the other and still
       // look like a chain, because `findChain` drops missing names silently.
@@ -305,9 +315,7 @@ export class WyvernFlightRig {
     }
 
     // 6. Apply neck & head offsets
-    for (const bone of this.bones.neck) {
-      applyBoneOffset(bone, this.headNeckPose.neckPitch, this.headNeckPose.neckYaw)
-    }
+    applyNeckOffset(this.bones.neck, this.headNeckPose.neckPitch, this.headNeckPose.neckYaw)
     if (this.bones.head) {
       applyBoneOffset(
         this.bones.head,
@@ -315,6 +323,29 @@ export class WyvernFlightRig {
         this.headNeckPose.headYaw,
         this.headNeckPose.headRoll,
       )
+    }
+
+    // Straighten neck/head and tail chains along body line during speed mode or high-speed sprint
+    if (flightMode === 'speed' || horizontalSpeed >= this.options.referenceSpeed * 1.2) {
+      const speedNorm = clamp(
+        (horizontalSpeed - this.options.referenceSpeed) / (this.options.referenceSpeed * 0.5),
+        0,
+        1,
+      )
+      const straightAmount = flightMode === 'speed' ? 1.0 : speedNorm
+      const neckHeadChain = [...this.bones.neck, this.bones.head].filter(
+        (b): b is Object3D => b != null,
+      )
+      const anchor = this.bones.pelvis ?? this.bones.spine[0] ?? this.root
+      if (anchor) {
+        if (neckHeadChain.length > 0) {
+          alignChainToBody(neckHeadChain, anchor, straightAmount)
+          holdStreamlinedHeadPose(this.bones.head, straightAmount)
+        }
+        if (this.bones.tail.length > 0) {
+          alignTailToBody(this.bones.tail, anchor, straightAmount)
+        }
+      }
     }
 
     // 7. Apply leg tuck

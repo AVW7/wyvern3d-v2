@@ -95,6 +95,59 @@ export function modelCounts(entries: ModelLibraryEntry[]) {
   }, { total: 0, ready: 0, pending: 0, categories: {} as Record<string, number> })
 }
 
+/** The animation states a model can preview, in manifest order. */
+export function statesFor(asset: AssetEntry): ModelState[] {
+  return Object.keys(asset.animations) as ModelState[]
+}
+
+/**
+ * The state the preview should actually play: the request when the manifest
+ * maps it, otherwise the model's first mapped state (or `idle` for models
+ * with no animation map at all, where GameModel's own default applies).
+ */
+export function resolveModelState(asset: AssetEntry, requested: ModelState | undefined): ModelState {
+  const states = statesFor(asset)
+  if (requested && states.includes(requested)) return requested
+  return states[0] ?? 'idle'
+}
+
+/**
+ * Resolves a `?state=` deep link against a specific model. Unlike
+ * `resolveModelState` this never substitutes a neighbouring state: a link
+ * naming a state this model does not map is dropped, so a stale link to
+ * `cruise` selects the model without silently playing something else.
+ */
+export function resolveLinkedState(asset: AssetEntry, value: string | string[] | undefined): ModelState | undefined {
+  const candidate = Array.isArray(value) ? value[0] : value
+  if (!candidate) return undefined
+  return statesFor(asset).includes(candidate as ModelState) ? candidate as ModelState : undefined
+}
+
+/**
+ * Every file a model will actually fetch: the base GLB plus either the
+ * singular sidecar or the compact sidecar list. Used by the payload HEAD so
+ * the inspector number matches what GameModel loads.
+ */
+export function payloadUrls(asset: AssetEntry): string[] {
+  return [asset.url, asset.animationUrl, ...(asset.animationUrls ?? [])].filter(
+    (url): url is string => Boolean(url),
+  )
+}
+
+/** Human-readable byte size for the payload column; 0 renders as a dash. */
+export function formatBytes(bytes: number): string {
+  if (!Number.isFinite(bytes) || bytes <= 0) return '—'
+  if (bytes < 1024) return `${bytes} B`
+  const units = ['KB', 'MB', 'GB']
+  let value = bytes / 1024
+  let unit = 0
+  while (value >= 1024 && unit < units.length - 1) {
+    value /= 1024
+    unit += 1
+  }
+  return `${value >= 100 ? Math.round(value) : value.toFixed(1)} ${units[unit]}`
+}
+
 function clipSummary(spec: ClipSpec): string {
   const details = [spec.loop === false ? 'one-shot' : 'loop']
   if (spec.next) details.push(`next: ${spec.next}`)

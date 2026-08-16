@@ -8,11 +8,13 @@ export class PreyDoe extends PropBase {
   detectionRadius: number = 25.0
   runSpeed: number = 10.0
   wanderTimer: number = 0
+  wanderSeed: number
   moveTarget: Vector3
 
   constructor(id: string, initialPosition: Vector3) {
     super(id, 'prey_doe', initialPosition, 80, 50)
     this.moveTarget = initialPosition.clone()
+    this.wanderSeed = Number.parseInt(id.replace(/\D/g, ''), 10) || 1
   }
 
   update(dt: number, wyvernPos: Vector3): void {
@@ -48,12 +50,13 @@ export class PreyDoe extends PropBase {
       // Slow wander
       this.wanderTimer -= dt
       if (this.wanderTimer <= 0) {
-        this.wanderTimer = 3.0 + Math.sin(dt) * 2.0
+        this.wanderTimer = 3 + ((this.wanderSeed % 20) / 10)
         this.moveTarget.set(
-          this.position.x + (Math.sin(Date.now() * 0.001) * 6 - 3),
+          this.position.x + (((this.wanderSeed * 3) % 60) / 10) - 3,
           this.position.y,
-          this.position.z + (Math.cos(Date.now() * 0.001) * 6 - 3)
+          this.position.z + (((this.wanderSeed * 7) % 60) / 10) - 3,
         )
+        this.wanderSeed += 1
       }
 
       const dir = new Vector3().subVectors(this.moveTarget, this.position)

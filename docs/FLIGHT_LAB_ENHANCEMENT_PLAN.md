@@ -1,6 +1,7 @@
 # Flight Lab Enhancement Plan
 
-**Status: Completed**
+**Status: Superseded in part — 2026-08-16.** The original phase boxes below were a wishlist that was marked Completed while several UI controls still did not reach the rig. The honesty / numeric / auto / visible-prey pass now lives in `src/app/debug/animation/` (`labPresets.ts`, `labDynamics.ts`, `labTelemetry.ts`, `labComposer.ts`). Treat this document as historical intent, not a ledger.
+
 **Created: 2026-08-03**
 **Goal: Modularize the Flight Lab architecture, establish a comprehensive animation development and model debugging environment, author speed-dependent head/neck/tail dynamics, build a dedicated readout & debug log panel with copy-paste code export, and implement interactive food props (big-doe, small-bird) for fire attack and hunting simulation.**
 

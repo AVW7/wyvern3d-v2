@@ -9,6 +9,7 @@ import {
   getAtlasLayerLegend,
   getRegionLayerValue,
 } from '@/core/state/atlasLayers'
+import { legendShapeCue } from '@/core/state/atlasA11y'
 
 /**
  * World Atlas Strategic Map Legend (Atlas Stage 3).
@@ -68,9 +69,12 @@ export function AtlasLegend() {
       </div>
 
       <div className="atlas-legend-scale">
-        {legendItems.map((item) => (
+        {legendItems.map((item, index) => (
           <div key={item.label} className="atlas-legend-row">
-            <span className="legend-swatch" style={{ backgroundColor: item.color }} />
+            <span className="legend-swatch" style={{ backgroundColor: item.color }}>
+              {/* Color-independent cue: same index, same glyph, whatever the color. */}
+              <span aria-hidden="true">{legendShapeCue(index)}</span>
+            </span>
             <span className="legend-label">{item.label}</span>
             {item.description && <span className="legend-desc">{item.description}</span>}
           </div>

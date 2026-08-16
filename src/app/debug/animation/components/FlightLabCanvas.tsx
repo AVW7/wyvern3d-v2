@@ -21,7 +21,6 @@ export function FlightLabCanvas({ camera, theme = 'dark', children }: FlightLabC
 
   return (
     <Canvas
-      key={camera}
       shadows="percentage"
       dpr={[1, 1.5]}
       camera={{ position: view.position, fov: view.fov, near: 1, far: 2000 }}

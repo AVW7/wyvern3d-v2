@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 
 interface UseFlightLabShortcutsOptions {
   step: (delta: number) => void
-  setAuto: (auto: boolean) => void
+  setAuto: React.Dispatch<React.SetStateAction<boolean>>
   setFrozen: React.Dispatch<React.SetStateAction<boolean>>
   setCenterTrigger: React.Dispatch<React.SetStateAction<number>>
   setZoomFitTrigger: React.Dispatch<React.SetStateAction<number>>
@@ -41,6 +41,8 @@ export function useFlightLabShortcuts({
       } else if (event.code === 'Space') {
         event.preventDefault()
         setFrozen((value) => !value)
+      } else if (event.key === 'a' || event.key === 'A') {
+        setAuto((value) => !value)
       } else if (event.key === 'c' || event.key === 'C') {
         setCenterTrigger((trig) => trig + 1)
       } else if (event.key === 'f' || event.key === 'F') {

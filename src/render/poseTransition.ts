@@ -337,21 +337,23 @@ export function triggerModeTransition(
     legTuck: number
     tailSwing: number
     tailLift: number
-  }
+  },
+  durationOverride?: number,
 ): PoseTransitionState {
   const settings = MODE_TRANSITIONS[newMode]
-  
+  const duration = durationOverride ?? settings.duration
+
   return {
-    pitch: startTransition(state.pitch, targetPose.pitch, settings.duration, settings.easing),
-    bank: startTransition(state.bank, targetPose.bank, settings.duration, settings.easing),
-    neckPitch: startTransition(state.neckPitch, targetPose.neckPitch, settings.duration, settings.easing),
-    neckYaw: startTransition(state.neckYaw, targetPose.neckYaw, settings.duration, settings.easing),
-    headPitch: startTransition(state.headPitch, targetPose.headPitch, settings.duration, settings.easing),
-    headYaw: startTransition(state.headYaw, targetPose.headYaw, settings.duration, settings.easing),
-    headRoll: startTransition(state.headRoll, targetPose.headRoll, settings.duration, settings.easing),
-    legTuck: startTransition(state.legTuck, targetPose.legTuck, settings.duration, settings.easing),
-    tailSwing: startTransition(state.tailSwing, targetPose.tailSwing, settings.duration, settings.easing),
-    tailLift: startTransition(state.tailLift, targetPose.tailLift, settings.duration, settings.easing),
+    pitch: startTransition(state.pitch, targetPose.pitch, duration, settings.easing),
+    bank: startTransition(state.bank, targetPose.bank, duration, settings.easing),
+    neckPitch: startTransition(state.neckPitch, targetPose.neckPitch, duration, settings.easing),
+    neckYaw: startTransition(state.neckYaw, targetPose.neckYaw, duration, settings.easing),
+    headPitch: startTransition(state.headPitch, targetPose.headPitch, duration, settings.easing),
+    headYaw: startTransition(state.headYaw, targetPose.headYaw, duration, settings.easing),
+    headRoll: startTransition(state.headRoll, targetPose.headRoll, duration, settings.easing),
+    legTuck: startTransition(state.legTuck, targetPose.legTuck, duration, settings.easing),
+    tailSwing: startTransition(state.tailSwing, targetPose.tailSwing, duration, settings.easing),
+    tailLift: startTransition(state.tailLift, targetPose.tailLift, duration, settings.easing),
     loopTime: state.loopTime,
     loopCount: state.loopCount,
     targetMode: newMode,

@@ -15,6 +15,7 @@ import { useGame, useGameState } from '@/state/store'
 import { WorldLabel } from '@/render/labels/WorldLabel'
 import { PERCHES, ROOSTS, TRAINING_POSTS } from '../layout'
 import { useGameEventStream } from './useGameEventStream'
+import { sanctuaryAudio } from '../audio/sanctuaryAudio'
 
 interface ActiveFlourish {
   id: number
@@ -92,6 +93,7 @@ export function EventFlourishManager() {
       if (event.kind === 'egg_hatched') {
         const roost = ROOSTS[0] ?? [11, 0]
         const pos: [number, number, number] = [roost[0], 0.5, roost[1]]
+        sanctuaryAudio.playWyvernVocalization('chirp', { stage: 'hatchling' })
 
         // Generate shell burst particles
         const particles: ActiveFlourish['particles'] = []
@@ -133,6 +135,7 @@ export function EventFlourishManager() {
       } else if (event.kind === 'wyvern_leveled') {
         const pos = resolveWyvernPosition(event.subjectId)
         const lvl = (event.payload?.level as number) ?? ''
+        sanctuaryAudio.playCue('duty_completed')
 
         setFlourishes((prev) => [
           ...prev,
@@ -150,6 +153,7 @@ export function EventFlourishManager() {
       } else if (event.kind === 'stage_promoted') {
         const pos = resolveWyvernPosition(event.subjectId)
         const stage = ((event.payload?.stage as string) ?? 'ADULT').toUpperCase()
+        sanctuaryAudio.playWyvernVocalization('happy')
 
         setFlourishes((prev) => [
           ...prev,
@@ -169,6 +173,7 @@ export function EventFlourishManager() {
         const post = TRAINING_POSTS[stationId] ?? [0, 0]
         const pos: [number, number, number] = [post[0], 0, post[1]]
         const wyvernName = state.wyverns[event.subjectId]?.name ?? 'Wyvern'
+        sanctuaryAudio.playCue('duty_completed')
 
         setFlourishes((prev) => [
           ...prev,
@@ -187,6 +192,7 @@ export function EventFlourishManager() {
         const pos = resolveWyvernPosition(event.subjectId)
         const wyvernName = state.wyverns[event.subjectId]?.name ?? 'Wyvern'
         const bondBonus = (event.payload?.bondBonus as number) ?? 1
+        sanctuaryAudio.playCue('duty_completed')
 
         setFlourishes((prev) => [
           ...prev,
@@ -204,6 +210,7 @@ export function EventFlourishManager() {
       } else if (event.kind === 'sanctuary_milestone_unlocked') {
         const title = (event.payload?.title as string) ?? 'Sanctuary Improvement'
         const count = (event.payload?.dutyCount as number) ?? 0
+        sanctuaryAudio.playCue('milestone_unlocked')
 
         setFlourishes((prev) => [
           ...prev,

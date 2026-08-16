@@ -275,6 +275,27 @@ function EcologyTab({ dossier }: { dossier: RegionDossierData }) {
           </div>
         </div>
       )}
+
+      {/* Completed Expedition Activities & Mysteries */}
+      {dossier.completedActivities.length > 0 && (
+        <div className="dossier-card">
+          <h4>Solved Ecological Mysteries & Hazards</h4>
+          <div className="phenomena-list">
+            {dossier.completedActivities.map((act) => (
+              <div key={act.id} className="phenomenon-item" style={{ borderLeftColor: act.themeColor }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <strong>{act.name} ({act.kind})</strong>
+                  <span className="landmark-kind-badge" style={{ backgroundColor: act.themeColor, color: '#0f172a' }}>
+                    {act.knowledgeTag}
+                  </span>
+                </div>
+                <p>{act.description}</p>
+                <small style={{ color: '#94a3b8', marginTop: 4, display: 'block' }}>Objective: {act.objective}</small>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

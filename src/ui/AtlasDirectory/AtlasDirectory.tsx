@@ -14,14 +14,25 @@ import {
   type AtlasDirectoryQuery,
 } from '@/core/state/atlasDirectory'
 import { getAtlasCompletionStats } from '@/core/state/atlasKnowledge'
+import {
+  atlasLayoutMode,
+  atlasSelectionSummary,
+  stepAtlasListIndex,
+} from '@/core/state/atlasA11y'
 import { AtlasFilterBar } from './AtlasFilterBar'
 import { AtlasRow } from './AtlasRow'
+import { AtlasDiagnostic } from './AtlasDiagnostic'
 
 /**
- * World Atlas drawer (Atlas Stage 1). Lists every region with search and
- * filters built from the pure core directory helpers, and drives the one
- * selection authority (`gameStore.selectedRegion`) so the drawer row, the 3D
- * node and the camera focus always agree.
+ * World Atlas drawer (Atlas Stage 1 + Stage 5 a11y). Lists every region with
+ * search and filters built from the pure core directory helpers, and drives
+ * the one selection authority (`gameStore.selectedRegion`) so the drawer
+ * row, the 3D node and the camera focus always agree.
+ *
+ * Stage 5 additions: focus returns to the toggle button on close, a polite
+ * live region announces selections for screen readers, list traversal uses
+ * the shared pure stepper, and the root carries a layout-mode data attribute
+ * that the CSS narrow-viewport rules key off.
  */
 export function AtlasDirectory() {
   const mode = useGame((s) => s.mode)
@@ -32,6 +43,7 @@ export function AtlasDirectory() {
   // revision is what changes and must key the directory memos.
   const revision = useGame((s) => s.revision)
 
+  const activeLayer = useMapUiStore((s) => s.activeLayer)
   const atlasOpen = useMapUiStore((s) => s.atlasOpen)
   const setAtlasOpen = useMapUiStore((s) => s.setAtlasOpen)
   const toggleAtlas = useMapUiStore((s) => s.toggleAtlas)
@@ -40,11 +52,37 @@ export function AtlasDirectory() {
   const [query, setQuery] = useState<AtlasDirectoryQuery>(EMPTY_ATLAS_QUERY)
   const listRef = useRef<HTMLDivElement>(null)
 
+  /** The nav pill that opened the drawer — focus returns here on close. */
+  const focusToggle = () => {
+    document.querySelector<HTMLButtonElement>('button[data-atlas-toggle]')?.focus()
+  }
+
+  // Layout mode drives the CSS narrow-viewport rules; mirrors the
+  // `@media (max-width: 860px)` breakpoint (asserted in atlasA11y tests).
+  const [layout, setLayout] = useState(() =>
+    typeof window === 'undefined' ? 'standard' : atlasLayoutMode(window.innerWidth),
+  )
+  useEffect(() => {
+    const onResize = () => setLayout(atlasLayoutMode(window.innerWidth))
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+
   const entries = useMemo(() => buildAtlasDirectory(state), [state, revision])
   const facets = useMemo(() => getAtlasFacets(entries), [entries])
   const results = useMemo(() => filterAtlasDirectory(entries, query), [entries, query])
   const stats = useMemo(() => getAtlasCompletionStats(state), [state, revision])
   const active = isQueryActive(query)
+
+  // Screen-reader selection summary under the active layer, announced once
+  // per selection change (not per keystroke) via a polite live region.
+  const selectionSummary = useMemo(
+    () =>
+      selectedRegion
+        ? atlasSelectionSummary(state, selectedRegion, activeLayer)
+        : null,
+    [state, selectedRegion, activeLayer, revision],
+  )
 
   // 'A' toggles the atlas on the world map; Escape closes it. Both are
   // ignored while typing in a field (except Escape inside our own search).
@@ -59,12 +97,36 @@ export function AtlasDirectory() {
         if (useMapUiStore.getState().atlasOpen) {
           e.preventDefault()
           setAtlasOpen(false)
+          // Focus return: the toggle that opened the drawer gets focus back.
+          focusToggle()
         }
       }
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [mode, toggleAtlas, setAtlasOpen])
+
+  // Opening the drawer moves focus into it so keyboard users land inside,
+  // not behind, the panel.
+  useEffect(() => {
+    if (atlasOpen && mode === 'worldmap') {
+      const search = listRef.current
+        ?.closest('.atlas-drawer')
+        ?.querySelector<HTMLInputElement>('input.atlas-search')
+      search?.focus()
+    }
+  }, [atlasOpen, mode])
+
+  // Dev-only atlas diagnostic (?reveal=1 on the world map).
+  const [showDiagnostic, setShowDiagnostic] = useState(false)
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    try {
+      setShowDiagnostic(new URLSearchParams(window.location.search).get('reveal') === '1')
+    } catch {
+      /* ignore */
+    }
+  }, [])
 
   if (mode !== 'worldmap' || !atlasOpen) return null
 
@@ -75,27 +137,30 @@ export function AtlasDirectory() {
     setInspected(entry.id)
   }
 
-  // Keyboard navigation across result rows: Arrow/Home/End move DOM focus
-  // between row buttons; Enter/Space activate the focused one natively.
+  // Keyboard navigation across result rows uses the shared pure stepper;
+  // Enter/Space activate the focused row button natively.
   const onListKeyDown = (e: React.KeyboardEvent) => {
     const buttons = Array.from(
       listRef.current?.querySelectorAll<HTMLButtonElement>('button.atlas-row') ?? [],
     )
-    if (buttons.length === 0) return
     const index = buttons.indexOf(document.activeElement as HTMLButtonElement)
-    let next = -1
-    if (e.key === 'ArrowDown') next = Math.min(buttons.length - 1, index + 1)
-    else if (e.key === 'ArrowUp') next = Math.max(0, index - 1)
-    else if (e.key === 'Home') next = 0
-    else if (e.key === 'End') next = buttons.length - 1
-    if (next >= 0) {
+    const next = stepAtlasListIndex(buttons.length, index < 0 ? 0 : index, e.key)
+    if (next !== null) {
       e.preventDefault()
-      buttons[next]!.focus()
+      buttons[next]?.focus()
     }
   }
 
   return (
-    <div className="atlas-drawer black-glass" role="complementary" aria-label="World Atlas directory">
+    <div
+      className="atlas-drawer black-glass"
+      role="complementary"
+      aria-label="World Atlas directory"
+      data-atlas-layout={layout}
+    >
+      <div className="atlas-sr-live" role="status" aria-live="polite">
+        {selectionSummary}
+      </div>
       <div className="atlas-drawer-head">
         <div className="atlas-drawer-title">
           <h3>World Atlas</h3>
@@ -106,7 +171,10 @@ export function AtlasDirectory() {
         </div>
         <button
           className="region-inspector-close"
-          onClick={() => setAtlasOpen(false)}
+          onClick={() => {
+            setAtlasOpen(false)
+            focusToggle()
+          }}
           title="Close Atlas (Escape)"
           aria-label="Close atlas"
         >
@@ -115,6 +183,8 @@ export function AtlasDirectory() {
       </div>
 
       <AtlasFilterBar query={query} onChange={setQuery} facets={facets} onClear={() => setQuery(EMPTY_ATLAS_QUERY)} active={active} />
+
+      {showDiagnostic && <AtlasDiagnostic />}
 
       <div className="atlas-list" ref={listRef} onKeyDown={onListKeyDown} role="listbox" aria-label="Regions">
         {results.length === 0 ? (

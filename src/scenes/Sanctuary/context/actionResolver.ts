@@ -51,7 +51,8 @@ export function getSupplySourcePositions(state: GameState): Array<{ id: string; 
  * 1. Active Delivery Target (if player is carrying a duty item and within range of subject wyvern)
  * 2. Duty Source / Supply Pick-up (if an available duty exists, player is near barrel/crate, not carrying)
  * 3. Placed Station / Interactable (warTable, roster, training stations, etc.)
- * 4. Wyvern Inspection / Interaction (near a wyvern when not delivering)
+ * 4. Interactive Functional Props (trough, anvil, hearth, nest)
+ * 5. Wyvern Inspection / Interaction (near a wyvern when not delivering)
  */
 export function resolveContextAction({
   playerPosition,
@@ -202,7 +203,67 @@ export function resolveContextAction({
     }
   }
 
-  // 4. WYVERN PRIORITY: General wyvern inspection when close
+  // 4. INTERACTIVE PROP PRIORITY: Specific functional affordances on placed props
+  if (state.sanctuaryLayout?.objects) {
+    let closestPropAction: ContextAction | null = null
+    let closestPropDist = Infinity
+
+    for (const obj of state.sanctuaryLayout.objects) {
+      const dist = Math.hypot(px - obj.position[0], pz - obj.position[2])
+      const radius = obj.radius ?? 2.8
+
+      if (dist <= radius && dist < closestPropDist) {
+        // A. Feeding & Quenching Trough
+        if (obj.propId === 'prop.forge.trough') {
+          closestPropDist = dist
+          closestPropAction = {
+            id: `prop_trough_${obj.id}`,
+            label: 'Inspect Quenching Basin',
+            priority: 'interactiveProp',
+            panel: 'training',
+            station: 'scaleForge',
+          }
+        }
+        // B. Forge Anvil & Grindstone
+        else if (obj.propId === 'prop.forge.anvil' || obj.propId === 'prop.forge.grindstone') {
+          closestPropDist = dist
+          closestPropAction = {
+            id: `prop_forge_${obj.id}`,
+            label: 'Use Smithing Anvil',
+            priority: 'interactiveProp',
+            panel: 'training',
+            station: 'scaleForge',
+          }
+        }
+        // C. Infirmary Hearth & Campfire
+        else if (obj.propId === 'prop.campfire') {
+          closestPropDist = dist
+          closestPropAction = {
+            id: `prop_hearth_${obj.id}`,
+            label: 'Rest at Infirmary Hearth',
+            priority: 'interactiveProp',
+            panel: 'infirmary',
+          }
+        }
+        // D. Hatchery Brood Cave Nest
+        else if (obj.propId === 'prop.hatchery.cave') {
+          closestPropDist = dist
+          closestPropAction = {
+            id: `prop_nest_${obj.id}`,
+            label: 'Tend Hatchery Nest',
+            priority: 'interactiveProp',
+            panel: 'hatchery',
+          }
+        }
+      }
+    }
+
+    if (closestPropAction) {
+      return closestPropAction
+    }
+  }
+
+  // 5. WYVERN PRIORITY: General wyvern inspection when close
   let closestWyvernId: string | null = null
   let closestWyvernDist = Infinity
 

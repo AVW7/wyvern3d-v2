@@ -3,6 +3,13 @@
 import { Component, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import type { ErrorInfo, ReactNode } from 'react'
 import { useGLTF } from '@react-three/drei'
+
+// Prevent Drei's useGLTF from garbage collecting during Next.js fast-refresh.
+// When components unmount and remount in Strict Mode, it clears the cache and revokes blob: URLs.
+if (process.env.NODE_ENV === 'development') {
+  useGLTF.clear = () => {}
+}
+
 import { useFrame } from '@react-three/fiber'
 import { AnimationMixer, LoopOnce, LoopRepeat } from 'three'
 // From `three` directly, not three-stdlib: pnpm's strict node_modules does not

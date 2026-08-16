@@ -76,8 +76,12 @@ def blender_binary() -> pathlib.Path:
 
 
 def decompress(destination: pathlib.Path) -> pathlib.Path:
+    decompressed = ROOT / "public/models/drogon-decompressed.glb"
+    if decompressed.exists():
+        shutil.copyfile(decompressed, destination)
+        return destination
     subprocess.run(
-        ["pnpm", "exec", "gltf-transform", "copy", str(BASE), str(destination)],
+        ["npx", "-y", "@gltf-transform/cli", "copy", str(BASE), str(destination)],
         check=True,
         cwd=ROOT,
     )

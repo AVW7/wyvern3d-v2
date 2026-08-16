@@ -1,6 +1,6 @@
 # Sanctuary environment art — staged work orders
 
-**Status: OPEN.** Stages 0, 1, 2, 3, 4, and 5 are DONE. Stage 6 (Interaction-ready prop vertical slices) is the next eligible stage.
+**Status: OPEN.** Stages 0, 1, 2, 3, 4, 5, and 6 are DONE. Stage 7 (Storytelling polish, performance, and release gate) is the next eligible stage.
 
 This plan improves the sanctuary's spatial design, 3D asset quality, environmental realism, and
 physical interaction language. It is a production plan for coding, technical-art, and environment-
@@ -194,7 +194,7 @@ normal intents for persistent consequences and use the existing event/flourish s
 | 3 | Terrain and updated biome integration | 1, 2 | DONE | BIOME_SCATTER in dressing.ts, soot/moisture soil factors in terrain.ts, dual-atlas Scenery |
 | 4 | Architectural kit and hero work areas | 1, 2 | DONE | StationHeroBuildings.tsx for all 11 hero stations, 5 priority replacements, clearance & flight corridor verified |
 | 5 | Materials, lighting, and weathering pass | 3, 4 | DONE | Stylized water shader & pools in SanctuaryWater.tsx, multi-factor weathering & roughness in terrain.ts, atmospheric lighting and hero landmark tuning. |
-| 6 | Interaction-ready prop vertical slices | 4; Sanctuary Gameplay Stage 1 | TODO | Six priority affordances |
+| 6 | Interaction-ready prop vertical slices | 4; Sanctuary Gameplay Stage 1 | DONE | Implemented 6 priority interactive prop vertical slices (trough water shimmer, forge sparks, hatchery thermal nest, supply containers, healer hearth, perches), context action integration, and 5 unit tests in interactiveProps.test.ts. |
 | 7 | Storytelling polish, performance, and release gate | 5, 6 | TODO | Final integration |
 
 Stages 1 and 2 may be assigned to separate agents after Stage 0. Stages 3 and 4 may also proceed in
@@ -441,7 +441,7 @@ Run atlas validators and standard gates; record representative frame and draw-ca
 
 ## STAGE 6 — Interaction-ready prop vertical slices
 
-**Status: TODO**
+**Status: DONE — 2026-08-16**
 
 ### Goal
 

@@ -305,7 +305,7 @@ author_flight_loop("speed",
     up_amp=35, dn_amp=-35, sweep_up=-14, sweep_dn=14,
     elbow_up=-8, elbow_dn=12,
     wrist_amp=6, f1_amp=10, f2_amp=8, f3_amp=6,
-    leg_tuck_deg=-28, neck_reach_deg=3,
+    leg_tuck_deg=-28, neck_reach_deg=0,
     tail_counter_amp=1.0, body_bob=2.0)
 
 # BANK LEFT: 6s, 3 beats, asymmetric

@@ -143,7 +143,7 @@ Keep all numbers in `src/core/data/config.ts`. Initial guidance, subject to test
 | 2 | Request readability and wyvern reactions | DONE | 1 | `SanctuaryDutiesHud` chips, 3D `DutyRequestBadge`, `director.playReaction(..., 'eat')`, spectral completion flourish in `EventFlourishManager`, 3 unit tests in `sanctuaryDutiesPresentation.test.ts`. |
 | 3 | Medicine, companionship, and flight exercise | DONE | 2 | Implemented 4-duty care vocabulary in core & presentation (`feed`, `medicine`, `companionship`, `flightExercise`), deterministic candidate priority generator, config costs & relief, tested in `duties.test.ts` and `actionResolver.test.ts`. |
 | 4 | Sanctuary improvement unlocks | DONE | 3 | Milestone thresholds in config, save migration 11->12, storage rewards and `sanctuary_milestone_unlocked` event emission, catalog lock badges in `SanctuaryEditorHud`, ambient idle prop weighting in `wyvernDirector`, fully unit-tested. |
-| 5 | Sanctuary audio layer | NOT STARTED | 2 | — |
+| 5 | Sanctuary audio layer | DONE | 2 | Procedural Web Audio synthesis in `sanctuaryAudio.ts`, spatial landmark loops, locomotion footsteps, interaction one-shots (`collect`, `delivery`, `invalid`, `duty_completed`, `milestone_unlocked`), wyvern vocal cues, visibility pause/resume, tested in `sanctuaryAudio.test.ts`. |
 | 6 | Layout snapshots and editor feedback | NOT STARTED | 4 | — |
 
 Stages 5 and 6 are independent once their listed dependencies are complete, but the handoff
@@ -321,7 +321,7 @@ changes where/how wyverns idle, without a new economy or destructive migration.
 
 # STAGE 5 — Sanctuary audio layer
 
-**Status:** NOT STARTED · **Depends on:** Stage 2
+**Status:** DONE · **Depends on:** Stage 2
 
 **Goal.** Give the sanctuary an owned, disposable audio presentation layer: environment bed,
 localized landmarks, contextual interaction cues, and wyvern responses.

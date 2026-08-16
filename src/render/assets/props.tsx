@@ -6,6 +6,11 @@ import { Matrix4, Quaternion, Vector3 } from 'three'
 import type { BufferGeometry, InstancedMesh, Material, Mesh, MeshStandardMaterial, Object3D } from 'three'
 import { BIOME_PROP_ATLAS, FOOD_PROP_ATLAS, PROP_ATLAS } from './manifest'
 
+// Prevent Drei's useGLTF from garbage collecting during Next.js fast-refresh
+if (process.env.NODE_ENV === 'development') {
+  useGLTF.clear = () => {}
+}
+
 /**
  * Static scenery props, drawn from a shared prop atlas.
  *

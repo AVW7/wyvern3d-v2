@@ -55,6 +55,12 @@
   resting on y=0), scaled to authored metre heights, simplified to per-prop triangle budgets,
   spec/gloss materials converted to metallic/roughness, textures re-encoded as 512 px WebP
 
+## Sanctuary audio layer
+
+- **Design:** Procedural real-time Web Audio API synthesis (`src/scenes/Sanctuary/audio/sanctuaryAudio.ts`)
+- **Licence:** MIT (Project-authored procedural sound design)
+- **Components:** Filtered brown/pink noise outdoor bed, positional landmark oscillators & filters (fire/forge, pool, hatchery, woodland), locomotion footsteps, discrete interaction cues (`collect`, `delivery`, `invalid`, `duty_completed`, `milestone_unlocked`), and species/age-scaled wyvern FM vocalizations. Zero external audio samples required.
+
 ---
 
 Add new third-party assets here with their licence and attribution. Do not commit assets whose

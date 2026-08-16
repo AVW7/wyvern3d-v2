@@ -257,6 +257,8 @@ export interface RegionKnowledge {
   discoveredLandmarkIds: string[]
   /** Phenomena the player has deliberately observed here (Biome Stage 4). */
   observedPhenomenonIds: string[]
+  /** Expedition activities and ecological puzzles solved here. */
+  completedActivityIds: string[]
   firstVisitedTick: number | null
 }
 
@@ -298,6 +300,7 @@ export type GameEventKind =
   | 'region_visited'
   | 'landmark_discovered'
   | 'phenomenon_observed'
+  | 'activity_completed'
 
 export interface GameEvent {
   seq: number

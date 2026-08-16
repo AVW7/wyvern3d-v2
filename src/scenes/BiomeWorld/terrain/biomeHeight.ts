@@ -1,9 +1,59 @@
 import { getRegionBiomeModifiers } from './regionModifiers'
+import {
+  DRY_SITE_CLEARANCE,
+  drySiteLift,
+  getProtectedSites,
+  getRegionWaterBody,
+  hummockFalloff,
+} from './biomeWater'
 
 export const BIOME_WORLD_RADIUS = 110
 
 /** Height of the grove's central mound; the world tree is planted on top of it. */
 export const GROVE_MOUND_HEIGHT = 2.2
+
+/** One dry-islet lift under a protected site. */
+interface SiteLift {
+  x: number
+  z: number
+  height: number
+  radius: number
+}
+
+/**
+ * Lifts are derived from other authored modules (landmark anchors, observation
+ * vantages), which is more work than a bare height sample — memoize per
+ * (biome, region, seed). Deterministic inputs make the cache semantically
+ * invisible; it is bounded so long sessions cannot grow it without end.
+ */
+const liftCache = new Map<string, SiteLift[]>()
+const LIFT_CACHE_MAX = 64
+
+function getRegionSiteLifts(biome: string, regionId?: string, seed = 42): SiteLift[] {
+  const water = getRegionWaterBody(biome, regionId, seed)
+  if (!water) return []
+
+  const key = `${biome}|${regionId ?? ''}|${seed}`
+  const cached = liftCache.get(key)
+  if (cached) return cached
+
+  const lifts: SiteLift[] = []
+  for (const site of getProtectedSites(regionId, seed)) {
+    // Measure the *un-lifted* base at the site centre so a lift never feeds
+    // back into its own need; neighbouring sites only ever add height.
+    // baseSurfaceHeight takes plane-local coords: local y = -world z.
+    const base = baseSurfaceHeight(biome, site.x, -site.z, regionId, seed)
+    const need = water.level + DRY_SITE_CLEARANCE - base
+    const resolved = drySiteLift(need)
+    if (resolved) {
+      lifts.push({ x: site.x, z: site.z, height: resolved.height, radius: resolved.radius })
+    }
+  }
+
+  if (liftCache.size >= LIFT_CACHE_MAX) liftCache.clear()
+  liftCache.set(key, lifts)
+  return lifts
+}
 
 /**
  * Terrain relief per biome, in the ground plane's *local* coordinates.
@@ -13,6 +63,28 @@ export const GROVE_MOUND_HEIGHT = 2.2
  * build wants world coordinates — use `biomeHeightAt` for those.
  */
 export function surfaceHeight(
+  biome: string,
+  x: number,
+  y: number,
+  regionId?: string,
+  seed: number = 42,
+): number {
+  const base = baseSurfaceHeight(biome, x, y, regionId, seed)
+
+  const lifts = getRegionSiteLifts(biome, regionId, seed)
+  if (lifts.length === 0) return base
+
+  // Local (x, y) ↔ world (x, -z); see the note above.
+  const worldZ = -y
+  let lift = 0
+  for (const site of lifts) {
+    const d = Math.hypot(x - site.x, worldZ - site.z)
+    if (d < site.radius) lift += site.height * hummockFalloff(d, site.radius)
+  }
+  return base + lift
+}
+
+function baseSurfaceHeight(
   biome: string,
   x: number,
   y: number,

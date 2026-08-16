@@ -139,9 +139,10 @@ export function propagateNeckWave(
 ): void {
   if (neckBones.length === 0) return;
   
-  // Neck has gentler undulation than spine
+  // Neck has gentler undulation than spine, stiffening completely at high speed for a streamlined straight line
   const speedRatio = Math.max(0, Math.min(1, horizontalSpeed / 30));
-  const amplitude = 0.015 + speedRatio * 0.025; // Smaller amplitude for neck
+  const stiffenFactor = Math.max(0, 1 - (horizontalSpeed > 18 ? (horizontalSpeed - 18) / 12 : 0));
+  const amplitude = (0.015 + speedRatio * 0.015) * stiffenFactor;
   
   const weights = SPINE_WAVE_CONFIG.neckWeights;
   const phaseDelay = 0.15; // Slightly larger phase delay for serpentine neck

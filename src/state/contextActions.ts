@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import type { Intent } from '@/core/intents'
 
-export type ContextActionPriority = 'delivery' | 'dutySource' | 'station' | 'wyvern'
+export type ContextActionPriority = 'delivery' | 'dutySource' | 'interactiveProp' | 'station' | 'wyvern'
 
 export interface ContextAction {
   id: string

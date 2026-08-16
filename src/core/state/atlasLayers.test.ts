@@ -74,6 +74,7 @@ describe('atlasLayers', () => {
         visited: false,
         discoveredLandmarkIds: [],
         observedPhenomenonIds: [],
+        completedActivityIds: [],
         firstVisitedTick: null,
       }
       const val = getRegionLayerValue(state, 'frostgate', 'biome')

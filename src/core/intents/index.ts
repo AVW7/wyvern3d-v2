@@ -35,6 +35,7 @@ export type Intent =
   | { type: 'RECORD_REGION_VISIT'; regionId: string }
   | { type: 'DISCOVER_LANDMARK'; regionId: string; landmarkId: string }
   | { type: 'OBSERVE_PHENOMENON'; regionId: string; phenomenonId: string }
+  | { type: 'COMPLETE_EXPEDITION_ACTIVITY'; regionId: string; activityId: string }
   | { type: 'TAKE_DUTY_ITEM'; dutyId: number }
   | { type: 'ABANDON_DUTY_ITEM'; dutyId: number }
   | { type: 'COMPLETE_DUTY'; dutyId: number }

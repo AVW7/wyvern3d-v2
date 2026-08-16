@@ -2,7 +2,7 @@
 
 import { useFrame, useThree } from '@react-three/fiber'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Box3, Box3Helper, Color, PerspectiveCamera, Sphere, Vector3 } from 'three'
+import { Box3, Box3Helper, Color, Vector3 } from 'three'
 import type { AnimationMixer, Group, Object3D } from 'three'
 import { GameModel } from '@/render/assets/GameModel'
 import type { ModelState } from '@/render/assets/manifest'
@@ -13,6 +13,7 @@ import {
   applyBoneOffset,
   applyLegTuck,
   applyNeckOffset,
+  holdStreamlinedHeadPose,
 } from '@/render/boneOffsets'
 import { captureClosedJawPose, sealFlightJaw, shouldSealFlightJaw, type ClosedJawPose } from '@/render/flightMouth'
 import {
@@ -23,7 +24,6 @@ import {
   flightPoseTargets,
   headNeckTargets,
   legTuckTarget,
-  speedPitchTrim,
   type FlightLoopState,
   type FlightPose,
   type HeadNeckPose,
@@ -63,49 +63,24 @@ import {
   type WingsState,
 } from '@/render/wingRefinement'
 import type { FlightLabProps } from '../FlightLab'
-import { LEG_CHAIN, TAIL_CHAIN, TAIL_WEIGHTS, MARKERS, CAMERAS } from '../constants'
-
-// The clean flight rig's swept wing membrane reaches ~2.94 world units below
-// its origin at the downstroke. Keep only airborne states clear of the floor;
-// grounded clips must use their manifest yOffset directly so the Lab can review
-// their actual contacts. The Pose Composer's bodyY remains a relative offset.
-const FLIGHT_LAB_ALTITUDE = 4
-const AIRBORNE_STATES = new Set<ModelState>([
-  'fly', 'airborne', 'attackAir', 'breatheAir', 'huntCarry', 'cruise', 'scout',
-  'speed', 'glide', 'dive', 'bankLeft', 'bankRight', 'hover', 'land',
-])
-
-function flightLabAltitude(state: ModelState): number {
-  return AIRBORNE_STATES.has(state) ? FLIGHT_LAB_ALTITUDE : 0
-}
-
-const MARKER_ALIASES: Record<string, string[]> = {
-  head: ['Head', 'Bip002-Head_015'],
-  pelvis: ['Body', 'Bip002_06', 'Bip002-Pelvis_07', 'Bip002-Spine_08'],
-  tail: ['Tail6', 'Tail10', 'Bip002-Tail6_01', 'Bip002-Tail8_03'],
-  footL: ['L_Foot', 'Bip002-L-Foot_0188', 'Bip001-L-Foot_0178', 'Bip002-L-Foot_0226'],
-  footR: ['R_Foot', 'Bip002-R-Foot_0202', 'Bip001-R-Foot_0182', 'Bip002-R-Foot_0234'],
-  wingL: ['L_WingFinger3_end', 'L_WingD3P2', 'L_WingFinger3', 'Bip002-L-Hand_052', 'Bip002-L-Finger3_055'],
-  wingR: ['R_WingFinger3_end', 'R_WingD3P2', 'R_WingFinger3', 'Bip002-R-Hand_089', 'Bip002-R-Finger3_090'],
-}
-
-function resolveFirstBone(root: Object3D, names: string[]): Object3D | null {
-  for (const name of names) {
-    const obj = root.getObjectByName(name)
-    if (obj) return obj
-  }
-  return null
-}
-
-function resolveBoneChain(root: Object3D, candidates: (readonly string[])[]): Object3D[] {
-  for (const chain of candidates) {
-    const chainBones = chain
-      .map((name) => root.getObjectByName(name))
-      .filter((b): b is Object3D => b !== null && b !== undefined)
-    if (chainBones.length > 0) return chainBones
-  }
-  return []
-}
+import { LEG_CHAIN, TAIL_CHAIN, TAIL_WEIGHTS, MARKERS } from '../constants'
+import { MARKER_ALIASES, resolveBoneChain, resolveFirstBone } from '../labBones'
+import { applyComposerWings } from '../labComposer'
+import {
+  extraPitchFromSlider,
+  gazeBlendFromWeight,
+  scaleLegTuck,
+  scaleNeckStream,
+  tailAggressionFromWave,
+  tailSpeedForStiffness,
+  verticalSpeedFromPitch,
+  wingTurbulenceFromSlider,
+  activeControllerNames,
+} from '../labDynamics'
+import { AIRBORNE_STATES, flightLabAltitude, resolveClipName } from '../labPresets'
+import { evaluateLabContract, formatReadout, type LabTelemetry } from '../labTelemetry'
+import { useLabCamera } from '../hooks/useLabCamera'
+import { PreyField } from './PreyField'
 
 export function FlightLabRigContainer({
   speciesId,
@@ -128,6 +103,12 @@ export function FlightLabRigContainer({
   fireBreath = false,
   readout,
   onActiveState,
+  onTelemetry,
+  controllerIsolation,
+  speedDynamics,
+  transitionDuration,
+  propManager,
+  propsList,
   centerTrigger = 0,
   zoomFitTrigger = 0,
   zoomInTrigger = 0,
@@ -172,6 +153,29 @@ export function FlightLabRigContainer({
   poseEditsRef.current = poseEdits
   const poseComposerRef = useRef(poseComposer)
   poseComposerRef.current = poseComposer
+  const isolationRef = useRef(controllerIsolation)
+  isolationRef.current = controllerIsolation
+  const dynamicsRef = useRef(speedDynamics)
+  dynamicsRef.current = speedDynamics
+  const durationRef = useRef(transitionDuration)
+  durationRef.current = transitionDuration
+  const telemetryCbRef = useRef(onTelemetry)
+  telemetryCbRef.current = onTelemetry
+  const sampleClock = useRef(0)
+  const lastSampleKey = useRef('')
+  const wyvernWorld = useRef(new Vector3())
+  const gazeLook = useRef(new Vector3(8, 2, 18))
+  const bodyPos = useRef(new Vector3())
+  const bodyVel = useRef(new Vector3())
+  const sampleScratch = useRef({
+    head: new Vector3(),
+    tail: new Vector3(),
+    pelvis: new Vector3(),
+    footL: new Vector3(),
+    footR: new Vector3(),
+    wingL: new Vector3(),
+    wingR: new Vector3(),
+  })
   const scene = useThree((s) => s.scene)
   const threeCamera = useThree((s) => s.camera)
   const threeControls = useThree((s) => s.controls)
@@ -179,12 +183,6 @@ export function FlightLabRigContainer({
   const [loopState, setLoopState] = useState<FlightLoopState>('cruise')
   const loopStateRef = useRef<FlightLoopState>('cruise')
   const state: ModelState = auto ? loopState : requestedState
-
-  const lastCenter = useRef(centerTrigger)
-  const lastZoomFit = useRef(zoomFitTrigger)
-  const lastZoomIn = useRef(zoomInTrigger)
-  const lastZoomOut = useRef(zoomOutTrigger)
-  const lastResetCam = useRef(resetCamTrigger)
 
   const handleReady = useCallback((root: Group, mixer: AnimationMixer) => {
     modelRoot.current = root
@@ -256,118 +254,18 @@ export function FlightLabRigContainer({
   const bounds = useRef(0)
   const box = useMemo(() => new Box3(), [])
 
-  const getModelCenter = useCallback((): Vector3 => {
-    const center = new Vector3()
-    if (modelRoot.current) {
-      modelRoot.current.updateWorldMatrix(true, true)
-      const liveBox = new Box3().setFromObject(modelRoot.current, true)
-      if (!liveBox.isEmpty()) {
-        liveBox.getCenter(center)
-        return center
-      }
-    }
-    if (!box.isEmpty()) {
-      box.getCenter(center)
-      return center
-    }
-    return new Vector3(0, 25, 0)
-  }, [box])
-
-  useEffect(() => {
-    const controls = threeControls as {
-      target: Vector3
-      update: () => void
-      minDistance?: number
-      maxDistance?: number
-    } | null
-    if (!controls) return
-
-    let updated = false
-
-    if (centerTrigger > lastCenter.current) {
-      lastCenter.current = centerTrigger
-      const center = getModelCenter()
-      const delta = new Vector3().subVectors(center, controls.target)
-      controls.target.copy(center)
-      threeCamera.position.add(delta)
-      updated = true
-    }
-
-    if (zoomFitTrigger > lastZoomFit.current) {
-      lastZoomFit.current = zoomFitTrigger
-      const center = getModelCenter()
-      let radius = 35
-      if (modelRoot.current) {
-        modelRoot.current.updateWorldMatrix(true, true)
-        const liveBox = new Box3().setFromObject(modelRoot.current, true)
-        if (!liveBox.isEmpty()) {
-          const sphere = new Sphere()
-          liveBox.getBoundingSphere(sphere)
-          radius = Math.max(sphere.radius, 12)
-        }
-      }
-      const perspCamera = threeCamera as PerspectiveCamera
-      const fovRad = ((perspCamera.fov ?? 35) * Math.PI) / 180
-      const fitDistance = (radius / Math.sin(fovRad / 2)) * 1.15
-      const dir = new Vector3().subVectors(perspCamera.position, controls.target)
-      if (dir.lengthSq() < 0.0001) dir.set(0, 0.5, 1)
-      dir.normalize()
-      controls.target.copy(center)
-      perspCamera.position.copy(center).addScaledVector(dir, fitDistance)
-      updated = true
-    }
-
-    if (zoomInTrigger > lastZoomIn.current) {
-      lastZoomIn.current = zoomInTrigger
-      const center = getModelCenter()
-      controls.target.copy(center)
-      const dir = new Vector3().subVectors(threeCamera.position, center)
-      const currentDist = dir.length()
-      const minD = controls.minDistance ?? 20
-      const newDist = Math.max(currentDist * 0.75, minD)
-      dir.normalize().multiplyScalar(newDist)
-      threeCamera.position.copy(center).add(dir)
-      updated = true
-    }
-
-    if (zoomOutTrigger > lastZoomOut.current) {
-      lastZoomOut.current = zoomOutTrigger
-      const center = getModelCenter()
-      controls.target.copy(center)
-      const dir = new Vector3().subVectors(threeCamera.position, center)
-      const currentDist = dir.length()
-      const maxD = controls.maxDistance ?? 600
-      const newDist = Math.min(currentDist * 1.35, maxD)
-      dir.normalize().multiplyScalar(newDist)
-      threeCamera.position.copy(center).add(dir)
-      updated = true
-    }
-
-    if (resetCamTrigger > lastResetCam.current) {
-      lastResetCam.current = resetCamTrigger
-      const preset = CAMERAS[cameraPreset] ?? CAMERAS.side
-      if (preset) {
-        controls.target.set(preset.target[0], preset.target[1], preset.target[2])
-        threeCamera.position.set(preset.position[0], preset.position[1], preset.position[2])
-        updated = true
-      }
-    }
-
-    if (updated) {
-      controls.update()
-    }
-  }, [
+  useLabCamera({
+    modelRoot,
+    box,
+    cameraPreset,
+    threeCamera,
+    threeControls,
     centerTrigger,
     zoomFitTrigger,
     zoomInTrigger,
     zoomOutTrigger,
     resetCamTrigger,
-    cameraPreset,
-    threeCamera,
-    threeControls,
-    box,
-    getModelCenter,
-  ])
+  })
 
   const helper = useMemo(() => new Box3Helper(box, new Color('#5b6b7d')), [box])
   useEffect(() => {
@@ -430,27 +328,35 @@ export function FlightLabRigContainer({
     }
 
     // ── Phase 2: Compute Target Pose Dynamics ──────────────────────────────
+    const dyn = dynamicsRef.current
+    const iso = isolationRef.current
+    const liveVertical = verticalSpeed + verticalSpeedFromPitch(horizontalSpeed, dyn.pitchAngle)
+    const extraPitch = extraPitchFromSlider(dyn.pitchAngle)
+
     const target = flightPoseTargets(
-      verticalSpeed,
+      liveVertical,
       horizontalSpeed,
       yawRate,
       labTime.current,
       referenceSpeed,
     )
-    pose.current = dampFlightPose(pose.current, target, dt)
+    pose.current = dampFlightPose(pose.current, { ...target, pitch: target.pitch + extraPitch }, dt)
 
     const targetHeadNeck = headNeckTargets(
       horizontalSpeed,
-      verticalSpeed,
+      liveVertical,
       yawRate,
       pose.current.pitch,
       pose.current.bank,
       referenceSpeed,
     )
-    headNeck.current = dampHeadNeckPose(headNeck.current, targetHeadNeck, dt)
+    headNeck.current = dampHeadNeckPose(headNeck.current, {
+      ...targetHeadNeck,
+      neckPitch: scaleNeckStream(targetHeadNeck.neckPitch, dyn.neckStreamFactor),
+    }, dt)
     legTuck.current = dampLegTuck(
       legTuck.current,
-      legTuckTarget(horizontalSpeed, referenceSpeed),
+      scaleLegTuck(legTuckTarget(horizontalSpeed, referenceSpeed), dyn.legTuckWeight),
       dt,
     )
 
@@ -465,11 +371,12 @@ export function FlightLabRigContainer({
       flightLabAltitude(state) + (pc ? pe.bodyY : 0),
       pc ? pe.bodyZ : 0,
     )
+    wyvernWorld.current.set(group.position.x, group.position.y, group.position.z)
 
     if (auto) {
       const next = flightAnimationState(loopStateRef.current, pose.current.bank, {
         horizontalSpeed,
-        verticalSpeed,
+        verticalSpeed: liveVertical,
         referenceSpeed,
         powered,
         boosting,
@@ -479,7 +386,6 @@ export function FlightLabRigContainer({
         loopStateRef.current = next
         setLoopState(next)
         onActiveState(next)
-        
         poseTransition.current = triggerModeTransition(poseTransition.current, next, {
           pitch: pose.current.pitch,
           bank: pose.current.bank,
@@ -491,128 +397,153 @@ export function FlightLabRigContainer({
           legTuck: legTuck.current,
           tailSwing: tailState.current.smoothedTurnRate,
           tailLift: tailState.current.lift,
-        })
+        }, durationRef.current)
       }
     }
 
     if (procedural && AIRBORNE_STATES.has(state) && !pc) {
-      const phase = calculatePhase(labTime.current)
-      propagateFullBodyWave(
-        { spine: spineBones.current, neck: neckBones.current },
-        phase,
-        horizontalSpeed,
-        yawRate
-      )
-      
-      const gazeTarget: GazeTarget | null = null
+      if (iso.spineWave) {
+        const phase = calculatePhase(labTime.current)
+        propagateFullBodyWave(
+          { spine: spineBones.current, neck: neckBones.current },
+          phase,
+          horizontalSpeed,
+          yawRate,
+        )
+      }
+
+      const gazeTarget: GazeTarget | null = searching
+        ? { position: gazeLook.current, type: 'waypoint', urgency: dyn.headGazeWeight }
+        : null
+      bodyPos.current.set(0, 0, 0)
+      bodyVel.current.set(horizontalSpeed, liveVertical, 0)
       const bodyPose = {
-        position: new Vector3(0, 0, 0),
-        velocity: new Vector3(horizontalSpeed, verticalSpeed, 0),
+        position: bodyPos.current,
+        velocity: bodyVel.current,
         yaw: 0,
         pitch: pose.current.pitch,
         bank: pose.current.bank,
       }
       const flightContext: FlightContext = {
         horizontalSpeed,
-        verticalSpeed,
+        verticalSpeed: liveVertical,
         turnRate: yawRate,
-        turbulence: Math.abs(verticalSpeed) > 5 ? 0.3 : Math.abs(yawRate) > 0.5 ? 0.2 : 0,
+        turbulence: Math.abs(liveVertical) > 5 ? 0.3 : Math.abs(yawRate) > 0.5 ? 0.2 : 0,
         flightMode: loopStateRef.current,
         time: labTime.current,
       }
-      intelligentHeadNeck.current = intelligentHeadNeckController(
-        bodyPose,
-        gazeTarget,
-        flightContext,
-        intelligentHeadNeck.current,
-        dt
-      )
-      
-      const blendFactor = Math.min(intelligentHeadNeck.current.trackingVelocity * 0.1, 0.4)
-      const blendedNeckPitch = headNeck.current.neckPitch + intelligentHeadNeck.current.neckPitch * blendFactor
-      const blendedNeckYaw = headNeck.current.neckYaw + intelligentHeadNeck.current.neckYaw * blendFactor
-      const blendedHeadPitch = headNeck.current.headPitch + intelligentHeadNeck.current.headPitch * blendFactor
-      const blendedHeadYaw = headNeck.current.headYaw + intelligentHeadNeck.current.headYaw * blendFactor
-      const blendedHeadRoll = headNeck.current.headRoll + intelligentHeadNeck.current.headRoll * blendFactor
-      
+
+      if (iso.gazeController) {
+        intelligentHeadNeck.current = intelligentHeadNeckController(
+          bodyPose,
+          gazeTarget,
+          flightContext,
+          intelligentHeadNeck.current,
+          dt,
+        )
+      }
+
+      const blendFactor = gazeBlendFromWeight(dyn.headGazeWeight, intelligentHeadNeck.current.trackingVelocity)
+      const blendedNeckPitch = headNeck.current.neckPitch + (iso.gazeController ? intelligentHeadNeck.current.neckPitch * blendFactor : 0)
+      const blendedNeckYaw = headNeck.current.neckYaw + (iso.gazeController ? intelligentHeadNeck.current.neckYaw * blendFactor : 0)
+      const blendedHeadPitch = headNeck.current.headPitch + (iso.gazeController ? intelligentHeadNeck.current.headPitch * blendFactor : 0)
+      const blendedHeadYaw = headNeck.current.headYaw + (iso.gazeController ? intelligentHeadNeck.current.headYaw * blendFactor : 0)
+      const blendedHeadRoll = headNeck.current.headRoll + (iso.gazeController ? intelligentHeadNeck.current.headRoll * blendFactor : 0)
+
       applyNeckOffset(neckBones.current, blendedNeckPitch, blendedNeckYaw)
-      applyBoneOffset(
-        headBone.current,
-        blendedHeadPitch,
-        blendedHeadYaw,
-        blendedHeadRoll,
-      )
-      
-      tailState.current = dynamicTailController(
-        tailBones.current,
-        yawRate,
-        pose.current.bank,
-        horizontalSpeed,
-        loopStateRef.current,
-        0.5,
-        labTime.current,
-        tailState.current,
-        dt
-      )
-      
+      applyBoneOffset(headBone.current, blendedHeadPitch, blendedHeadYaw, blendedHeadRoll)
+
+      if (loopStateRef.current === 'speed' || dyn.neckStreamFactor > 0.5) {
+        const straightAmount = loopStateRef.current === 'speed' ? 1.0 : dyn.neckStreamFactor
+        const anchor = bones.current.get('pelvis') ?? bones.current.get('Body') ?? spineBones.current[0]
+        if (anchor) {
+          if (neckHeadChain.current.length > 0) {
+            alignChainToBody(neckHeadChain.current, anchor, straightAmount)
+            holdStreamlinedHeadPose(headBone.current, straightAmount)
+          }
+          if (tailBones.current.length > 0) {
+            alignTailToBody(tailBones.current, anchor, straightAmount)
+          }
+        }
+      }
+
+      if (iso.dynamicTail) {
+        tailState.current = dynamicTailController(
+          tailBones.current,
+          yawRate,
+          pose.current.bank,
+          tailSpeedForStiffness(horizontalSpeed, dyn.tailStiffness),
+          loopStateRef.current,
+          tailAggressionFromWave(dyn.tailWaveAmp),
+          labTime.current,
+          tailState.current,
+          dt,
+        )
+      }
+
       const leftLeg = legBones.current[0]
       const rightLeg = legBones.current[1]
-      if (leftLeg && rightLeg) {
+      if (iso.dynamicLegs && leftLeg && rightLeg) {
         legsState.current = dynamicLegController(
           leftLeg,
           rightLeg,
           yawRate,
           horizontalSpeed,
-          verticalSpeed,
+          liveVertical,
           10,
           loopStateRef.current,
           legTuck.current,
           labTime.current,
           legsState.current,
-          dt
+          dt,
         )
       }
-      
-      poseTransition.current = updatePoseTransition(poseTransition.current, dt)
-      
-      const breathePhase = getLoopPhase(poseTransition.current, 3.0)
-      const breatheOscillation = Math.sin(breathePhase * Math.PI * 2) * 0.02
-      const swayOscillation = oscillate(poseTransition.current, 0.15, 0.03)
-      
-      if (spineBones.current[0]) {
-        applyBoneOffset(spineBones.current[0], breatheOscillation * 0.5, swayOscillation)
-      }
-      
-      const baseTuck = legTuck.current
-      const modeTuckMult = loopState === 'dive' || loopState === 'speed' ? 1.2
-        : loopState === 'hover' ? 0.6
-        : 1.0
-      
-      const transitionProgress = poseTransition.current.pitch.progress
-      const effectiveTuck = baseTuck * modeTuckMult * (isTransitioning(poseTransition.current) ? transitionProgress : 1)
-      const finalTuck = Math.max(0, Math.min(1, effectiveTuck + legsState.current.left.extension * 0.3))
-      
-      for (const chain of legBones.current) {
-        applyLegTuck(chain, finalTuck)
-      }
-      
-      const turbulence = Math.abs(verticalSpeed) > 5 ? 0.35
-        : Math.abs(yawRate) > 0.5 ? 0.25
-        : Math.abs(verticalSpeed) > 2 ? 0.15
-        : 0
 
-      wingsState.current = dynamicWingController(
-        wingBonesL.current,
-        wingBonesR.current,
-        turbulence,
-        pose.current.pitch,
-        yawRate,
-        horizontalSpeed,
-        loopStateRef.current,
-        labTime.current,
-        wingsState.current,
-        dt
-      )
+      poseTransition.current = updatePoseTransition(poseTransition.current, dt)
+
+      if (iso.spineWave) {
+        const breathePhase = getLoopPhase(poseTransition.current, 3.0)
+        const breatheOscillation = Math.sin(breathePhase * Math.PI * 2) * 0.02
+        const swayOscillation = oscillate(poseTransition.current, 0.15, 0.03)
+        if (spineBones.current[0]) {
+          applyBoneOffset(spineBones.current[0], breatheOscillation * 0.5, swayOscillation)
+        }
+      }
+
+      if (iso.dynamicLegs) {
+        const baseTuck = legTuck.current
+        const modeTuckMult = loopState === 'dive' || loopState === 'speed' ? 1.2
+          : loopState === 'hover' ? 0.6
+          : 1.0
+        const transitionProgress = poseTransition.current.pitch.progress
+        const effectiveTuck = baseTuck * modeTuckMult * (isTransitioning(poseTransition.current) ? transitionProgress : 1)
+        const finalTuck = Math.max(0, Math.min(1, effectiveTuck + legsState.current.left.extension * 0.3))
+        for (const chain of legBones.current) {
+          applyLegTuck(chain, finalTuck)
+        }
+      }
+
+      if (iso.wingRefinement) {
+        const turbulence = wingTurbulenceFromSlider(
+          Math.abs(liveVertical) > 5 ? 0.35
+            : Math.abs(yawRate) > 0.5 ? 0.25
+            : Math.abs(liveVertical) > 2 ? 0.15
+            : 0,
+          dyn.wingFlutterFreq,
+        )
+        wingsState.current = dynamicWingController(
+          wingBonesL.current,
+          wingBonesR.current,
+          turbulence,
+          pose.current.pitch,
+          yawRate,
+          horizontalSpeed,
+          loopStateRef.current,
+          labTime.current,
+          wingsState.current,
+          dt,
+        )
+      }
     }
 
     if (pc) {
@@ -623,11 +554,7 @@ export function FlightLabRigContainer({
       if (pe.tailPitch !== 0 || pe.tailYaw !== 0) {
         for (let index = 0; index < tailBones.current.length; index += 1) {
           const weight = TAIL_WEIGHTS[index] ?? 0
-          applyBoneOffset(
-            tailBones.current[index],
-            pe.tailPitch * weight,
-            pe.tailYaw * weight,
-          )
+          applyBoneOffset(tailBones.current[index], pe.tailPitch * weight, pe.tailYaw * weight)
         }
       }
       if (pe.tailAlignment !== 1) {
@@ -639,56 +566,14 @@ export function FlightLabRigContainer({
       for (const foot of footBones.current) {
         applyBoneOffset(foot, pe.footTuck)
       }
-
-      // Wing Height & Wing Fold Master Adjustments
-      const wingShoulderL = bones.current.get('L_WingShoulder') ?? bones.current.get('Bip002-L-Clavicle_049') ?? bones.current.get('Bip002-L-UpperArm_050') ?? bones.current.get('wingL1')
-      const wingElbowL = bones.current.get('L_WingElbow') ?? bones.current.get('Bip002-L-Forearm_051') ?? bones.current.get('wingL2')
-      const wingWristL = bones.current.get('L_WingWrist') ?? bones.current.get('Bip002-L-Hand_052')
-
-      const wingShoulderR = bones.current.get('R_WingShoulder') ?? bones.current.get('Bip002-R-Clavicle_086') ?? bones.current.get('Bip002-R-UpperArm_087') ?? bones.current.get('wingR1')
-      const wingElbowR = bones.current.get('R_WingElbow') ?? bones.current.get('Bip002-R-Forearm_088') ?? bones.current.get('wingR2')
-      const wingWristR = bones.current.get('R_WingWrist') ?? bones.current.get('Bip002-R-Hand_089')
-
-      // 1. Wing Height (Up / Down) -> Local X pitch
-      applyBoneOffset(wingShoulderL, pe.wingHeight + pe.leftWingPitch, pe.leftWingYaw, pe.leftWingRoll)
-      applyBoneOffset(wingShoulderR, pe.wingHeight + pe.rightWingPitch, pe.rightWingYaw, pe.rightWingRoll)
-
-      // 2. Wing Fold / Unfold -> Local Z yaw sweeps
-      applyBoneOffset(wingShoulderL, 0, pe.wingFold * 0.8, 0)
-      applyBoneOffset(wingElbowL, 0, -pe.wingFold * 1.2, 0)
-      applyBoneOffset(wingWristL, 0, pe.wingFold * 0.6, 0)
-
-      applyBoneOffset(wingShoulderR, 0, -pe.wingFold * 0.8, 0)
-      applyBoneOffset(wingElbowR, 0, pe.wingFold * 1.2, 0)
-      applyBoneOffset(wingWristR, 0, -pe.wingFold * 0.6, 0)
-
-      // 3. Membrane Billow & Finger Fan Spread -> Local Y/Z rotation on wing fingers
-      const fingerNames = ['L_WingFinger1', 'L_WingFinger2', 'L_WingFinger3', 'R_WingFinger1', 'R_WingFinger2', 'R_WingFinger3']
-      fingerNames.forEach((fname) => {
-        const fingerBone = bones.current.get(fname)
-        if (fingerBone) {
-          applyBoneOffset(
-            fingerBone,
-            0,
-            pe.membraneBillow * (fname.startsWith('R_') ? -0.5 : 0.5),
-            pe.membraneBillow * 0.3
-          )
-        }
-      })
-
-      // Left & Right Leg Rotations
-      const legL = bones.current.get('L_Thigh') ?? bones.current.get('Bip002-L-Thigh_0186') ?? bones.current.get('Bip001-L-Thigh_0176') ?? bones.current.get('legL')
-      if (legL) {
-        applyBoneOffset(legL, 0, pe.leftLegYaw, pe.leftLegPitch)
-      }
-
-      const legR = bones.current.get('R_Thigh') ?? bones.current.get('Bip002-R-Thigh_0201') ?? bones.current.get('Bip001-R-Thigh_0180') ?? bones.current.get('legR')
-      if (legR) {
-        applyBoneOffset(legR, 0, pe.rightLegYaw, pe.rightLegPitch)
-      }
+      applyComposerWings(bones.current, pe)
+      const legL = bones.current.get('L_Thigh') ?? bones.current.get('Bip002-L-Thigh_0186') ?? bones.current.get('Bip001-L-Thigh_0176')
+      if (legL) applyBoneOffset(legL, 0, pe.leftLegYaw, pe.leftLegPitch)
+      const legR = bones.current.get('R_Thigh') ?? bones.current.get('Bip002-R-Thigh_0201') ?? bones.current.get('Bip001-R-Thigh_0180')
+      if (legR) applyBoneOffset(legR, 0, pe.rightLegYaw, pe.rightLegPitch)
     }
 
-    if (shouldSealFlightJaw(state)) {
+    if (iso.jawSeal && shouldSealFlightJaw(state)) {
       sealFlightJaw(jawBone.current, closedJaw.current)
     }
 
@@ -709,64 +594,97 @@ export function FlightLabRigContainer({
       }
     }
 
-    const node = readout.current
-    if (!node) return
+    const pts = sampleScratch.current
     const head = bones.current.get('head')
     const tail = bones.current.get('tail')
     const pelvis = bones.current.get('pelvis')
     const foot = bones.current.get('footL')
     const footR = bones.current.get('footR')
+    const wingL = bones.current.get('wingL')
+    const wingR = bones.current.get('wingR')
     let axisAngle = Number.NaN
     let footDrop = Number.NaN
     let footDropR = Number.NaN
+    let wingSpan = Number.NaN
+    let tailExtent = Number.NaN
+    if (head) head.getWorldPosition(pts.head)
+    if (tail) tail.getWorldPosition(pts.tail)
+    if (pelvis) pelvis.getWorldPosition(pts.pelvis)
+    if (foot) foot.getWorldPosition(pts.footL)
+    if (footR) footR.getWorldPosition(pts.footR)
+    if (wingL) wingL.getWorldPosition(pts.wingL)
+    if (wingR) wingR.getWorldPosition(pts.wingR)
     if (head && tail) {
-      const h = head.getWorldPosition(new Vector3())
-      const t = tail.getWorldPosition(new Vector3())
-      axisAngle = (Math.atan2(h.y - t.y, Math.hypot(h.x - t.x, h.z - t.z)) * 180) / Math.PI
+      axisAngle = (Math.atan2(pts.head.y - pts.tail.y, Math.hypot(pts.head.x - pts.tail.x, pts.head.z - pts.tail.z)) * 180) / Math.PI
     }
     if (pelvis) {
-      const p = pelvis.getWorldPosition(new Vector3()).y
-      if (foot) footDrop = p - foot.getWorldPosition(new Vector3()).y
-      if (footR) footDropR = p - footR.getWorldPosition(new Vector3()).y
+      if (foot) footDrop = pts.pelvis.y - pts.footL.y
+      if (footR) footDropR = pts.pelvis.y - pts.footR.y
+      if (tail) tailExtent = pts.pelvis.distanceTo(pts.tail)
     }
-    const size = box.getSize(new Vector3())
-    const trimRad = speedPitchTrim(horizontalSpeed, referenceSpeed)
-    const trimDeg = (trimRad * 180) / Math.PI
-    const ratio = referenceSpeed > 0 ? horizontalSpeed / referenceSpeed : 0
-    let speedCategory = 'MEDIUM (CRUISE)'
-    if (horizontalSpeed < 0.5) speedCategory = 'HOVER / STILL'
-    else if (ratio < 0.65) speedCategory = 'SLOW / LOITER'
-    else if (ratio > 1.25 || boosting) speedCategory = 'FAST / SPRINT'
+    if (wingL && wingR) wingSpan = pts.wingL.distanceTo(pts.wingR)
 
-    const neckPitchDeg = ((headNeck.current.neckPitch * 3) * 180) / Math.PI
-    const headPitchDeg = (headNeck.current.headPitch * 180) / Math.PI
-    const headYawDeg = (headNeck.current.headYaw * 180) / Math.PI
+    const requestedLabel = auto ? `auto -> ${loopStateRef.current}` : requestedState
+    const resolvedClip = resolveClipName(speciesId, state)
+    const markers = {
+      head: Boolean(head),
+      tail: Boolean(tail),
+      pelvis: Boolean(pelvis),
+      wingL: Boolean(wingL),
+      wingR: Boolean(wingR),
+    }
+    const contract = evaluateLabContract({
+      requestedState: state,
+      resolvedClip,
+      clipName,
+      markers,
+      bodyAxisDeg: axisAngle,
+      footDropL: footDrop,
+      wingSpan,
+      poseComposer: pc,
+    })
+    const sample: LabTelemetry = {
+      timestamp: labTime.current,
+      airspeed: horizontalSpeed,
+      pitchAngle: (pose.current.pitch * 180) / Math.PI,
+      bankAngle: (pose.current.bank * 180) / Math.PI,
+      headOrientation: {
+        pitch: headNeck.current.headPitch,
+        yaw: headNeck.current.headYaw,
+        roll: headNeck.current.headRoll,
+      },
+      neckCurve: headNeck.current.neckPitch,
+      tailExtent,
+      tailFlexAngles: [tailState.current.swing, tailState.current.lift],
+      footDropL: footDrop,
+      footDropR,
+      bodyAxisDeg: axisAngle,
+      wingSpan,
+      clipName,
+      clipTime,
+      clipDuration: duration,
+      requestedState: requestedLabel,
+      resolvedClip,
+      loopState: auto ? loopStateRef.current : state,
+      activeControllers: activeControllerNames(iso),
+      contractStatus: contract.status,
+      contractNotes: contract.notes,
+      poseComposer: pc,
+      markers,
+    }
 
-    node.textContent = [
-      `requested   ${auto ? `auto -> ${loopStateRef.current}` : requestedState}`,
-      `speed level ${speedCategory} (${horizontalSpeed.toFixed(1)} u/s, ${ratio.toFixed(2)}x ref)`,
-      `speed trim  ${trimDeg > 0 ? '+' : ''}${trimDeg.toFixed(1)}deg (${trimDeg > 0 ? 'nose-up lift' : trimDeg < 0 ? 'nose-down fast' : 'neutral'})`,
-      `neck/head   neck ${neckPitchDeg > 0 ? '+' : ''}${neckPitchDeg.toFixed(1)}deg (${ratio > 0.7 ? 'straightened' : 'curved'})  head pitch ${headPitchDeg.toFixed(1)}deg  turn lead ${headYawDeg.toFixed(1)}deg`,
-      `clip        ${clipName}`,
-      `time        ${clipTime.toFixed(2)}s / ${duration.toFixed(2)}s  (phase ${
-        duration > 0 ? ((clipTime % duration) / duration).toFixed(3) : '—'
-      })`,
-      `pitch/bank  ${pose.current.pitch.toFixed(3)} / ${pose.current.bank.toFixed(3)} rad`,
-      `body axis   ${Number.isNaN(axisAngle) ? '—' : `${axisAngle.toFixed(1)}deg nose-up`}`,
-      `foot drop   L ${Number.isNaN(footDrop) ? '—' : footDrop.toFixed(2)}  R ${
-        Number.isNaN(footDropR) ? '—' : footDropR.toFixed(2)
-      } below pelvis (${legTuck.current < -0.02 ? 'letting down' : legTuck.current > 0.02 ? 'tucking' : 'at mode base'})`,
-      `leg tuck    ${legTuck.current > 0 ? '+' : ''}${legTuck.current.toFixed(3)} rad of airspeed offset`,
-      `pose lab    ${
-        pc
-          ? `ON  body ${pe.bodyX.toFixed(1)}, ${pe.bodyY.toFixed(1)}, ${pe.bodyZ.toFixed(1)}  climb ${pe.bodyPitch.toFixed(2)}  neck ${pe.neckPitch.toFixed(2)}/${pe.neckYaw.toFixed(2)} align ${pe.neckAlignment.toFixed(2)}  tail ${pe.tailPitch.toFixed(2)}/${pe.tailYaw.toFixed(2)} align ${pe.tailAlignment.toFixed(2)}  legs ${pe.legTuck.toFixed(2)}  feet ${pe.footTuck.toFixed(2)}`
-          : 'off (authored clip plus selected runtime layers only)'
-      }`,
-      `bounds      w ${size.x.toFixed(1)}  h ${size.y.toFixed(1)}  d ${size.z.toFixed(1)}`,
-      `  x ${box.min.x.toFixed(1)}..${box.max.x.toFixed(1)}`,
-      `  y ${box.min.y.toFixed(1)}..${box.max.y.toFixed(1)}`,
-      `  z ${box.min.z.toFixed(1)}..${box.max.z.toFixed(1)}`,
-    ].join('\n')
+    const node = readout.current
+    if (node) node.textContent = formatReadout(sample)
+
+    sampleClock.current += dt
+    if (sampleClock.current >= 0.12) {
+      sampleClock.current = 0
+      const key = `${sample.clipName}|${sample.contractStatus}|${sample.airspeed.toFixed(1)}|${sample.bodyAxisDeg.toFixed(1)}|${sample.wingSpan.toFixed(1)}`
+      if (key !== lastSampleKey.current) {
+        lastSampleKey.current = key
+        telemetryCbRef.current?.(sample)
+      }
+    }
   })
 
   return (
@@ -790,6 +708,7 @@ export function FlightLabRigContainer({
         </GameModel>
         {overlays && <axesHelper args={[30]} />}
       </group>
+      <PreyField propManager={propManager} propsList={propsList} wyvernPosition={wyvernWorld.current} />
       {overlays &&
         MARKERS.map((marker: { key: string; bone: string; color: string }) => (
           <mesh

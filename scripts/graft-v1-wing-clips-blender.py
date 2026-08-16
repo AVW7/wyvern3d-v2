@@ -132,8 +132,8 @@ GRAFTS = [
     # way. The 0.50 m of asymmetry that remains is the lift solving each wing
     # from its own lowest vertex as the body moves under it -- real, and clear
     # of the 0.1 m minimum the validator holds walk to so that an accidental
-    # locked carrier cannot ship.
-    Graft("walk", "v1_walk", True, True, fold_digits=True),
+    # Unmirrored so the alternating left-then-right quadrupedal walk from v1 is preserved.
+    Graft("walk", "v1_walk", True, False, fold_digits=True),
     Graft("takeoff", "v1_riseUp", False, True),
     Graft("land", "v1_goDown", False, True),
     # The powered flight family, all cut from the one measured cycle so their

@@ -5,6 +5,10 @@ import type { AssetId, ModelState } from '@/render/assets/manifest'
 import { FlightLabCanvas } from './components/FlightLabCanvas'
 import { FlightLabRigContainer } from './components/FlightLabRigContainer'
 import { CAMERAS } from './constants'
+import type { ControllerIsolationState, SpeedDynamicsState } from './components/AnimationControls'
+import type { LabTelemetry } from './labTelemetry'
+import type { PropBase } from './props/PropBase'
+import type { PropManager } from './systems/PropManager'
 
 export type LabCamera = 'side' | 'front' | 'top' | 'threeQuarter' | 'sanctuary' | 'battle'
 export type LabTheme = 'dark' | 'light' | 'monochrome'
@@ -62,6 +66,12 @@ export interface FlightLabProps {
   fireBreath?: boolean
   readout: RefObject<HTMLPreElement | null>
   onActiveState: (state: ModelState) => void
+  onTelemetry?: (sample: LabTelemetry) => void
+  controllerIsolation: ControllerIsolationState
+  speedDynamics: SpeedDynamicsState
+  transitionDuration: number
+  propManager: PropManager
+  propsList: PropBase[]
   centerTrigger?: number
   zoomFitTrigger?: number
   zoomInTrigger?: number

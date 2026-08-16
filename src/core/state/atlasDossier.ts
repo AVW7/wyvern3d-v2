@@ -4,6 +4,7 @@ import { SPECIES } from '../data/species'
 import { UNITS } from '../data/units'
 import {
   ensureAtlasKnowledge,
+  getCompletedActivities,
   getDiscoveredLandmarks,
   getKnownRegionSummary,
   getKnownRegionTags,
@@ -171,6 +172,11 @@ export function formatRegionalEvent(event: GameEvent, regionId: string): string 
     }
     case 'phenomenon_observed':
       return `Environmental phenomenon recorded in ${regName}.`
+    case 'activity_completed': {
+      const actName = (event.payload?.activityName as string) ?? 'Expedition activity'
+      const tag = (event.payload?.knowledgeTag as string) ?? 'Mystery Solved'
+      return `Expedition completed: ${actName} [${tag}].`
+    }
     default:
       return `${event.kind.replace(/_/g, ' ')} recorded (tick ${event.tick}).`
   }
@@ -228,6 +234,15 @@ export interface RegionDossierData {
     discoveredCount: number
   }
   observedPhenomena: { id: string; name: string; description: string; kind: string }[]
+  completedActivities: {
+    id: string
+    name: string
+    description: string
+    kind: string
+    objective: string
+    knowledgeTag: string
+    themeColor: string
+  }[]
   yields: {
     base: Record<string, number>
     effective: Record<string, number>
@@ -276,6 +291,17 @@ export function getRegionDossier(state: GameState, regionId: string): RegionDoss
     name: p.name,
     description: p.description,
     kind: p.kind,
+  }))
+
+  // Completed Activities
+  const completedActivities = getCompletedActivities(state, regionId).map((a) => ({
+    id: a.id,
+    name: a.name,
+    description: a.description,
+    kind: a.kind,
+    objective: a.objective,
+    knowledgeTag: a.knowledgeTag,
+    themeColor: a.themeColor,
   }))
 
   // Yields
@@ -329,6 +355,7 @@ export function getRegionDossier(state: GameState, regionId: string): RegionDoss
       discoveredCount: discoveredLandmarks.length,
     },
     observedPhenomena,
+    completedActivities,
     yields: {
       base: { ...def.yields },
       effective: effectiveYields,

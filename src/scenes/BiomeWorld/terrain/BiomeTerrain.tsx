@@ -3,7 +3,14 @@
 import { useMemo, useEffect } from 'react'
 import { PlaneGeometry } from 'three'
 import { getBiomePalette } from '../atmosphere/biomePalettes'
+import {
+  WEATHER_PROFILES,
+  getEffectiveWeatherPalette,
+  type WeatherType,
+} from '../atmosphere/biomeWeather'
 import { BIOME_WORLD_RADIUS, surfaceHeight } from './biomeHeight'
+import { getRegionWaterBody } from './biomeWater'
+import { BiomeWaterSurface } from './BiomeWaterSurface'
 
 export { BIOME_WORLD_RADIUS, GROVE_MOUND_HEIGHT, biomeHeightAt } from './biomeHeight'
 
@@ -11,9 +18,11 @@ interface BiomeTerrainProps {
   biome: string
   regionId?: string
   seed?: number
+  /** Active deterministic weather, shared with the atmosphere so water fog matches. */
+  weather?: WeatherType
 }
 
-export function BiomeTerrain({ biome, regionId, seed = 42 }: BiomeTerrainProps) {
+export function BiomeTerrain({ biome, regionId, seed = 42, weather }: BiomeTerrainProps) {
   const palette = useMemo(() => getBiomePalette(biome), [biome])
 
   const geometry = useMemo(() => {
@@ -31,6 +40,19 @@ export function BiomeTerrain({ biome, regionId, seed = 42 }: BiomeTerrainProps) 
 
   useEffect(() => () => geometry.dispose(), [geometry])
 
+  const water = useMemo(
+    () => getRegionWaterBody(biome, regionId, seed),
+    [biome, regionId, seed],
+  )
+
+  const waterPalette = useMemo(() => {
+    if (!water) return null
+    const profile = weather ? WEATHER_PROFILES[weather] ?? WEATHER_PROFILES.clear : WEATHER_PROFILES.clear
+    return getEffectiveWeatherPalette(palette, profile)
+  }, [water, weather, palette])
+
+  const windSpeed = weather ? (WEATHER_PROFILES[weather] ?? WEATHER_PROFILES.clear).windSpeed : 1
+
   return (
     <group>
       {/* Main Ground Mesh */}
@@ -38,26 +60,17 @@ export function BiomeTerrain({ biome, regionId, seed = 42 }: BiomeTerrainProps) 
         <meshStandardMaterial color={palette.groundColor} roughness={0.85} />
       </mesh>
 
-      {/* Sea / Liquid Plane for Coast and Marsh biomes */}
-      {biome === 'coast' && (
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.6, 0]} receiveShadow>
-          <planeGeometry args={[BIOME_WORLD_RADIUS * 2.4, BIOME_WORLD_RADIUS * 2.4]} />
-          <meshStandardMaterial color="#1e40af" roughness={0.2} metalness={0.8} transparent opacity={0.8} />
-        </mesh>
-      )}
-
-      {(biome === 'marsh' || biome === 'swamp') && (
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.3, 0]} receiveShadow>
-          <planeGeometry args={[BIOME_WORLD_RADIUS * 2, BIOME_WORLD_RADIUS * 2]} />
-          <meshStandardMaterial color="#14532d" roughness={0.4} transparent opacity={0.6} />
-        </mesh>
-      )}
-
-      {biome === 'ashland' && (
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.5, 0]}>
-          <planeGeometry args={[BIOME_WORLD_RADIUS * 2, BIOME_WORLD_RADIUS * 2]} />
-          <meshStandardMaterial color="#ea580c" emissive="#c2410c" emissiveIntensity={0.6} roughness={0.3} />
-        </mesh>
+      {/* Animated sea / bog / lava surface for water biomes */}
+      {water && waterPalette && (
+        <BiomeWaterSurface
+          body={water}
+          biome={biome}
+          regionId={regionId}
+          seed={seed}
+          radius={BIOME_WORLD_RADIUS * water.extent}
+          palette={waterPalette}
+          windSpeed={windSpeed}
+        />
       )}
     </group>
   )
