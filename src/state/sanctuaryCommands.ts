@@ -21,6 +21,7 @@ export type SanctuaryCommand =
 
 export type SanctuaryCommandPhase =
   | 'settled'
+  | 'walking'
   | 'approachingPlayer'
   | 'takeoff'
   | 'transit'

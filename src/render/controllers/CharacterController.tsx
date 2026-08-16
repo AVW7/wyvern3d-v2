@@ -7,6 +7,7 @@ import { useCameraStore } from '@/state/cameraStore'
 import { usePlayerControlStore } from '@/state/playerControlStore'
 import { useSanctuaryCommands } from '@/state/sanctuaryCommands'
 import { CONTROLS, axis, consumeClick, consumeDrag, consumeWheel, isDown, pointer } from './input'
+import { findPath } from './navigation'
 
 /** Axis-aligned box footprint in the XZ plane. */
 export interface Collider {
@@ -42,6 +43,14 @@ const CAMERA_MIN_PITCH = 0.05
 const CAMERA_MAX_PITCH = 1.42
 const EYE_HEIGHT = 1.6
 const CLICK_ARRIVAL_RADIUS = 0.25
+/**
+ * Extra room the planned route keeps beyond the body radius.
+ *
+ * `resolveCollisions` pushes out at exactly RADIUS, so a route planned at
+ * RADIUS alone would ride the push-out boundary the whole way and jitter along
+ * every wall it passes.
+ */
+const PATH_CLEARANCE = 0.15
 const GROUND_PLANE = new Plane(new Vector3(0, 1, 0), 0)
 
 export function CharacterController({
@@ -85,6 +94,8 @@ export function CharacterController({
   const cameraDistance = useRef(CAMERA_DISTANCE)
   const yaw = useRef(0)
   const destination = useRef<Vector3 | null>(null)
+  /** Remaining corners of the planned route, after `destination`. */
+  const pathQueue = useRef<Vector3[]>([])
   const commandFace = useRef<Vector3 | null>(null)
   const commandToken = useRef<number | null>(null)
   const raycaster = useRef(new Raycaster())
@@ -94,6 +105,13 @@ export function CharacterController({
   const lastPresetToken = useRef(0)
 
   const presetToken = useCameraStore((s) => s.presetToken)
+
+  // Read by the move-command effect, which must not re-run when the layout
+  // changes — that would re-issue an order the player has already answered.
+  const collidersRef = useRef(colliders)
+  collidersRef.current = colliders
+  const boundsRef = useRef(bounds)
+  boundsRef.current = bounds
 
   useEffect(() => {
     if (presetToken > 0 && presetToken !== lastPresetToken.current) {
@@ -117,12 +135,20 @@ export function CharacterController({
     if (!moveCommand) {
       if (commandToken.current !== null) {
         destination.current = null
+        pathQueue.current = []
         commandFace.current = null
         commandToken.current = null
       }
       return
     }
-    destination.current = new Vector3(moveCommand.position[0], 0, moveCommand.position[1])
+    const route = planRoute(
+      position.current,
+      new Vector3(moveCommand.position[0], 0, moveCommand.position[1]),
+      collidersRef.current,
+      boundsRef.current,
+    )
+    destination.current = route[0]!
+    pathQueue.current = route.slice(1)
     commandFace.current = moveCommand.face
       ? new Vector3(moveCommand.face[0], 0, moveCommand.face[1])
       : null
@@ -176,7 +202,9 @@ export function CharacterController({
           hit.x *= bounds / flat
           hit.z *= bounds / flat
         }
-        destination.current = hit
+        const clicked = planRoute(position.current, hit, colliders, bounds)
+        destination.current = clicked[0]!
+        pathQueue.current = clicked.slice(1)
       }
     }
 
@@ -188,6 +216,7 @@ export function CharacterController({
     if (keyboardMoving || spacePressed) {
       if (destination.current) {
         destination.current = null
+        pathQueue.current = []
         if (commandToken.current !== null) {
           onCommandCancel?.(commandToken.current)
           commandToken.current = null
@@ -221,18 +250,25 @@ export function CharacterController({
       const distance = Math.hypot(dx, dz)
 
       if (distance <= CLICK_ARRIVAL_RADIUS) {
-        destination.current = null
-        if (commandToken.current !== null) {
-          const arrived = commandToken.current
-          if (commandFace.current) {
-            yaw.current = Math.atan2(
-              commandFace.current.x - position.current.x,
-              commandFace.current.z - position.current.z,
-            )
+        const corner = pathQueue.current.shift()
+        if (corner) {
+          // A turn on the route, not the destination — keep walking.
+          destination.current = corner
+          moving = true
+        } else {
+          destination.current = null
+          if (commandToken.current !== null) {
+            const arrived = commandToken.current
+            if (commandFace.current) {
+              yaw.current = Math.atan2(
+                commandFace.current.x - position.current.x,
+                commandFace.current.z - position.current.z,
+              )
+            }
+            commandToken.current = null
+            commandFace.current = null
+            onCommandArrival?.(arrived)
           }
-          commandToken.current = null
-          commandFace.current = null
-          onCommandArrival?.(arrived)
         }
       } else {
         const step = Math.min(WALK_SPEED * dt, distance)
@@ -291,6 +327,33 @@ export function CharacterController({
   })
 
   return <group ref={group}>{children}</group>
+}
+
+/**
+ * Turns a walk order into waypoints that go around the obstacles.
+ *
+ * A straight line plus `resolveCollisions` is not a detour, it is a dead stop:
+ * the push-out pins the body against whatever is in the way and the walk never
+ * arrives. That stranded the sanctuary's contact commands, whose wyvern waits
+ * in `approachingPlayer` until the player reports arrival.
+ *
+ * A goal with no route at all falls back to the straight line, so a stale or
+ * over-inflated collider set can never freeze the character where it stands.
+ */
+function planRoute(
+  from: Vector3,
+  target: Vector3,
+  colliders: readonly Collider[],
+  bounds: number,
+): Vector3[] {
+  const route = findPath(
+    { x: from.x, z: from.z },
+    { x: target.x, z: target.z },
+    colliders,
+    { radius: RADIUS + PATH_CLEARANCE, boundsRadius: bounds },
+  )
+  const points = route ?? [{ x: target.x, z: target.z }]
+  return points.map((point) => new Vector3(point.x, 0, point.z))
 }
 
 /**

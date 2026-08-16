@@ -5,6 +5,7 @@ import {
   TAKEOFF_SECONDS,
   LAND_SECONDS,
   TRANSIT_ALTITUDE,
+  WALK_REACH,
 } from './wyvernDirector'
 
 function createMockWyvern(id: string, stage: 'hatchling' | 'juvenile' | 'adult' = 'adult'): WyvernInstance {
@@ -185,5 +186,121 @@ describe('SanctuaryDirector', () => {
 
     expect(agent.ambientRoll).toBeGreaterThan(0)
     expect(agent.ambientAction).not.toBeNull()
+  })
+  it('walks a short relocation instead of paying for a takeoff', () => {
+    const director = createSanctuaryDirector({ seed: 42 })
+    const wyvern = createMockWyvern('w1')
+    director.syncWyverns([wyvern])
+    const agent = director.agents.get('w1')!
+    const ctx = { setStatus: vi.fn(), movePlayer: vi.fn(() => 1), clearPlayerInteraction: vi.fn() }
+
+    agent.position.set(agent.base[0] + 10, 0, agent.base[1])
+    director.dispatchCommand({ wyvernId: 'w1', kind: 'return', token: 1 }, [wyvern], [], ctx)
+
+    expect(agent.phase).toBe('walking')
+    expect(agent.airborne).toBe(false)
+    expect(director.getVisual('w1').state).toBe('walk')
+
+    for (let t = 0; t < 10 && agent.phase === 'walking'; t += 0.05) {
+      director.step(0.05, { playerPosition: [0, 0] }, [wyvern], ctx)
+    }
+
+    expect(agent.phase).toBe('settled')
+    expect(agent.position.y).toBe(0)
+    expect(Math.hypot(agent.position.x - agent.base[0], agent.position.z - agent.base[1]))
+      .toBeLessThan(1)
+  })
+
+  it('flies home when the trip is longer than a wyvern will walk', () => {
+    const director = createSanctuaryDirector({ seed: 42 })
+    const wyvern = createMockWyvern('w1')
+    director.syncWyverns([wyvern])
+    const agent = director.agents.get('w1')!
+    const ctx = { setStatus: vi.fn(), movePlayer: vi.fn(() => 1), clearPlayerInteraction: vi.fn() }
+
+    agent.position.set(agent.base[0] - (WALK_REACH + 16), 0, agent.base[1])
+    director.dispatchCommand({ wyvernId: 'w1', kind: 'return', token: 1 }, [wyvern], [], ctx)
+
+    expect(agent.phase).toBe('takeoff')
+    expect(director.getVisual('w1').state).toBe('fly')
+  })
+
+  it('keeps a hatchling on the ground however far it is sent', () => {
+    const director = createSanctuaryDirector({ seed: 42 })
+    const hatchling = createMockWyvern('w1', 'hatchling')
+    director.syncWyverns([hatchling])
+    const agent = director.agents.get('w1')!
+    const ctx = { setStatus: vi.fn(), movePlayer: vi.fn(() => 1), clearPlayerInteraction: vi.fn() }
+
+    agent.position.set(agent.base[0] - (WALK_REACH + 16), 0, agent.base[1])
+    director.dispatchCommand({ wyvernId: 'w1', kind: 'return', token: 1 }, [hatchling], [], ctx)
+
+    expect(agent.phase).toBe('walking')
+
+    for (let t = 0; t < 30 && agent.phase === 'walking'; t += 0.05) {
+      director.step(0.05, { playerPosition: [0, 0] }, [hatchling], ctx)
+      expect(agent.airborne).toBe(false)
+      expect(agent.position.y).toBe(0)
+    }
+
+    expect(agent.phase).toBe('settled')
+  })
+
+  it('finds standing room beside a wyvern perched at the sanctuary edge', () => {
+    const director = createSanctuaryDirector({ seed: 42 })
+    // Perch 7 sits 58.1 units out; facing away from the centre used to put
+    // every candidate stand-point outside the bounds interactionPoint tested.
+    const wyvern = { ...createMockWyvern('w1'), preferredPerchIndex: 7 }
+    director.syncWyverns([wyvern])
+    const agent = director.agents.get('w1')!
+    agent.yaw = Math.atan2(agent.position.x, agent.position.z)
+
+    const setStatus = vi.fn()
+    director.dispatchCommand({ wyvernId: 'w1', kind: 'pet', token: 1 }, [wyvern], [], {
+      setStatus,
+      movePlayer: vi.fn(() => 7),
+      clearPlayerInteraction: vi.fn(),
+    })
+
+    expect(agent.phase).toBe('approachingPlayer')
+    expect(setStatus).not.toHaveBeenCalledWith('There is no clear space beside this wyvern.')
+  })
+
+  it('records the meal through the feed callback when the offer lands', () => {
+    const director = createSanctuaryDirector({ seed: 42 })
+    const wyvern = createMockWyvern('w1')
+    director.syncWyverns([wyvern])
+    const feedWyvern = vi.fn()
+    const ctx = {
+      setStatus: vi.fn(),
+      movePlayer: vi.fn(() => 42),
+      clearPlayerInteraction: vi.fn(),
+      acknowledgePlayerMove: vi.fn(),
+      feedWyvern,
+    }
+
+    director.dispatchCommand({ wyvernId: 'w1', kind: 'offerFood', token: 1 }, [wyvern], [], ctx)
+    director.handlePlayerMoveResult({ token: 42, result: 'arrived' }, ctx)
+
+    expect(feedWyvern).toHaveBeenCalledWith('w1')
+    expect(director.getVisual('w1').action?.state).toBe('eat')
+    expect(director.getVisual('w1').showFood).toBe(true)
+  })
+
+  it('wakes a wyvern out of its ambient idle when an order arrives', () => {
+    const director = createSanctuaryDirector({ seed: 12345 })
+    const wyvern = createMockWyvern('w1')
+    director.syncWyverns([wyvern])
+    const agent = director.agents.get('w1')!
+    const ctx = { setStatus: vi.fn(), movePlayer: vi.fn(() => 1), clearPlayerInteraction: vi.fn() }
+
+    director.step(10, { playerPosition: [0, 0] }, [wyvern], ctx)
+    expect(agent.ambientAction).not.toBeNull()
+
+    director.dispatchCommand({ wyvernId: 'w1', kind: 'circle', token: 1 }, [wyvern], [], ctx)
+
+    expect(agent.ambientAction).toBeNull()
+    expect(agent.ambientDwell).toBeGreaterThan(0)
+    expect(director.getVisual('w1').state).toBe('fly')
   })
 })

@@ -76,6 +76,9 @@ export function SanctuaryWyverns({ wyverns, colliders, placedObjects, seed }: Sa
       useHighlandsHunt.getState().open(wyvernId)
       useGame.getState().setMode('highlands')
     },
+    // The clip is presentation; the meal itself goes through the normal intent
+    // path so hunger, food stock and the log all move with it.
+    feedWyvern: (wyvernId) => useGame.getState().dispatch({ type: 'FEED_WYVERN', wyvernId }),
   }
 
   useGameEventStream({

@@ -50,6 +50,26 @@ export const AMBIENT_MIN_HOLD = 8
 export const AMBIENT_MAX_HOLD = 20
 export const EAT_SECONDS = 4.5
 
+/**
+ * Ground travel: pace, and how far a wyvern will cover on foot.
+ *
+ * Every sanctuary relocation used to be answered the same way regardless of
+ * distance — launch, cruise at TRANSIT_ALTITUDE, land — so a four-metre shuffle
+ * back onto a perch cost a 3.34 s takeoff and a 4.67 s landing, and a hatchling
+ * the wheel says "cannot fly yet" flew anyway the moment it was told to return.
+ *
+ * WALK_REACH is where the two answers cost about the same: 24 units is ~5.3 s
+ * on foot, against the 8.01 s of takeoff plus landing a flight spends before it
+ * has covered any ground at all. Past that the walk starts to read as a trudge
+ * and flight is the better answer — for anything that can fly. A wyvern that
+ * cannot walks whatever the distance, because the alternative is disobeying.
+ */
+export const WALK_SPEED = 4.5
+export const WALK_REACH = 24
+
+/** Player standing room around a wyvern's head, in units. */
+const INTERACTION_CLEARANCE = 0.8
+
 export interface VisualState {
   state: ModelState
   action: ModelActionRequest | null
@@ -79,6 +99,8 @@ export interface Agent {
   airborne: boolean
   base: SanctuaryPoint
   baseState: ModelState
+  /** Cleared for flight. False for hatchlings, who answer every order on foot. */
+  canFly: boolean
   destination: SanctuaryPoint | null
   purpose: Purpose | null
   attackTarget: SanctuaryPoint | null
@@ -177,6 +199,11 @@ export function isCruisePhase(phase: SanctuaryCommandPhase): boolean {
 }
 
 export function phaseLabel(agent: Agent): string {
+  if (agent.phase === 'walking') {
+    return agent.purpose === 'return' || agent.purpose === 'assignment'
+      ? 'walking home'
+      : 'walking over'
+  }
   if (agent.phase === 'approachingPlayer') return 'waiting for you'
   if (agent.phase === 'takeoff') return 'taking off'
   if (agent.phase === 'transit' || agent.phase === 'returning') return 'in flight'
@@ -210,6 +237,24 @@ export function commandName(command: SanctuaryCommand): string {
   }
 }
 
+/**
+ * What the status line calls an action, where the clip name is not the order.
+ *
+ * The player asked to feed, pet, calm or strike; `eat`, `nuzzle` and `calm` are
+ * the clips that answer, and only one of them shares its name with the order.
+ */
+const ACTION_STATUS: Partial<Record<ModelState, string>> = {
+  eat: 'Feeding',
+  nuzzle: 'Petting',
+  calm: 'Calming',
+  attack: 'Striking',
+  rest: 'Resting',
+  sleep: 'Sleeping',
+  sit: 'Sitting',
+  groom: 'Grooming',
+  perch: 'Perching',
+}
+
 export function hasAttackTargetBlocker(object: Object3D): boolean {
   let current: Object3D | null = object
   while (current) {
@@ -233,6 +278,31 @@ export function isActorClearTarget(
   return true
 }
 
+/**
+ * Pulls a point back inside the sanctuary disc, along its own radius.
+ *
+ * Used on interaction candidates rather than rejecting them: a stand-point one
+ * metre out of bounds is a point that wants nudging inward, not a reason to
+ * refuse the order.
+ */
+function clampToGround(x: number, z: number, limit: number): [number, number] {
+  const radius = Math.hypot(x, z)
+  if (radius <= limit || radius < 1e-6) return [x, z]
+  return [(x * limit) / radius, (z * limit) / radius]
+}
+
+/**
+ * Where the player should stand to reach this wyvern, and what to look at.
+ *
+ * Candidates ring the head, not the root: the contact clips play at the jaw, so
+ * a stand-point measured from the body would put the player under a wing.
+ *
+ * Each candidate is clamped back inside the ground disc before it is tested,
+ * and tested against GROUND_RADIUS. It used to test against a hardcoded 50 with
+ * no clamp, and six of the eight perches sit past that — so Feed, Pet and Calm
+ * refused outright ("There is no clear space beside this wyvern") for any
+ * wyvern on an outer perch that was not happening to face inward.
+ */
 export function interactionPoint(
   agent: Agent,
   colliders: readonly SanctuaryCollider[],
@@ -256,11 +326,15 @@ export function interactionPoint(
     Math.PI / 2,
     -Math.PI / 2,
   ]
+  const limit = GROUND_RADIUS - INTERACTION_CLEARANCE - 0.5
   const candidates = angles
-    .map((offset): [number, number] => [
-      scratch.x + Math.sin(agent.yaw + offset) * 2.5,
-      scratch.z + Math.cos(agent.yaw + offset) * 2.5,
-    ])
+    .map((offset): [number, number] =>
+      clampToGround(
+        scratch.x + Math.sin(agent.yaw + offset) * 2.5,
+        scratch.z + Math.cos(agent.yaw + offset) * 2.5,
+        limit,
+      ),
+    )
     .sort(
       (left, right) =>
         Math.hypot(left[0] - playerPosition[0], left[1] - playerPosition[1]) -
@@ -269,9 +343,9 @@ export function interactionPoint(
   for (const point of candidates) {
     if (
       isSanctuaryPointValid(point, {
-        boundsRadius: 50,
+        boundsRadius: GROUND_RADIUS,
         colliders,
-        clearance: 0.8,
+        clearance: INTERACTION_CLEARANCE,
       })
     ) {
       return { position: point, face: facePos }
@@ -344,6 +418,15 @@ export interface SanctuaryCommandsContext {
   clearPlayerInteraction: () => void
   acknowledgePlayerMove?: () => void
   openHighlandsHunt?: (wyvernId: string) => void
+  /**
+   * Records the meal through the normal intent path.
+   *
+   * Offer Food played the `eat` clip and changed nothing: hunger, food stock
+   * and the log all stayed where they were, so the order was theatre. Everything
+   * else about the command stays cosmetic; this one callback is the seam where
+   * it becomes an actual feed.
+   */
+  feedWyvern?: (wyvernId: string) => void
 }
 
 /**
@@ -360,6 +443,15 @@ export class SanctuaryDirector {
 
   private actionLatch = { breath: false, attack: false }
   private jawWorldScratch = new Vector3()
+  /**
+   * Last player position seen by `step`.
+   *
+   * `dispatchCommand` is called from the frame loop but is not handed the frame
+   * context, and the stand-point it picks has to be the one nearest the player
+   * — it used to be handed the wyvern's own position instead, which always
+   * chose the same candidate and routinely walked the player the long way round.
+   */
+  private lastPlayerPosition: SanctuaryPoint | null = null
 
   constructor(options: SanctuaryDirectorOptions = {}) {
     this.seed = options.seed ?? 1
@@ -416,6 +508,7 @@ export class SanctuaryDirector {
       if (existing) {
         existing.base = base.position
         existing.baseState = base.state
+        existing.canFly = wyvern.stage !== 'hatchling'
         continue
       }
 
@@ -439,6 +532,7 @@ export class SanctuaryDirector {
         airborne: false,
         base: base.position,
         baseState: base.state,
+        canFly: wyvern.stage !== 'hatchling',
         destination: null,
         purpose: null,
         attackTarget: null,
@@ -482,6 +576,7 @@ export class SanctuaryDirector {
     }
     agent.queued = null
     commandsCtx.setStatus(null)
+    this.holdAttention(agent)
 
     if (request.kind === 'takeOff' || request.kind === 'circle') {
       if (wyvern?.stage === 'hatchling') {
@@ -586,8 +681,8 @@ export class SanctuaryDirector {
         face(agent, request.target)
         this.playAction(agent, 'attack', 3.34, false, commandsCtx)
       } else {
-        if (wyvern?.stage === 'hatchling') {
-          commandsCtx.setStatus('Choose a point closer to this hatchling.')
+        if (!agent.canFly && flatDistance(agent.position, landing) > WALK_REACH) {
+          commandsCtx.setStatus('Too far for this hatchling to reach on foot.')
           return
         }
         this.startJourney(agent, landing, 'attack')
@@ -688,6 +783,7 @@ export class SanctuaryDirector {
       airborne: a.airborne,
     }))
 
+    if (context.playerPosition) this.lastPlayerPosition = context.playerPosition
     const playerVec = context.playerPosition
       ? { x: context.playerPosition[0], y: 0, z: context.playerPosition[1] }
       : null
@@ -823,7 +919,18 @@ export class SanctuaryDirector {
       }
       this.runQueued(agent, wyverns, context.colliders ?? [], commandsCtx)
       if (agent.purpose === null && agent.queued === null && agent.baseState === 'idle') {
-        this.updateAmbient(agent, dt, wyverns)
+        this.updateAmbient(agent, dt, wyverns, context.placedObjects)
+      }
+      return
+    }
+
+    if (agent.phase === 'walking') {
+      if (!agent.destination) {
+        this.settle(agent)
+        return
+      }
+      if (moveFlat(agent, agent.destination, WALK_SPEED, dt) <= 0.2) {
+        this.onArrived(agent, wyverns, context.colliders ?? [], commandsCtx)
       }
       return
     }
@@ -937,7 +1044,7 @@ export class SanctuaryDirector {
       if (t >= 1) {
         agent.position.y = 0
         agent.airborne = false
-        this.onLanded(agent, wyverns, context.colliders ?? [], commandsCtx)
+        this.onArrived(agent, wyverns, context.colliders ?? [], commandsCtx)
       }
       return
     }
@@ -954,10 +1061,22 @@ export class SanctuaryDirector {
       return
     }
 
-    if (agent.phase === 'approachingPlayer') return
+    if (agent.phase === 'approachingPlayer') {
+      // Turning to watch is the only thing between the order and the contact
+      // clip that reads as the wyvern having heard it.
+      const player = context.playerPosition
+      if (player) {
+        const dx = player[0] - agent.position.x
+        const dz = player[1] - agent.position.z
+        if (Math.hypot(dx, dz) > 1e-3) {
+          agent.yaw += angleDelta(Math.atan2(dx, dz), agent.yaw) * Math.min(1, 3 * dt)
+        }
+      }
+    }
   }
 
-  private onLanded(
+  /** Shared arrival handling for both ways of getting somewhere: flight and foot. */
+  private onArrived(
     agent: Agent,
     wyverns: WyvernInstance[],
     colliders: readonly SanctuaryCollider[],
@@ -995,6 +1114,10 @@ export class SanctuaryDirector {
     agent.attackTarget = null
     const atBase = flatDistance(agent.position, agent.base) <= 1
     if (atBase) agent.purpose = null
+    // Without this the scheduler still believes an ambient action is running,
+    // and its next roll emits a stray `rise` out of nowhere.
+    agent.ambientAction = null
+    agent.ambientDwell = AMBIENT_MIN_DWELL
     this.setVisual(agent.id, {
       state: atBase ? agent.baseState : 'idle',
       action: null,
@@ -1002,17 +1125,42 @@ export class SanctuaryDirector {
     })
   }
 
+  /**
+   * Sends an agent to a point by whichever means suits the trip.
+   *
+   * Already airborne means fly. On the ground it is a walk inside WALK_REACH,
+   * or for anything that cannot fly at all; only a grounded flier with real
+   * distance to cover pays for a takeoff.
+   */
   public startJourney(agent: Agent, destination: SanctuaryPoint, purpose: Purpose): void {
     agent.destination = destination
     agent.purpose = purpose
     agent.attackTarget = purpose === 'attack' ? agent.attackTarget : null
-    if (!agent.airborne) this.startTakeoff(agent, purpose)
-    else {
+
+    if (agent.airborne) {
       agent.phase = purpose === 'return' || purpose === 'assignment' ? 'returning' : 'transit'
       agent.phaseTime = 0
       agent.flightAnimation = 'cruise'
       this.setVisual(agent.id, { state: 'cruise', action: null, showFood: false })
+      return
     }
+
+    if (!agent.canFly || flatDistance(agent.position, destination) <= WALK_REACH) {
+      this.startWalk(agent, destination)
+      return
+    }
+
+    this.startTakeoff(agent, purpose)
+  }
+
+  /** Ground travel: turn to the destination and pace over on foot. */
+  public startWalk(agent: Agent, destination: SanctuaryPoint): void {
+    agent.destination = destination
+    agent.phase = 'walking'
+    agent.phaseTime = 0
+    agent.airborne = false
+    face(agent, destination)
+    this.setVisual(agent.id, { state: 'walk', action: null, showFood: false })
   }
 
   public startTakeoff(agent: Agent, purpose: Purpose): void {
@@ -1065,7 +1213,7 @@ export class SanctuaryDirector {
       agent,
       colliders,
       this.jawWorldScratch,
-      [agent.position.x, agent.position.z],
+      this.lastPlayerPosition ?? [agent.position.x, agent.position.z],
     )
     if (!interaction) {
       commandsCtx.setStatus('There is no clear space beside this wyvern.')
@@ -1089,9 +1237,14 @@ export class SanctuaryDirector {
     kind: SanctuaryCommand,
     commandsCtx: SanctuaryCommandsContext,
   ): void {
-    if (kind === 'offerFood') this.playAction(agent, 'eat', EAT_SECONDS, true, commandsCtx)
-    else if (kind === 'pet') this.playAction(agent, 'nuzzle', 4, false, commandsCtx)
-    else this.playAction(agent, 'calm', 5, false, commandsCtx)
+    if (kind === 'offerFood') {
+      commandsCtx.feedWyvern?.(agent.id)
+      this.playAction(agent, 'eat', EAT_SECONDS, true, commandsCtx)
+    } else if (kind === 'pet') {
+      this.playAction(agent, 'nuzzle', 4, false, commandsCtx)
+    } else {
+      this.playAction(agent, 'calm', 5, false, commandsCtx)
+    }
   }
 
   public playAction(
@@ -1106,11 +1259,17 @@ export class SanctuaryDirector {
     agent.actionToken += 1
     agent.activeAction = { state, token: agent.actionToken }
     this.setVisual(agent.id, {
+      // The action channel layers over the base loop, so the base has to be a
+      // still pose or the wyvern pads on the spot underneath the tell for its
+      // whole duration — which is exactly what a walked-to strike used to do.
+      // Airborne reactions keep their flight loop; dropping that to `idle`
+      // would strand a flying wyvern in a standing pose.
+      ...(agent.airborne ? {} : { state: 'idle' as ModelState }),
       action: { state, token: agent.actionToken },
       showFood,
     })
     if (commandsCtx) {
-      commandsCtx.setStatus(`${state === 'nuzzle' ? 'Petting' : title(state)}…`)
+      commandsCtx.setStatus(`${ACTION_STATUS[state] ?? title(state)}…`)
     }
     agent.currentActionDuration = duration
   }
@@ -1119,6 +1278,22 @@ export class SanctuaryDirector {
     const agent = this.agents.get(wyvernId)
     if (!agent) return
     this.playAction(agent, state, duration, state === 'eat')
+  }
+
+  /**
+   * Snaps a wyvern out of ambient life the moment it is given an order.
+   *
+   * A sleeping wyvern told to be fed used to stay asleep for the whole walk
+   * over and only then play `eat`, and a wyvern that had just obeyed could roll
+   * straight back into a nap. Waking it and pushing the next roll out one full
+   * dwell is most of what makes the wheel read as instruction.
+   */
+  private holdAttention(agent: Agent): void {
+    if (agent.ambientAction !== null) {
+      agent.ambientAction = null
+      this.setVisual(agent.id, { state: agent.baseState })
+    }
+    agent.ambientDwell = AMBIENT_MIN_DWELL
   }
 
   private runQueued(
