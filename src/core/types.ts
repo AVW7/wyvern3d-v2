@@ -277,6 +277,7 @@ export interface SanctuaryDutiesState {
   active: SanctuaryDuty[]
   carriedDutyId: number | null
   completed: number
+  unlockedMilestones: string[]
 }
 
 export interface LogEntry {
@@ -293,6 +294,7 @@ export type GameEventKind =
   | 'wyvern_died'
   | 'wyvern_leveled'
   | 'sanctuary_duty_completed'
+  | 'sanctuary_milestone_unlocked'
   | 'region_visited'
   | 'landmark_discovered'
   | 'phenomenon_observed'

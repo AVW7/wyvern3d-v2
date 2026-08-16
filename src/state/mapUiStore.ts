@@ -34,11 +34,14 @@ export interface MapUiState {
   activeLayer: AtlasLayerId
   /** Atlas drawer open state (presentation-only; not in GameState). */
   atlasOpen: boolean
+  /** Region ID currently being viewed in the full dossier (null if closed). */
+  dossierRegionId: string | null
   setHovered: (id: string | null) => void
   setInspected: (id: string | null) => void
   setActiveLayer: (layer: AtlasLayerId) => void
   setAtlasOpen: (open: boolean) => void
   toggleAtlas: () => void
+  setDossierRegionId: (id: string | null) => void
   clear: () => void
 }
 
@@ -47,6 +50,7 @@ export const useMapUiStore = create<MapUiState>((set) => ({
   inspected: null,
   activeLayer: getInitialLayer(),
   atlasOpen: false,
+  dossierRegionId: null,
 
   setHovered: (id) =>
     set((state) => {
@@ -84,10 +88,23 @@ export const useMapUiStore = create<MapUiState>((set) => ({
       return { atlasOpen: !state.atlasOpen }
     }),
 
+  setDossierRegionId: (id) =>
+    set((state) => {
+      if (state.dossierRegionId === id) return state
+      return { dossierRegionId: id }
+    }),
+
   clear: () =>
     set((state) => {
-      if (state.hovered === null && state.inspected === null && !state.atlasOpen) return state
-      return { hovered: null, inspected: null, atlasOpen: false }
+      if (
+        state.hovered === null &&
+        state.inspected === null &&
+        !state.atlasOpen &&
+        state.dossierRegionId === null
+      ) {
+        return state
+      }
+      return { hovered: null, inspected: null, atlasOpen: false, dossierRegionId: null }
     }),
 }))
 

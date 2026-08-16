@@ -77,6 +77,13 @@ export function RegionInspector() {
           </p>
         </div>
         <div className="region-inspector-head-actions">
+          <button
+            onClick={() => useMapUiStore.getState().setDossierRegionId(targetId)}
+            className="region-dossier-btn"
+            title="Open Full Region Dossier"
+          >
+            📖 Dossier
+          </button>
           <span className={`region-status ${status}`}>{status}</span>
           <button
             onClick={() => {

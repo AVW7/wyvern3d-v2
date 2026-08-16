@@ -1,6 +1,6 @@
 # Sanctuary environment art — staged work orders
 
-**Status: OPEN.** Stages 0, 1, 2, and 3 are DONE. Stage 4 (Architectural kit and hero work areas) is the next eligible stage.
+**Status: OPEN.** Stages 0, 1, 2, 3, 4, and 5 are DONE. Stage 6 (Interaction-ready prop vertical slices) is the next eligible stage.
 
 This plan improves the sanctuary's spatial design, 3D asset quality, environmental realism, and
 physical interaction language. It is a production plan for coding, technical-art, and environment-
@@ -193,7 +193,7 @@ normal intents for persistent consequences and use the existing event/flourish s
 | 2 | Sanctuary asset catalogue and validation pipeline | 0 | DONE | scripts/sanctuary-library.json, pnpm assets:validate-sanctuary-atlas, /sanctuary-props review surface |
 | 3 | Terrain and updated biome integration | 1, 2 | DONE | BIOME_SCATTER in dressing.ts, soot/moisture soil factors in terrain.ts, dual-atlas Scenery |
 | 4 | Architectural kit and hero work areas | 1, 2 | DONE | StationHeroBuildings.tsx for all 11 hero stations, 5 priority replacements, clearance & flight corridor verified |
-| 5 | Materials, lighting, and weathering pass | 3, 4 | TODO | Runtime look-development gate |
+| 5 | Materials, lighting, and weathering pass | 3, 4 | DONE | Stylized water shader & pools in SanctuaryWater.tsx, multi-factor weathering & roughness in terrain.ts, atmospheric lighting and hero landmark tuning. |
 | 6 | Interaction-ready prop vertical slices | 4; Sanctuary Gameplay Stage 1 | TODO | Six priority affordances |
 | 7 | Storytelling polish, performance, and release gate | 5, 6 | TODO | Final integration |
 
@@ -403,7 +403,7 @@ Run asset builders/validators and standard gates. Capture the fixed review camer
 
 ## STAGE 5 — Materials, lighting, and weathering pass
 
-**Status: TODO**
+**Status: DONE**
 
 ### Goal
 

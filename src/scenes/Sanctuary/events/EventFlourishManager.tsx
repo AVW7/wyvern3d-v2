@@ -201,6 +201,23 @@ export function EventFlourishManager() {
             duration: LEVELUP_DURATION,
           },
         ])
+      } else if (event.kind === 'sanctuary_milestone_unlocked') {
+        const title = (event.payload?.title as string) ?? 'Sanctuary Improvement'
+        const count = (event.payload?.dutyCount as number) ?? 0
+
+        setFlourishes((prev) => [
+          ...prev,
+          {
+            id,
+            type: 'promotion',
+            position: [0, 4.0, 0],
+            label: `✦ SANCTUARY IMPROVEMENT UNLOCKED ✦`,
+            subtitle: `${title.toUpperCase()} (${count} DUTIES)`,
+            color: '#f59e0b',
+            startTime: now,
+            duration: LEVELUP_DURATION + 1.0,
+          },
+        ])
       }
     },
     [resolveWyvernPosition, state.wyverns],

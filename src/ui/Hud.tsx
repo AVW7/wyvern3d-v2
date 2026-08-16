@@ -17,7 +17,10 @@ import { ControlShiftWidget } from './ControlShiftWidget'
 import { useCameraStore } from '@/state/cameraStore'
 import { InteractionNotice } from './InteractionNotice'
 import { RegionInspector } from './RegionInspector'
+import { RegionDossier } from './RegionDossier/RegionDossier'
 import { AtlasDirectory } from './AtlasDirectory/AtlasDirectory'
+import { AtlasLayerBar } from './AtlasDirectory/AtlasLayerBar'
+import { AtlasLegend } from './AtlasDirectory/AtlasLegend'
 import { HighlandsHud } from './HighlandsHud'
 import { useHighlandsHunt } from '@/state/highlandsHuntStore'
 import { BiomeTransitionOverlay } from '@/scenes/BiomeWorld/transitions/BiomeTransitionOverlay'
@@ -243,12 +246,19 @@ export function Hud() {
                 </div>
               )}
 
-              {mode === 'worldmap' && <AtlasDirectory />}
+              {mode === 'worldmap' && (
+                <>
+                  <AtlasDirectory />
+                  <AtlasLayerBar />
+                  <RegionDossier />
+                </>
+              )}
 
               {/* Bottom-Left Stack — Wyvern Status Card & Event Log with matching widths */}
               {mode !== 'highlands' && !isEditing && !openPanel && (
                 <div className="left-dock-stack">
                   {mode === 'sanctuary' && <SanctuaryDutiesHud />}
+                  {mode === 'worldmap' && <AtlasLegend />}
                   <RegionInspector />
                   <QuickLevelWidget
                     eventLogCollapsed={isEventLogCollapsed}

@@ -10,7 +10,7 @@ import { PlaceholderWyvern } from '@/render/placeholders/PlaceholderWyvern'
 import { WorldLabel } from '@/render/labels/WorldLabel'
 import { readDirectWyvernFlightInput, stepDirectWyvernFlight } from '@/render/controllers/wyvernFlight'
 import { consumeDrag, consumeWheel } from '@/render/controllers/input'
-import { angleDelta } from '@/render/flightPose'
+import { angleDelta, type FlightLoopState } from '@/render/flightPose'
 import { createWyvernFlightRig, type WyvernFlightRig } from '@/render/wyvernFlightRig'
 import { BIOME_WORLD_RADIUS } from '../terrain/BiomeTerrain'
 
@@ -26,6 +26,9 @@ export interface BiomeFlightAgent {
   rig: WyvernFlightRig
   previousPosition: Vector3
   previousYaw: number
+  airspeed?: number
+  climbRate?: number
+  flightMode?: FlightLoopState
 }
 
 export function createBiomeFlightAgent(): BiomeFlightAgent {
@@ -123,8 +126,11 @@ function BiomeFlightModel({
     agent.previousPosition.copy(agent.position)
     agent.previousYaw = agent.yaw
 
-    const flightMode =
-      result.locomotion === 'idle' || result.locomotion === 'walk' ? 'cruise' : result.locomotion
+    // The controller now picks the loop from the same v1-measured selector the
+    // director uses, and hands back the attitude that produced it.
+    const flightMode = result.flightMode ?? 'cruise'
+    agent.pitch += (result.pitch - agent.pitch) * Math.min(1, dt * 8)
+    agent.bank += (result.bank - agent.bank) * Math.min(1, dt * 8)
 
     agent.rig.step(dt, {
       position: agent.position,
@@ -133,6 +139,7 @@ function BiomeFlightModel({
       bank: agent.bank,
       airborne: agent.airborne,
       flightMode,
+      powered: result.powered,
       horizontalSpeed,
       verticalSpeed,
       yawRate,

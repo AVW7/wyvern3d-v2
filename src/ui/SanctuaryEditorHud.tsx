@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useGameState, dispatch } from '@/state/store'
 import { useSanctuaryEditor } from '@/state/sanctuaryEditorStore'
 import { useSanctuaryColors } from '@/state/sanctuaryColorsStore'
-import { PROP_CATALOG } from '@/core/state/sanctuaryLayout'
+import { PROP_CATALOG, isPropUnlocked } from '@/core/state/sanctuaryLayout'
 import { useUi } from '@/state/uiStore'
 
 export function SanctuaryEditorHud() {
@@ -223,15 +223,17 @@ export function SanctuaryEditorHud() {
         ) : (
           <div className="catalog-grid">
             {catalogList.map((item) => {
+              const completedDuties = state.duties?.completed ?? 0
+              const unlocked = isPropUnlocked(item.propId, completedDuties, storage, objects)
               const stockNum = storage[item.propId] ?? 0
-              const count = item.isStructure ? 'Placed' : stockNum
-              const available = item.isStructure || stockNum > 0
-              const isLowStock = !item.isStructure && stockNum > 0 && stockNum <= 2
+              const count = item.isStructure ? 'Placed' : !unlocked ? 'Locked' : stockNum
+              const available = unlocked && (item.isStructure || stockNum > 0)
+              const isLowStock = unlocked && !item.isStructure && stockNum > 0 && stockNum <= 2
 
               return (
                 <div
                   key={item.propId}
-                  className={`catalog-card ${!available ? 'disabled' : ''} ${isLowStock ? 'low-stock' : ''}`}
+                  className={`catalog-card ${!available ? 'disabled' : ''} ${!unlocked ? 'locked' : ''} ${isLowStock ? 'low-stock' : ''}`}
                   onClick={() => available && startPlacing(item)}
                 >
                   <div className="card-top">
@@ -239,13 +241,29 @@ export function SanctuaryEditorHud() {
                       <CategoryTabIcon category={item.category} />
                       {item.label}
                     </span>
-                    <span className={`card-badge ${isLowStock ? 'warning' : ''}`}>
-                      {count}
+                    <span className={`card-badge ${!unlocked ? 'locked-badge' : isLowStock ? 'warning' : ''}`}>
+                      {!unlocked ? (
+                        <>
+                          <LockIcon />
+                          <span>{item.requiredDuties} Duties</span>
+                        </>
+                      ) : (
+                        count
+                      )}
                     </span>
                   </div>
-                  <p className="card-desc">{item.description}</p>
+                  <p className="card-desc">
+                    {!unlocked && item.milestoneName
+                      ? `Unlocked at milestone: ${item.milestoneName} (${item.requiredDuties} duties). ${item.description}`
+                      : item.description}
+                  </p>
                   <button className="card-add-btn" disabled={!available}>
-                    {item.isStructure ? (
+                    {!unlocked ? (
+                      <>
+                        <LockIcon />
+                        <span>Requires {item.requiredDuties} Duties</span>
+                      </>
+                    ) : item.isStructure ? (
                       'Place Structure'
                     ) : available ? (
                       <>
@@ -513,5 +531,14 @@ function CategoryTabIcon({ category }: { category: string }) {
         </svg>
       )
   }
+}
+
+function LockIcon() {
+  return (
+    <svg className="icon-monotone" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+    </svg>
+  )
 }
 

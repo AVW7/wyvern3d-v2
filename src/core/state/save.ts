@@ -225,6 +225,23 @@ const MIGRATIONS: Record<number, Migration> = {
       saveVersion: 11,
     }
   },
+  // 11 -> 12: Sanctuary Improvement Unlocks & Milestone Tracking
+  11: (state) => {
+    const migrated = ensureSanctuaryDuties(state)
+    const completed = migrated.duties.completed ?? 0
+    const unlocked = [...(migrated.duties.unlockedMilestones ?? [])]
+    const milestones = CONFIG.duties.milestones ?? []
+    for (const m of milestones) {
+      if (completed >= m.threshold && !unlocked.includes(m.id)) {
+        unlocked.push(m.id)
+      }
+    }
+    migrated.duties.unlockedMilestones = unlocked
+    return {
+      ...migrated,
+      saveVersion: 12,
+    }
+  },
 }
 
 export function ensureSanctuaryDuties(state: GameState): GameState {
@@ -234,7 +251,10 @@ export function ensureSanctuaryDuties(state: GameState): GameState {
       active: [],
       carriedDutyId: null,
       completed: 0,
+      unlockedMilestones: [],
     }
+  } else if (!state.duties.unlockedMilestones) {
+    state.duties.unlockedMilestones = []
   }
   return state
 }

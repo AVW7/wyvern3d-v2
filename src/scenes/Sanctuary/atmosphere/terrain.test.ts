@@ -4,6 +4,8 @@ import { GROUND_RADIUS } from '../layout'
 import {
   OUTER_INNER_RADIUS,
   groundColorAt,
+  groundFactorsAt,
+  groundRoughnessFrom,
   outerHeightAt,
   wearAt,
 } from './terrain'
@@ -100,5 +102,26 @@ describe('sanctuary ground colour', () => {
     const open = groundColorAt(-52, 46, GRASS)
     // Dirt is warmer than grass: more red relative to green.
     expect(worn[0] / worn[1]).toBeGreaterThan(open[0] / open[1])
+  })
+
+  it('calculates physical surface roughness from environmental factors', () => {
+    const warTable = SANCTUARY_STATIONS.warTable.position
+    const wornFactors = groundFactorsAt(warTable[0], warTable[1])
+    const openFactors = groundFactorsAt(-52, 46)
+    const troughFactors = groundFactorsAt(30.3, -11.3)
+    const forgeFactors = groundFactorsAt(32, -12)
+
+    expect(wornFactors.wear).toBeGreaterThan(0.5)
+    expect(troughFactors.moisture).toBeGreaterThan(0.5)
+    expect(forgeFactors.soot).toBeGreaterThan(0.5)
+
+    const openRoughness = groundRoughnessFrom(openFactors)
+    const wetRoughness = groundRoughnessFrom(troughFactors)
+    const sootRoughness = groundRoughnessFrom(forgeFactors)
+
+    // Wet moisture has low roughness (glossy specular sheen)
+    expect(wetRoughness).toBeLessThan(openRoughness)
+    // Dry soot/ash is matte rough
+    expect(sootRoughness).toBeGreaterThan(wetRoughness)
   })
 })

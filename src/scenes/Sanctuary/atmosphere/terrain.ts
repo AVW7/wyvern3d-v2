@@ -75,10 +75,21 @@ function sootAt(x: number, z: number): number {
 function moistureAt(x: number, z: number): number {
   const distHatchery = Math.hypot(x - 14, z - (-3))
   const distTrough = Math.hypot(x - 30.3, z - (-11.3))
+  const distSpring = Math.hypot(x - (-18), z - (-8))
   let moisture = 0
   if (distHatchery < 6) moisture = Math.max(moisture, (1 - distHatchery / 6) * 0.7)
   if (distTrough < 4) moisture = Math.max(moisture, (1 - distTrough / 4) * 0.8)
+  if (distSpring < 5.5) moisture = Math.max(moisture, (1 - distSpring / 5.5) * 0.9)
   return moisture
+}
+
+function mossAt(x: number, z: number): number {
+  // Shaded north keep base and damp care court edges
+  const northKeep = z < -24 && Math.abs(x) < 14
+  let moss = northKeep ? 0.4 : 0
+  const distBreeding = Math.hypot(x - 34.5, z - 8)
+  if (distBreeding < 8) moss = Math.max(moss, (1 - distBreeding / 8) * 0.5)
+  return moss
 }
 
 const DIRT: Rgb = [0.36, 0.29, 0.21]
@@ -100,7 +111,7 @@ function mix(a: Rgb, b: Rgb, t: number): Rgb {
 }
 
 /**
- * The grass-independent part of a vertex's colour.
+ * The grass-independent part of a vertex's colour and physical roughness.
  *
  * Split out because `wearAt` walks every path stone and station for each
  * vertex, and the ground has thousands — while the editor's colour picker fires
@@ -113,6 +124,7 @@ export interface GroundFactors {
   wear: number
   soot: number
   moisture: number
+  moss: number
 }
 
 export function groundFactorsAt(x: number, z: number): GroundFactors {
@@ -127,13 +139,15 @@ export function groundFactorsAt(x: number, z: number): GroundFactors {
     wear: wearAt(x, z),
     soot: sootAt(x, z),
     moisture: moistureAt(x, z),
+    moss: mossAt(x, z),
   }
 }
 
 /** Cheap: everything expensive already happened in `groundFactorsAt`. */
 export function groundColorFrom(factors: GroundFactors, base: Rgb): Rgb {
   let color: Rgb = [base[0] * factors.shade, base[1] * factors.shade, base[2] * factors.shade]
-  color = mix(color, MOSS, Math.min(0.45, factors.rim * 0.45))
+  const totalMoss = Math.min(0.6, factors.rim * 0.45 + (factors.moss ?? 0) * 0.5)
+  color = mix(color, MOSS, totalMoss)
   // Moisture darkens soil to damp mud
   if (factors.moisture > 0) {
     color = mix(color, MUD, factors.moisture * 0.75)
@@ -147,6 +161,20 @@ export function groundColorFrom(factors: GroundFactors, base: Rgb): Rgb {
     color = mix(color, SOOT, factors.soot * 0.9)
   }
   return color
+}
+
+/**
+ * Calculates physical surface roughness from environmental factors:
+ * - Damp mud / moisture has a wet specular sheen (low roughness ~0.25)
+ * - Compacted dirt path is smooth stone/earth (~0.65)
+ * - Scorched ash is dry matte (~0.95)
+ */
+export function groundRoughnessFrom(factors: GroundFactors): number {
+  let roughness = 0.85
+  if (factors.wear > 0) roughness = roughness * (1 - factors.wear * 0.25) + 0.65 * (factors.wear * 0.25)
+  if (factors.soot > 0) roughness = roughness * (1 - factors.soot * 0.3) + 0.95 * (factors.soot * 0.3)
+  if (factors.moisture > 0) roughness = roughness * (1 - factors.moisture * 0.75) + 0.25 * (factors.moisture * 0.75)
+  return Math.max(0.2, Math.min(1.0, roughness))
 }
 
 /**

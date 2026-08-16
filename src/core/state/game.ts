@@ -112,6 +112,7 @@ export function createInitialState(seed: number): GameState {
       active: [],
       carriedDutyId: null,
       completed: 0,
+      unlockedMilestones: [],
     },
     buildings: {
       hatchery: 1,

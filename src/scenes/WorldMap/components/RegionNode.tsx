@@ -12,10 +12,14 @@ import { regionCrestHeight } from '../terrain/mapTerrain'
 import { getTierGeometries, getSharedNodeMaterial } from '../mapResources'
 import { wasDrag } from '../interaction'
 
+import type { AtlasLayerId, LayerRegionValue } from '@/core/state/atlasLayers'
+
 export interface RegionNodeProps {
   node: MapNode
   selected: boolean
   isHovered: boolean
+  activeLayer?: AtlasLayerId
+  layerValue?: LayerRegionValue
   onPointerOver: () => void
   onPointerOut: () => void
   onSelect: () => void
@@ -25,6 +29,8 @@ export function RegionNode({
   node,
   selected,
   isHovered,
+  activeLayer = 'political',
+  layerValue,
   onPointerOver,
   onPointerOut,
   onSelect,
@@ -40,9 +46,14 @@ export function RegionNode({
 
   const tierGeom = getTierGeometries(def.tier)
   const sharedMaterial = getSharedNodeMaterial()
-  const groundColor = nodeGroundColor(def.biome)
+  const groundColor = layerValue && activeLayer !== 'political' ? layerValue.color : nodeGroundColor(def.biome)
   const status = regionStatus(owner, attackable)
-  const badgeColor = statusColor(owner, attackable)
+  const badgeColor = layerValue && activeLayer !== 'political' ? layerValue.color : statusColor(owner, attackable)
+  const badgeText = layerValue && activeLayer !== 'political'
+    ? layerValue.displayValue.toUpperCase()
+    : status === 'locked'
+      ? `LOCKED • TIER ${def.tier}`
+      : status.toUpperCase()
 
   useFrame((frameState, delta) => {
     const t = frameState.clock.elapsedTime
@@ -141,7 +152,7 @@ export function RegionNode({
       {/* World Labels */}
       <WorldLabel text={def.name} position={[0, baseHeight + 7.5, 0]} size={3.6} variant="map" />
       <WorldLabel
-        text={status === 'locked' ? `LOCKED • TIER ${def.tier}` : status.toUpperCase()}
+        text={badgeText}
         position={[0, baseHeight + 4.8, 0]}
         size={2.1}
         variant="default"

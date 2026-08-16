@@ -45,8 +45,8 @@ The atlas answers four questions without opening several panels:
 | 0 | Atlas content and knowledge contract | DONE | Animation Stage 6 |
 | 1 | Searchable directory and camera focus | DONE | 0 |
 | 2 | Region visits, discoveries, and landmarks | DONE | 1 |
-| 3 | Strategic map layers and legend | NOT STARTED | 1 |
-| 4 | Region dossier and campaign journal | NOT STARTED | 2, 3 |
+| 3 | Strategic map layers and legend | DONE | 1 |
+| 4 | Region dossier and campaign journal | DONE | 2, 3 |
 | 5 | Accessibility, navigation, and performance | NOT STARTED | 4 |
 
 # STAGE 0 — Atlas content and knowledge contract
@@ -123,7 +123,7 @@ the region directory reflects it immediately.
 
 # STAGE 3 — Strategic map layers and legend
 
-**Status:** NOT STARTED · **Depends on:** Stage 1
+**Status:** DONE · **Depends on:** Stage 1
 
 **Goal.** Let players compare the world by one concern at a time without changing game rules.
 
@@ -148,7 +148,7 @@ authoritative result.
 
 # STAGE 4 — Region dossier and campaign journal
 
-**Status:** NOT STARTED · **Depends on:** Stages 2 and 3
+**Status:** DONE · **Depends on:** Stages 2 and 3
 
 **Goal.** Turn the compact inspector into a coherent region record without making one giant panel.
 

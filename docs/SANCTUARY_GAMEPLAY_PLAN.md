@@ -142,7 +142,7 @@ Keep all numbers in `src/core/data/config.ts`. Initial guidance, subject to test
 | 1 | Context action and physical carry | DONE | 0 | Pure proximity & priority resolver in `actionResolver.ts`, change-guarded `useContextActionStore`, 3D `CarriedItem` visual bundle, click/touch and E key trigger, fully tested in `actionResolver.test.ts`. |
 | 2 | Request readability and wyvern reactions | DONE | 1 | `SanctuaryDutiesHud` chips, 3D `DutyRequestBadge`, `director.playReaction(..., 'eat')`, spectral completion flourish in `EventFlourishManager`, 3 unit tests in `sanctuaryDutiesPresentation.test.ts`. |
 | 3 | Medicine, companionship, and flight exercise | DONE | 2 | Implemented 4-duty care vocabulary in core & presentation (`feed`, `medicine`, `companionship`, `flightExercise`), deterministic candidate priority generator, config costs & relief, tested in `duties.test.ts` and `actionResolver.test.ts`. |
-| 4 | Sanctuary improvement unlocks | NOT STARTED | 3 | — |
+| 4 | Sanctuary improvement unlocks | DONE | 3 | Milestone thresholds in config, save migration 11->12, storage rewards and `sanctuary_milestone_unlocked` event emission, catalog lock badges in `SanctuaryEditorHud`, ambient idle prop weighting in `wyvernDirector`, fully unit-tested. |
 | 5 | Sanctuary audio layer | NOT STARTED | 2 | — |
 | 6 | Layout snapshots and editor feedback | NOT STARTED | 4 | — |
 
@@ -294,7 +294,7 @@ existing system or landmark instead of adding a disconnected minigame.
 
 # STAGE 4 — Sanctuary improvement unlocks
 
-**Status:** NOT STARTED · **Depends on:** Stage 3
+**Status:** DONE · **Depends on:** Stage 3
 
 **Goal.** Duty completion visibly improves the sanctuary and gives the layout editor meaningful
 progression without introducing a new spendable currency.

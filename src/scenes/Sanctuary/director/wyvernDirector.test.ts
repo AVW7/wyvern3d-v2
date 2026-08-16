@@ -166,4 +166,24 @@ describe('SanctuaryDirector', () => {
     expect(agent.ambientRoll).toBeGreaterThan(0)
     expect(agent.ambientAction).not.toBeNull()
   })
+
+  it('weights ambient idles based on nearby placed sanctuary props', () => {
+    const director = createSanctuaryDirector({ seed: 999 })
+    const wyvern = createMockWyvern('w1')
+    director.syncWyverns([wyvern])
+    const agent = director.agents.get('w1')!
+
+    // Place a trough right next to the wyvern
+    const placedProps = [
+      {
+        propId: 'prop.forge.trough',
+        position: [agent.position.x, 0, agent.position.z] as [number, number, number],
+      },
+    ]
+
+    director.step(10, { playerPosition: [0, 0], placedObjects: placedProps }, [wyvern])
+
+    expect(agent.ambientRoll).toBeGreaterThan(0)
+    expect(agent.ambientAction).not.toBeNull()
+  })
 })

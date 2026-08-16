@@ -44,11 +44,12 @@ const GROUND = new Plane(new Vector3(0, 1, 0), 0)
 interface SanctuaryWyvernsProps {
   wyverns: WyvernInstance[]
   colliders: readonly SanctuaryCollider[]
+  placedObjects?: readonly { propId: string; position: readonly [number, number, number] }[]
   /** Save seed, for deterministic-per-agent (but purely cosmetic) ambient rolls. */
   seed: number
 }
 
-export function SanctuaryWyverns({ wyverns, colliders, seed }: SanctuaryWyvernsProps) {
+export function SanctuaryWyverns({ wyverns, colliders, placedObjects, seed }: SanctuaryWyvernsProps) {
   const camera = useThree((state) => state.camera)
   const scene = useThree((state) => state.scene)
   const size = useThree((state) => state.size)
@@ -164,6 +165,7 @@ export function SanctuaryWyverns({ wyverns, colliders, seed }: SanctuaryWyvernsP
         cameraRotationY: camera.rotation.y,
         elapsedTime: threeState.clock.elapsedTime,
         colliders,
+        placedObjects,
       },
       wyverns,
       commandsCtx,

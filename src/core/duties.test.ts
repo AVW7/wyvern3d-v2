@@ -252,7 +252,7 @@ describe('Sanctuary Gameplay Stage 0: Feed-Duty Vertical Slice', () => {
     expect(state.duties.completed).toBe(1)
   })
 
-  it('migrates older save version 10 by initializing duties state', () => {
+  it('migrates older save version 10 and 11 by initializing duties state and milestones', () => {
     const stateV10 = {
       ...createInitialState(100),
       saveVersion: 10,
@@ -260,11 +260,54 @@ describe('Sanctuary Gameplay Stage 0: Feed-Duty Vertical Slice', () => {
     }
 
     const migrated = migrate(stateV10)
-    expect(migrated.saveVersion).toBe(11)
+    expect(migrated.saveVersion).toBe(12)
     expect(migrated.duties).toBeDefined()
     expect(migrated.duties.nextSeq).toBe(1)
     expect(migrated.duties.active).toEqual([])
     expect(migrated.duties.carriedDutyId).toBeNull()
     expect(migrated.duties.completed).toBe(0)
+    expect(migrated.duties.unlockedMilestones).toEqual([])
+  })
+
+  it('unlocks sanctuary improvements at duty completion milestones and emits typed events', () => {
+    const state = createInitialState(42)
+    const wyvern = Object.values(state.wyverns)[0]!
+    wyvern.hunger = 0
+    wyvern.injury = 0
+    wyvern.bond = 40
+    wyvern.assignment = { kind: 'idle' }
+
+    expect(state.duties.unlockedMilestones).toEqual([])
+    expect(state.sanctuaryLayout.storage['prop.perch.trunk'] ?? 0).toBe(0)
+
+    // Complete 3 duties to reach first milestone (perch_roost)
+    for (let i = 0; i < 3; i++) {
+      advanceTicks(state, 1)
+      const duty = state.duties.active[0]!
+      execute(state, { type: 'COMPLETE_DUTY', dutyId: duty.id })
+    }
+
+    expect(state.duties.completed).toBe(3)
+    expect(state.duties.unlockedMilestones).toContain('perch_roost')
+    expect(state.sanctuaryLayout.storage['prop.perch.trunk']).toBe(3)
+    expect(state.sanctuaryLayout.storage['prop.perch.stump']).toBeGreaterThanOrEqual(2)
+
+    // Check emitted event
+    const milestoneEvent = state.events.find((e) => e.kind === 'sanctuary_milestone_unlocked')
+    expect(milestoneEvent).toBeDefined()
+    expect(milestoneEvent?.subjectId).toBe('perch_roost')
+    expect(milestoneEvent?.payload?.milestoneId).toBe('perch_roost')
+    expect(milestoneEvent?.payload?.dutyCount).toBe(3)
+
+    // Complete 3 more duties (total 6) to reach second milestone (feeding_trough)
+    for (let i = 0; i < 3; i++) {
+      advanceTicks(state, 1)
+      const duty = state.duties.active[0]!
+      execute(state, { type: 'COMPLETE_DUTY', dutyId: duty.id })
+    }
+
+    expect(state.duties.completed).toBe(6)
+    expect(state.duties.unlockedMilestones).toContain('feeding_trough')
+    expect(state.sanctuaryLayout.storage['prop.forge.trough']).toBe(3)
   })
 })

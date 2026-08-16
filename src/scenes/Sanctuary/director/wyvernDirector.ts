@@ -99,6 +99,11 @@ export interface Agent {
   ambientRoll: number
   /** The ambient action currently playing (sleep/sit/groom/eat/drink/perch), or null between them. */
   ambientAction: ModelState | null
+  /** Piloted-flight energy state, owned by `stepDirectWyvernFlight`. */
+  airspeed?: number
+  climbRate?: number
+  bank?: number
+  flightMode?: FlightLoopState
 }
 
 export function baseFor(
@@ -322,6 +327,7 @@ export interface SanctuaryDirectorStepContext {
   cameraRotationY?: number
   elapsedTime?: number
   colliders?: readonly SanctuaryCollider[]
+  placedObjects?: readonly { propId: string; position: readonly [number, number, number] }[]
   onStatusChange?: (status: string | null) => void
   onPlayerMove?: (
     target: [number, number],
@@ -661,8 +667,11 @@ export class SanctuaryDirector {
       boundsRadius: GROUND_RADIUS,
     })
     agent.phase = flight.airborne ? (flight.climbing ? 'soaring' : 'transit') : 'settled'
-    agent.powered = flight.airborne
-    this.setVisual(agent.id, { state: flight.locomotion, action: null })
+    agent.powered = flight.powered
+    // The piloted loop comes from the same selector the autonomous agents use,
+    // so a player dive, glide, hover or bank reads as the authored clip.
+    if (flight.flightMode) agent.flightAnimation = flight.flightMode
+    this.setVisual(agent.id, { state: flight.flightMode ?? flight.locomotion, action: null })
 
     if (action) {
       agent.activeAction = { token: agent.actionToken, state: action }
@@ -1130,7 +1139,12 @@ export class SanctuaryDirector {
     }
   }
 
-  private updateAmbient(agent: Agent, dt: number, wyverns: WyvernInstance[]): void {
+  private updateAmbient(
+    agent: Agent,
+    dt: number,
+    wyverns: WyvernInstance[],
+    placedObjects?: readonly { propId: string; position: readonly [number, number, number] }[],
+  ): void {
     agent.ambientDwell -= dt
     if (agent.ambientDwell > 0) return
 
@@ -1145,13 +1159,55 @@ export class SanctuaryDirector {
     }
 
     const wyvern = wyverns.find((candidate) => candidate.id === agent.id)
+
+    let drinkBonus = 0
+    let eatBonus = 0
+    let perchBonus = 0
+    let groomBonus = 0
+    let sleepBonus = 0
+    let sitBonus = 0
+
+    if (placedObjects && placedObjects.length > 0) {
+      for (const obj of placedObjects) {
+        const dx = agent.position.x - obj.position[0]
+        const dz = agent.position.z - obj.position[2]
+        const distSq = dx * dx + dz * dz
+        if (distSq < 64) {
+          if (obj.propId === 'prop.forge.trough' || obj.propId === 'prop.barrel') {
+            drinkBonus += 1.5
+            eatBonus += 0.8
+          } else if (
+            obj.propId === 'prop.perch.trunk' ||
+            obj.propId === 'prop.perch.stump' ||
+            obj.propId === 'prop.perch.rockA' ||
+            obj.propId === 'prop.perch.rockB'
+          ) {
+            perchBonus += 1.5
+            sitBonus += 0.8
+          } else if (
+            obj.propId === 'prop.ring.menhir' ||
+            obj.propId === 'prop.roost.runeStone'
+          ) {
+            groomBonus += 1.5
+            sleepBonus += 0.8
+          } else if (
+            obj.propId === 'prop.burn.lavaColumn' ||
+            obj.propId === 'prop.burn.lavaStone'
+          ) {
+            sleepBonus += 1.0
+            sitBonus += 1.0
+          }
+        }
+      }
+    }
+
     const candidates: { state: ModelState; weight: number }[] = [
-      { state: 'sleep', weight: 1 + (wyvern ? wyvern.injury / 40 : 0) },
-      { state: 'sit', weight: 1 },
-      { state: 'groom', weight: 1 + (wyvern && wyvern.bond > 60 ? 0.5 : 0) },
-      { state: 'eat', weight: 1 + (wyvern ? wyvern.hunger / 30 : 0) },
-      { state: 'drink', weight: 0.6 },
-      { state: 'perch', weight: 0.8 },
+      { state: 'sleep', weight: 1 + sleepBonus + (wyvern ? wyvern.injury / 40 : 0) },
+      { state: 'sit', weight: 1 + sitBonus },
+      { state: 'groom', weight: 1 + groomBonus + (wyvern && wyvern.bond > 60 ? 0.5 : 0) },
+      { state: 'eat', weight: 1 + eatBonus + (wyvern ? wyvern.hunger / 30 : 0) },
+      { state: 'drink', weight: 0.6 + drinkBonus },
+      { state: 'perch', weight: 0.8 + perchBonus },
     ]
     const totalWeight = candidates.reduce((sum, candidate) => sum + candidate.weight, 0)
     const rng = createRng(deriveSeed(this.seed, `${agent.id}:ambient-pick:${agent.ambientRoll}`))

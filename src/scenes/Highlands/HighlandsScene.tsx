@@ -11,7 +11,7 @@ import { PlaceholderWyvern } from '@/render/placeholders/PlaceholderWyvern'
 import { WorldLabel } from '@/render/labels/WorldLabel'
 import { consumeDrag, consumeWheel } from '@/render/controllers/input'
 import { readDirectWyvernFlightInput, stepDirectWyvernFlight } from '@/render/controllers/wyvernFlight'
-import { angleDelta } from '@/render/flightPose'
+import { angleDelta, type FlightLoopState } from '@/render/flightPose'
 import { createWyvernFlightRig, type WyvernFlightRig } from '@/render/wyvernFlightRig'
 import { useGameState } from '@/state/store'
 import { usePlayerControlStore } from '@/state/playerControlStore'
@@ -50,6 +50,9 @@ interface HighlandsAgent {
   previousPosition: Vector3
   previousYaw: number
   carriedDoe: Group | null
+  airspeed?: number
+  climbRate?: number
+  flightMode?: FlightLoopState
 }
 
 function createAgent(): HighlandsAgent {
@@ -376,6 +379,8 @@ function HighlandsHuntDirector({
       ? live.does.find((candidate) => candidate.id === live.activeDoeId) ?? null
       : null
 
+    let pilotAttitude: { pitch: number; bank: number } | null = null
+
     if (live.mode === 'guided' && live.phase === 'search' && doe) {
       updateGuidedSearch(body, doe, dt)
     } else if (live.mode === 'playable' && live.phase === 'ready') {
@@ -383,7 +388,8 @@ function HighlandsHuntDirector({
       const result = stepDirectWyvernFlight(body, input, camera.rotation.y, dt, {
         boundsRadius: HIGHLANDS_RADIUS,
       })
-      useHighlandsHunt.getState().setWyvernState(result.locomotion)
+      useHighlandsHunt.getState().setWyvernState(result.flightMode ?? result.locomotion)
+      pilotAttitude = { pitch: result.pitch, bank: result.bank }
 
       if (input.attacking && !body.attackHeld) {
         const target = body.position.y <= 4 ? nearestHuntableDoe(body.position, live.does) : null
@@ -475,6 +481,13 @@ function HighlandsHuntDirector({
       }
     }
 
+    if (pilotAttitude) {
+      // Piloted flight already produced a coordinated attitude; the scripted
+      // phases below own it only when the player is not flying.
+      targetPitch = pilotAttitude.pitch
+      targetBank = pilotAttitude.bank
+    }
+
     body.pitch += (targetPitch - body.pitch) * Math.min(1, dt * 6.5)
     body.bank += (targetBank - body.bank) * Math.min(1, dt * 6.5)
 
@@ -493,7 +506,7 @@ function HighlandsHuntDirector({
       pitch: body.pitch,
       bank: body.bank,
       airborne: body.airborne,
-      flightMode: 'cruise',
+      flightMode: body.flightMode ?? 'cruise',
       horizontalSpeed,
       verticalSpeed,
       yawRate,

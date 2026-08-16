@@ -188,6 +188,37 @@ export const CONFIG = {
       /** Stamina stat gain upon completing flight exercise. */
       staminaGain: 1,
     },
+    /** Duty completion milestones that unlock sanctuary improvements and props. */
+    milestones: [
+      {
+        id: 'perch_roost',
+        threshold: 3,
+        title: 'Sanctuary Perches & Roosts',
+        description: 'Weathered log perches for wyverns to rest and observe.',
+        grantStorage: { 'prop.perch.trunk': 3, 'prop.perch.stump': 2 },
+      },
+      {
+        id: 'feeding_trough',
+        threshold: 6,
+        title: 'Quenching Basin & Troughs',
+        description: 'Dedicated water troughs and feeding basins.',
+        grantStorage: { 'prop.forge.trough': 3, 'prop.barrel': 2 },
+      },
+      {
+        id: 'mystic_menhir',
+        threshold: 10,
+        title: 'Sacred Menhir Monoliths',
+        description: 'Mystic floating menhir stones that draw grooming and meditative rest.',
+        grantStorage: { 'prop.ring.menhir': 2, 'prop.roost.runeStone': 2 },
+      },
+      {
+        id: 'lava_hearth',
+        threshold: 15,
+        title: 'Volcanic Hearth Beacon',
+        description: 'Ancient lava hearth columns providing comforting heat.',
+        grantStorage: { 'prop.burn.lavaColumn': 2, 'prop.torch': 4 },
+      },
+    ],
     /** Minimum hunger for a wyvern to trigger a feed duty (legacy/direct lookup). */
     feedThreshold: 30,
     /** Bonus bond granted when completing a feed duty (legacy/direct lookup). */
@@ -201,5 +232,5 @@ export const CONFIG = {
   eventLimit: 64,
 } as const
 
-export const SAVE_VERSION = 11
+export const SAVE_VERSION = 12
 

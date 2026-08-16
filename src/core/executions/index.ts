@@ -294,6 +294,7 @@ function completeDuty(state: GameState, dutyId: number): void {
       state.duties.carriedDutyId = null
     }
     state.duties.completed += 1
+    checkDutyMilestones(state)
 
     emit(state, 'sanctuary_duty_completed', wyvern.id, undefined, {
       dutyId: duty.id,
@@ -322,6 +323,7 @@ function completeDuty(state: GameState, dutyId: number): void {
       state.duties.carriedDutyId = null
     }
     state.duties.completed += 1
+    checkDutyMilestones(state)
 
     emit(state, 'sanctuary_duty_completed', wyvern.id, undefined, {
       dutyId: duty.id,
@@ -344,6 +346,7 @@ function completeDuty(state: GameState, dutyId: number): void {
       state.duties.carriedDutyId = null
     }
     state.duties.completed += 1
+    checkDutyMilestones(state)
 
     emit(state, 'sanctuary_duty_completed', wyvern.id, undefined, {
       dutyId: duty.id,
@@ -370,6 +373,7 @@ function completeDuty(state: GameState, dutyId: number): void {
       state.duties.carriedDutyId = null
     }
     state.duties.completed += 1
+    checkDutyMilestones(state)
 
     emit(state, 'sanctuary_duty_completed', wyvern.id, undefined, {
       dutyId: duty.id,
@@ -382,6 +386,38 @@ function completeDuty(state: GameState, dutyId: number): void {
       `Completed flight ring exercise with ${wyvern.name}. Stamina +${CONFIG.duties.flightExercise.staminaGain} & bond +${CONFIG.duties.flightExercise.bondBonus}.`,
     )
     return
+  }
+}
+
+function checkDutyMilestones(state: GameState): void {
+  if (!state.duties) return
+  if (!state.duties.unlockedMilestones) {
+    state.duties.unlockedMilestones = []
+  }
+  const milestones = CONFIG.duties.milestones ?? []
+  for (const milestone of milestones) {
+    if (
+      state.duties.completed >= milestone.threshold &&
+      !state.duties.unlockedMilestones.includes(milestone.id)
+    ) {
+      state.duties.unlockedMilestones.push(milestone.id)
+
+      if (milestone.grantStorage && state.sanctuaryLayout) {
+        if (!state.sanctuaryLayout.storage) {
+          state.sanctuaryLayout.storage = {}
+        }
+        for (const [propId, count] of Object.entries(milestone.grantStorage)) {
+          state.sanctuaryLayout.storage[propId] = (state.sanctuaryLayout.storage[propId] ?? 0) + count
+        }
+      }
+
+      emit(state, 'sanctuary_milestone_unlocked', milestone.id, undefined, {
+        milestoneId: milestone.id,
+        title: milestone.title,
+        dutyCount: state.duties.completed,
+      })
+      log(state, 'good', `✦ Sanctuary improvement unlocked: ${milestone.title}! New props added to storage.`)
+    }
   }
 }
 

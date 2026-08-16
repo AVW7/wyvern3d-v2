@@ -29,6 +29,7 @@ import { Firelight } from './atmosphere/Firelight'
 import { SanctuaryWind } from './atmosphere/SanctuaryWind'
 import { Ambience, SmokePlumes } from './atmosphere/Ambience'
 import { SanctuaryGround } from './atmosphere/SanctuaryGround'
+import { SanctuaryWaterPools } from './atmosphere/SanctuaryWater'
 import { outerHeightAt } from './atmosphere/terrain'
 import { useSanctuaryCommands } from '@/state/sanctuaryCommands'
 import { usePlayerControlStore } from '@/state/playerControlStore'
@@ -166,6 +167,7 @@ export function SanctuaryScene() {
       <Ambience />
       <SmokePlumes />
       <SanctuaryGround />
+      <SanctuaryWaterPools />
       <Scenery />
       <KeepWalls />
       <DynamicSanctuaryObjects />
@@ -186,7 +188,12 @@ export function SanctuaryScene() {
         )
       })}
 
-      <SanctuaryWyverns wyverns={wyverns} colliders={colliders} seed={state.seed} />
+      <SanctuaryWyverns
+        wyverns={wyverns}
+        colliders={colliders}
+        placedObjects={state.sanctuaryLayout?.objects}
+        seed={state.seed}
+      />
       <EventFlourishManager />
       <CarriedItem />
 

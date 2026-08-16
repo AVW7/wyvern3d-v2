@@ -15,6 +15,7 @@ import { MapBeacons } from './atmosphere/MapBeacons'
 import { MapAmbience } from './atmosphere/MapAmbience'
 import { WindClock } from '@/render/assets/WindClock'
 import { buildMapGraph, mapSignature } from './mapGraph'
+import { getRegionLayerValue } from '@/core/state/atlasLayers'
 
 /**
  * The world map: an interactive 3D tactical board for every region in REGIONS.
@@ -27,6 +28,7 @@ export function WorldMapScene() {
   const openPanel = useUi((s) => s.open)
 
   const hovered = useMapUiStore((s) => s.hovered)
+  const activeLayer = useMapUiStore((s) => s.activeLayer)
   const setHovered = useMapUiStore((s) => s.setHovered)
   const setInspected = useMapUiStore((s) => s.setInspected)
 
@@ -57,12 +59,15 @@ export function WorldMapScene() {
       {REGION_LIST.map((def) => {
         const node = nodes[def.id]
         if (!node) return null
+        const layerValue = getRegionLayerValue(state, def.id, activeLayer)
         return (
           <RegionNode
             key={def.id}
             node={node}
             selected={selected === def.id}
             isHovered={hovered === def.id}
+            activeLayer={activeLayer}
+            layerValue={layerValue}
             onPointerOver={() => setHovered(def.id)}
             onPointerOut={() => setHovered(null)}
             onSelect={() => {

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { createInitialState } from '@/core/state/game'
 import { execute } from '@/core/executions'
-import { PROP_CATALOG, createDefaultSanctuaryLayout } from '@/core/state/sanctuaryLayout'
+import { PROP_CATALOG, createDefaultSanctuaryLayout, isPropUnlocked } from '@/core/state/sanctuaryLayout'
 import {
   SANCTUARY_STATIONS,
   type SanctuaryStationId,
@@ -243,5 +243,35 @@ describe('Prop catalog completeness', () => {
     const { storage } = createDefaultSanctuaryLayout()
     const missing = Object.keys(storage).filter((propId) => !PROP_CATALOG[propId])
     expect(missing).toEqual([])
+  })
+
+  it('evaluates isPropUnlocked correctly and preserves backward compatibility', () => {
+    // Unlocked without requirement
+    expect(isPropUnlocked('prop.torch', 0)).toBe(true)
+
+    // Milestone prop locked when duties below threshold
+    expect(isPropUnlocked('prop.perch.trunk', 0)).toBe(false)
+    expect(isPropUnlocked('prop.perch.trunk', 2)).toBe(false)
+
+    // Unlocked when duties meet threshold
+    expect(isPropUnlocked('prop.perch.trunk', 3)).toBe(true)
+    expect(isPropUnlocked('prop.perch.trunk', 5)).toBe(true)
+
+    // Backward compatibility: unlocked if in storage
+    expect(isPropUnlocked('prop.perch.trunk', 0, { 'prop.perch.trunk': 1 })).toBe(true)
+
+    // Backward compatibility: unlocked if placed in scene
+    expect(
+      isPropUnlocked('prop.perch.trunk', 0, {}, [
+        {
+          id: 'test_obj',
+          propId: 'prop.perch.trunk',
+          position: [0, 0, 0],
+          rotationY: 0,
+          category: 'scenery',
+          label: 'Test Trunk',
+        },
+      ]),
+    ).toBe(true)
   })
 })

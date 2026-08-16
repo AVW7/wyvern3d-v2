@@ -16,6 +16,8 @@ export interface PropCatalogEntry {
   station?: string
   panel?: string
   radius?: number
+  requiredDuties?: number
+  milestoneName?: string
 }
 
 /** Catalog of all placeable props and structures in the Sanctuary */
@@ -39,7 +41,7 @@ export const PROP_CATALOG: Record<string, PropCatalogEntry> = {
   'prop.blockade': { propId: 'prop.blockade', label: 'Wooden Blockade', category: 'furniture', description: 'Heavy timber defensive barrier.' },
   'prop.campfire': { propId: 'prop.campfire', label: 'Infirmary Fire', category: 'utility', description: 'Warm fire for healing injuries.' },
   'prop.forge.anvil': { propId: 'prop.forge.anvil', label: 'Forge Anvil', category: 'utility', defaultScale: 0.55, description: 'Struck steel for scale-plate armor.' },
-  'prop.forge.trough': { propId: 'prop.forge.trough', label: 'Quenching Trough', category: 'utility', description: 'Water bath for cooling hot metal.' },
+  'prop.forge.trough': { propId: 'prop.forge.trough', label: 'Quenching Trough', category: 'utility', requiredDuties: 6, milestoneName: 'Quenching Basin & Troughs', description: 'Water bath for cooling hot metal and watering wyverns.' },
   'prop.forge.grindstone': { propId: 'prop.forge.grindstone', label: 'Grinding Stone', category: 'utility', description: 'Whetstone wheel for finishing edges.' },
 
   // Scenery & Decor
@@ -51,9 +53,29 @@ export const PROP_CATALOG: Record<string, PropCatalogEntry> = {
   'prop.perch.stump': { propId: 'prop.perch.stump', label: 'Tree Stump', category: 'scenery', description: 'Weathered stump for resting.' },
   'prop.perch.rockA': { propId: 'prop.perch.rockA', label: 'Moss Rock A', category: 'scenery', description: 'Mossy boulder accent.' },
   'prop.perch.rockB': { propId: 'prop.perch.rockB', label: 'Moss Rock B', category: 'scenery', description: 'Jagged rock formation.' },
-  'prop.perch.trunk': { propId: 'prop.perch.trunk', label: 'Wyvern Log Perch', category: 'scenery', description: 'Fallen tree log for wyverns to roost.' },
+  'prop.perch.trunk': { propId: 'prop.perch.trunk', label: 'Wyvern Log Perch', category: 'scenery', requiredDuties: 3, milestoneName: 'Sanctuary Perches & Roosts', description: 'Fallen tree log for wyverns to roost.' },
+  'prop.ring.menhir': { propId: 'prop.ring.menhir', label: 'Sacred Menhir', category: 'scenery', requiredDuties: 10, milestoneName: 'Sacred Menhir Monoliths', description: 'Ancient floating menhir stone that inspires grooming and rest.' },
   'prop.burn.lavaStone': { propId: 'prop.burn.lavaStone', label: 'Lava Stone', category: 'scenery', description: 'Glowing volcanic stone.' },
+  'prop.burn.lavaColumn': { propId: 'prop.burn.lavaColumn', label: 'Lava Hearth Column', category: 'scenery', requiredDuties: 15, milestoneName: 'Volcanic Hearth Beacon', description: 'Glowing basalt pillar radiating volcanic warmth.' },
   'prop.burn.burnedTree': { propId: 'prop.burn.burnedTree', label: 'Scorched Tree', category: 'scenery', description: 'Charred pine trunk.' },
+}
+
+/**
+ * Checks whether a catalog prop is unlocked for placement.
+ * Ensures backward compatibility by treating already-stocked or already-placed items as unlocked.
+ */
+export function isPropUnlocked(
+  propId: string,
+  completedDuties: number = 0,
+  storage?: Record<string, number>,
+  placedObjects?: readonly SanctuaryPlacedObject[],
+): boolean {
+  const entry = PROP_CATALOG[propId]
+  if (!entry || !entry.requiredDuties) return true
+  if (completedDuties >= entry.requiredDuties) return true
+  if (storage && (storage[propId] ?? 0) > 0) return true
+  if (placedObjects && placedObjects.some((o) => o.propId === propId)) return true
+  return false
 }
 
 export function createDefaultSanctuaryLayout(): SanctuaryLayoutState {
@@ -100,7 +122,6 @@ export function createDefaultSanctuaryLayout(): SanctuaryLayoutState {
     'prop.perch.stump': 6,
     'prop.perch.rockA': 4,
     'prop.perch.rockB': 4,
-    'prop.perch.trunk': 4,
     'prop.pathA': 8,
     'prop.pathB': 8,
     'prop.burn.lavaStone': 4,
