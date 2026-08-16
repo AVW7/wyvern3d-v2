@@ -28,6 +28,7 @@ import {
   canReuseLoopAction,
   normalizedPlaybackPhase,
   resolveClipSpec,
+  resolvePlantSpec,
   shouldApplyNext,
 } from './gameModelPlayback'
 import { useModelLibraryStore } from '@/state/modelLibraryStore'
@@ -263,12 +264,18 @@ function LoadedModel({
     setOverride((current) => current?.token === commandAction.token ? current : commandAction)
   }, [commandAction])
 
-  /** The one manifest spec whose pose and cosmetic offset are on screen. */
+  /** The one manifest spec whose pose is on screen. */
   const playingState = override?.state ?? active
   const chainedFrom = override === null ? active : null
   const playingSpec = useMemo(() => {
     return resolveClipSpec(clips?.[playingState], seed)
   }, [clips, playingState, seed])
+
+  /** Where the model is planted — see `resolvePlantSpec` for why this is the
+   * base state's offset and not the playing tell's. */
+  const plantSpec = useMemo(() => {
+    return resolvePlantSpec(playingSpec, resolveClipSpec(clips?.[active], seed), override !== null)
+  }, [active, clips, override, playingSpec, seed])
 
   useEffect(() => {
     if (!playingSpec) {
@@ -370,9 +377,10 @@ function LoadedModel({
     // rig's origin sits relative to its feet — a distance in model units, so a
     // half-size juvenile needs half the correction. `position` is in the
     // parent's space, so this group's own `scale` does not apply to it and the
-    // multiply has to be explicit. The playing clip's offset wins over the
-    // asset's, since each pose reaches a different distance below the origin.
-    <group ref={ref} scale={scale} position={[0, (playingSpec?.yOffset ?? yOffset ?? 0) * scale, 0]}>
+    // multiply has to be explicit. The planting clip's offset wins over the
+    // asset's, since each pose reaches a different distance below the origin —
+    // see `plantSpec` for why that is the base state's clip, not the tell's.
+    <group ref={ref} scale={scale} position={[0, (plantSpec?.yOffset ?? yOffset ?? 0) * scale, 0]}>
       <primitive object={cloned} dispose={null} />
       {children}
     </group>

@@ -77,7 +77,9 @@ as a side effect: it now opens *and* closes on the neutral pose.
 
 ⁴ Both used to loop and no longer do — see the action-channel section below.
 `breath` closes cleanly and *could* loop; it is a one-shot because of how it is
-dispatched, not because of anything in the clip.
+dispatched, not because of anything in the clip. It was re-authored after this
+audit as well (see below), which left its mirror and seam where they already
+were and changed everything else about it.
 
 **0.0009 m is the floor, not a residual defect.** The rig's own bind pose is
 asymmetric by 0.00089 m, so every repaired clip is now as symmetric as this
@@ -133,7 +135,50 @@ nothing enforced it.
 
 `src/render/assets/manifest.action-channel.test.ts` locks both, and cross-checks
 the state list against the `setAction` call sites so a new tell cannot be added
-without being a one-shot. It scopes itself to assets that actually load a model:
+without being a one-shot.
+
+## The action channel does not re-plant the model
+
+The second thing a tell must not do. `GameModel` positions the model from a
+clip's `yOffset` — the measured drop of that pose below the rig origin, negated —
+and it used to take that from the *playing* spec. `attack` and `breath` carry
+`yOffset: 0` against `idle`'s 152.89, so a grounded wyvern sank **1.10 m** the
+instant it bit or breathed, and popped back when the tell cleared.
+
+Measuring the tells and giving them their own numbers does not fix it. Their
+poses do hang lower — `breath`'s bottoms out at 277.4 rig units and `attack`'s at
+402.0 against `idle`'s 152.9 — but a tell is played over *several* bases, and the
+same clip has to be right over all of them:
+
+| base state | plant |
+|---|---|
+| `idle` | 152.89 |
+| `walk` | 85.57 |
+| `rest` | 368.80 |
+| every airborne state | 0 |
+
+So the offset is **inherited** instead. `resolvePlantSpec` in
+`gameModelPlayback.ts` returns the base state's spec whenever an action-channel
+override is playing, and the playing spec otherwise. A tell is a transient
+overlay on whatever locomotion is underneath, not a new stance, so it holds the
+plant that locomotion already established — and an airborne tell inherits 0,
+which is what the scene wants there anyway. `attack` and `breathe` keep their own
+offsets for when they are requested as ordinary *base* states, which `pickUp`,
+`huntGrip`, `drop` and `huntFinish` all do.
+
+This is continuous at both edges by construction: the plant is the base spec
+before the tell, during it, and after it clears, because `active` never changes
+while an override is playing (`chainedFrom` is null then, so the `next` chain
+cannot fire) and the override clears without touching it.
+`gameModelPlayback.test.ts` asserts the inheritance for all four tells against
+all three grounded loops, using the manifest's real numbers.
+
+What this does *not* address: the tells' wings are not run through the pipeline's
+lift pass — `lift-v1-wing-clips-blender.py` takes `idle,rest,walk,takeoff,land`
+only — so their neutral frames keep the gothic rig's unlifted bind fold, which
+hangs about 117 rig units (0.84 m) lower than `idle`'s lifted one. That gap is a
+property of the clip pair and was there before the plant changed; it was simply
+buried under the 1.10 m the plant was moving on its own. It scopes itself to assets that actually load a model:
 the `unit.*` entries are `url: null` placeholders, and their looping `attack` is
 fine because `attack` is legitimate as a *base* state — it only has to be a
 one-shot when the action channel dispatches it.
@@ -229,3 +274,98 @@ with one side — 15.4 and 16.2 m of wingtip asymmetry — and are listed in
 exemption the banks and `walk` carry. v1's `Battle_Attack01` is deliberately not
 promoted: at 195 frames it is 8.1 s, and the only way to fit it as a tell is a 3×
 retime that reads as a fast-forward.
+
+
+## The `breath` re-author, and where the jet points
+
+`breath` as audited was the procedural pass in `scripts/author-organic-ground.py`
+— 48 frames at 24 fps, four blocks of linear interpolation. Four things measured
+wrong at once, and only the last is visible in a still:
+
+**It opened with 12 frames of nothing.** `Body`, `Neck1`, `Neck2`, `Head`, `Jaw`
+and the whole tail held their frame-0 value exactly from f0 to f12. The only
+motion in the first half-second was the wing carrier's 2.5-degree idle flutter.
+That is a quarter of a clip whose entire job is to be a legible tell.
+
+**The gape was small, and late.** It peaked 31.8 degrees off the closed jaw at
+t = 1.63 s — two-thirds of the `attack` bite's 48.1, on the one clip in the set
+that exists to hold a mouth open. `BreathVFX` ignites on the frame the action
+starts and restarted its 0.85 s burst for as long as `action?.state ===
+'breathe'` held, so for the first 1.15 s — 58% of the clip — fire poured out of a
+shut mouth.
+
+**The jet pointed at the ground.** `BreathVFX` aims along the tangent from the
+last neck link to the skull, and `tryBreath` in `core/combat/encounter.ts` tests
+a strictly **horizontal** cone out to `breathRange`. The audited clip swung that
+tangent from −14.3° at rest up to +20.7° at t = 1.0, then down through 68 degrees
+to **−47.7°**, and held the widest gape there. The fire was drawn nowhere near
+what it damaged.
+
+**Nothing braced.** `Tail1` held 148.5° and `Tail5` held 2.4° for all 49 frames.
+An animal emitting a jet absorbed no recoil anywhere.
+
+`scripts/author-wyvern-breath-blender.py` replaces it over the same 48 frames:
+neutral → inhale (f7) → ignition (f11) → jet (f11–f34) → cutoff (f40) → neutral
+(f45, held to f48). Measured on `wyvern-gothic.glb` before and after:
+
+| | before | after |
+|---|---|---|
+| first frame a body channel leaves the frame-0 pose | f13 | **f1** |
+| gape travel | 31.8° | **51.0°** |
+| gape at the flame window | 3.7° open at 0.85 s | **>30° throughout** |
+| jet aim while the mouth is open | +20.7° … −47.7° | **−14.7° … −8.3°** |
+| `Tail3` travel | 0.0° | **3.5°** |
+| wing elevation | 4.5° | **37.7°** |
+| mirror | 0.0010 m | 0.0010 m |
+| seam | 0.0006 | 0.0006 |
+
+Only the wing carrier moved in the audited clip's first twelve frames, and only
+by its 2.5-degree idle flutter — hence the two different "first frame" answers
+for the same clip.
+
+### Where the jet points is solved, not guessed
+
+Probed on the armature: every bone from `Body` through `Neck2` moves the skull
+tangent by exactly **−1.0 degree per +1 degree of local X**, and `Head` moves it
+by **0.0** — it rotates the skull below the point the tangent is measured from,
+so it aligns the muzzle with the fire and does nothing to aim it. Therefore
+
+    aim = −14.32° − sum(Body, Spine1, Spine2, Spine3, Neck1, Neck2)
+
+The −14.32° is the bind pose's own aim, and it is already the line this animal
+needs: a grounded wyvern's head sits 793 rig units up — 5.71 m at `WYVERN_FIT` —
+so −14.32° reaches a ground target's torso at 16.5 m, the middle of the 14–18 m
+`breathRange` band in `core/data/config.ts`. The jet holds a chain sum near zero
+and lets recoil walk it *up* a few degrees, rather than sweeping past neutral.
+
+### The cutoff was trimmed by measurement, not by eye
+
+The first pass put +8 degrees of follow-through on `Body` and the spine at the
+cutoff. On the gothic mesh that dropped the lowest vertex to −232.7 rig units
+against the clip's own neutral of −120.2, punching the chin 0.56 m through the
+plane `idle` stands on for six frames. Moving the same +8 of aim onto `Neck1`
+and `Neck2`, which do not pitch the chest, and zeroing the tail's undershoot,
+brings the worst frame to −155.9 — within 3 rig units, 0.02 m, of `idle`'s own
+−152.9.
+
+### The burst was re-timed to the gape
+
+`BREATH_VFX_LEAD_SECONDS` (0.4 s) delays ignition to the frame the mouth is
+actually open, and the burst no longer restarts itself while the action holds.
+That restart is what hid the old clip's timing: a 0.85 s burst ran two and a bit
+times per breath and outlived the clip by its release tail, so the fire was
+always on and never had to agree with the mouth. `manifest.breath-clip.test.ts`
+derives its flame window from those two constants, so the clip and the effect
+cannot drift apart without failing.
+
+### One trap this re-author surfaced
+
+`author-wyvern-wing-surfaces-blender.py` stamps the response layer it adds onto
+the action and **subtracts that recorded layer** before re-applying, so a second
+run replaces the flex rather than doubling it. Both re-author scripts wipe every
+F-curve — which removes the layer but left the stamp behind. `attack` had been
+sitting in that state since its own re-author: no membrane curves, but still
+marked as carrying a response, so the next surface pass would have subtracted a
+flex that was not there and baked its negative into the carrier. Both scripts now
+delete the marker with the curves, and the surface pass has been re-run, which is
+what restored `attack`'s membrane response to `wyvern.glb`.

@@ -320,8 +320,10 @@ plants exactly one clip. Compatible loops may share a `phaseGroup`, preserving n
 time through a crossfade; the cruise and bank loops use it so steering never restarts a wingbeat. A state
 can map to an array of clips, chosen by `GameModel`'s `seed` prop, which is how perched wyverns avoid
 idling in lockstep — and, since the attack re-author, how they avoid striking in lockstep: `attack`
-and `attackAir` are both pools of an authored 1.5 s snap plus a v1 capture. See
-`docs/WYVERN_CLIP_AUDIT.md`.
+and `attackAir` are both pools of an authored 1.5 s snap plus a v1 capture. `breath` was re-authored
+the same way: a 2.0 s inhale/jet/cutoff whose gape travels 51 degrees and whose jet holds the aim
+line the horizontal combat cone actually tests, instead of the audited clip's twelve dead frames and
+47.7-degree dive into the ground. See `docs/WYVERN_CLIP_AUDIT.md`.
 
 `docs/WYVERN_ANIMATION_BASELINE.md` is the measured capability envelope: what the rig demonstrably
 does across all 52 artist clips, how the authored sidecar clips were built out of that, and the
@@ -392,8 +394,10 @@ Gaps the ledger still records, in case you trip over them first:
 - **Fire breath's impact point is a placeholder.** It does render now —
   `render/vfx/BreathVFX.tsx` is a skull-following, range-matched scaffold of layered procedural
   flame sheets, deterministic ember/smoke pools and one mouth light, wired into battle and the
-  Flight Lab. What it cannot do is show where the fire actually *lands*: `core/combat` stays the
-  only hit authority and exposes no impact positions, so the range-end burst sits at
+  Flight Lab. Its burst is timed to the `breath` clip's authored gape by
+  `BREATH_VFX_LEAD_SECONDS`, and runs once per exhale rather than restarting for as long as the
+  tell holds. What it still cannot do is show where the fire actually *lands*: `core/combat` stays
+  the only hit authority and exposes no impact positions, so the range-end burst sits at
   `breathRange` rather than on whatever it hit. A combat-event stream would be the fix, and it
   would have to be replay-stable.
 - **`Actor.flying` is assigned once and never mutated**, so battle wyverns can never land and the

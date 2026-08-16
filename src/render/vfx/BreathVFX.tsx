@@ -19,7 +19,9 @@ import {
 import {
   BREATH_VFX_DURATION_SECONDS,
   BREATH_VFX_EMBER_COUNT,
+  BREATH_VFX_LEAD_SECONDS,
   BREATH_VFX_SMOKE_COUNT,
+  BREATH_VFX_TOTAL_SECONDS,
   breathEnvelope,
   breathRadiusAt,
   breathSeed,
@@ -157,17 +159,22 @@ export function BreathVFX({
 
     const nextElapsed = elapsed + Math.min(rawDelta, 0.05)
     runtime.current.elapsed = nextElapsed
-    runtime.current.progress = Math.min(nextElapsed / BREATH_VFX_DURATION_SECONDS, 1)
+    runtime.current.progress = Math.min(
+      Math.max(nextElapsed - BREATH_VFX_LEAD_SECONDS, 0) / BREATH_VFX_DURATION_SECONDS,
+      1,
+    )
     runtime.current.envelope = breathEnvelope(nextElapsed)
-    if (runtime.current.progress >= 1) {
-      if (active) {
-        runtime.current.elapsed = 0
-        runtime.current.progress = 0
-      } else {
-        group.visible = false
-        runtime.current.elapsed = null
-        return
-      }
+    // One burst per exhale. This used to restart itself for as long as `active`
+    // held — which is the whole length of the tell, so a 0.85 s burst ran two
+    // and a bit times per breath and outlived the clip by its release tail. With
+    // the burst now timed to the authored gape, restarting it only re-lights a
+    // mouth that is on its way shut. A repeat breath still ignites: the effect
+    // above resets `elapsed` on the rising edge of `active` and on a new
+    // `trigger` token, and the sim's own `BREATH_INTERVAL` is longer than this.
+    if (nextElapsed >= BREATH_VFX_TOTAL_SECONDS) {
+      group.visible = false
+      runtime.current.elapsed = null
+      return
     }
 
     const envelope = runtime.current.envelope

@@ -63,6 +63,14 @@ ACTION = "attack"
 FPS = 24
 FRAMES = 36
 
+# `author-wyvern-wing-surfaces-blender.py` stamps the surface-response layer it
+# added onto the action, and subtracts that recorded layer before re-applying so
+# a second run replaces the flex rather than doubling it. Wiping the curves below
+# removes the layer but not the stamp, so the marker has to go with them --
+# otherwise the next surface pass subtracts a response that is no longer there
+# and bakes its negative into the carrier.
+SURFACE_RESPONSE_PROPERTY = "wyvern_surface_response_profile"
+
 # frame -> degrees of local X, per bone. Every column starts and ends at 0.
 #            f0   f9(wind) f15(strike) f18(bite) f33
 KEYS = {
@@ -152,6 +160,8 @@ def author() -> dict:
     # translate the root.
     for bag, curve in fcurves(action):
         bag.fcurves.remove(curve)
+    if SURFACE_RESPONSE_PROPERTY in action:
+        del action[SURFACE_RESPONSE_PROPERTY]
 
     if arm.animation_data is None:
         arm.animation_data_create()
