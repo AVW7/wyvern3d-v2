@@ -171,5 +171,3 @@ export const BUILDINGS: Record<string, BuildingDef> = {
     capacityPerLevel: [2, 4, 6],
   },
 }
-
-export const BUILDING_LIST = Object.values(BUILDINGS)

@@ -60,8 +60,7 @@ export const BIOME_SPAWN_ANCHOR: [number, number] = [0, -18]
 /** Maximum slope angle in radians (~20 degrees) considered safe for landing. */
 export const MAX_LANDING_SLOPE = 0.35
 
-/** Safe inner and outer radius bounds for exploration. */
-export const MIN_EXPLORATION_RADIUS = 2
+/** Safe outer radius bound for exploration. */
 export const MAX_EXPLORATION_RADIUS = 95
 
 /**

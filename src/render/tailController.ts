@@ -294,31 +294,3 @@ export function dynamicTailController(
   
   return state
 }
-
-/**
- * Simplified single-call version for useFrame integration.
- * Creates and manages state internally if not provided.
- */
-export function updateDynamicTail(
-  tailBones: Object3D[],
-  turnRate: number,
-  bank: number,
-  horizontalSpeed: number,
-  flightMode: FlightLoopState,
-  time: number,
-  state: TailState,
-  dt: number,
-  aggression: number = 0.5
-): TailState {
-  return dynamicTailController(
-    tailBones,
-    turnRate,
-    bank,
-    horizontalSpeed,
-    flightMode,
-    aggression,
-    time,
-    state,
-    dt
-  )
-}

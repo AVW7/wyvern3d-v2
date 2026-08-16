@@ -1,7 +1,9 @@
 import { GameState, RegionDef } from '../../core/types'
 import { REGIONS, REGION_LIST } from '../../core/data/regions'
-import { UNITS } from '../../core/data/units'
 import { isAttackable } from '../../core/state/game'
+import { calculateGarrisonStrength } from '../../core/state/atlasDossier'
+
+export { calculateGarrisonStrength }
 
 export interface MapNode {
   id: string
@@ -19,19 +21,6 @@ export interface MapEdge {
   a: string
   b: string
   status: 'owned' | 'attackable' | 'locked'
-}
-
-export function calculateGarrisonStrength(garrison: { unitId: string; strength: number }[]): number {
-  let total = 0
-  for (const item of garrison) {
-    const unitDef = UNITS[item.unitId]
-    if (unitDef) {
-      total += (unitDef.attack + unitDef.defense) * item.strength
-    } else {
-      total += item.strength
-    }
-  }
-  return total
 }
 
 export function buildMapGraph(state: GameState): { nodes: Record<string, MapNode>; edges: MapEdge[] } {

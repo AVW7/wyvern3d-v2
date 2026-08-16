@@ -11,6 +11,8 @@
  * time of day is presentation and needs no new state and no save migration.
  */
 
+import { mix } from '@/core/math/vec'
+
 export type Rgb = readonly [number, number, number]
 
 /**
@@ -139,12 +141,8 @@ const STOPS: Stop[] = [
   },
 ]
 
-function lerp(a: number, b: number, t: number): number {
-  return a + (b - a) * t
-}
-
 function lerpRgb(a: Rgb, b: Rgb, t: number): Rgb {
-  return [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t)]
+  return [mix(a[0], b[0], t), mix(a[1], b[1], t), mix(a[2], b[2], t)]
 }
 
 export interface SkyState {
@@ -176,7 +174,7 @@ function fogRange(phase: number): [number, number] {
   // Far distance reaches past the outer landform (which runs to r=132) in
   // daylight, so the horizon hills keep their colour and read as terrain rather
   // than dissolving into a flat band. At night it closes right in.
-  return [lerp(58, 30, night), lerp(300, 120, night)]
+  return [mix(58, 30, night), mix(300, 120, night)]
 }
 
 /** Full lighting state for a tick. Called once per frame; allocates one object. */
@@ -213,9 +211,9 @@ export function skyStateFor(tick: number): SkyState {
     fog: lerpRgb(from.fog, to.fog, e),
     horizon: lerpRgb(from.horizon, to.horizon, e),
     zenith: lerpRgb(from.zenith, to.zenith, e),
-    sunIntensity: lerp(from.sunIntensity, to.sunIntensity, e),
-    fillIntensity: lerp(from.fillIntensity, to.fillIntensity, e),
-    exposure: lerp(from.exposure, to.exposure, e),
+    sunIntensity: mix(from.sunIntensity, to.sunIntensity, e),
+    fillIntensity: mix(from.fillIntensity, to.fillIntensity, e),
+    exposure: mix(from.exposure, to.exposure, e),
     direction: sunDirection(phase),
     bucket: dayBucket(phase),
     fogNear,

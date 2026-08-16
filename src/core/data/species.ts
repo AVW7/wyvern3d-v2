@@ -60,5 +60,3 @@ export const SPECIES: Record<string, WyvernSpecies> = {
     traitPool: ['ancient', 'venomous', 'stubborn'],
   },
 }
-
-export const SPECIES_LIST = Object.values(SPECIES)

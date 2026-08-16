@@ -85,8 +85,6 @@ export type Intent =
       layout: SanctuaryLayoutState
     }
 
-export type IntentType = Intent['type']
-
 /** A recorded session: replaying these against `seed` reproduces it exactly. */
 export interface IntentLog {
   seed: number

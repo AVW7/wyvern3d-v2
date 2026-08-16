@@ -53,5 +53,3 @@ export const TRAITS: Record<string, Trait> = {
     bondRate: 0.9,
   },
 }
-
-export const TRAIT_LIST = Object.values(TRAITS)

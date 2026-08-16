@@ -150,10 +150,6 @@ export function round2(value: number): number {
   return Math.round(value * 100) / 100
 }
 
-export function isNonInterruptible(phase: SanctuaryCommandPhase): boolean {
-  return phase === 'takeoff' || phase === 'landing' || phase === 'acting'
-}
-
 export function isFlightPhase(phase: SanctuaryCommandPhase): boolean {
   return (
     phase === 'takeoff' ||

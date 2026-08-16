@@ -3,6 +3,7 @@
 import { Component, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import type { ErrorInfo, ReactNode } from 'react'
 import { useGLTF } from '@react-three/drei'
+import { useFrame } from '@react-three/fiber'
 import { AnimationMixer, LoopOnce, LoopRepeat } from 'three'
 // From `three` directly, not three-stdlib: pnpm's strict node_modules does not
 // hoist drei's transitive deps, so three-stdlib is not importable from here.
@@ -376,14 +377,4 @@ function LoadedModel({
       {children}
     </group>
   )
-}
-
-import { useFrame } from '@react-three/fiber'
-
-export function preloadAsset(id: AssetId): void {
-  const entry = getAsset(id)
-  if (!entry?.url) return
-  useGLTF.preload(entry.url)
-  if (entry.animationUrl) useGLTF.preload(entry.animationUrl)
-  if (entry.animationUrls) useGLTF.preload(entry.animationUrls)
 }

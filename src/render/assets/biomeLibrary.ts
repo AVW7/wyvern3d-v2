@@ -1,4 +1,4 @@
-import { BIOME_PROP_ATLAS, PROP_ATLAS } from './manifest'
+import { BIOME_PROP_ATLAS } from './manifest'
 
 /**
  * What each biome scatters.
@@ -150,9 +150,4 @@ export const BIOME_DRESSING: Record<string, BiomeLayer[]> = {
 /** Atlas a layer draws from. */
 export function layerAtlas(layer: BiomeLayer): string {
   return layer.atlas ?? BIOME_PROP_ATLAS
-}
-
-/** True when the layer comes from the sanctuary atlas rather than the biome one. */
-export function isSanctuaryLayer(layer: BiomeLayer): boolean {
-  return layerAtlas(layer) === PROP_ATLAS
 }

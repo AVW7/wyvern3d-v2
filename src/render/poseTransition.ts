@@ -9,6 +9,7 @@
  */
 
 import type { FlightLoopState } from '@/render/flightPose'
+import { mix } from '@/core/math/vec'
 
 /**
  * Easing functions for smooth transitions.
@@ -664,18 +665,17 @@ export function getPreset(name: string): PosePreset {
  * Blends between two presets by weight.
  */
 export function blendPresets(a: PosePreset, b: PosePreset, weight: number): PosePreset {
-  const lerp = (x: number, y: number) => x + (y - x) * weight
   return {
-    pitch: lerp(a.pitch, b.pitch),
-    bank: lerp(a.bank, b.bank),
-    neckPitch: lerp(a.neckPitch, b.neckPitch),
-    neckYaw: lerp(a.neckYaw, b.neckYaw),
-    headPitch: lerp(a.headPitch, b.headPitch),
-    headYaw: lerp(a.headYaw, b.headYaw),
-    headRoll: lerp(a.headRoll, b.headRoll),
-    legTuck: lerp(a.legTuck, b.legTuck),
-    tailSwing: lerp(a.tailSwing, b.tailSwing),
-    tailLift: lerp(a.tailLift, b.tailLift),
+    pitch: mix(a.pitch, b.pitch, weight),
+    bank: mix(a.bank, b.bank, weight),
+    neckPitch: mix(a.neckPitch, b.neckPitch, weight),
+    neckYaw: mix(a.neckYaw, b.neckYaw, weight),
+    headPitch: mix(a.headPitch, b.headPitch, weight),
+    headYaw: mix(a.headYaw, b.headYaw, weight),
+    headRoll: mix(a.headRoll, b.headRoll, weight),
+    legTuck: mix(a.legTuck, b.legTuck, weight),
+    tailSwing: mix(a.tailSwing, b.tailSwing, weight),
+    tailLift: mix(a.tailLift, b.tailLift, weight),
   }
 }
 
@@ -764,26 +764,19 @@ export function applyLayers(base: PosePreset, layers: PoseLayer[]): PosePreset {
     const m = layer.mask
     const p = layer.pose
     
-    if (m.pitch) result.pitch = lerp(result.pitch, p.pitch, w)
-    if (m.bank) result.bank = lerp(result.bank, p.bank, w)
-    if (m.neckPitch) result.neckPitch = lerp(result.neckPitch, p.neckPitch, w)
-    if (m.neckYaw) result.neckYaw = lerp(result.neckYaw, p.neckYaw, w)
-    if (m.headPitch) result.headPitch = lerp(result.headPitch, p.headPitch, w)
-    if (m.headYaw) result.headYaw = lerp(result.headYaw, p.headYaw, w)
-    if (m.headRoll) result.headRoll = lerp(result.headRoll, p.headRoll, w)
-    if (m.legTuck) result.legTuck = lerp(result.legTuck, p.legTuck, w)
-    if (m.tailSwing) result.tailSwing = lerp(result.tailSwing, p.tailSwing, w)
-    if (m.tailLift) result.tailLift = lerp(result.tailLift, p.tailLift, w)
+    if (m.pitch) result.pitch = mix(result.pitch, p.pitch, w)
+    if (m.bank) result.bank = mix(result.bank, p.bank, w)
+    if (m.neckPitch) result.neckPitch = mix(result.neckPitch, p.neckPitch, w)
+    if (m.neckYaw) result.neckYaw = mix(result.neckYaw, p.neckYaw, w)
+    if (m.headPitch) result.headPitch = mix(result.headPitch, p.headPitch, w)
+    if (m.headYaw) result.headYaw = mix(result.headYaw, p.headYaw, w)
+    if (m.headRoll) result.headRoll = mix(result.headRoll, p.headRoll, w)
+    if (m.legTuck) result.legTuck = mix(result.legTuck, p.legTuck, w)
+    if (m.tailSwing) result.tailSwing = mix(result.tailSwing, p.tailSwing, w)
+    if (m.tailLift) result.tailLift = mix(result.tailLift, p.tailLift, w)
   }
   
   return result
-}
-
-/**
- * Linear interpolation helper.
- */
-function lerp(a: number, b: number, t: number): number {
-  return a + (b - a) * t
 }
 
 // ============================================================================

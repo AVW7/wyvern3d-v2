@@ -1,5 +1,5 @@
 import { REGIONS } from '@/core/data/regions'
-import { deriveSeed } from '@/core/math/rng'
+import { unitFromSeed } from '@/core/math/rng'
 
 /**
  * Deterministic landmark anchors for a biome region (Atlas Stage 2).
@@ -36,7 +36,7 @@ const APPROACH_RADIUS = 9
 
 /** Bounded deterministic offset in [0, 1) from region id, salt and index. */
 function hashUnit(seed: number, regionId: string, salt: string, index: number): number {
-  return (deriveSeed(seed, `${regionId}:${salt}:${index}`) >>> 0) / 4294967296
+  return unitFromSeed(seed, `${regionId}:${salt}:${index}`)
 }
 
 /**

@@ -55,6 +55,9 @@ export const lerp = (a: Vec3, b: Vec3, t: number): Vec3 => ({
 export const clamp = (v: number, min: number, max: number): number =>
   v < min ? min : v > max ? max : v
 
+/** Scalar linear interpolation. The Vec3 form above is `lerp`. */
+export const mix = (a: number, b: number, t: number): number => a + (b - a) * t
+
 /**
  * Frame-rate independent exponential smoothing.
  * `rate` is roughly "fraction closed per second".

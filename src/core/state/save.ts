@@ -38,16 +38,6 @@ export const localStorageAdapter: SaveAdapter = {
   },
 }
 
-/** In-memory adapter for tests and the headless harnesses. */
-export function memoryAdapter(): SaveAdapter {
-  const store = new Map<string, string>()
-  return {
-    read: (key) => store.get(key) ?? null,
-    write: (key, value) => void store.set(key, value),
-    remove: (key) => void store.delete(key),
-  }
-}
-
 type Migration = (state: GameState) => GameState
 
 /**

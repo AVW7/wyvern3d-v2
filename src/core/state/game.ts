@@ -1,4 +1,4 @@
-import type { BuildingId, GameEventKind, GameState, LogEntry, RegionState, Resources, ResourceId } from '../types'
+import type { BuildingId, GameEventKind, GameState, LogEntry, Resources, ResourceId } from '../types'
 import { BUILDINGS } from '../data/buildings'
 import { CONFIG, SAVE_VERSION } from '../data/config'
 import { REGIONS, STARTING_REGION } from '../data/regions'
@@ -7,17 +7,6 @@ import { createRng, type Rng } from '../math/rng'
 import { createWyvern, nameFor, rollSpeciesStats, rollSpeciesTraits } from '../entities/wyvern'
 
 export const RESOURCE_IDS: ResourceId[] = ['food', 'gold', 'ore', 'timber', 'arcane', 'water', 'hide', 'iron']
-
-export const emptyResources = (): Resources => ({
-  food: 0,
-  gold: 0,
-  ore: 0,
-  timber: 0,
-  arcane: 0,
-  water: 0,
-  hide: 0,
-  iron: 0,
-})
 
 /**
  * Runs `fn` with an RNG resumed from the state's stored cursor, then writes the
@@ -79,9 +68,6 @@ export function capacityOf(state: GameState, id: BuildingId): number {
   const tiers = BUILDINGS[id]?.capacityPerLevel ?? []
   return tiers[Math.min(level, tiers.length) - 1] ?? 0
 }
-
-export const ownedRegions = (state: GameState): RegionState[] =>
-  Object.values(state.regions).filter((r) => r.owner === 'player')
 
 /** A region is attackable when an adjacent region is already held. */
 export function isAttackable(state: GameState, regionId: string): boolean {

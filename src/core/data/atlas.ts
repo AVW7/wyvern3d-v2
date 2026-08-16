@@ -14,8 +14,6 @@ export const CLIMATE_TAGS = [
   'shadowed',
 ] as const
 
-export type ClimateTag = (typeof CLIMATE_TAGS)[number]
-
 /** Standard vocabulary of terrain tags for filtering and indexing. */
 export const TERRAIN_TAGS = [
   'valleys',
@@ -32,8 +30,6 @@ export const TERRAIN_TAGS = [
   'glaciers',
   'barrens',
 ] as const
-
-export type TerrainTag = (typeof TERRAIN_TAGS)[number]
 
 export const REGION_ATLAS_DATA: Record<string, AtlasRegionData> = {
   hearthvale: {

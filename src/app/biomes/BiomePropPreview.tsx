@@ -5,28 +5,7 @@ import { Canvas } from '@react-three/fiber'
 import { Suspense } from 'react'
 import { BIOME_PROP_ATLAS } from '@/render/assets/manifest'
 import { Prop } from '@/render/assets/props'
-
-/**
- * A 1.6 m stand-in for the player, beside the prop.
- *
- * The whole point of the biome atlas's authored `targetHeight` is that a prop
- * reads at a believable size next to a person, and a preview that frames each
- * prop to fill the viewport hides exactly that. This is the metre stick.
- */
-function HumanReference({ x }: { x: number }) {
-  return (
-    <group position={[x, 0, 0]}>
-      <mesh position={[0, 0.9, 0]}>
-        <capsuleGeometry args={[0.22, 1.0, 4, 12]} />
-        <meshStandardMaterial color="#4a5a72" roughness={0.9} />
-      </mesh>
-      <mesh position={[0, 1.62, 0]}>
-        <sphereGeometry args={[0.13, 12, 12]} />
-        <meshStandardMaterial color="#5d6f8a" roughness={0.9} />
-      </mesh>
-    </group>
-  )
-}
+import { HumanReference } from '@/render/preview/HumanReference'
 
 export function BiomePropPreview({ id, height }: { id: string; height: number }) {
   // Stand the reference figure clear of the prop's own footprint.

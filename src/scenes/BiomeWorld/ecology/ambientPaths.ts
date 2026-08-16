@@ -1,4 +1,4 @@
-import { deriveSeed } from '@/core/math/rng'
+import { unitFromSeed } from '@/core/math/rng'
 import { getRegionPhenomenon } from '@/core/data/phenomena'
 
 /**
@@ -74,7 +74,7 @@ const PERIODS: Record<AmbientAgentSpec['ambient'], number> = {
 }
 
 function hashUnit(seed: number, salt: string): number {
-  return (deriveSeed(seed, salt) >>> 0) / 4294967296
+  return unitFromSeed(seed, salt)
 }
 
 /**

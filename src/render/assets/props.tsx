@@ -386,12 +386,6 @@ function PropInstancedMesh({
   )
 }
 
-export function preloadProps(): void {
-  useGLTF.preload(PROP_ATLAS)
-  useGLTF.preload(FOOD_PROP_ATLAS)
-  useGLTF.preload(BIOME_PROP_ATLAS)
-}
-
 /**
  * Suspends the DOM-side GameCanvas component until the atlas is cached.
  *

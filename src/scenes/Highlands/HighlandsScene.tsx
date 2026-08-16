@@ -22,6 +22,7 @@ import {
   useHighlandsHunt,
 } from '@/state/highlandsHuntStore'
 import { useCameraStore } from '@/state/cameraStore'
+import { mix } from '@/core/math/vec'
 
 const HIGHLANDS_RADIUS = 96
 const TAKEOFF_SECONDS = 3.2
@@ -411,9 +412,9 @@ function HighlandsHuntDirector({
       body.phaseElapsed += dt
       const progress = Math.min(1, body.phaseElapsed / STRIKE_SECONDS)
       const eased = smoothstep(progress)
-      body.position.x = lerp(body.phaseOrigin.x, doe.position[0], eased)
-      body.position.z = lerp(body.phaseOrigin.z, doe.position[1] - HUNT_CONTACT_DISTANCE, eased)
-      body.position.y = lerp(body.phaseOrigin.y, 0, eased * eased)
+      body.position.x = mix(body.phaseOrigin.x, doe.position[0], eased)
+      body.position.z = mix(body.phaseOrigin.z, doe.position[1] - HUNT_CONTACT_DISTANCE, eased)
+      body.position.y = mix(body.phaseOrigin.y, 0, eased * eased)
       face(body, doe.position)
 
       if (progress < 0.68) {
@@ -422,7 +423,7 @@ function HighlandsHuntDirector({
         targetBank = Math.sin(diveP * Math.PI) * 0.12
       } else {
         const flareP = (progress - 0.68) / 0.32
-        targetPitch = lerp(0.42, -0.26, smoothstep(flareP))
+        targetPitch = mix(0.42, -0.26, smoothstep(flareP))
         targetBank = 0
       }
     } else if (phase === 'carry' && doe) {
@@ -447,12 +448,12 @@ function HighlandsHuntDirector({
     } else if (phase === 'landing') {
       body.phaseElapsed += dt
       const progress = Math.min(1, body.phaseElapsed / LAND_SECONDS)
-      body.position.y = lerp(body.phaseOrigin.y, 0, smoothstep(progress))
+      body.position.y = mix(body.phaseOrigin.y, 0, smoothstep(progress))
       if (doe) face(body, doe.position)
 
-      targetPitch = lerp(0.0, -0.36, smoothstep(Math.min(1, progress * 1.1)))
+      targetPitch = mix(0.0, -0.36, smoothstep(Math.min(1, progress * 1.1)))
       if (progress >= 0.85) {
-        targetPitch = lerp(targetPitch, 0.0, (progress - 0.85) / 0.15)
+        targetPitch = mix(targetPitch, 0.0, (progress - 0.85) / 0.15)
       }
       targetBank = 0
     } else if (phase === 'fire') {
@@ -682,10 +683,6 @@ function HuntFireBurst({
       <pointLight ref={lightRef} color="#ff6a18" intensity={8} distance={28} />
     </group>
   )
-}
-
-function lerp(start: number, end: number, amount: number): number {
-  return start + (end - start) * amount
 }
 
 function smoothstep(value: number): number {

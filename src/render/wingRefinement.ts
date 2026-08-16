@@ -244,20 +244,27 @@ function applyWingFlutter(
 }
 
 /**
- * Applies wing fold to bone chain.
+ * Applies the fold sweep to one wing's bone chain.
+ *
+ * `mirror` negates Z for the right wing: local +Z sweeps the two wings in
+ * opposite directions, so an unmirrored sign folds the left back and the right
+ * forward across the chest. Named apart from `wingFold.applyWingFold`, which
+ * slerps the whole rig onto the authored gothic fold pose.
  */
-function applyWingFold(
+function applyFoldSweep(
   bones: Object3D[],
   foldAmount: number,
-  weights: number[]
+  weights: number[],
+  mirror: boolean
 ): void {
   if (bones.length === 0 || foldAmount < 0.01) return
   
+  const sign = mirror ? -1 : 1
   bones.forEach((bone, i) => {
     if (!bone) return
     const weight = weights[i] ?? 1
     // Fold pulls wing backward and in
-    bone.rotation.z += foldAmount * weight * 0.1
+    bone.rotation.z += sign * foldAmount * weight * 0.1
   })
 }
 
@@ -328,7 +335,7 @@ export function dynamicWingController(
   // Apply to left wing
   if (wingBonesL.length > 0) {
     applyWingFlutter(wingBonesL, flutterL * asymmetry.left, weights)
-    applyWingFold(wingBonesL, state.left.foldAmount, weights)
+    applyFoldSweep(wingBonesL, state.left.foldAmount, weights, false)
     // Membrane billow on distal bones only
     for (let i = 3; i < wingBonesL.length; i++) {
       const bone = wingBonesL[i]
@@ -341,7 +348,7 @@ export function dynamicWingController(
   // Apply to right wing
   if (wingBonesR.length > 0) {
     applyWingFlutter(wingBonesR, flutterR * asymmetry.right, weights)
-    applyWingFold(wingBonesR, state.right.foldAmount, weights)
+    applyFoldSweep(wingBonesR, state.right.foldAmount, weights, true)
     // Membrane billow on distal bones only
     for (let i = 3; i < wingBonesR.length; i++) {
       const bone = wingBonesR[i]

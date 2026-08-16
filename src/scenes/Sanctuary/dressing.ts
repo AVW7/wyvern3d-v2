@@ -10,6 +10,7 @@ import {
   ROOSTS,
   TRAINING_POSTS,
 } from './layout'
+import { createRng } from '@/core/math/rng'
 
 /**
  * Where every piece of sanctuary scenery stands.
@@ -27,15 +28,14 @@ import {
  * can walk or what they can interact with.
  */
 
-/** Deterministic PRNG. Not from core/rng: this is cosmetic and never replayed. */
-function mulberry32(seed: number): () => number {
-  let a = seed
-  return () => {
-    a = (a + 0x6d2b79f5) | 0
-    let t = Math.imul(a ^ (a >>> 15), 1 | a)
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
-  }
+/**
+ * Deterministic scatter stream. Cosmetic and never replayed, but drawn from
+ * `createRng` like the rest of the scene layer rather than from a second
+ * hand-rolled mulberry32 — the tick path's `withRng` is the thing that must be
+ * kept away from render code, not the generator itself.
+ */
+function scatterRng(seed: number): () => number {
+  return createRng(seed).next
 }
 
 const TAU = Math.PI * 2
@@ -102,7 +102,7 @@ export const KEEP_PILLARS: PropPlacement[] = [
  * footprint and cannot overlap its neighbour into z-fighting.
  */
 function keepFloor(): Record<'floorA' | 'floorB' | 'floorC', PropPlacement[]> {
-  const rng = mulberry32(0x5ea1)
+  const rng = scatterRng(0x5ea1)
   const tiles = { floorA: [] as PropPlacement[], floorB: [] as PropPlacement[], floorC: [] as PropPlacement[] }
   const keys = ['floorA', 'floorB', 'floorC'] as const
 
@@ -211,7 +211,7 @@ function scatter(
     maxAngle?: number
   },
 ): PropPlacement[] {
-  const rng = mulberry32(seed)
+  const rng = scatterRng(seed)
   const zones = exclusions()
   const placed: PropPlacement[] = []
 

@@ -674,24 +674,6 @@ export const ASSETS: Record<AssetId, AssetEntry> = {
   },
 }
 
-/**
- * The vertical extent of a model at a given state, for camera framing.
- *
- * Flat for now. 11 is close to the measured adult: the `idle` pose tops out
- * 1492 rig units above the origin, which is 10.7 m at `WYVERN_FIT`. Worth
- * making per-state once the clips settle — `hover` and `takeoff` reach roughly
- * twice that.
- */
-export function modelStateHeight(_state: ModelState, _seed: number): number {
-  return 11
-}
-
-/** How far from the model origin to look down to focus on a named bone. */
-export function boneOffset(_boneName: string): number {
-  // Flat: nothing reads a per-bone framing offset yet.
-  return 0
-}
-
 /** Fetch the asset entry, or undefined for an unknown id. */
 export function getAsset(id: AssetId): AssetEntry | undefined {
   return ASSETS[id]

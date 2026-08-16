@@ -1,4 +1,4 @@
-import { deriveSeed } from '@/core/math/rng'
+import { unitFromSeed } from '@/core/math/rng'
 import { getRegionPhenomenon } from '@/core/data/phenomena'
 import { getRegionAmbientSpec } from './ambientPaths'
 
@@ -32,7 +32,7 @@ const TIMED_PERIOD = 240
 const TIMED_DURATION = 75
 
 function hashUnit(seed: number, regionId: string, salt: string): number {
-  return (deriveSeed(seed, `${regionId}:obs:${salt}`) >>> 0) / 4294967296
+  return unitFromSeed(seed, `${regionId}:obs:${salt}`)
 }
 
 /**

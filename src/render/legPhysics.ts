@@ -304,34 +304,3 @@ export function dynamicLegController(
   
   return state
 }
-
-/**
- * Simplified single-call version for useFrame integration.
- */
-export function updateDynamicLegs(
-  legChainL: Object3D[],
-  legChainR: Object3D[],
-  turnRate: number,
-  horizontalSpeed: number,
-  verticalSpeed: number,
-  groundClearance: number,
-  flightMode: FlightLoopState,
-  baseTuck: number,
-  time: number,
-  state: LegsState,
-  dt: number
-): LegsState {
-  return dynamicLegController(
-    legChainL,
-    legChainR,
-    turnRate,
-    horizontalSpeed,
-    verticalSpeed,
-    groundClearance,
-    flightMode,
-    baseTuck,
-    time,
-    state,
-    dt
-  )
-}

@@ -55,3 +55,13 @@ export function deriveSeed(seed: number, label: string): number {
   }
   return h >>> 0
 }
+
+/**
+ * A bounded deterministic value in [0, 1) from a seed and a label.
+ *
+ * The same derive-then-normalise pair the biome scatter, landmark anchors and
+ * ambient paths each used to spell out locally; callers build the label.
+ */
+export function unitFromSeed(seed: number, label: string): number {
+  return (deriveSeed(seed, label) >>> 0) / 4294967296
+}

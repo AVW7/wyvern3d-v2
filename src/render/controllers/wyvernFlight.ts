@@ -2,6 +2,7 @@
 
 import { axis, CONTROLS, isDown, keys } from './input'
 import { flightAnimationState, type FlightLoopState } from '../flightPose'
+import { clamp } from '@/core/math/vec'
 
 export interface DirectWyvernFlightBody {
   position: { x: number; y: number; z: number }
@@ -314,8 +315,4 @@ function approach(current: number, target: number, step: number): number {
 
 function decay(current: number, dt: number): number {
   return approach(current, 0, BANK_RESPONSE * dt)
-}
-
-function clamp(value: number, min: number, max: number): number {
-  return Math.min(max, Math.max(min, value))
 }

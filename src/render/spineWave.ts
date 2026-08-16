@@ -214,26 +214,3 @@ export function propagateFullBodyWave(
 export function calculatePhase(timeAccumulator: number, frequency: number = 2.5): number {
   return (timeAccumulator * frequency) % 1.0;
 }
-
-/**
- * Performance optimization: Batch apply spine wave to multiple wyverns.
- * Reduces per-bone quaternion allocations by reusing objects.
- */
-export function propagateSpineWaveBatch(
-  wyverns: Array<{
-    spineBones: Object3D[];
-    neckBones: Object3D[];
-    horizontalSpeed: number;
-    turnRate: number;
-  }>,
-  basePhase: number
-): void {
-  wyverns.forEach(wyvern => {
-    propagateFullBodyWave(
-      { spine: wyvern.spineBones, neck: wyvern.neckBones },
-      basePhase,
-      wyvern.horizontalSpeed,
-      wyvern.turnRate
-    );
-  });
-}

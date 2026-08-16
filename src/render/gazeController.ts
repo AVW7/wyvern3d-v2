@@ -375,35 +375,3 @@ export function horizonTarget(): GazeTarget {
     type: 'horizon',
   }
 }
-
-/**
- * Batch update multiple head/neck states for multiple agents.
- * Preserves object references for GC efficiency.
- */
-export function batchUpdateHeadNeck(
-  agents: Array<{
-    bodyPose: BodyPose
-    gazeTarget: GazeTarget | null
-    flightContext: FlightContext
-    state: HeadNeckState
-  }>,
-  dt: number
-): void {
-  for (const agent of agents) {
-    const newState = intelligentHeadNeckController(
-      agent.bodyPose,
-      agent.gazeTarget,
-      agent.flightContext,
-      agent.state,
-      dt
-    )
-    // Update in-place to preserve reference
-    agent.state.neckPitch = newState.neckPitch
-    agent.state.neckYaw = newState.neckYaw
-    agent.state.headPitch = newState.headPitch
-    agent.state.headYaw = newState.headYaw
-    agent.state.headRoll = newState.headRoll
-    agent.state.lastTargetWorld.copy(newState.lastTargetWorld)
-    agent.state.trackingVelocity = newState.trackingVelocity
-  }
-}

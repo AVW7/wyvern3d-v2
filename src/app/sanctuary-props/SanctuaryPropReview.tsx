@@ -6,6 +6,7 @@ import { Bounds, Grid, OrbitControls } from '@react-three/drei'
 import { Prop } from '@/render/assets/props'
 import { PROP_ATLAS } from '@/render/assets/manifest'
 import styles from './sanctuaryProps.module.css'
+import { HumanReference } from '@/render/preview/HumanReference'
 
 export interface SanctuaryPropSpec {
   id: string
@@ -23,22 +24,6 @@ export interface SanctuaryPropSpec {
     status: string
     evidence: string
   }
-}
-
-function HumanReference({ x }: { x: number }) {
-  return (
-    <group position={[x, 0, 0]}>
-      {/* 1.75m Beastmaster figure */}
-      <mesh position={[0, 0.9, 0]}>
-        <capsuleGeometry args={[0.24, 1.1, 4, 12]} />
-        <meshStandardMaterial color="#4a5a72" roughness={0.9} />
-      </mesh>
-      <mesh position={[0, 1.62, 0]}>
-        <sphereGeometry args={[0.13, 12, 12]} />
-        <meshStandardMaterial color="#5d6f8a" roughness={0.9} />
-      </mesh>
-    </group>
-  )
 }
 
 function SocketMarkers({ sockets }: { sockets?: Record<string, [number, number, number]> }) {

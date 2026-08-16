@@ -4,56 +4,6 @@ import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import type { Group } from 'three'
 
-/** Stand-in building: a plinth, a body and a roof. Footprint comes from props. */
-export function PlaceholderBuilding({
-  color = '#8a7a5c',
-  width = 6,
-  depth = 6,
-  height = 4,
-  roof = true,
-}: {
-  color?: string
-  width?: number
-  depth?: number
-  height?: number
-  roof?: boolean
-}) {
-  return (
-    <group>
-      <mesh position={[0, 0.15, 0]} receiveShadow>
-        <boxGeometry args={[width + 0.8, 0.3, depth + 0.8]} />
-        <meshStandardMaterial color="#5a5248" roughness={0.95} />
-      </mesh>
-      <mesh position={[0, height / 2 + 0.3, 0]} castShadow receiveShadow>
-        <boxGeometry args={[width, height, depth]} />
-        <meshStandardMaterial color={color} roughness={0.85} />
-      </mesh>
-      {roof && (
-        <mesh position={[0, height + 0.3 + height * 0.22, 0]} rotation={[0, Math.PI / 4, 0]} castShadow>
-          <coneGeometry args={[Math.max(width, depth) * 0.78, height * 0.45, 4]} />
-          <meshStandardMaterial color="#4a3f36" roughness={0.9} />
-        </mesh>
-      )}
-    </group>
-  )
-}
-
-/** Stand-in soldier. Instanced squads use their own path; this is for singles. */
-export function PlaceholderUnit({ color = '#8a7a5c', scale = 1 }: { color?: string; scale?: number }) {
-  return (
-    <group scale={scale}>
-      <mesh position={[0, 0.9, 0]} castShadow>
-        <capsuleGeometry args={[0.28, 0.8, 4, 8]} />
-        <meshStandardMaterial color={color} roughness={0.8} />
-      </mesh>
-      <mesh position={[0, 1.65, 0]} castShadow>
-        <sphereGeometry args={[0.24, 10, 8]} />
-        <meshStandardMaterial color="#c9b8a0" roughness={0.7} />
-      </mesh>
-    </group>
-  )
-}
-
 /**
  * Stand-in for the player's sim.
  *
