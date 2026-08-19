@@ -92,6 +92,7 @@ export const GROUPS: { label: string; states: ModelState[] }[] = [
       'speed',
       'glide',
       'dive',
+      'climb',
       'bankLeft',
       'bankRight',
       'hover',

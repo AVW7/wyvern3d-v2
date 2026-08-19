@@ -52,6 +52,7 @@ import json
 import sys
 
 import bpy
+from mathutils import Matrix
 
 MAP = {
     "WingFinger1": ["WingD0P0", "WingD1P0"],
@@ -202,7 +203,24 @@ def main() -> None:
             problems.append(f"{action.name} keys {len(missing)} absent bone(s): {missing[:4]}")
     report["problems"] = problems
 
+    # Unbinding the action is not enough: `matrix_basis` is pose state, not
+    # animation, so every bone this stage posed stays posed once the action is
+    # gone -- and that state is what gets saved into the blend.
+    #
+    # It shipped that way, and the damage was not confined to the wing. This
+    # blend carried 89 stale pose bones, among them `RootMotion` at 0.262 rad.
+    # No clip animates `RootMotion` -- it is a v2-only control bone -- so nothing
+    # downstream ever overwrote it, and a 15-degree tilt at the root of the
+    # skeleton was applied to every clip in the model from here on. Measured on
+    # `v1_stand` either side of this stage, it dropped the head 449 rig units and
+    # the feet 177: far from the root moves further, which is why it read as a
+    # head-drop rather than as the whole-body tilt it is.
+    #
+    # `retarget-v1-ground-clips-blender.py` already ends this way. So does this
+    # one now.
     target.animation_data.action = None
+    for pose_bone in target.pose.bones:
+        pose_bone.matrix_basis = Matrix.Identity(4)
     bpy.ops.wm.save_as_mainfile(filepath=args.out)
     with open(args.report, "w", encoding="utf8") as handle:
         json.dump(report, handle, indent=2, sort_keys=True)

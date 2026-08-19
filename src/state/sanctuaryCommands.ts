@@ -246,8 +246,8 @@ export const useSanctuaryCommands = create<SanctuaryCommandStore>()((set, get) =
       const old = state.wheelAnchor
       if (
         old.visible === anchor.visible &&
-        Math.abs(old.x - anchor.x) < 2 &&
-        Math.abs(old.y - anchor.y) < 2
+        old.x === anchor.x &&
+        old.y === anchor.y
       ) {
         return state
       }

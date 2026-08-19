@@ -45,6 +45,8 @@ export interface FlightLabPoseEdits {
 
 export interface FlightLabProps {
   speciesId: AssetId
+  /** Second asset drawn beside the rig for A/B against v1; null for one model. */
+  compareId?: AssetId | null
   requestedState: ModelState
   auto: boolean
   scale: number

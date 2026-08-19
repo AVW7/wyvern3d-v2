@@ -196,6 +196,7 @@ ACTION_NAMES = (
     "Sanct_Speed",
     "Sanct_Soar",
     "Sanct_Dive",
+    "Sanct_Climb",
     "Sanct_Nuzzle",
     "Sanct_Calm",
     "Sanct_PickUp",
@@ -1187,6 +1188,15 @@ RECIPES = (
         held_wing_keys(
             HOLD_FOLDED_FRAME, body_pitch=30.0, trim=0.04, neck_down=-0.14,
             leg_tuck=1.6, toe_pose=0.35,
+        ),
+    ),
+    ActionRecipe(
+        "Sanct_Climb",
+        "ascending power flight: four strong wingbeats on an aggressive nose-up climb trim",
+        True,
+        flight_keys(
+            beats=4, beat_frames=36, body_pitch=-18.0, neck_down=0.08,
+            leg_tuck=1.2, toe_pose=0.25,
         ),
     ),
     ActionRecipe(

@@ -3,9 +3,10 @@ import { clamp, damp, type Vec3 } from '@/core/math/vec'
 export const PLAYER_NOTICE_DIST = 8.0
 export const NEIGHBOR_NOTICE_DIST = 10.0
 
-export const MAX_HEAD_YAW = 0.96 // ~55 deg
-export const MIN_HEAD_PITCH = -0.61 // ~-35 deg
-export const MAX_HEAD_PITCH = 0.44 // ~+25 deg
+export const MAX_HEAD_YAW = 0.65 // ~37 deg natural head swivel
+export const MIN_HEAD_PITCH = -0.40 // ~-23 deg
+export const MAX_HEAD_PITCH = 0.35 // ~+20 deg
+export const MAX_GAZE_FOV = 1.30 // ~75 deg field of view
 
 export interface HeadPose {
   pitch: number
@@ -54,7 +55,7 @@ export function resolveGazeTarget(
 
 /**
  * Computes relative pitch and yaw angles from the agent's facing body orientation
- * toward the gaze target, clamped within anatomical limits.
+ * toward the gaze target, clamped within anatomical limits and forward field of view.
  */
 export function calculateHeadTargetAngles(
   selfPos: Vec3,
@@ -79,6 +80,11 @@ export function calculateHeadTargetAngles(
   // Wrap relative yaw to [-PI, PI]
   relativeYaw = Math.atan2(Math.sin(relativeYaw), Math.cos(relativeYaw))
 
+  // If target is behind the wyvern outside its field of view, do not strain backwards
+  if (Math.abs(relativeYaw) > MAX_GAZE_FOV) {
+    return { pitch: 0, yaw: 0 }
+  }
+
   const targetPitch = -Math.atan2(dy, horizDist)
 
   return {
@@ -92,7 +98,7 @@ export function dampHeadPose(
   current: HeadPose,
   target: HeadPose,
   dt: number,
-  rate = 6,
+  rate = 3.5,
 ): HeadPose {
   return {
     pitch: damp(current.pitch, target.pitch, rate, dt),

@@ -142,6 +142,42 @@ export interface AtlasRegionData {
   landmarks: LandmarkDef[]
 }
 
+/**
+ * Authored, static settlement data. Purely descriptive — who lives here and how
+ * much of them there is. Condition is never stored: it is derived from
+ * `RegionState` by `core/state/settlement.ts`.
+ */
+export interface SettlementDef {
+  /** The place people call it, distinct from the region name. */
+  name: string
+  /** 1–3. Drives silhouette mass on the world map, not any game rule. */
+  tier: 1 | 2 | 3
+  /**
+   * Anchor on the map node cap, as a fraction of that node's radius. Kept
+   * unitless so one authored value reads the same on a tier-1 and a tier-4
+   * node, whose radii differ by 80%.
+   */
+  offset: { x: number; z: number }
+}
+
+/** How a region's people are taking the current owner. Derived, never stored. */
+export type SettlementCondition =
+  | 'prospering'
+  | 'strained'
+  | 'resentful'
+  | 'revolting'
+  /** Not the player's ground; its people are not the player's problem yet. */
+  | 'hostile'
+
+/** Which way unrest is heading under the current garrison. Derived, never stored. */
+export type SettlementTrend = 'improving' | 'holding' | 'worsening'
+
+export interface SettlementReading {
+  condition: SettlementCondition
+  trend: SettlementTrend
+  unrest: number
+}
+
 export interface RegionDef {
   id: string
   name: string
@@ -165,6 +201,8 @@ export interface RegionDef {
   compositionTag?: string
   /** Authored static atlas lore and landmark data. */
   atlas?: AtlasRegionData
+  /** Authored static settlement. Absent for genuinely uninhabited regions. */
+  settlement?: SettlementDef
 }
 
 export interface TrainingStationDef {
@@ -301,6 +339,7 @@ export type GameEventKind =
   | 'landmark_discovered'
   | 'phenomenon_observed'
   | 'activity_completed'
+  | 'settlement_condition_changed'
 
 export interface GameEvent {
   seq: number

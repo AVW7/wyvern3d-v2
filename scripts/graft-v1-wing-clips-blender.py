@@ -83,6 +83,9 @@ class Graft:
 
     `fold_digits` replaces the sampled hand and digits with the measured closed
     pose, leaving the arm chain to carry the performance.
+
+    `body` takes the source's torso, neck and legs as well, so the target *is*
+    the v1 performance rather than a gameplay clip wearing its wings.
     """
     target: str
     source: str
@@ -92,48 +95,59 @@ class Graft:
     beats: int = 1
     retime: int | None = None
     fold_digits: bool = False
+    body: bool = False
 
 
 GRAFTS = [
-    # Both fold, for consistency with `walk` rather than for any measured gain.
+    # The two settled stances, both from v1's `Battle_Stand`. `idle` is
+    # whole-body -- the gameplay clip underneath was never this stance, it kept
+    # its own authored torso and legs and only wore v1's wings. Mirrored on the
+    # wing and as-authored on the body, per the note in the sampling loop.
     #
-    # Be clear about what this does not buy, so nobody treats it as load-bearing:
-    # it moves idle's wing low point from -319 to -316 rig units and rest's from
-    # -426 to -424, and leaves the lift doing 37.9 and 41.6 degrees. It cannot do
-    # more, because these two already sample `v1_stand` and the fold pose IS the
-    # most-closed frame of that same capture -- their digits were already shut.
-    # Neither loses motion to it either: both already moved 0 of 36 distal bones.
+    # `idle` does NOT fold its digits, and that is the point of it: a settled
+    # dragon in v1 stands with the wing held out, not stowed, and `idle` is the
+    # clip that has to read as v1's stance. Folding it was costing the match for
+    # almost nothing measurable -- the fold moved idle's wing low point from -319
+    # to -316 rig units, three units on a 2000-unit animal, because `v1_stand`'s
+    # digits are already near-shut and the fold pose IS the most-closed frame of
+    # that same capture. `rest` keeps the fold: it is the longer, stiller read
+    # where a stowed wing is the right silhouette, and nothing compares it to v1.
     #
-    # What still hangs their wings below the foot plane is v1's shoulder carriage,
-    # which no fold reaches. Folding the wrist and elbow as well was measured and
-    # rejected: idle went -316 to -309 and the lift did not drop. Improving these
-    # two means changing the stance the graft exists to import, which is a
-    # re-author of `idle`/`rest`, not a graft option.
-    Graft("idle", "v1_stand", True, True, fold_digits=True),
+    # The fold, where it is used, stops at the hand on purpose. Extending it to
+    # the wrist was tried for exactly the fault it looked like it should cure --
+    # the settled knuckle drifting on the ground, 0.099 on `idle` and 0.107 on
+    # `rest` against v1's own 0.046 -- and it made both worse, 0.145 and 0.167.
+    # Pinning the hand to the forearm does not damp the contact; it hands the
+    # contact the forearm's whole swing. An earlier revision of this file reached
+    # the same conclusion by a different route, so this is twice-measured:
+    # whatever moves that knuckle is upstream of the wrist, in the stance itself.
+    Graft("idle", "v1_stand", True, True, body=True),
     Graft("rest", "v1_stand", True, True, fold_digits=True),
-    # Mirrored, and the only clip whose digits are folded.
+    # The one whole-clip graft. Torso, neck, legs and the wing all come from
+    # `v1_walk` -- v1's `Battle_Walk`, retargeted -- because v1 is the only source
+    # that has this gait: a true quadruped walking on its front wing knuckles
+    # alongside the hind feet, with the wing closed. That transfer only became
+    # usable when `retarget-v1-ground-clips-blender.py` had its inverted bone-axis
+    # constant fixed; measured on the corrected retarget, the feet are the lowest
+    # part of the animal (-181 rig units), the folded wing knuckle rides 108 units
+    # above them, and the tail rises 499 -> 1013 down its length instead of being
+    # driven 1602 units through the floor.
     #
-    # Unmirrored -- which is how this shipped -- walk inherited v1's rig
-    # lopsidedness rather than its gait, measuring 21.4 m of wingtip mirror
-    # error. That is the same fault that put `takeoff` 20.4 m out before that
-    # clip was mirrored, not a gait: v1's own `Battle_Walk` is near-symmetric in
-    # position, wingtip lateral +9.02 left against -9.36 right.
+    # The tail is the one chain left out, and it is left out here rather than in
+    # the retarget: v2 has ten tail bones to v1's nine, so the pairing compresses
+    # and `Tail1` doubles the pelvis rotation. The gameplay clip's own authored
+    # tail wave reads better than the compressed transfer.
     #
-    # The digits are folded because the arm chain transfers from v1 but the
-    # rebuilt digits do not close with it, so the membrane stayed a broad open
-    # sheet and the lift pass swung it up over the flank -- the drape. Folded,
-    # the wing hangs 172 units below the origin instead of 1720, and the lift
-    # needs 6.8 degrees on average against the 28.6 it needed before.
+    # Unmirrored, and the only clip that must be. The gait alternates its
+    # wing-knuckle contacts, so a symmetric walk is a wrong walk --
+    # `validate-wyvern-clips.mjs` holds it to a *minimum* asymmetry of 0.1 m for
+    # exactly that reason, and mirroring it locked the knuckles together at 0.001.
+    # No synthetic half-cycle offset is needed either: v1 carries the offset in
+    # the same channels as the leg contacts it belongs to.
     #
-    # A stowed wing does not alternate, so nothing here reintroduces one. A
-    # half-cycle offset between the two wings was tried and rejected: it flung
-    # the tips 12.4 m apart against v1's own symmetric placement, because a
-    # small shift on a steep part of v1's 30-degree stroke moves the tip a long
-    # way. The 0.50 m of asymmetry that remains is the lift solving each wing
-    # from its own lowest vertex as the body moves under it -- real, and clear
-    # of the 0.1 m minimum the validator holds walk to so that an accidental
-    # Unmirrored so the alternating left-then-right quadrupedal walk from v1 is preserved.
-    Graft("walk", "v1_walk", True, False, fold_digits=True),
+    # The digits are still folded, because the arm chain transfers from v1 but the
+    # rebuilt digits do not close with it.
+    Graft("walk", "v1_walk", True, False, fold_digits=True, body=True),
     Graft("takeoff", "v1_riseUp", False, True),
     Graft("land", "v1_goDown", False, True),
     # The powered flight family, all cut from the one measured cycle so their
@@ -188,7 +202,7 @@ def wingspan(armature) -> float:
     return ((m @ left.tail) - (m @ right.tail)).length
 
 
-def fold_pose(armature) -> dict:
+def fold_pose(armature, prefixes) -> dict:
     """The closed hand/digit pose, from the most-closed frame of v1's stance.
 
     Why the grounded clips need this at all: v1's wing performance transfers as
@@ -217,7 +231,7 @@ def fold_pose(armature) -> dict:
     bpy.context.view_layer.update()
     pose = {}
     for bone in armature.pose.bones:
-        if not bone.name.startswith(FOLD_PREFIXES):
+        if not bone.name.startswith(prefixes):
             continue
         q = bone.rotation_quaternion.normalized().copy()
         pose[bone.name] = q
@@ -269,6 +283,23 @@ def retime(action, frames: int) -> dict:
     return {"from": span, "to": frames, "scale": round(scale, 4)}
 
 
+def bone_of(fcurve) -> str:
+    return fcurve.data_path.split('"')[1] if '"' in fcurve.data_path else ""
+
+
+def translating_bones(action, bones: set) -> set:
+    """Which of `bones` the source actually translates -- only v1's `Body`.
+
+    It matters because the body bob is a location channel, and a rotation-only
+    transfer leaves the target's own bob under v1's gait.
+    """
+    bag = channelbag(action)
+    return {
+        bone_of(fcurve) for fcurve in bag.fcurves
+        if fcurve.data_path.endswith("location") and bone_of(fcurve) in bones
+    }
+
+
 def channelbag(action):
     for layer in action.layers:
         for strip in layer.strips:
@@ -291,7 +322,25 @@ def main() -> None:
         if b.name.startswith(("L_Wing", "R_Wing")) and "Panel" not in b.name
     ]
     left = [name for name in wing if name.startswith("L_")]
+    # What a `body` graft adds: everything except the panel battens, which stay
+    # out for the reason above -- v1 has no channels for them, so transferring
+    # would leave the membrane dead.
+    #
+    # The tail is in, and holding it out was a mistake. The worry was that v2's
+    # ten tail bones pair onto v1's nine, but the pairing is only off at the very
+    # base: `Tail2`..`Tail10` map in order onto v1's `Tail`..`Tail8`, and `Tail1`
+    # takes the pelvis, which is where a tail base belongs anyway. What the
+    # exclusion actually produced was worse than the compression it avoided --
+    # `walk` took its `Body` from v1 while keeping the tail that had been authored
+    # against the old one, so the tail hung off a root it was never posed against
+    # and dropped 144 rig units through the foot plane. Measured on the retarget,
+    # v1's own tail sits +404 above the feet.
+    body = [
+        b.name for b in armature.pose.bones
+        if b.name not in set(wing) and "Panel" not in b.name
+    ]
     report["wing_bones"] = len(wing)
+    report["body_bones"] = len(body)
 
     grafted = {}
     folded: dict = {}
@@ -313,6 +362,13 @@ def main() -> None:
         if source is None:
             raise SystemExit(f"missing action: {source_name}")
 
+        # A `body` graft widens the transfer to every non-panel, non-tail bone,
+        # sampled through the same wrapping resample as the wing -- which is what
+        # closes the loop. Copied raw, v1's body bob does not return to its
+        # frame-0 value and the seam reads 8.5 rig units.
+        bones = wing + body if graft.body else list(wing)
+        moving = translating_bones(source, set(bones)) if graft.body else set()
+
         target_start, target_end = (int(v) for v in target.frame_range)
         if graft.window:
             source_start, source_end = graft.window
@@ -326,6 +382,7 @@ def main() -> None:
         # reads a pose that is half one clip and half the other.
         armature.animation_data_create().action = source
         samples = []
+        locations: list = []
         for index in range(span + 1):
             # A looping target wraps: its last frame samples the source's first,
             # so the seam closes on exactly the pose it opened with.
@@ -336,7 +393,17 @@ def main() -> None:
             progress = (index % span) / span if loops else index / span
             t = (progress * graft.beats) % 1.0 if graft.beats > 1 else progress
             frame = source_start + t * (source_end - source_start)
-            bpy.context.scene.frame_set(int(round(frame)))
+            # Sample at the fractional frame, not the nearest whole one.
+            # Rounding stair-steps any resample whose source and target lengths
+            # differ: `idle` and `rest` stretch 121 source frames onto 145, so a
+            # rounded sample holds one pose for two frames and then jumps, and
+            # the contact velocity that produces is twice v1's own. Measured on
+            # the stance clips, rounding put the foot p95 at 0.031 against v1's
+            # 0.015 and the knuckle at 0.105 against 0.046. `walk` resamples
+            # almost 1:1 (60 onto 59) and was clean either way, which is what
+            # localised this.
+            whole = int(frame // 1)
+            bpy.context.scene.frame_set(whole, subframe=frame - whole)
             bpy.context.view_layer.update()
             # Sampled from the left wing and mirrored onto the right. v1's
             # captures are lopsided performances -- its own rig was asymmetric --
@@ -345,11 +412,21 @@ def main() -> None:
             # symmetric acts, so the reflection is the correct reading, and it
             # makes symmetry structural here exactly as it is in the rig.
             pose = {}
+            locations.append({
+                name: armature.pose.bones[name].location.copy() for name in moving
+            })
+            # `mirror` reflects the wing only. The torso, neck and legs a `body`
+            # graft brings over are taken as authored: most of them (`Body`,
+            # `Spine*`, `Neck*`, `Head`) have no left/right twin to reflect onto,
+            # and reflecting the legs would erase the weight shift that makes a
+            # stance read as standing rather than posed.
+            if graft.body:
+                for name in body:
+                    pose[name] = armature.pose.bones[name].rotation_quaternion.copy()
             if not mirror:
-                samples.append({
-                    name: armature.pose.bones[name].rotation_quaternion.copy()
-                    for name in wing
-                })
+                for name in wing:
+                    pose[name] = armature.pose.bones[name].rotation_quaternion.copy()
+                samples.append(pose)
                 continue
             for name in left:
                 q = armature.pose.bones[name].rotation_quaternion.copy()
@@ -363,7 +440,7 @@ def main() -> None:
             samples.append(pose)
 
         if graft.fold_digits:
-            folded = folded or fold_pose(armature)
+            folded = folded or fold_pose(armature, FOLD_PREFIXES)
             for pose in samples:
                 for name, quaternion in folded.items():
                     if name in pose:
@@ -377,7 +454,7 @@ def main() -> None:
             for fcurve in list(bag.fcurves):
                 if '"' not in fcurve.data_path:
                     continue
-                if fcurve.data_path.split('"')[1] in set(wing):
+                if fcurve.data_path.split('"')[1] in set(bones):
                     bag.fcurves.remove(fcurve)
                     removed += 1
 
@@ -389,12 +466,18 @@ def main() -> None:
                 bone.rotation_mode = "QUATERNION"
                 bone.rotation_quaternion = quaternion
                 bone.keyframe_insert("rotation_quaternion", frame=frame)
+            for name, translation in locations[index].items():
+                bone = armature.pose.bones[name]
+                bone.location = translation
+                bone.keyframe_insert("location", frame=frame)
         grafted[target_name] = {
             "source": source_name, "frames": span + 1,
             "channels_replaced": removed, "loops": loops, "mirrored": mirror,
             "window": list(graft.window) if graft.window else None,
             "beats": graft.beats, "retimed": retimed,
             "folded_digits": graft.fold_digits,
+            "whole_body": graft.body,
+            "translated_bones": sorted(moving),
         }
 
     report["grafted"] = grafted

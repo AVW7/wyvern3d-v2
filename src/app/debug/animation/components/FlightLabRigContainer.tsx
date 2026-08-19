@@ -80,10 +80,19 @@ import {
 import { AIRBORNE_STATES, flightLabAltitude, resolveClipName } from '../labPresets'
 import { evaluateLabContract, formatReadout, type LabTelemetry } from '../labTelemetry'
 import { useLabCamera } from '../hooks/useLabCamera'
+import { ComparisonModel } from './ComparisonModel'
 import { PreyField } from './PreyField'
+
+/**
+ * Gap between the rig under review and its comparison, in world units. Sized to
+ * clear the widest measured silhouette -- the gothic wing spans about 46 at the
+ * lab's fit -- while staying inside the `side` camera's frame at default zoom.
+ */
+const COMPARISON_OFFSET = 55
 
 export function FlightLabRigContainer({
   speciesId,
+  compareId,
   requestedState,
   auto,
   scale,
@@ -707,6 +716,23 @@ export function FlightLabRigContainer({
           />
         </GameModel>
         {overlays && <axesHelper args={[30]} />}
+        {/* Inside `attitude`, not beside it. That group carries the rig's
+            altitude from `flightLabAltitude(state)` and its procedural pitch and
+            bank, so a comparison mounted outside it sits at ground level in
+            world axes while the rig climbs and rolls away from it -- the two
+            stop being comparable the moment the clip is airborne or procedural
+            attitude is on. Inheriting the group puts the comparison in the rig's
+            own frame, which is the only frame the A/B means anything in. */}
+        {compareId && (
+          <ComparisonModel
+            id={compareId}
+            state={state}
+            scale={scale}
+            frozen={frozen}
+            scrub={scrub}
+            offset={COMPARISON_OFFSET}
+          />
+        )}
       </group>
       <PreyField propManager={propManager} propsList={propsList} wyvernPosition={wyvernWorld.current} />
       {overlays &&

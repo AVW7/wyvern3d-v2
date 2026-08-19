@@ -283,12 +283,14 @@ export class WyvernFlightRig {
         safeDt,
       )
 
-      const blendFactor = clamp(this.intelligentHeadNeck.trackingVelocity * 0.1, 0, 0.4)
-      this.headNeckPose.neckPitch += this.intelligentHeadNeck.neckPitch * blendFactor
-      this.headNeckPose.neckYaw += this.intelligentHeadNeck.neckYaw * blendFactor
-      this.headNeckPose.headPitch += this.intelligentHeadNeck.headPitch * blendFactor
-      this.headNeckPose.headYaw += this.intelligentHeadNeck.headYaw * blendFactor
-      this.headNeckPose.headRoll += this.intelligentHeadNeck.headRoll * blendFactor
+      const gazeWeight = gazeInput && gazeInput.target ? clamp(gazeInput.weight ?? 0.5, 0, 0.7) : 0
+      if (gazeWeight > 0) {
+        this.headNeckPose.neckPitch += this.intelligentHeadNeck.neckPitch * gazeWeight * 0.35
+        this.headNeckPose.neckYaw += this.intelligentHeadNeck.neckYaw * gazeWeight * 0.35
+        this.headNeckPose.headPitch += this.intelligentHeadNeck.headPitch * gazeWeight * 0.65
+        this.headNeckPose.headYaw += this.intelligentHeadNeck.headYaw * gazeWeight * 0.65
+        this.headNeckPose.headRoll += this.intelligentHeadNeck.headRoll * gazeWeight * 0.65
+      }
     }
 
     // 4. Leg tuck calculation

@@ -53,6 +53,7 @@ const expected = [
   'Sanct_Breathe',
   'Sanct_BreatheAir',
   'Sanct_Calm',
+  'Sanct_Climb',
   'Sanct_Cruise',
   'Sanct_Dive',
   'Sanct_Drink',
@@ -78,6 +79,7 @@ const expected = [
 const looping = new Set([
   'Sanct_BankL',
   'Sanct_BankR',
+  'Sanct_Climb',
   'Sanct_Cruise',
   'Sanct_Scout',
   'Sanct_Dive',

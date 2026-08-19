@@ -72,8 +72,22 @@ def main() -> None:
     # plants ground clips on the foot, so the fold is raised here instead, after
     # the graft and on this rig: the solve is geometric and does not survive a
     # transfer onto differently-oriented spars.
+    #
+    # Two passes, and `walk` has to be the one on its own. The lift measures each
+    # clip's foot plane off the evaluated mesh, and that measurement leaks across
+    # clips inside a single invocation: with `walk` in the same list, `takeoff`'s
+    # plane read 86.1 instead of its own 100.0 and both `takeoff` and `land` came
+    # out 1.4-1.6 m out of wing mirror against a 0.25 m limit -- neither clip's
+    # own solve having changed. Binding the action slot (which this script now
+    # does, as every other Blender script here already did) is correct but does
+    # not cure it, so the clips are separated by process instead. `walk` is the
+    # odd one out because it is the only clip whose foot plane is below the
+    # origin (-411.7 against takeoff's +100.0).
     run(WORK / "gothic-grafted.blend", "lift-v1-wing-clips-blender.py",
-        "--clips", "idle,rest,walk,takeoff,land",
+        "--clips", "idle,rest,takeoff,land",
+        "--out", str(WORK / "gothic-lifted-air.blend"))
+    run(WORK / "gothic-lifted-air.blend", "lift-v1-wing-clips-blender.py",
+        "--clips", "walk",
         "--out", str(WORK / "gothic-lifted.blend"))
     run(WORK / "gothic-lifted.blend", "export-gothic-wing-blender.py",
         "--out", str(WORK / "wyvern-gothic.glb"))

@@ -11474,7 +11474,7 @@
       "blender_action": "Sanct_BankL",
       "body_axis_deg": {
         "max": 6.78,
-        "mean": 2.69,
+        "mean": 2.7,
         "min": -1.05,
         "range": 7.83
       },
@@ -11579,10 +11579,10 @@
       "source": "sidecar",
       "summary_samples": 48,
       "symmetry_error": {
-        "max": 20.42,
+        "max": 20.43,
         "mean": 11.49,
         "min": 0.13,
-        "range": 20.29
+        "range": 20.3
       },
       "tail_reach": {
         "horizontal": {
@@ -11625,55 +11625,55 @@
       },
       "wing_azimuth_L": {
         "max": 174.69,
-        "mean": 9.85,
-        "min": -177.25,
-        "range": 351.94
+        "mean": 9.86,
+        "min": -177.21,
+        "range": 351.9
       },
       "wing_elev_L": {
-        "max": 11.38,
-        "mean": -32.8,
-        "min": -78.02,
-        "range": 89.39
+        "max": 11.41,
+        "mean": -32.78,
+        "min": -78.03,
+        "range": 89.43
       },
       "wing_elev_R": {
-        "max": 49.14,
-        "mean": -11.29,
-        "min": -76.64,
-        "range": 125.79
+        "max": 49.17,
+        "mean": -11.28,
+        "min": -76.67,
+        "range": 125.85
       },
       "wing_elev_bias": {
-        "max": 23.79,
-        "mean": -21.51,
-        "min": -54.15,
-        "range": 77.93
+        "max": 23.86,
+        "mean": -21.5,
+        "min": -54.14,
+        "range": 78.0
       },
       "wing_extension_L": {
         "max": 21.78,
         "mean": 13.56,
         "min": 5.67,
-        "range": 16.11
+        "range": 16.12
       },
       "wing_extension_R": {
-        "max": 22.37,
+        "max": 22.38,
         "mean": 13.76,
         "min": 5.6,
         "range": 16.77
       },
-      "wing_stroke_asymmetry": -36.39,
+      "wing_stroke_asymmetry": -36.41,
       "wingtip_L": {
         "lateral": {
-          "max": 13.34,
+          "max": 13.35,
           "mean": 1.83,
-          "min": -4.59,
-          "range": 17.93
+          "min": -4.58,
+          "range": 17.94
         },
-        "path": 330.42,
+        "path": 330.54,
         "span": {
-          "x": 17.93,
-          "y": 20.874,
-          "z": 25.083
+          "x": 17.935,
+          "y": 20.881,
+          "z": 25.094
         },
-        "stroke_arc_deg": 141.9
+        "stroke_arc_deg": 142.0
       },
       "wingtip_R": {
         "lateral": {
@@ -11682,11 +11682,11 @@
           "min": -14.02,
           "range": 20.41
         },
-        "path": 295.738,
+        "path": 295.857,
         "span": {
-          "x": 20.405,
-          "y": 18.99,
-          "z": 25.951
+          "x": 20.413,
+          "y": 18.996,
+          "z": 25.963
         },
         "stroke_arc_deg": 138.1
       }
@@ -11802,14 +11802,14 @@
       "symmetry_error": {
         "max": 20.75,
         "mean": 11.88,
-        "min": 0.39,
+        "min": 0.4,
         "range": 20.36
       },
       "tail_reach": {
         "horizontal": {
           "max": 17.29,
           "mean": 16.97,
-          "min": 16.62,
+          "min": 16.63,
           "range": 0.66
         },
         "lateral": {
@@ -11827,7 +11827,7 @@
       },
       "tail_tip": {
         "span": {
-          "x": 0.038,
+          "x": 0.037,
           "y": 0.66,
           "z": 1.785
         }
@@ -11845,31 +11845,31 @@
         "range": 0.0
       },
       "wing_azimuth_L": {
-        "max": 175.76,
-        "mean": 95.38,
-        "min": -179.99,
-        "range": 355.75
+        "max": 175.79,
+        "mean": 95.39,
+        "min": -179.95,
+        "range": 355.74
       },
       "wing_elev_L": {
-        "max": 46.3,
+        "max": 46.33,
         "mean": -12.18,
-        "min": -77.26,
-        "range": 123.57
+        "min": -77.29,
+        "range": 123.62
       },
       "wing_elev_R": {
-        "max": 11.95,
-        "mean": -31.88,
-        "min": -74.5,
-        "range": 86.45
+        "max": 11.99,
+        "mean": -31.86,
+        "min": -74.51,
+        "range": 86.5
       },
       "wing_elev_bias": {
         "max": 56.59,
-        "mean": 19.7,
-        "min": -26.26,
-        "range": 82.85
+        "mean": 19.68,
+        "min": -26.33,
+        "range": 82.92
       },
       "wing_extension_L": {
-        "max": 22.37,
+        "max": 22.38,
         "mean": 13.76,
         "min": 5.6,
         "range": 16.77
@@ -11878,38 +11878,38 @@
         "max": 21.78,
         "mean": 13.56,
         "min": 5.67,
-        "range": 16.11
+        "range": 16.12
       },
-      "wing_stroke_asymmetry": 37.11,
+      "wing_stroke_asymmetry": 37.13,
       "wingtip_L": {
         "lateral": {
-          "max": 14.27,
+          "max": 14.28,
           "mean": 2.82,
           "min": -5.93,
-          "range": 20.2
+          "range": 20.21
         },
-        "path": 296.075,
+        "path": 296.193,
         "span": {
-          "x": 20.198,
-          "y": 19.24,
-          "z": 25.914
+          "x": 20.206,
+          "y": 19.246,
+          "z": 25.925
         },
-        "stroke_arc_deg": 138.1
+        "stroke_arc_deg": 138.2
       },
       "wingtip_R": {
         "lateral": {
           "max": 5.05,
           "mean": -1.34,
-          "min": -12.45,
+          "min": -12.46,
           "range": 17.5
         },
-        "path": 330.307,
+        "path": 330.425,
         "span": {
-          "x": 17.498,
-          "y": 20.782,
-          "z": 24.866
+          "x": 17.503,
+          "y": 20.789,
+          "z": 24.878
         },
-        "stroke_arc_deg": 141.9
+        "stroke_arc_deg": 142.0
       }
     },
     "Sanct_Breathe": {
@@ -11977,10 +11977,10 @@
         "range": 31.52
       },
       "loop": {
-        "basis_max": 38.593763,
+        "basis_max": 38.593764,
         "loops": false,
-        "pose_max": 5.12,
-        "pose_mean": 0.713
+        "pose_max": 5.117,
+        "pose_mean": 0.712
       },
       "pelvis": {
         "height": {
@@ -12000,13 +12000,13 @@
         "max": 2.06,
         "mean": -130.98,
         "min": -178.49,
-        "range": 180.55
+        "range": 180.56
       },
       "root_roll_delta_deg": {
         "max": 174.12,
         "mean": 41.08,
         "min": -6.43,
-        "range": 180.55
+        "range": 180.56
       },
       "skin_side_balance": {
         "max": 41.55,
@@ -12017,7 +12017,7 @@
       "source": "sidecar",
       "summary_samples": 48,
       "symmetry_error": {
-        "max": 17.16,
+        "max": 17.17,
         "mean": 13.75,
         "min": 8.02,
         "range": 9.14
@@ -12046,43 +12046,43 @@
         "span": {
           "x": 1.853,
           "y": 2.013,
-          "z": 6.193
+          "z": 6.194
         }
       },
       "toe_curl_deg": {
         "max": 26.98,
         "mean": 11.84,
-        "min": -0.42,
+        "min": -0.41,
         "range": 27.39
       },
       "toe_deg": {
         "max": -5.91,
-        "mean": -9.84,
+        "mean": -9.83,
         "min": -16.65,
         "range": 10.73
       },
       "wing_azimuth_L": {
         "max": 179.92,
-        "mean": -83.37,
-        "min": -179.73,
-        "range": 359.65
+        "mean": -83.36,
+        "min": -179.71,
+        "range": 359.63
       },
       "wing_elev_L": {
-        "max": -5.81,
-        "mean": -10.3,
-        "min": -14.74,
-        "range": 8.92
+        "max": -5.84,
+        "mean": -10.32,
+        "min": -14.75,
+        "range": 8.91
       },
       "wing_elev_R": {
-        "max": 49.48,
-        "mean": 15.7,
-        "min": 4.09,
-        "range": 45.39
+        "max": 49.47,
+        "mean": 15.67,
+        "min": 4.06,
+        "range": 45.41
       },
       "wing_elev_bias": {
-        "max": -11.5,
-        "mean": -26.0,
-        "min": -62.34,
+        "max": -11.51,
+        "mean": -25.99,
+        "min": -62.35,
         "range": 50.84
       },
       "wing_extension_L": {
@@ -12097,19 +12097,19 @@
         "min": 9.73,
         "range": 3.48
       },
-      "wing_stroke_asymmetry": -36.47,
+      "wing_stroke_asymmetry": -36.5,
       "wingtip_L": {
         "lateral": {
-          "max": -9.4,
+          "max": -9.39,
           "mean": -10.39,
           "min": -11.33,
-          "range": 1.93
+          "range": 1.94
         },
-        "path": 16.091,
+        "path": 16.101,
         "span": {
-          "x": 2.802,
-          "y": 6.608,
-          "z": 2.579
+          "x": 2.803,
+          "y": 6.616,
+          "z": 2.576
         },
         "stroke_arc_deg": 24.4
       },
@@ -12120,11 +12120,11 @@
           "min": -0.29,
           "range": 5.24
         },
-        "path": 38.355,
+        "path": 38.362,
         "span": {
-          "x": 6.559,
-          "y": 7.402,
-          "z": 12.259
+          "x": 6.56,
+          "y": 7.401,
+          "z": 12.262
         },
         "stroke_arc_deg": 60.0
       }
@@ -12181,7 +12181,7 @@
         "lateral": {
           "max": 0.38,
           "mean": 0.02,
-          "min": -0.58,
+          "min": -0.57,
           "range": 0.95
         },
         "vertical": {
@@ -12198,9 +12198,9 @@
         "range": 30.28
       },
       "loop": {
-        "basis_max": 100.210812,
+        "basis_max": 100.210846,
         "loops": false,
-        "pose_max": 38.37,
+        "pose_max": 38.367,
         "pose_mean": 7.06
       },
       "pelvis": {
@@ -12238,7 +12238,7 @@
       "source": "sidecar",
       "summary_samples": 48,
       "symmetry_error": {
-        "max": 4.64,
+        "max": 4.63,
         "mean": 1.17,
         "min": 0.05,
         "range": 4.59
@@ -12265,16 +12265,16 @@
       },
       "tail_tip": {
         "span": {
-          "x": 1.534,
+          "x": 1.535,
           "y": 7.342,
-          "z": 20.249
+          "z": 20.25
         }
       },
       "toe_curl_deg": {
-        "max": 2.59,
+        "max": 2.58,
         "mean": -0.23,
         "min": -0.95,
-        "range": 3.54
+        "range": 3.53
       },
       "toe_deg": {
         "max": -5.74,
@@ -12283,54 +12283,54 @@
         "range": 1.76
       },
       "wing_azimuth_L": {
-        "max": 177.24,
-        "mean": 47.31,
-        "min": -176.79,
-        "range": 354.02
+        "max": 177.31,
+        "mean": 47.32,
+        "min": -176.7,
+        "range": 354.01
       },
       "wing_elev_L": {
-        "max": 71.99,
+        "max": 72.03,
         "mean": -13.48,
-        "min": -78.16,
-        "range": 150.15
+        "min": -78.17,
+        "range": 150.2
       },
       "wing_elev_R": {
-        "max": 72.7,
+        "max": 72.73,
         "mean": -12.24,
-        "min": -79.06,
-        "range": 151.76
+        "min": -79.04,
+        "range": 151.77
       },
       "wing_elev_bias": {
         "max": 4.29,
         "mean": -1.24,
-        "min": -15.17,
-        "range": 19.46
+        "min": -15.15,
+        "range": 19.45
       },
       "wing_extension_L": {
         "max": 23.05,
         "mean": 12.58,
-        "min": 6.8,
-        "range": 16.25
+        "min": 6.79,
+        "range": 16.26
       },
       "wing_extension_R": {
         "max": 23.05,
         "mean": 12.58,
-        "min": 6.8,
-        "range": 16.25
+        "min": 6.79,
+        "range": 16.26
       },
-      "wing_stroke_asymmetry": -1.61,
+      "wing_stroke_asymmetry": -1.57,
       "wingtip_L": {
         "lateral": {
           "max": 14.0,
           "mean": 0.84,
           "min": -8.49,
-          "range": 22.49
+          "range": 22.5
         },
-        "path": 158.736,
+        "path": 158.781,
         "span": {
-          "x": 22.492,
-          "y": 21.876,
-          "z": 30.154
+          "x": 22.496,
+          "y": 21.88,
+          "z": 30.166
         },
         "stroke_arc_deg": 176.4
       },
@@ -12339,15 +12339,15 @@
           "max": 8.57,
           "mean": -1.24,
           "min": -12.96,
-          "range": 21.53
+          "range": 21.54
         },
-        "path": 156.068,
+        "path": 156.115,
         "span": {
-          "x": 21.534,
-          "y": 21.9,
-          "z": 30.208
+          "x": 21.536,
+          "y": 21.904,
+          "z": 30.219
         },
-        "stroke_arc_deg": 175.7
+        "stroke_arc_deg": 175.8
       }
     },
     "Sanct_Calm": {
@@ -12367,8 +12367,8 @@
       "duration_s": 5.0,
       "foot_asymmetry": {
         "max": 0.1,
-        "mean": -0.11,
-        "min": -0.79,
+        "mean": -0.12,
+        "min": -0.8,
         "range": 0.9
       },
       "foot_drop": {
@@ -12415,7 +12415,7 @@
       "jaw_deg": {
         "max": 2.85,
         "mean": 0.79,
-        "min": -0.0,
+        "min": 0.0,
         "range": 2.85
       },
       "loop": {
@@ -12460,7 +12460,7 @@
       "summary_samples": 48,
       "symmetry_error": {
         "max": 13.01,
-        "mean": 10.12,
+        "mean": 10.13,
         "min": 5.82,
         "range": 7.19
       },
@@ -12486,7 +12486,7 @@
       },
       "tail_tip": {
         "span": {
-          "x": 9.827,
+          "x": 9.829,
           "y": 1.512,
           "z": 5.18
         }
@@ -12507,25 +12507,25 @@
         "max": 178.95,
         "mean": -57.48,
         "min": -178.54,
-        "range": 357.5
+        "range": 357.49
       },
       "wing_elev_L": {
-        "max": 4.86,
-        "mean": -6.76,
-        "min": -14.67,
+        "max": 4.84,
+        "mean": -6.79,
+        "min": -14.69,
         "range": 19.53
       },
       "wing_elev_R": {
-        "max": 5.69,
-        "mean": -3.92,
-        "min": -29.57,
-        "range": 35.26
+        "max": 5.67,
+        "mean": -3.95,
+        "min": -29.62,
+        "range": 35.29
       },
       "wing_elev_bias": {
-        "max": 16.69,
-        "mean": -2.85,
-        "min": -19.28,
-        "range": 35.97
+        "max": 16.72,
+        "mean": -2.84,
+        "min": -19.27,
+        "range": 35.99
       },
       "wing_extension_L": {
         "max": 14.29,
@@ -12539,18 +12539,18 @@
         "min": 10.79,
         "range": 2.41
       },
-      "wing_stroke_asymmetry": -15.73,
+      "wing_stroke_asymmetry": -15.76,
       "wingtip_L": {
         "lateral": {
-          "max": -7.42,
+          "max": -7.43,
           "mean": -9.03,
           "min": -10.09,
           "range": 2.66
         },
-        "path": 23.399,
+        "path": 23.395,
         "span": {
           "x": 2.101,
-          "y": 5.426,
+          "y": 5.422,
           "z": 6.203
         },
         "stroke_arc_deg": 36.4
@@ -12559,16 +12559,237 @@
         "lateral": {
           "max": 5.16,
           "mean": 3.1,
-          "min": 0.78,
+          "min": 0.79,
           "range": 4.37
         },
-        "path": 22.543,
+        "path": 22.549,
         "span": {
-          "x": 3.715,
-          "y": 2.617,
-          "z": 7.885
+          "x": 3.712,
+          "y": 2.621,
+          "z": 7.888
         },
-        "stroke_arc_deg": 39.3
+        "stroke_arc_deg": 39.4
+      }
+    },
+    "Sanct_Climb": {
+      "blender_action": "Sanct_Climb",
+      "body_axis_deg": {
+        "max": 25.26,
+        "mean": 21.47,
+        "min": 17.81,
+        "range": 7.45
+      },
+      "clearance_samples": 48,
+      "cycle": {
+        "beat_frames": 36.0,
+        "beats": 4,
+        "cadence_hz": 0.667
+      },
+      "duration_s": 6.0,
+      "foot_asymmetry": {
+        "max": 0.07,
+        "mean": 0.07,
+        "min": 0.07,
+        "range": 0.0
+      },
+      "foot_drop": {
+        "max": 2.32,
+        "mean": 2.24,
+        "min": 2.17,
+        "range": 0.15
+      },
+      "foot_drop_R": {
+        "max": 2.25,
+        "mean": 2.17,
+        "min": 2.1,
+        "range": 0.15
+      },
+      "frame_count": 145,
+      "frames": [
+        0,
+        144
+      ],
+      "ground_clearance": {
+        "max": -3.7,
+        "min": -12.14
+      },
+      "head_reach": {
+        "horizontal": {
+          "max": 10.33,
+          "mean": 10.08,
+          "min": 9.85,
+          "range": 0.47
+        },
+        "lateral": {
+          "max": 0.12,
+          "mean": 0.1,
+          "min": 0.08,
+          "range": 0.04
+        },
+        "vertical": {
+          "max": 6.37,
+          "mean": 5.11,
+          "min": 3.94,
+          "range": 2.43
+        }
+      },
+      "jaw_deg": {
+        "max": 0.75,
+        "mean": 0.75,
+        "min": 0.75,
+        "range": 0.0
+      },
+      "loop": {
+        "basis_max": 0.0,
+        "loops": true,
+        "pose_max": 0.0,
+        "pose_mean": 0.0
+      },
+      "pelvis": {
+        "height": {
+          "max": 5.11,
+          "mean": 5.11,
+          "min": 5.11,
+          "range": 0.0
+        },
+        "path": 0.0,
+        "span": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        }
+      },
+      "root_roll_deg": {
+        "max": 122.79,
+        "mean": 122.79,
+        "min": 122.79,
+        "range": 0.0
+      },
+      "root_roll_delta_deg": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "range": 0.0
+      },
+      "skin_side_balance": {
+        "max": -2.3,
+        "mean": -2.56,
+        "min": -2.85,
+        "range": 0.55
+      },
+      "source": "sidecar",
+      "summary_samples": 48,
+      "symmetry_error": {
+        "max": 1.18,
+        "mean": 0.66,
+        "min": 0.17,
+        "range": 1.01
+      },
+      "tail_reach": {
+        "horizontal": {
+          "max": 16.53,
+          "mean": 16.45,
+          "min": 16.38,
+          "range": 0.15
+        },
+        "lateral": {
+          "max": 0.02,
+          "mean": 0.01,
+          "min": 0.01,
+          "range": 0.01
+        },
+        "vertical": {
+          "max": -4.4,
+          "mean": -5.35,
+          "min": -6.29,
+          "range": 1.89
+        }
+      },
+      "tail_tip": {
+        "span": {
+          "x": 0.009,
+          "y": 0.154,
+          "z": 1.887
+        }
+      },
+      "toe_curl_deg": {
+        "max": 13.8,
+        "mean": 13.8,
+        "min": 13.8,
+        "range": 0.0
+      },
+      "toe_deg": {
+        "max": -8.01,
+        "mean": -8.01,
+        "min": -8.01,
+        "range": 0.0
+      },
+      "wing_azimuth_L": {
+        "max": 175.13,
+        "mean": 20.87,
+        "min": -175.75,
+        "range": 350.88
+      },
+      "wing_elev_L": {
+        "max": 16.91,
+        "mean": -29.21,
+        "min": -78.57,
+        "range": 95.47
+      },
+      "wing_elev_R": {
+        "max": 18.14,
+        "mean": -28.51,
+        "min": -76.28,
+        "range": 94.42
+      },
+      "wing_elev_bias": {
+        "max": 3.16,
+        "mean": -0.7,
+        "min": -3.09,
+        "range": 6.25
+      },
+      "wing_extension_L": {
+        "max": 22.1,
+        "mean": 13.49,
+        "min": 5.91,
+        "range": 16.19
+      },
+      "wing_extension_R": {
+        "max": 22.1,
+        "mean": 13.49,
+        "min": 5.91,
+        "range": 16.19
+      },
+      "wing_stroke_asymmetry": 1.05,
+      "wingtip_L": {
+        "lateral": {
+          "max": 14.22,
+          "mean": 2.1,
+          "min": -5.27,
+          "range": 19.49
+        },
+        "path": 404.84,
+        "span": {
+          "x": 19.491,
+          "y": 19.604,
+          "z": 26.169
+        },
+        "stroke_arc_deg": 139.3
+      },
+      "wingtip_R": {
+        "lateral": {
+          "max": 5.91,
+          "mean": -1.82,
+          "min": -13.6,
+          "range": 19.51
+        },
+        "path": 404.571,
+        "span": {
+          "x": 19.507,
+          "y": 19.262,
+          "z": 26.184
+        },
+        "stroke_arc_deg": 139.3
       }
     },
     "Sanct_Cruise": {
@@ -12681,7 +12902,7 @@
       "summary_samples": 48,
       "symmetry_error": {
         "max": 1.23,
-        "mean": 0.69,
+        "mean": 0.7,
         "min": 0.1,
         "range": 1.13
       },
@@ -12699,7 +12920,7 @@
           "range": 0.01
         },
         "vertical": {
-          "max": 1.69,
+          "max": 1.68,
           "mean": 0.81,
           "min": -0.11,
           "range": 1.8
@@ -12725,56 +12946,56 @@
         "range": 0.0
       },
       "wing_azimuth_L": {
-        "max": 176.64,
+        "max": 176.65,
         "mean": 43.49,
-        "min": -178.3,
-        "range": 354.94
+        "min": -178.22,
+        "range": 354.87
       },
       "wing_elev_L": {
-        "max": 30.69,
-        "mean": -26.55,
-        "min": -76.44,
+        "max": 30.71,
+        "mean": -26.53,
+        "min": -76.4,
         "range": 107.12
       },
       "wing_elev_R": {
-        "max": 32.29,
-        "mean": -25.61,
-        "min": -74.63,
+        "max": 32.32,
+        "mean": -25.6,
+        "min": -74.6,
         "range": 106.92
       },
       "wing_elev_bias": {
         "max": 3.58,
         "mean": -0.93,
         "min": -3.57,
-        "range": 7.14
+        "range": 7.15
       },
       "wing_extension_L": {
-        "max": 22.1,
-        "mean": 13.66,
+        "max": 22.11,
+        "mean": 13.67,
         "min": 5.61,
-        "range": 16.49
+        "range": 16.5
       },
       "wing_extension_R": {
-        "max": 22.1,
-        "mean": 13.66,
+        "max": 22.11,
+        "mean": 13.67,
         "min": 5.61,
-        "range": 16.49
+        "range": 16.5
       },
-      "wing_stroke_asymmetry": 0.21,
+      "wing_stroke_asymmetry": 0.2,
       "wingtip_L": {
         "lateral": {
-          "max": 14.33,
+          "max": 14.34,
           "mean": 2.14,
           "min": -5.56,
           "range": 19.89
         },
-        "path": 311.512,
+        "path": 311.633,
         "span": {
-          "x": 19.886,
-          "y": 20.024,
-          "z": 27.594
+          "x": 19.893,
+          "y": 20.033,
+          "z": 27.605
         },
-        "stroke_arc_deg": 139.6
+        "stroke_arc_deg": 139.7
       },
       "wingtip_R": {
         "lateral": {
@@ -12783,11 +13004,11 @@
           "min": -13.67,
           "range": 19.8
         },
-        "path": 311.318,
+        "path": 311.438,
         "span": {
-          "x": 19.798,
-          "y": 19.809,
-          "z": 27.524
+          "x": 19.804,
+          "y": 19.817,
+          "z": 27.536
         },
         "stroke_arc_deg": 139.6
       }
@@ -12797,7 +13018,7 @@
       "body_axis_deg": {
         "max": -26.13,
         "mean": -27.27,
-        "min": -28.41,
+        "min": -28.4,
         "range": 2.27
       },
       "clearance_samples": 48,
@@ -12942,54 +13163,54 @@
         "range": 0.0
       },
       "wing_azimuth_L": {
-        "max": 80.36,
-        "mean": 79.16,
-        "min": 77.87,
+        "max": 80.34,
+        "mean": 79.15,
+        "min": 77.85,
         "range": 2.49
       },
       "wing_elev_L": {
-        "max": -5.05,
+        "max": -5.06,
         "mean": -13.11,
-        "min": -21.2,
+        "min": -21.21,
         "range": 16.16
       },
       "wing_elev_R": {
-        "max": -5.78,
-        "mean": -13.75,
-        "min": -21.76,
+        "max": -5.79,
+        "mean": -13.76,
+        "min": -21.77,
         "range": 15.98
       },
       "wing_elev_bias": {
-        "max": 0.73,
-        "mean": 0.64,
+        "max": 0.74,
+        "mean": 0.65,
         "min": 0.56,
         "range": 0.18
       },
       "wing_extension_L": {
         "max": 19.31,
         "mean": 19.25,
-        "min": 19.18,
+        "min": 19.19,
         "range": 0.12
       },
       "wing_extension_R": {
         "max": 19.31,
         "mean": 19.25,
-        "min": 19.18,
+        "min": 19.19,
         "range": 0.12
       },
       "wing_stroke_asymmetry": 0.18,
       "wingtip_L": {
         "lateral": {
           "max": 7.95,
-          "mean": 7.42,
-          "min": 6.9,
+          "mean": 7.43,
+          "min": 6.91,
           "range": 1.04
         },
-        "path": 10.949,
+        "path": 10.951,
         "span": {
           "x": 1.044,
-          "y": 1.166,
-          "z": 5.225
+          "y": 1.167,
+          "z": 5.226
         },
         "stroke_arc_deg": 16.3
       },
@@ -12997,14 +13218,14 @@
         "lateral": {
           "max": -6.2,
           "mean": -6.85,
-          "min": -7.51,
+          "min": -7.52,
           "range": 1.31
         },
-        "path": 10.949,
+        "path": 10.951,
         "span": {
           "x": 1.312,
-          "y": 1.204,
-          "z": 5.156
+          "y": 1.205,
+          "z": 5.157
         },
         "stroke_arc_deg": 16.3
       }
@@ -13013,9 +13234,9 @@
       "blender_action": "Sanct_Drink",
       "body_axis_deg": {
         "max": -8.86,
-        "mean": -10.89,
-        "min": -12.13,
-        "range": 3.27
+        "mean": -10.88,
+        "min": -12.12,
+        "range": 3.26
       },
       "clearance_samples": 48,
       "cycle": null,
@@ -13045,7 +13266,7 @@
       ],
       "ground_clearance": {
         "max": 1.86,
-        "min": -0.74
+        "min": -0.73
       },
       "head_reach": {
         "horizontal": {
@@ -13107,7 +13328,7 @@
       },
       "skin_side_balance": {
         "max": -0.18,
-        "mean": -37.13,
+        "mean": -37.12,
         "min": -54.11,
         "range": 53.93
       },
@@ -13135,21 +13356,21 @@
         "vertical": {
           "max": 4.0,
           "mean": 3.36,
-          "min": 3.11,
-          "range": 0.89
+          "min": 3.1,
+          "range": 0.9
         }
       },
       "tail_tip": {
         "span": {
           "x": 1.355,
-          "y": 2.168,
-          "z": 3.613
+          "y": 2.167,
+          "z": 3.618
         }
       },
       "toe_curl_deg": {
         "max": 30.6,
         "mean": 15.45,
-        "min": -0.42,
+        "min": -0.41,
         "range": 31.01
       },
       "toe_deg": {
@@ -13159,32 +13380,32 @@
         "range": 24.79
       },
       "wing_azimuth_L": {
-        "max": 176.98,
-        "mean": 87.35,
-        "min": -178.77,
+        "max": 177.0,
+        "mean": 87.36,
+        "min": -178.75,
         "range": 355.75
       },
       "wing_elev_L": {
-        "max": -5.81,
-        "mean": -12.47,
-        "min": -18.19,
+        "max": -5.84,
+        "mean": -12.5,
+        "min": -18.21,
         "range": 12.38
       },
       "wing_elev_R": {
-        "max": 5.69,
-        "mean": 4.21,
-        "min": 1.66,
-        "range": 4.03
+        "max": 5.67,
+        "mean": 4.19,
+        "min": 1.63,
+        "range": 4.04
       },
       "wing_elev_bias": {
-        "max": -9.99,
-        "mean": -16.68,
-        "min": -23.18,
-        "range": 13.19
+        "max": -10.0,
+        "mean": -16.69,
+        "min": -23.19,
+        "range": 13.2
       },
       "wing_extension_L": {
         "max": 14.29,
-        "mean": 13.48,
+        "mean": 13.49,
         "min": 12.68,
         "range": 1.61
       },
@@ -13197,16 +13418,16 @@
       "wing_stroke_asymmetry": 8.34,
       "wingtip_L": {
         "lateral": {
-          "max": -9.47,
+          "max": -9.48,
           "mean": -9.58,
           "min": -9.75,
           "range": 0.27
         },
-        "path": 19.026,
+        "path": 19.024,
         "span": {
           "x": 1.136,
-          "y": 7.215,
-          "z": 4.594
+          "y": 7.214,
+          "z": 4.593
         },
         "stroke_arc_deg": 27.2
       },
@@ -13215,15 +13436,15 @@
           "max": 5.03,
           "mean": 3.55,
           "min": 0.67,
-          "range": 4.37
+          "range": 4.36
         },
-        "path": 18.727,
+        "path": 18.715,
         "span": {
-          "x": 3.849,
+          "x": 3.846,
           "y": 4.455,
-          "z": 2.449
+          "z": 2.445
         },
-        "stroke_arc_deg": 16.1
+        "stroke_arc_deg": 16.0
       }
     },
     "Sanct_Drop": {
@@ -13289,16 +13510,16 @@
         }
       },
       "jaw_deg": {
-        "max": 27.74,
+        "max": 27.75,
         "mean": 2.19,
         "min": -10.71,
-        "range": 38.45
+        "range": 38.46
       },
       "loop": {
-        "basis_max": 89.051445,
+        "basis_max": 89.051453,
         "loops": false,
-        "pose_max": 55.405,
-        "pose_mean": 5.548
+        "pose_max": 55.394,
+        "pose_mean": 5.55
       },
       "pelvis": {
         "height": {
@@ -13338,7 +13559,7 @@
         "max": 2.22,
         "mean": 0.63,
         "min": 0.06,
-        "range": 2.15
+        "range": 2.16
       },
       "tail_reach": {
         "horizontal": {
@@ -13357,14 +13578,14 @@
           "max": 1.52,
           "mean": -2.22,
           "min": -9.03,
-          "range": 10.56
+          "range": 10.55
         }
       },
       "tail_tip": {
         "span": {
           "x": 0.211,
           "y": 4.4,
-          "z": 10.555
+          "z": 10.554
         }
       },
       "toe_curl_deg": {
@@ -13380,54 +13601,54 @@
         "range": 7.96
       },
       "wing_azimuth_L": {
-        "max": 177.49,
-        "mean": 55.32,
-        "min": -179.87,
+        "max": 177.58,
+        "mean": 55.34,
+        "min": -179.79,
         "range": 357.37
       },
       "wing_elev_L": {
-        "max": 39.09,
-        "mean": -12.8,
-        "min": -84.61,
-        "range": 123.7
+        "max": 39.14,
+        "mean": -12.79,
+        "min": -84.6,
+        "range": 123.74
       },
       "wing_elev_R": {
-        "max": 39.15,
-        "mean": -13.24,
-        "min": -84.73,
-        "range": 123.88
+        "max": 39.2,
+        "mean": -13.23,
+        "min": -84.71,
+        "range": 123.91
       },
       "wing_elev_bias": {
         "max": 5.55,
-        "mean": 0.44,
-        "min": -8.31,
+        "mean": 0.43,
+        "min": -8.32,
         "range": 13.87
       },
       "wing_extension_L": {
-        "max": 15.94,
+        "max": 15.95,
         "mean": 11.14,
         "min": 6.77,
         "range": 9.17
       },
       "wing_extension_R": {
-        "max": 15.94,
+        "max": 15.95,
         "mean": 11.14,
         "min": 6.77,
         "range": 9.17
       },
-      "wing_stroke_asymmetry": -0.18,
+      "wing_stroke_asymmetry": -0.17,
       "wingtip_L": {
         "lateral": {
           "max": 13.96,
           "mean": -0.93,
           "min": -12.25,
-          "range": 26.2
+          "range": 26.21
         },
-        "path": 95.146,
+        "path": 95.182,
         "span": {
-          "x": 26.202,
-          "y": 13.086,
-          "z": 19.227
+          "x": 26.207,
+          "y": 13.096,
+          "z": 19.233
         },
         "stroke_arc_deg": 152.1
       },
@@ -13438,13 +13659,13 @@
           "min": -13.0,
           "range": 25.17
         },
-        "path": 95.989,
+        "path": 96.023,
         "span": {
-          "x": 25.171,
-          "y": 14.15,
-          "z": 19.905
+          "x": 25.175,
+          "y": 14.161,
+          "z": 19.91
         },
-        "stroke_arc_deg": 147.5
+        "stroke_arc_deg": 147.6
       }
     },
     "Sanct_Eat": {
@@ -13452,8 +13673,8 @@
       "body_axis_deg": {
         "max": -2.84,
         "mean": -11.61,
-        "min": -20.29,
-        "range": 17.45
+        "min": -20.3,
+        "range": 17.46
       },
       "clearance_samples": 48,
       "cycle": {
@@ -13464,7 +13685,7 @@
       "duration_s": 8.0,
       "foot_asymmetry": {
         "max": 0.28,
-        "mean": 0.04,
+        "mean": 0.05,
         "min": -0.54,
         "range": 0.81
       },
@@ -13528,11 +13749,11 @@
           "min": 4.47,
           "range": 3.08
         },
-        "path": 18.905,
+        "path": 18.904,
         "span": {
           "x": 1.51,
           "y": 0.76,
-          "z": 3.084
+          "z": 3.083
         }
       },
       "root_roll_deg": {
@@ -13556,7 +13777,7 @@
       "source": "sidecar",
       "summary_samples": 48,
       "symmetry_error": {
-        "max": 14.53,
+        "max": 14.54,
         "mean": 11.29,
         "min": 4.45,
         "range": 10.09
@@ -13575,7 +13796,7 @@
           "range": 3.3
         },
         "vertical": {
-          "max": 6.8,
+          "max": 6.81,
           "mean": 3.37,
           "min": -1.61,
           "range": 8.42
@@ -13585,58 +13806,58 @@
         "span": {
           "x": 4.326,
           "y": 2.836,
-          "z": 7.722
+          "z": 7.724
         }
       },
       "toe_curl_deg": {
         "max": 38.72,
         "mean": 15.39,
-        "min": -0.42,
+        "min": -0.41,
         "range": 39.13
       },
       "toe_deg": {
         "max": -5.91,
         "mean": -13.03,
         "min": -32.92,
-        "range": 27.0
+        "range": 27.01
       },
       "wing_azimuth_L": {
         "max": 177.76,
-        "mean": 65.3,
-        "min": -177.45,
-        "range": 355.21
+        "mean": 65.31,
+        "min": -177.44,
+        "range": 355.19
       },
       "wing_elev_L": {
-        "max": 2.13,
-        "mean": -14.23,
-        "min": -27.28,
+        "max": 2.1,
+        "mean": -14.26,
+        "min": -27.3,
         "range": 29.41
       },
       "wing_elev_R": {
-        "max": 12.61,
-        "mean": 0.2,
-        "min": -16.8,
-        "range": 29.4
+        "max": 12.6,
+        "mean": 0.18,
+        "min": -16.82,
+        "range": 29.42
       },
       "wing_elev_bias": {
         "max": -0.82,
         "mean": -14.43,
-        "min": -31.36,
-        "range": 30.54
+        "min": -31.37,
+        "range": 30.56
       },
       "wing_extension_L": {
-        "max": 14.49,
-        "mean": 13.73,
+        "max": 14.5,
+        "mean": 13.74,
         "min": 12.68,
         "range": 1.82
       },
       "wing_extension_R": {
-        "max": 13.2,
+        "max": 13.21,
         "mean": 11.04,
         "min": 9.61,
         "range": 3.59
       },
-      "wing_stroke_asymmetry": 0.01,
+      "wing_stroke_asymmetry": -0.01,
       "wingtip_L": {
         "lateral": {
           "max": -9.01,
@@ -13644,11 +13865,11 @@
           "min": -10.47,
           "range": 1.46
         },
-        "path": 46.949,
+        "path": 46.947,
         "span": {
-          "x": 2.492,
-          "y": 7.816,
-          "z": 7.26
+          "x": 2.49,
+          "y": 7.815,
+          "z": 7.261
         },
         "stroke_arc_deg": 36.1
       },
@@ -13657,13 +13878,13 @@
           "max": 5.7,
           "mean": 3.46,
           "min": 0.31,
-          "range": 5.4
+          "range": 5.39
         },
-        "path": 44.801,
+        "path": 44.793,
         "span": {
-          "x": 5.271,
-          "y": 6.927,
-          "z": 6.306
+          "x": 5.268,
+          "y": 6.928,
+          "z": 6.305
         },
         "stroke_arc_deg": 44.3
       }
@@ -13674,7 +13895,7 @@
         "max": 0.34,
         "mean": -7.52,
         "min": -13.25,
-        "range": 13.58
+        "range": 13.59
       },
       "clearance_samples": 48,
       "cycle": {
@@ -13726,7 +13947,7 @@
         "vertical": {
           "max": -0.19,
           "mean": -1.45,
-          "min": -1.91,
+          "min": -1.92,
           "range": 1.73
         }
       },
@@ -13771,8 +13992,8 @@
       "skin_side_balance": {
         "max": 4.93,
         "mean": -8.17,
-        "min": -49.38,
-        "range": 54.31
+        "min": -49.4,
+        "range": 54.33
       },
       "source": "sidecar",
       "summary_samples": 48,
@@ -13804,7 +14025,7 @@
       },
       "tail_tip": {
         "span": {
-          "x": 11.95,
+          "x": 11.951,
           "y": 1.861,
           "z": 6.213
         }
@@ -13818,35 +14039,35 @@
       "toe_deg": {
         "max": -4.63,
         "mean": -6.02,
-        "min": -7.18,
-        "range": 2.55
+        "min": -7.17,
+        "range": 2.54
       },
       "wing_azimuth_L": {
         "max": 179.16,
         "mean": -102.79,
-        "min": -178.33,
-        "range": 357.5
+        "min": -178.32,
+        "range": 357.48
       },
       "wing_elev_L": {
-        "max": 9.25,
-        "mean": -6.1,
-        "min": -13.05,
+        "max": 9.22,
+        "mean": -6.13,
+        "min": -13.08,
         "range": 22.3
       },
       "wing_elev_R": {
-        "max": 20.65,
-        "mean": -4.97,
-        "min": -38.55,
-        "range": 59.2
+        "max": 20.62,
+        "mean": -5.0,
+        "min": -38.59,
+        "range": 59.21
       },
       "wing_elev_bias": {
-        "max": 28.33,
-        "mean": -1.14,
+        "max": 28.35,
+        "mean": -1.13,
         "min": -29.33,
-        "range": 57.67
+        "range": 57.68
       },
       "wing_extension_L": {
-        "max": 14.92,
+        "max": 14.93,
         "mean": 13.97,
         "min": 13.25,
         "range": 1.67
@@ -13857,19 +14078,19 @@
         "min": 10.68,
         "range": 2.52
       },
-      "wing_stroke_asymmetry": -36.9,
+      "wing_stroke_asymmetry": -36.92,
       "wingtip_L": {
         "lateral": {
           "max": -7.93,
-          "mean": -9.35,
+          "mean": -9.36,
           "min": -10.97,
           "range": 3.04
         },
-        "path": 25.363,
+        "path": 25.36,
         "span": {
-          "x": 1.69,
-          "y": 5.524,
-          "z": 6.48
+          "x": 1.692,
+          "y": 5.526,
+          "z": 6.481
         },
         "stroke_arc_deg": 33.6
       },
@@ -13880,11 +14101,11 @@
           "min": -2.98,
           "range": 7.63
         },
-        "path": 34.605,
+        "path": 34.615,
         "span": {
-          "x": 6.479,
-          "y": 2.327,
-          "z": 11.336
+          "x": 6.48,
+          "y": 2.333,
+          "z": 11.339
         },
         "stroke_arc_deg": 60.6
       }
@@ -14043,22 +14264,22 @@
         "range": 0.0
       },
       "wing_azimuth_L": {
-        "max": 174.29,
+        "max": 174.3,
         "mean": 14.72,
-        "min": -173.31,
-        "range": 347.61
+        "min": -173.3,
+        "range": 347.6
       },
       "wing_elev_L": {
-        "max": 7.6,
-        "mean": -31.72,
-        "min": -81.3,
-        "range": 88.9
+        "max": 7.63,
+        "mean": -31.7,
+        "min": -81.31,
+        "range": 88.94
       },
       "wing_elev_R": {
-        "max": 8.6,
-        "mean": -31.22,
-        "min": -78.89,
-        "range": 87.49
+        "max": 8.63,
+        "mean": -31.2,
+        "min": -78.9,
+        "range": 87.53
       },
       "wing_elev_bias": {
         "max": 2.73,
@@ -14067,16 +14288,16 @@
         "range": 5.27
       },
       "wing_extension_L": {
-        "max": 22.09,
-        "mean": 13.48,
+        "max": 22.1,
+        "mean": 13.49,
         "min": 5.91,
-        "range": 16.18
+        "range": 16.19
       },
       "wing_extension_R": {
-        "max": 22.09,
-        "mean": 13.48,
+        "max": 22.1,
+        "mean": 13.49,
         "min": 5.91,
-        "range": 16.18
+        "range": 16.19
       },
       "wing_stroke_asymmetry": 1.41,
       "wingtip_L": {
@@ -14086,36 +14307,36 @@
           "min": -5.28,
           "range": 19.48
         },
-        "path": 404.648,
+        "path": 404.804,
         "span": {
-          "x": 19.477,
-          "y": 19.212,
-          "z": 24.536
+          "x": 19.484,
+          "y": 19.219,
+          "z": 24.547
         },
         "stroke_arc_deg": 139.3
       },
       "wingtip_R": {
         "lateral": {
           "max": 5.9,
-          "mean": -1.82,
-          "min": -13.6,
-          "range": 19.5
+          "mean": -1.83,
+          "min": -13.61,
+          "range": 19.51
         },
-        "path": 404.369,
+        "path": 404.523,
         "span": {
-          "x": 19.505,
-          "y": 18.994,
-          "z": 24.548
+          "x": 19.511,
+          "y": 19.002,
+          "z": 24.559
         },
-        "stroke_arc_deg": 139.2
+        "stroke_arc_deg": 139.3
       }
     },
     "Sanct_HuntCarry": {
       "blender_action": "Sanct_HuntCarry",
       "body_axis_deg": {
         "max": 3.29,
-        "mean": 1.58,
-        "min": -0.14,
+        "mean": 1.59,
+        "min": -0.13,
         "range": 3.42
       },
       "clearance_samples": 48,
@@ -14238,8 +14459,8 @@
           "range": 0.0
         },
         "vertical": {
-          "max": 1.66,
-          "mean": 0.81,
+          "max": 1.65,
+          "mean": 0.8,
           "min": -0.04,
           "range": 1.7
         }
@@ -14264,22 +14485,22 @@
         "range": 0.0
       },
       "wing_azimuth_L": {
-        "max": 178.1,
-        "mean": 57.31,
-        "min": -179.78,
-        "range": 357.88
+        "max": 178.13,
+        "mean": 57.32,
+        "min": -179.7,
+        "range": 357.82
       },
       "wing_elev_L": {
-        "max": 34.71,
-        "mean": -25.37,
-        "min": -76.64,
-        "range": 111.35
+        "max": 34.74,
+        "mean": -25.35,
+        "min": -76.6,
+        "range": 111.34
       },
       "wing_elev_R": {
-        "max": 36.38,
-        "mean": -24.38,
-        "min": -74.7,
-        "range": 111.09
+        "max": 36.42,
+        "mean": -24.37,
+        "min": -74.67,
+        "range": 111.08
       },
       "wing_elev_bias": {
         "max": 3.51,
@@ -14288,16 +14509,16 @@
         "range": 7.03
       },
       "wing_extension_L": {
-        "max": 22.1,
-        "mean": 13.66,
+        "max": 22.11,
+        "mean": 13.67,
         "min": 5.61,
-        "range": 16.49
+        "range": 16.5
       },
       "wing_extension_R": {
-        "max": 22.1,
-        "mean": 13.66,
+        "max": 22.11,
+        "mean": 13.67,
         "min": 5.61,
-        "range": 16.49
+        "range": 16.5
       },
       "wing_stroke_asymmetry": 0.26,
       "wingtip_L": {
@@ -14305,30 +14526,30 @@
           "max": 14.32,
           "mean": 2.13,
           "min": -5.57,
-          "range": 19.88
+          "range": 19.89
         },
-        "path": 302.454,
+        "path": 302.569,
         "span": {
-          "x": 19.881,
-          "y": 18.319,
-          "z": 28.282
+          "x": 19.887,
+          "y": 18.327,
+          "z": 28.293
         },
-        "stroke_arc_deg": 144.4
+        "stroke_arc_deg": 144.5
       },
       "wingtip_R": {
         "lateral": {
           "max": 6.12,
           "mean": -1.8,
-          "min": -13.68,
-          "range": 19.8
+          "min": -13.69,
+          "range": 19.81
         },
-        "path": 302.451,
+        "path": 302.566,
         "span": {
-          "x": 19.803,
-          "y": 18.27,
-          "z": 28.211
+          "x": 19.809,
+          "y": 18.277,
+          "z": 28.223
         },
-        "stroke_arc_deg": 144.4
+        "stroke_arc_deg": 144.5
       }
     },
     "Sanct_HuntFinish": {
@@ -14370,7 +14591,7 @@
         120
       ],
       "ground_clearance": {
-        "max": 2.02,
+        "max": 2.03,
         "min": 0.94
       },
       "head_reach": {
@@ -14402,7 +14623,7 @@
       "loop": {
         "basis_max": 25.249996,
         "loops": false,
-        "pose_max": 34.749,
+        "pose_max": 34.741,
         "pose_mean": 1.816
       },
       "pelvis": {
@@ -14433,17 +14654,17 @@
       },
       "skin_side_balance": {
         "max": 20.6,
-        "mean": -16.9,
-        "min": -36.5,
-        "range": 57.1
+        "mean": -16.89,
+        "min": -36.49,
+        "range": 57.09
       },
       "source": "sidecar",
       "summary_samples": 48,
       "symmetry_error": {
         "max": 14.83,
-        "mean": 10.81,
+        "mean": 10.82,
         "min": 4.88,
-        "range": 9.96
+        "range": 9.95
       },
       "tail_reach": {
         "horizontal": {
@@ -14469,11 +14690,11 @@
         "span": {
           "x": 10.859,
           "y": 2.663,
-          "z": 5.757
+          "z": 5.758
         }
       },
       "toe_curl_deg": {
-        "max": 8.65,
+        "max": 8.66,
         "mean": 3.9,
         "min": -0.87,
         "range": 9.53
@@ -14485,28 +14706,28 @@
         "range": 2.53
       },
       "wing_azimuth_L": {
-        "max": 178.8,
+        "max": 178.81,
         "mean": -25.07,
         "min": -178.7,
-        "range": 357.5
+        "range": 357.51
       },
       "wing_elev_L": {
-        "max": 6.24,
-        "mean": -6.53,
-        "min": -15.42,
+        "max": 6.21,
+        "mean": -6.56,
+        "min": -15.45,
         "range": 21.66
       },
       "wing_elev_R": {
-        "max": 18.03,
-        "mean": -1.59,
-        "min": -27.9,
-        "range": 45.93
+        "max": 18.01,
+        "mean": -1.63,
+        "min": -27.95,
+        "range": 45.96
       },
       "wing_elev_bias": {
-        "max": 14.07,
-        "mean": -4.94,
-        "min": -19.64,
-        "range": 33.7
+        "max": 14.09,
+        "mean": -4.93,
+        "min": -19.65,
+        "range": 33.73
       },
       "wing_extension_L": {
         "max": 14.29,
@@ -14520,21 +14741,21 @@
         "min": 10.78,
         "range": 2.42
       },
-      "wing_stroke_asymmetry": -24.27,
+      "wing_stroke_asymmetry": -24.3,
       "wingtip_L": {
         "lateral": {
           "max": -7.19,
-          "mean": -9.1,
+          "mean": -9.11,
           "min": -10.11,
           "range": 2.92
         },
-        "path": 36.1,
+        "path": 36.094,
         "span": {
-          "x": 2.342,
-          "y": 7.263,
+          "x": 2.343,
+          "y": 7.261,
           "z": 6.971
         },
-        "stroke_arc_deg": 45.3
+        "stroke_arc_deg": 45.2
       },
       "wingtip_R": {
         "lateral": {
@@ -14545,9 +14766,9 @@
         },
         "path": 30.617,
         "span": {
-          "x": 5.367,
-          "y": 4.24,
-          "z": 9.505
+          "x": 5.365,
+          "y": 4.239,
+          "z": 9.51
         },
         "stroke_arc_deg": 46.6
       }
@@ -14556,9 +14777,9 @@
       "blender_action": "Sanct_HuntGrip",
       "body_axis_deg": {
         "max": -1.32,
-        "mean": -11.35,
+        "mean": -11.34,
         "min": -19.06,
-        "range": 17.73
+        "range": 17.74
       },
       "clearance_samples": 48,
       "cycle": {
@@ -14623,7 +14844,7 @@
       "loop": {
         "basis_max": 25.249996,
         "loops": false,
-        "pose_max": 34.767,
+        "pose_max": 34.759,
         "pose_mean": 1.94
       },
       "pelvis": {
@@ -14633,7 +14854,7 @@
           "min": 4.4,
           "range": 3.12
         },
-        "path": 9.186,
+        "path": 9.185,
         "span": {
           "x": 1.529,
           "y": 0.752,
@@ -14688,15 +14909,15 @@
       },
       "tail_tip": {
         "span": {
-          "x": 4.097,
+          "x": 4.096,
           "y": 3.232,
-          "z": 7.951
+          "z": 7.952
         }
       },
       "toe_curl_deg": {
         "max": 34.92,
         "mean": 20.57,
-        "min": -0.42,
+        "min": -0.41,
         "range": 35.34
       },
       "toe_deg": {
@@ -14712,26 +14933,26 @@
         "range": 358.79
       },
       "wing_elev_L": {
-        "max": 5.12,
-        "mean": -18.29,
-        "min": -27.83,
-        "range": 32.95
+        "max": 5.09,
+        "mean": -18.32,
+        "min": -27.85,
+        "range": 32.94
       },
       "wing_elev_R": {
-        "max": 9.19,
-        "mean": -4.53,
-        "min": -19.57,
+        "max": 9.17,
+        "mean": -4.55,
+        "min": -19.6,
         "range": 28.77
       },
       "wing_elev_bias": {
-        "max": -4.07,
+        "max": -4.08,
         "mean": -13.76,
-        "min": -26.44,
-        "range": 22.37
+        "min": -26.43,
+        "range": 22.36
       },
       "wing_extension_L": {
-        "max": 14.34,
-        "mean": 14.03,
+        "max": 14.35,
+        "mean": 14.04,
         "min": 13.15,
         "range": 1.19
       },
@@ -14741,7 +14962,7 @@
         "min": 9.68,
         "range": 3.52
       },
-      "wing_stroke_asymmetry": 4.18,
+      "wing_stroke_asymmetry": 4.17,
       "wingtip_L": {
         "lateral": {
           "max": -8.91,
@@ -14751,7 +14972,7 @@
         },
         "path": 24.538,
         "span": {
-          "x": 2.344,
+          "x": 2.343,
           "y": 7.613,
           "z": 8.27
         },
@@ -14764,11 +14985,11 @@
           "min": 4.04,
           "range": 2.11
         },
-        "path": 23.518,
+        "path": 23.52,
         "span": {
-          "x": 2.368,
-          "y": 7.657,
-          "z": 5.26
+          "x": 2.369,
+          "y": 7.658,
+          "z": 5.261
         },
         "stroke_arc_deg": 30.2
       }
@@ -14838,7 +15059,7 @@
       "jaw_deg": {
         "max": 1.7,
         "mean": 0.32,
-        "min": -0.0,
+        "min": 0.0,
         "range": 1.7
       },
       "loop": {
@@ -14876,8 +15097,8 @@
       "skin_side_balance": {
         "max": 8.24,
         "mean": -16.04,
-        "min": -32.79,
-        "range": 41.03
+        "min": -32.8,
+        "range": 41.04
       },
       "source": "sidecar",
       "summary_samples": 48,
@@ -14909,7 +15130,7 @@
       },
       "tail_tip": {
         "span": {
-          "x": 4.841,
+          "x": 4.842,
           "y": 1.011,
           "z": 2.721
         }
@@ -14917,38 +15138,38 @@
       "toe_curl_deg": {
         "max": 3.09,
         "mean": 1.67,
-        "min": -0.42,
+        "min": -0.41,
         "range": 3.51
       },
       "toe_deg": {
         "max": -5.91,
-        "mean": -6.29,
+        "mean": -6.3,
         "min": -6.57,
         "range": 0.65
       },
       "wing_azimuth_L": {
-        "max": 177.57,
-        "mean": 39.8,
-        "min": -179.96,
+        "max": 177.59,
+        "mean": 39.81,
+        "min": -179.95,
         "range": 357.53
       },
       "wing_elev_L": {
-        "max": -1.27,
-        "mean": -10.91,
-        "min": -18.45,
-        "range": 17.18
+        "max": -1.3,
+        "mean": -10.94,
+        "min": -18.49,
+        "range": 17.19
       },
       "wing_elev_R": {
-        "max": 10.98,
-        "mean": 3.61,
-        "min": -6.2,
-        "range": 17.19
+        "max": 10.95,
+        "mean": 3.58,
+        "min": -6.23,
+        "range": 17.18
       },
       "wing_elev_bias": {
         "max": 3.96,
         "mean": -14.52,
-        "min": -29.12,
-        "range": 33.08
+        "min": -29.13,
+        "range": 33.09
       },
       "wing_extension_L": {
         "max": 14.29,
@@ -14962,19 +15183,19 @@
         "min": 10.57,
         "range": 2.63
       },
-      "wing_stroke_asymmetry": -0.0,
+      "wing_stroke_asymmetry": 0.01,
       "wingtip_L": {
         "lateral": {
           "max": -9.12,
           "mean": -9.45,
           "min": -9.77,
-          "range": 0.64
+          "range": 0.65
         },
-        "path": 17.023,
+        "path": 17.029,
         "span": {
-          "x": 0.853,
-          "y": 6.621,
-          "z": 4.512
+          "x": 0.854,
+          "y": 6.624,
+          "z": 4.514
         },
         "stroke_arc_deg": 39.2
       },
@@ -14985,10 +15206,10 @@
           "min": 0.44,
           "range": 4.17
         },
-        "path": 13.947,
+        "path": 13.953,
         "span": {
-          "x": 3.809,
-          "y": 2.373,
+          "x": 3.808,
+          "y": 2.374,
           "z": 3.251
         },
         "stroke_arc_deg": 18.6
@@ -14997,10 +15218,10 @@
     "Sanct_PerchGrip": {
       "blender_action": "Sanct_PerchGrip",
       "body_axis_deg": {
-        "max": -9.2,
-        "mean": -10.06,
-        "min": -10.99,
-        "range": 1.79
+        "max": -9.22,
+        "mean": -10.07,
+        "min": -10.98,
+        "range": 1.76
       },
       "clearance_samples": 48,
       "cycle": null,
@@ -15037,7 +15258,7 @@
           "max": 12.27,
           "mean": 12.07,
           "min": 11.89,
-          "range": 0.38
+          "range": 0.37
         },
         "lateral": {
           "max": 0.0,
@@ -15055,7 +15276,7 @@
       "jaw_deg": {
         "max": 0.0,
         "mean": 0.0,
-        "min": -0.0,
+        "min": 0.0,
         "range": 0.0
       },
       "loop": {
@@ -15086,7 +15307,7 @@
       },
       "root_roll_delta_deg": {
         "max": 2.06,
-        "mean": -0.16,
+        "mean": -0.15,
         "min": -2.36,
         "range": 4.42
       },
@@ -15106,10 +15327,10 @@
       },
       "tail_reach": {
         "horizontal": {
-          "max": 18.69,
+          "max": 18.68,
           "mean": 18.58,
           "min": 18.44,
-          "range": 0.25
+          "range": 0.24
         },
         "lateral": {
           "max": -0.0,
@@ -15119,22 +15340,22 @@
         },
         "vertical": {
           "max": 4.0,
-          "mean": 3.77,
-          "min": 3.46,
-          "range": 0.55
+          "mean": 3.78,
+          "min": 3.47,
+          "range": 0.54
         }
       },
       "tail_tip": {
         "span": {
           "x": 0.001,
-          "y": 0.158,
-          "z": 0.427
+          "y": 0.153,
+          "z": 0.417
         }
       },
       "toe_curl_deg": {
         "max": 12.21,
-        "mean": 5.23,
-        "min": -0.42,
+        "mean": 5.24,
+        "min": -0.41,
         "range": 12.63
       },
       "toe_deg": {
@@ -15145,26 +15366,26 @@
       },
       "wing_azimuth_L": {
         "max": -162.54,
-        "mean": -162.85,
-        "min": -163.04,
+        "mean": -162.84,
+        "min": -163.03,
         "range": 0.5
       },
       "wing_elev_L": {
-        "max": -5.55,
-        "mean": -6.0,
-        "min": -6.37,
+        "max": -5.57,
+        "mean": -6.02,
+        "min": -6.39,
         "range": 0.82
       },
       "wing_elev_R": {
-        "max": 6.05,
-        "mean": 5.36,
-        "min": 4.92,
+        "max": 6.04,
+        "mean": 5.34,
+        "min": 4.9,
         "range": 1.13
       },
       "wing_elev_bias": {
         "max": -10.86,
         "mean": -11.36,
-        "min": -11.75,
+        "min": -11.76,
         "range": 0.89
       },
       "wing_extension_L": {
@@ -15187,10 +15408,10 @@
           "min": -9.74,
           "range": 0.02
         },
-        "path": 0.994,
+        "path": 0.993,
         "span": {
           "x": 0.019,
-          "y": 0.134,
+          "y": 0.133,
           "z": 0.439
         },
         "stroke_arc_deg": 0.8
@@ -15202,11 +15423,11 @@
           "min": 4.59,
           "range": 0.04
         },
-        "path": 1.33,
+        "path": 1.328,
         "span": {
           "x": 0.038,
-          "y": 0.196,
-          "z": 0.582
+          "y": 0.198,
+          "z": 0.58
         },
         "stroke_arc_deg": 1.1
       }
@@ -15214,7 +15435,7 @@
     "Sanct_PickUp": {
       "blender_action": "Sanct_PickUp",
       "body_axis_deg": {
-        "max": 3.87,
+        "max": 3.88,
         "mean": -6.5,
         "min": -17.98,
         "range": 21.86
@@ -15250,7 +15471,7 @@
         72
       ],
       "ground_clearance": {
-        "max": 2.09,
+        "max": 2.08,
         "min": -19.42
       },
       "head_reach": {
@@ -15280,10 +15501,10 @@
         "range": 41.81
       },
       "loop": {
-        "basis_max": 94.195583,
+        "basis_max": 94.195602,
         "loops": false,
-        "pose_max": 44.542,
-        "pose_mean": 7.568
+        "pose_max": 44.53,
+        "pose_mean": 7.569
       },
       "pelvis": {
         "height": {
@@ -15302,14 +15523,14 @@
       "root_roll_deg": {
         "max": 179.81,
         "mean": 4.49,
-        "min": -175.21,
+        "min": -175.22,
         "range": 355.03
       },
       "root_roll_delta_deg": {
-        "max": 74.35,
+        "max": 74.34,
         "mean": -5.91,
         "min": -125.53,
-        "range": 199.88
+        "range": 199.87
       },
       "skin_side_balance": {
         "max": 0.0,
@@ -15320,10 +15541,10 @@
       "source": "sidecar",
       "summary_samples": 48,
       "symmetry_error": {
-        "max": 6.33,
+        "max": 6.34,
         "mean": 2.52,
         "min": 0.38,
-        "range": 5.95
+        "range": 5.96
       },
       "tail_reach": {
         "horizontal": {
@@ -15339,7 +15560,7 @@
           "range": 1.38
         },
         "vertical": {
-          "max": 5.38,
+          "max": 5.39,
           "mean": 1.84,
           "min": -1.8,
           "range": 7.19
@@ -15347,9 +15568,9 @@
       },
       "tail_tip": {
         "span": {
-          "x": 1.01,
+          "x": 1.009,
           "y": 9.144,
-          "z": 6.794
+          "z": 6.796
         }
       },
       "toe_curl_deg": {
@@ -15362,31 +15583,31 @@
         "max": -6.26,
         "mean": -16.04,
         "min": -32.59,
-        "range": 26.33
+        "range": 26.34
       },
       "wing_azimuth_L": {
-        "max": 179.96,
-        "mean": 33.36,
-        "min": -179.27,
+        "max": 179.97,
+        "mean": 33.38,
+        "min": -179.26,
         "range": 359.23
       },
       "wing_elev_L": {
-        "max": 51.79,
-        "mean": -2.71,
-        "min": -43.03,
-        "range": 94.82
+        "max": 51.76,
+        "mean": -2.72,
+        "min": -43.04,
+        "range": 94.8
       },
       "wing_elev_R": {
-        "max": 45.61,
-        "mean": -1.61,
-        "min": -45.28,
+        "max": 45.6,
+        "mean": -1.62,
+        "min": -45.29,
         "range": 90.89
       },
       "wing_elev_bias": {
-        "max": 33.31,
+        "max": 33.29,
         "mean": -1.1,
-        "min": -34.63,
-        "range": 67.94
+        "min": -34.61,
+        "range": 67.9
       },
       "wing_extension_L": {
         "max": 24.13,
@@ -15400,7 +15621,7 @@
         "min": 9.5,
         "range": 14.63
       },
-      "wing_stroke_asymmetry": 3.93,
+      "wing_stroke_asymmetry": 3.91,
       "wingtip_L": {
         "lateral": {
           "max": -0.92,
@@ -15408,26 +15629,26 @@
           "min": -13.38,
           "range": 12.46
         },
-        "path": 57.392,
+        "path": 57.399,
         "span": {
-          "x": 11.986,
-          "y": 8.926,
-          "z": 25.537
+          "x": 11.992,
+          "y": 8.925,
+          "z": 25.541
         },
         "stroke_arc_deg": 111.7
       },
       "wingtip_R": {
         "lateral": {
-          "max": 13.06,
+          "max": 13.07,
           "mean": 5.77,
-          "min": 2.04,
+          "min": 2.03,
           "range": 11.03
         },
-        "path": 53.824,
+        "path": 53.827,
         "span": {
-          "x": 11.746,
-          "y": 8.756,
-          "z": 25.921
+          "x": 11.749,
+          "y": 8.754,
+          "z": 25.926
         },
         "stroke_arc_deg": 107.1
       }
@@ -15556,7 +15777,7 @@
           "range": 0.66
         },
         "vertical": {
-          "max": -0.07,
+          "max": -0.06,
           "mean": -0.47,
           "min": -0.87,
           "range": 0.81
@@ -15576,21 +15797,21 @@
         "range": 0.0
       },
       "toe_deg": {
-        "max": 1.57,
-        "mean": 1.57,
-        "min": 1.57,
+        "max": 1.58,
+        "mean": 1.58,
+        "min": 1.58,
         "range": 0.0
       },
       "wing_azimuth_L": {
-        "max": 172.97,
-        "mean": 172.28,
-        "min": 171.3,
-        "range": 1.67
+        "max": 172.99,
+        "mean": 172.3,
+        "min": 171.32,
+        "range": 1.68
       },
       "wing_elev_L": {
-        "max": -23.66,
-        "mean": -24.4,
-        "min": -25.02,
+        "max": -23.68,
+        "mean": -24.43,
+        "min": -25.04,
         "range": 1.36
       },
       "wing_elev_R": {
@@ -15600,13 +15821,13 @@
         "range": 2.91
       },
       "wing_elev_bias": {
-        "max": 15.71,
-        "mean": 13.62,
-        "min": 11.46,
+        "max": 15.68,
+        "mean": 13.59,
+        "min": 11.43,
         "range": 4.25
       },
       "wing_extension_L": {
-        "max": 13.54,
+        "max": 13.55,
         "mean": 13.51,
         "min": 13.48,
         "range": 0.07
@@ -15625,18 +15846,18 @@
           "min": -12.25,
           "range": 0.13
         },
-        "path": 0.545,
+        "path": 0.546,
         "span": {
-          "x": 0.145,
+          "x": 0.144,
           "y": 0.214,
-          "z": 0.044
+          "z": 0.043
         },
         "stroke_arc_deg": 2.0
       },
       "wingtip_R": {
         "lateral": {
           "max": 2.47,
-          "mean": 2.41,
+          "mean": 2.42,
           "min": 2.37,
           "range": 0.1
         },
@@ -15709,14 +15930,14 @@
       },
       "jaw_deg": {
         "max": 0.0,
-        "mean": -0.0,
-        "min": -0.0,
+        "mean": 0.0,
+        "min": 0.0,
         "range": 0.0
       },
       "loop": {
         "basis_max": 58.999989,
         "loops": false,
-        "pose_max": 20.713,
+        "pose_max": 20.706,
         "pose_mean": 4.293
       },
       "pelvis": {
@@ -15789,7 +16010,7 @@
       "toe_curl_deg": {
         "max": 13.48,
         "mean": 4.84,
-        "min": -0.42,
+        "min": -0.41,
         "range": 13.9
       },
       "toe_deg": {
@@ -15799,54 +16020,54 @@
         "range": 8.2
       },
       "wing_azimuth_L": {
-        "max": -149.82,
-        "mean": -154.87,
-        "min": -163.04,
+        "max": -149.81,
+        "mean": -154.86,
+        "min": -163.03,
         "range": 13.22
       },
       "wing_elev_L": {
-        "max": 5.97,
-        "mean": 0.97,
-        "min": -5.81,
-        "range": 11.78
+        "max": 5.95,
+        "mean": 0.95,
+        "min": -5.84,
+        "range": 11.79
       },
       "wing_elev_R": {
-        "max": 5.69,
-        "mean": 1.41,
-        "min": -2.93,
-        "range": 8.62
+        "max": 5.67,
+        "mean": 1.38,
+        "min": -2.98,
+        "range": 8.65
       },
       "wing_elev_bias": {
-        "max": 6.99,
-        "mean": -0.43,
-        "min": -11.5,
-        "range": 18.5
+        "max": 7.0,
+        "mean": -0.42,
+        "min": -11.51,
+        "range": 18.51
       },
       "wing_extension_L": {
         "max": 15.17,
         "mean": 14.57,
-        "min": 14.07,
+        "min": 14.08,
         "range": 1.1
       },
       "wing_extension_R": {
         "max": 13.2,
-        "mean": 11.13,
+        "mean": 11.14,
         "min": 10.07,
         "range": 3.13
       },
-      "wing_stroke_asymmetry": 3.16,
+      "wing_stroke_asymmetry": 3.14,
       "wingtip_L": {
         "lateral": {
-          "max": -8.88,
+          "max": -8.89,
           "mean": -9.38,
           "min": -9.88,
           "range": 1.0
         },
-        "path": 4.232,
+        "path": 4.229,
         "span": {
-          "x": 0.783,
+          "x": 0.784,
           "y": 1.265,
-          "z": 1.96
+          "z": 1.961
         },
         "stroke_arc_deg": 15.8
       },
@@ -15857,11 +16078,11 @@
           "min": 2.63,
           "range": 1.97
         },
-        "path": 7.397,
+        "path": 7.399,
         "span": {
           "x": 2.475,
-          "y": 4.405,
-          "z": 1.934
+          "y": 4.406,
+          "z": 1.935
         },
         "stroke_arc_deg": 13.5
       }
@@ -16020,69 +16241,69 @@
         "range": 0.0
       },
       "wing_azimuth_L": {
-        "max": 176.58,
-        "mean": 40.76,
-        "min": -172.86,
-        "range": 349.44
+        "max": 176.66,
+        "mean": 40.77,
+        "min": -172.84,
+        "range": 349.49
       },
       "wing_elev_L": {
-        "max": 26.39,
-        "mean": -26.44,
-        "min": -76.25,
-        "range": 102.64
+        "max": 26.42,
+        "mean": -26.42,
+        "min": -76.26,
+        "range": 102.68
       },
       "wing_elev_R": {
-        "max": 27.89,
-        "mean": -25.52,
-        "min": -73.27,
-        "range": 101.16
+        "max": 27.92,
+        "mean": -25.5,
+        "min": -73.28,
+        "range": 101.2
       },
       "wing_elev_bias": {
         "max": 3.46,
         "mean": -0.92,
-        "min": -3.43,
+        "min": -3.44,
         "range": 6.9
       },
       "wing_extension_L": {
-        "max": 22.09,
+        "max": 22.1,
         "mean": 13.37,
         "min": 6.0,
-        "range": 16.09
+        "range": 16.1
       },
       "wing_extension_R": {
-        "max": 22.09,
+        "max": 22.1,
         "mean": 13.37,
         "min": 6.0,
-        "range": 16.09
+        "range": 16.1
       },
       "wing_stroke_asymmetry": 1.48,
       "wingtip_L": {
         "lateral": {
-          "max": 14.24,
+          "max": 14.25,
           "mean": 2.0,
           "min": -5.27,
-          "range": 19.51
+          "range": 19.52
         },
-        "path": 211.394,
+        "path": 211.476,
         "span": {
-          "x": 19.511,
-          "y": 20.062,
-          "z": 27.13
+          "x": 19.517,
+          "y": 20.07,
+          "z": 27.141
         },
-        "stroke_arc_deg": 138.9
+        "stroke_arc_deg": 139.0
       },
       "wingtip_R": {
         "lateral": {
           "max": 5.92,
           "mean": -1.7,
-          "min": -13.59,
+          "min": -13.6,
           "range": 19.51
         },
-        "path": 211.281,
+        "path": 211.362,
         "span": {
-          "x": 19.507,
-          "y": 19.802,
-          "z": 27.068
+          "x": 19.513,
+          "y": 19.809,
+          "z": 27.08
         },
         "stroke_arc_deg": 138.9
       }
@@ -16147,14 +16368,14 @@
       },
       "jaw_deg": {
         "max": 0.0,
-        "mean": -0.0,
-        "min": -0.0,
+        "mean": 0.0,
+        "min": 0.0,
         "range": 0.0
       },
       "loop": {
         "basis_max": 58.999989,
         "loops": false,
-        "pose_max": 20.713,
+        "pose_max": 20.706,
         "pose_mean": 4.293
       },
       "pelvis": {
@@ -16227,7 +16448,7 @@
       "toe_curl_deg": {
         "max": 13.48,
         "mean": 4.84,
-        "min": -0.42,
+        "min": -0.41,
         "range": 13.9
       },
       "toe_deg": {
@@ -16237,54 +16458,54 @@
         "range": 8.2
       },
       "wing_azimuth_L": {
-        "max": -149.82,
-        "mean": -154.87,
-        "min": -163.04,
+        "max": -149.81,
+        "mean": -154.86,
+        "min": -163.03,
         "range": 13.22
       },
       "wing_elev_L": {
-        "max": 5.97,
-        "mean": 0.97,
-        "min": -5.81,
-        "range": 11.78
+        "max": 5.95,
+        "mean": 0.95,
+        "min": -5.84,
+        "range": 11.79
       },
       "wing_elev_R": {
-        "max": 5.69,
-        "mean": 1.41,
-        "min": -2.93,
-        "range": 8.62
+        "max": 5.67,
+        "mean": 1.38,
+        "min": -2.98,
+        "range": 8.65
       },
       "wing_elev_bias": {
-        "max": 6.99,
-        "mean": -0.43,
-        "min": -11.5,
-        "range": 18.5
+        "max": 7.0,
+        "mean": -0.42,
+        "min": -11.51,
+        "range": 18.51
       },
       "wing_extension_L": {
         "max": 15.17,
         "mean": 14.57,
-        "min": 14.07,
+        "min": 14.08,
         "range": 1.1
       },
       "wing_extension_R": {
         "max": 13.2,
-        "mean": 11.13,
+        "mean": 11.14,
         "min": 10.07,
         "range": 3.13
       },
-      "wing_stroke_asymmetry": 3.16,
+      "wing_stroke_asymmetry": 3.14,
       "wingtip_L": {
         "lateral": {
-          "max": -8.88,
+          "max": -8.89,
           "mean": -9.38,
           "min": -9.88,
           "range": 1.0
         },
-        "path": 4.232,
+        "path": 4.229,
         "span": {
-          "x": 0.783,
+          "x": 0.784,
           "y": 1.265,
-          "z": 1.96
+          "z": 1.961
         },
         "stroke_arc_deg": 15.8
       },
@@ -16295,11 +16516,11 @@
           "min": 2.63,
           "range": 1.97
         },
-        "path": 7.397,
+        "path": 7.399,
         "span": {
           "x": 2.475,
-          "y": 4.405,
-          "z": 1.934
+          "y": 4.406,
+          "z": 1.935
         },
         "stroke_arc_deg": 13.5
       }
@@ -16365,7 +16586,7 @@
       "jaw_deg": {
         "max": 0.0,
         "mean": 0.0,
-        "min": -0.0,
+        "min": 0.0,
         "range": 0.0
       },
       "loop": {
@@ -16381,7 +16602,7 @@
           "min": 6.59,
           "range": 0.22
         },
-        "path": 1.113,
+        "path": 1.114,
         "span": {
           "x": 0.391,
           "y": 0.033,
@@ -16401,10 +16622,10 @@
         "range": 1.37
       },
       "skin_side_balance": {
-        "max": -24.78,
-        "mean": -33.46,
+        "max": -24.8,
+        "mean": -33.47,
         "min": -36.32,
-        "range": 11.53
+        "range": 11.52
       },
       "source": "sidecar",
       "summary_samples": 48,
@@ -16454,42 +16675,42 @@
         "range": 1.92
       },
       "wing_azimuth_L": {
-        "max": -149.28,
-        "mean": -151.32,
-        "min": -152.11,
-        "range": 2.83
+        "max": -149.27,
+        "mean": -151.29,
+        "min": -152.08,
+        "range": 2.81
       },
       "wing_elev_L": {
-        "max": -0.75,
-        "mean": -1.5,
-        "min": -2.21,
-        "range": 1.46
+        "max": -0.77,
+        "mean": -1.51,
+        "min": -2.2,
+        "range": 1.43
       },
       "wing_elev_R": {
-        "max": 0.93,
-        "mean": -1.68,
-        "min": -3.01,
-        "range": 3.94
+        "max": 0.9,
+        "mean": -1.72,
+        "min": -3.06,
+        "range": 3.95
       },
       "wing_elev_bias": {
-        "max": 1.53,
-        "mean": 0.17,
-        "min": -3.14,
-        "range": 4.68
+        "max": 1.58,
+        "mean": 0.21,
+        "min": -3.09,
+        "range": 4.67
       },
       "wing_extension_L": {
-        "max": 14.78,
-        "mean": 14.23,
-        "min": 14.03,
+        "max": 14.79,
+        "mean": 14.24,
+        "min": 14.04,
         "range": 0.75
       },
       "wing_extension_R": {
         "max": 10.98,
-        "mean": 10.72,
+        "mean": 10.73,
         "min": 10.2,
         "range": 0.78
       },
-      "wing_stroke_asymmetry": -2.49,
+      "wing_stroke_asymmetry": -2.53,
       "wingtip_L": {
         "lateral": {
           "max": -8.98,
@@ -16497,26 +16718,26 @@
           "min": -9.17,
           "range": 0.19
         },
-        "path": 1.587,
+        "path": 1.597,
         "span": {
-          "x": 0.286,
-          "y": 0.261,
-          "z": 0.32
+          "x": 0.29,
+          "y": 0.259,
+          "z": 0.319
         },
-        "stroke_arc_deg": 3.1
+        "stroke_arc_deg": 3.0
       },
       "wingtip_R": {
         "lateral": {
-          "max": 4.01,
+          "max": 4.02,
           "mean": 3.9,
           "min": 3.7,
           "range": 0.31
         },
-        "path": 2.012,
+        "path": 2.021,
         "span": {
           "x": 0.359,
           "y": 0.29,
-          "z": 0.664
+          "z": 0.667
         },
         "stroke_arc_deg": 4.5
       }
@@ -16626,8 +16847,8 @@
       "source": "sidecar",
       "summary_samples": 48,
       "symmetry_error": {
-        "max": 6.77,
-        "mean": 6.62,
+        "max": 6.76,
+        "mean": 6.61,
         "min": 6.52,
         "range": 0.25
       },
@@ -16665,21 +16886,21 @@
         "range": 0.0
       },
       "toe_deg": {
-        "max": 1.57,
-        "mean": 1.57,
-        "min": 1.57,
+        "max": 1.58,
+        "mean": 1.58,
+        "min": 1.58,
         "range": 0.0
       },
       "wing_azimuth_L": {
-        "max": 173.04,
-        "mean": 172.38,
-        "min": 171.73,
-        "range": 1.3
+        "max": 173.06,
+        "mean": 172.4,
+        "min": 171.75,
+        "range": 1.31
       },
       "wing_elev_L": {
-        "max": -23.89,
-        "mean": -24.44,
-        "min": -24.81,
+        "max": -23.92,
+        "mean": -24.46,
+        "min": -24.83,
         "range": 0.92
       },
       "wing_elev_R": {
@@ -16689,13 +16910,13 @@
         "range": 1.85
       },
       "wing_elev_bias": {
-        "max": 14.58,
-        "mean": 13.3,
-        "min": 12.05,
-        "range": 2.53
+        "max": 14.56,
+        "mean": 13.27,
+        "min": 12.02,
+        "range": 2.54
       },
       "wing_extension_L": {
-        "max": 13.54,
+        "max": 13.55,
         "mean": 13.51,
         "min": 13.48,
         "range": 0.07
@@ -16706,7 +16927,7 @@
         "min": 12.73,
         "range": 0.16
       },
-      "wing_stroke_asymmetry": -0.93,
+      "wing_stroke_asymmetry": -0.94,
       "wingtip_L": {
         "lateral": {
           "max": -12.15,
@@ -16716,9 +16937,9 @@
         },
         "path": 0.836,
         "span": {
-          "x": 0.102,
-          "y": 0.191,
-          "z": 0.056
+          "x": 0.101,
+          "y": 0.192,
+          "z": 0.054
         },
         "stroke_arc_deg": 1.5
       },
@@ -16892,25 +17113,25 @@
         "range": 0.0
       },
       "wing_azimuth_L": {
-        "max": -114.29,
-        "mean": -126.25,
-        "min": -165.6,
-        "range": 51.31
+        "max": -114.28,
+        "mean": -126.14,
+        "min": -165.11,
+        "range": 50.83
       },
       "wing_elev_L": {
-        "max": -67.54,
-        "mean": -77.33,
-        "min": -86.34,
-        "range": 18.8
+        "max": -67.5,
+        "mean": -77.3,
+        "min": -86.32,
+        "range": 18.82
       },
       "wing_elev_R": {
-        "max": -65.84,
-        "mean": -75.0,
-        "min": -82.78,
-        "range": 16.94
+        "max": -65.8,
+        "mean": -74.97,
+        "min": -82.76,
+        "range": 16.96
       },
       "wing_elev_bias": {
-        "max": -1.7,
+        "max": -1.71,
         "mean": -2.33,
         "min": -3.56,
         "range": 1.85
@@ -16931,15 +17152,15 @@
       "wingtip_L": {
         "lateral": {
           "max": 3.02,
-          "mean": 2.65,
+          "mean": 2.64,
           "min": 2.22,
-          "range": 0.8
+          "range": 0.81
         },
         "path": 5.953,
         "span": {
-          "x": 0.804,
+          "x": 0.805,
           "y": 2.736,
-          "z": 0.776
+          "z": 0.778
         },
         "stroke_arc_deg": 20.4
       },
@@ -16952,9 +17173,9 @@
         },
         "path": 5.972,
         "span": {
-          "x": 0.801,
-          "y": 2.732,
-          "z": 0.828
+          "x": 0.802,
+          "y": 2.731,
+          "z": 0.83
         },
         "stroke_arc_deg": 20.3
       }
@@ -16962,8 +17183,8 @@
     "Sanct_Speed": {
       "blender_action": "Sanct_Speed",
       "body_axis_deg": {
-        "max": -4.95,
-        "mean": -8.93,
+        "max": -4.94,
+        "mean": -8.92,
         "min": -12.85,
         "range": 7.9
       },
@@ -17011,7 +17232,7 @@
         "lateral": {
           "max": 0.11,
           "mean": 0.09,
-          "min": 0.06,
+          "min": 0.07,
           "range": 0.04
         },
         "vertical": {
@@ -17061,7 +17282,7 @@
       },
       "skin_side_balance": {
         "max": -1.46,
-        "mean": -1.63,
+        "mean": -1.62,
         "min": -1.73,
         "range": 0.27
       },
@@ -17081,7 +17302,7 @@
           "range": 1.03
         },
         "lateral": {
-          "max": 0.0,
+          "max": -0.0,
           "mean": -0.0,
           "min": -0.01,
           "range": 0.01
@@ -17113,56 +17334,56 @@
         "range": 0.0
       },
       "wing_azimuth_L": {
-        "max": 177.72,
-        "mean": 52.07,
-        "min": -172.29,
-        "range": 350.01
+        "max": 177.74,
+        "mean": 52.09,
+        "min": -172.26,
+        "range": 350.0
       },
       "wing_elev_L": {
-        "max": 39.11,
-        "mean": -19.83,
-        "min": -83.55,
+        "max": 39.14,
+        "mean": -19.82,
+        "min": -83.52,
         "range": 122.66
       },
       "wing_elev_R": {
-        "max": 40.97,
-        "mean": -18.87,
-        "min": -80.02,
-        "range": 121.0
+        "max": 41.01,
+        "mean": -18.86,
+        "min": -80.0,
+        "range": 121.01
       },
       "wing_elev_bias": {
         "max": 3.7,
-        "mean": -0.95,
+        "mean": -0.96,
         "min": -3.64,
-        "range": 7.33
+        "range": 7.34
       },
       "wing_extension_L": {
         "max": 22.06,
-        "mean": 13.5,
+        "mean": 13.51,
         "min": 5.62,
-        "range": 16.43
+        "range": 16.44
       },
       "wing_extension_R": {
         "max": 22.06,
-        "mean": 13.5,
+        "mean": 13.51,
         "min": 5.62,
-        "range": 16.43
+        "range": 16.44
       },
-      "wing_stroke_asymmetry": 1.66,
+      "wing_stroke_asymmetry": 1.65,
       "wingtip_L": {
         "lateral": {
           "max": 14.07,
           "mean": 2.31,
           "min": -5.26,
-          "range": 19.33
+          "range": 19.34
         },
-        "path": 406.745,
+        "path": 406.899,
         "span": {
-          "x": 19.331,
-          "y": 20.556,
-          "z": 27.896
+          "x": 19.336,
+          "y": 20.565,
+          "z": 27.907
         },
-        "stroke_arc_deg": 140.9
+        "stroke_arc_deg": 141.0
       },
       "wingtip_R": {
         "lateral": {
@@ -17171,11 +17392,11 @@
           "min": -13.36,
           "range": 19.32
         },
-        "path": 406.545,
+        "path": 406.697,
         "span": {
-          "x": 19.316,
-          "y": 20.46,
-          "z": 27.822
+          "x": 19.321,
+          "y": 20.468,
+          "z": 27.834
         },
         "stroke_arc_deg": 140.9
       }

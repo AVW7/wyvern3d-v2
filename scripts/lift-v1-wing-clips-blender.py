@@ -269,6 +269,14 @@ def main():
     for name in clips:
         act = bpy.data.actions[name]
         arm.animation_data.action = act
+        # Bind the slot too, not just the action -- every other Blender script in
+        # this repo does, and under Blender 5's slotted actions an unbound slot
+        # can leave the previously-bound clip's channelbag live. It is not
+        # sufficient on its own: this script still leaks a clip's foot-plane
+        # measurement into the next one within a single invocation, which is why
+        # `build-gothic-wing.py` lifts `walk` in a separate process.
+        if act.slots:
+            arm.animation_data.action_slot = act.slots[0]
         start_f, end_f = (int(round(x)) for x in act.frame_range)
         frames = list(range(start_f, end_f + 1))
 

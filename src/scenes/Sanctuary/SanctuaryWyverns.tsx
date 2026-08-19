@@ -59,7 +59,6 @@ export function SanctuaryWyverns({ wyverns, colliders, placedObjects, seed }: Sa
   const raycaster = useRef(new Raycaster())
   const ndc = useRef(new Vector2())
   const projected = useRef(new Vector3())
-  const anchorClock = useRef(0)
   const [, setVisualVersion] = useState(0)
   const selectedId = useSanctuaryCommands((state) => state.selectedWyvernId)
 
@@ -183,11 +182,10 @@ export function SanctuaryWyverns({ wyverns, colliders, placedObjects, seed }: Sa
     // Trigger visual reconciliation if animations changed
     setVisualVersion((v) => v + 1)
 
-    // 5. Update command wheel 2D anchor projection
+    // 5. Update command wheel 2D anchor projection (frozen in place once open to prevent hover jitter)
     if (selectedAgent && selectedWyvern) {
-      anchorClock.current += dt
-      if (anchorClock.current >= 0.05) {
-        anchorClock.current = 0
+      const currentAnchor = useSanctuaryCommands.getState().wheelAnchor
+      if (!currentAnchor.visible) {
         projected.current
           .set(
             selectedAgent.position.x,
@@ -203,8 +201,8 @@ export function SanctuaryWyverns({ wyverns, colliders, placedObjects, seed }: Sa
         const marginBottom = Math.min(reach, size.height / 2)
         const marginTop = Math.min(Math.max(reach, topbarBottom + reach), size.height - marginBottom)
         commands.setWheelAnchor({
-          x: clamp((projected.current.x * 0.5 + 0.5) * size.width, marginX, size.width - marginX),
-          y: clamp((-projected.current.y * 0.5 + 0.5) * size.height, marginTop, size.height - marginBottom),
+          x: Math.round(clamp((projected.current.x * 0.5 + 0.5) * size.width, marginX, size.width - marginX)),
+          y: Math.round(clamp((-projected.current.y * 0.5 + 0.5) * size.height, marginTop, size.height - marginBottom)),
           visible,
         })
       }

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Vector3 } from 'three'
-import { getAsset, type ModelState } from '@/render/assets/manifest'
+import { getAsset, type AssetId, type ModelState } from '@/render/assets/manifest'
 import type { FlightLoopState } from '@/render/flightPose'
 import type { FlightLabPoseEdits, LabCamera, LabTheme } from '../FlightLab'
 import { GROUPS, NEUTRAL_POSE_EDITS, SPECIES } from '../constants'
@@ -33,6 +33,10 @@ export function useFlightLabState(initialOverride?: Partial<LabSearch>) {
   }, [initialOverride])
 
   const [speciesIndex, setSpeciesIndex] = useState(initial.speciesIndex ?? 0)
+  // The asset shown beside the rig for A/B, or null for a single model. Not in
+  // the shareable lab search params: it is a review aid, not part of the pose a
+  // link is meant to reproduce.
+  const [compareId, setCompareId] = useState<AssetId | null>(null)
   const [extraScale, setExtraScale] = useState(1)
   const [state, setState] = useState<ModelState>(initial.state ?? 'idle')
   const [auto, setAuto] = useState(initial.auto ?? false)
@@ -258,6 +262,8 @@ export function useFlightLabState(initialOverride?: Partial<LabSearch>) {
   return {
     speciesIndex,
     setSpeciesIndex,
+    compareId,
+    setCompareId,
     extraScale,
     setExtraScale,
     state,

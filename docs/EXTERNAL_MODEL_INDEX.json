@@ -1,0 +1,3390 @@
+{
+ "generated": "2026-08-19",
+ "roots": {
+  "world": "~/Desktop/world build",
+  "animals": "~/Desktop/3d models animals"
+ },
+ "totalFiles": 211,
+ "uniqueAssets": 130,
+ "assets": [
+  {
+   "dir": "3d models animals",
+   "file": "alchemist_shelf_with_potion_bottles (1).glb",
+   "mb": 148.35,
+   "tris": 1871044,
+   "prims": 28,
+   "materials": 1,
+   "textures": 3,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [],
+   "variantGroup": "alchemist_shelf_with_potion_bottles.glb",
+   "preferredFile": "alchemist_shelf_with_potion_bottles (1).glb",
+   "variants": [
+    {
+     "file": "alchemist_shelf_with_potion_bottles (1).glb",
+     "maxTexturePx": 4096,
+     "mb": 148.35,
+     "md5": "13967bc5daee"
+    },
+    {
+     "file": "alchemist_shelf_with_potion_bottles.glb",
+     "maxTexturePx": 1024,
+     "mb": 134.45,
+     "md5": "dcc2b61460e3"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "alchemy_table_-_game_model (1).glb",
+   "mb": 15.13,
+   "tris": 1648,
+   "prims": 1,
+   "materials": 1,
+   "textures": 3,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [],
+   "variantGroup": "alchemy_table_-_game_model.glb",
+   "preferredFile": "alchemy_table_-_game_model (1).glb",
+   "variants": [
+    {
+     "file": "alchemy_table_-_game_model (1).glb",
+     "maxTexturePx": 2048,
+     "mb": 15.13,
+     "md5": "b902cfc53d95"
+    },
+    {
+     "file": "alchemy_table_-_game_model.glb",
+     "maxTexturePx": 1024,
+     "mb": 4.08,
+     "md5": "2507926990bf"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "alchemy_table_free (1).glb",
+   "mb": 11.4,
+   "tris": 7603,
+   "prims": 1,
+   "materials": 1,
+   "textures": 3,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [],
+   "variantGroup": "alchemy_table_free.glb",
+   "preferredFile": "alchemy_table_free (1).glb",
+   "variants": [
+    {
+     "file": "alchemy_table_free (1).glb",
+     "maxTexturePx": 2048,
+     "mb": 11.4,
+     "md5": "988fa06a2235"
+    },
+    {
+     "file": "alchemy_table_free.glb",
+     "maxTexturePx": 1024,
+     "mb": 3.92,
+     "md5": "438329c7fb54"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "world build",
+   "file": "amphora (1).glb",
+   "mb": 0.01,
+   "tris": 632,
+   "prims": 1,
+   "materials": 1,
+   "textures": 0,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [
+    "KHR_draco_mesh_compression"
+   ]
+  },
+  {
+   "dir": "3d models animals",
+   "file": "ancient_fortress_asset_pack_-_part_2 (1).glb",
+   "mb": 22.19,
+   "tris": 116359,
+   "prims": 17,
+   "materials": 2,
+   "textures": 3,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [],
+   "variantGroup": "ancient_fortress_asset_pack_-_part_2.glb",
+   "preferredFile": "ancient_fortress_asset_pack_-_part_2 (1).glb",
+   "variants": [
+    {
+     "file": "ancient_fortress_asset_pack_-_part_2 (1).glb",
+     "maxTexturePx": 2048,
+     "mb": 22.19,
+     "md5": "4a1178e2828b"
+    },
+    {
+     "file": "ancient_fortress_asset_pack_-_part_2.glb",
+     "maxTexturePx": 1024,
+     "mb": 12.13,
+     "md5": "d0c45d5731a1"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "world build",
+   "file": "ancient_historical_weapons_pack_mauryan_style.glb",
+   "mb": 4.38,
+   "tris": 12060,
+   "prims": 33,
+   "materials": 2,
+   "textures": 3,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [
+    "KHR_materials_specular"
+   ]
+  },
+  {
+   "dir": "3d models animals",
+   "file": "ancient_horse_chariot_mauryan_era (1).glb",
+   "mb": 10.54,
+   "tris": 23828,
+   "prims": 3,
+   "materials": 3,
+   "textures": 8,
+   "maxTexPx": null,
+   "skinned": true,
+   "joints": 215,
+   "animCount": 1,
+   "anims": [
+    "Scene"
+   ],
+   "exts": [],
+   "variantGroup": "ancient_horse_chariot_mauryan_era.glb",
+   "preferredFile": "ancient_horse_chariot_mauryan_era.glb",
+   "variants": [
+    {
+     "file": "ancient_horse_chariot_mauryan_era (1).glb",
+     "maxTexturePx": 1024,
+     "mb": 10.54,
+     "md5": "c122a900ecd6"
+    },
+    {
+     "file": "ancient_horse_chariot_mauryan_era.glb",
+     "maxTexturePx": 2048,
+     "mb": 29.47,
+     "md5": "e6b3da6ea7e7"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "ancient_ritual_stone_altar_mw.glb",
+   "mb": 65.11,
+   "tris": 1065913,
+   "prims": 11,
+   "materials": 1,
+   "textures": 4,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [
+    "KHR_materials_pbrSpecularGlossiness"
+   ]
+  },
+  {
+   "dir": "3d models animals",
+   "file": "ancient_temple_modular_kit (1).glb",
+   "mb": 83.18,
+   "tris": 25462,
+   "prims": 42,
+   "materials": 19,
+   "textures": 51,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [],
+   "variantGroup": "ancient_temple_modular_kit.glb",
+   "preferredFile": "ancient_temple_modular_kit (1).glb",
+   "variants": [
+    {
+     "file": "ancient_temple_modular_kit (1).glb",
+     "maxTexturePx": 2048,
+     "mb": 83.18,
+     "md5": "e4790d151d5e"
+    },
+    {
+     "file": "ancient_temple_modular_kit.glb",
+     "maxTexturePx": 1024,
+     "mb": 59,
+     "md5": "d17c840f8f08"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "world build",
+   "file": "ancient_tree.glb",
+   "mb": 6.94,
+   "tris": 22542,
+   "prims": 16,
+   "materials": 2,
+   "textures": 6,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": []
+  },
+  {
+   "dir": "3d models animals",
+   "file": "antique_books.glb",
+   "mb": 4.09,
+   "tris": 2852,
+   "prims": 20,
+   "materials": 2,
+   "textures": 6,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": []
+  },
+  {
+   "dir": "world build",
+   "file": "apple-tree.glb",
+   "mb": 0.01,
+   "tris": 568,
+   "prims": 1,
+   "materials": 1,
+   "textures": 0,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [
+    "KHR_draco_mesh_compression"
+   ]
+  },
+  {
+   "dir": "world build",
+   "file": "arborvitae-conifer.glb",
+   "mb": 0.01,
+   "tris": 590,
+   "prims": 1,
+   "materials": 1,
+   "textures": 0,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [
+    "KHR_draco_mesh_compression"
+   ]
+  },
+  {
+   "dir": "world build",
+   "file": "autumn_forest_asset_extra_low_poly.glb",
+   "mb": 5.94,
+   "tris": 91913,
+   "prims": 70,
+   "materials": 2,
+   "textures": 1,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [
+    "KHR_materials_unlit"
+   ]
+  },
+  {
+   "dir": "world build",
+   "file": "barrel_gameready.glb",
+   "mb": 2.32,
+   "tris": 4424,
+   "prims": 1,
+   "materials": 1,
+   "textures": 3,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": []
+  },
+  {
+   "dir": "world build",
+   "file": "barrel_with_wood.glb",
+   "mb": 1.5,
+   "tris": 3082,
+   "prims": 2,
+   "materials": 1,
+   "textures": 2,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [
+    "KHR_materials_specular"
+   ]
+  },
+  {
+   "dir": "world build",
+   "file": "basket-set.glb",
+   "mb": 0.01,
+   "tris": 958,
+   "prims": 1,
+   "materials": 1,
+   "textures": 0,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [
+    "KHR_draco_mesh_compression"
+   ]
+  },
+  {
+   "dir": "3d models animals",
+   "file": "blacksmith_anvil__tool_set_prop (1).glb",
+   "mb": 142.61,
+   "tris": 1884975,
+   "prims": 27,
+   "materials": 1,
+   "textures": 3,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [],
+   "variantGroup": "blacksmith_anvil__tool_set_prop.glb",
+   "preferredFile": "blacksmith_anvil__tool_set_prop (1).glb",
+   "variants": [
+    {
+     "file": "blacksmith_anvil__tool_set_prop (1).glb",
+     "maxTexturePx": 4096,
+     "mb": 142.61,
+     "md5": "95ab6bd1019d"
+    },
+    {
+     "file": "blacksmith_anvil__tool_set_prop.glb",
+     "maxTexturePx": 1024,
+     "mb": 128.64,
+     "md5": "457d98974f11"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "world build",
+   "file": "camel.glb",
+   "mb": 0.01,
+   "tris": 1224,
+   "prims": 1,
+   "materials": 1,
+   "textures": 0,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [
+    "KHR_draco_mesh_compression"
+   ]
+  },
+  {
+   "dir": "world build",
+   "file": "cave_rocks.glb",
+   "mb": 12.06,
+   "tris": 25809,
+   "prims": 22,
+   "materials": 3,
+   "textures": 9,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": []
+  },
+  {
+   "dir": "3d models animals",
+   "file": "chest__box__wooden_26_mb (1).glb",
+   "mb": 20.57,
+   "tris": 10296,
+   "prims": 7,
+   "materials": 3,
+   "textures": 9,
+   "maxTexPx": null,
+   "skinned": true,
+   "joints": 8,
+   "animCount": 1,
+   "anims": [
+    "CINEMA_4D_Main"
+   ],
+   "exts": [],
+   "variantGroup": "chest__box__wooden_26_mb.glb",
+   "preferredFile": "chest__box__wooden_26_mb (1).glb",
+   "variants": [
+    {
+     "file": "chest__box__wooden_26_mb (1).glb",
+     "maxTexturePx": 2048,
+     "mb": 20.57,
+     "md5": "8191c711ce7a"
+    },
+    {
+     "file": "chest__box__wooden_26_mb.glb",
+     "maxTexturePx": 1024,
+     "mb": 9.09,
+     "md5": "65807a976fa8"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "chicken_rig (1).glb",
+   "mb": 0.69,
+   "tris": 1541,
+   "prims": 1,
+   "materials": 1,
+   "textures": 1,
+   "maxTexPx": null,
+   "skinned": true,
+   "joints": 50,
+   "animCount": 1,
+   "anims": [
+    "Idle"
+   ],
+   "exts": []
+  },
+  {
+   "dir": "3d models animals",
+   "file": "clearwing_swallowtail (1).glb",
+   "mb": 1.38,
+   "tris": 11064,
+   "prims": 1,
+   "materials": 1,
+   "textures": 1,
+   "maxTexPx": null,
+   "skinned": true,
+   "joints": 62,
+   "animCount": 1,
+   "anims": [
+    "fly"
+   ],
+   "exts": [
+    "KHR_materials_specular"
+   ],
+   "variantGroup": "clearwing_swallowtail.glb",
+   "preferredFile": "clearwing_swallowtail.glb",
+   "variants": [
+    {
+     "file": "clearwing_swallowtail (1).glb",
+     "maxTexturePx": 1024,
+     "mb": 1.38,
+     "md5": "2d7ee1341b81"
+    },
+    {
+     "file": "clearwing_swallowtail.glb",
+     "maxTexturePx": 2048,
+     "mb": 3.43,
+     "md5": "375acf9e3362"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "crumbling_stone_watchtower.glb",
+   "mb": 109.27,
+   "tris": 1897327,
+   "prims": 22,
+   "materials": 1,
+   "textures": 3,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": []
+  },
+  {
+   "dir": "3d models animals",
+   "file": "dark_fantasy_themed_props_for_scene.glb",
+   "mb": 16.73,
+   "tris": 15209,
+   "prims": 75,
+   "materials": 6,
+   "textures": 18,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": []
+  },
+  {
+   "dir": "3d models animals",
+   "file": "demonic_twinblades_-_stylized_weapon__free (1).glb",
+   "mb": 29.78,
+   "tris": 21132,
+   "prims": 1,
+   "materials": 1,
+   "textures": 3,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [],
+   "variantGroup": "demonic_twinblades_-_stylized_weapon__free.glb",
+   "preferredFile": "demonic_twinblades_-_stylized_weapon__free (1).glb",
+   "variants": [
+    {
+     "file": "demonic_twinblades_-_stylized_weapon__free (1).glb",
+     "maxTexturePx": 4096,
+     "mb": 29.78,
+     "md5": "5085b264396f"
+    },
+    {
+     "file": "demonic_twinblades_-_stylized_weapon__free.glb",
+     "maxTexturePx": 1024,
+     "mb": 5.52,
+     "md5": "8bd3e1730e2a"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "doe__realistic_animated_3d_model (1) copy.glb",
+   "mb": 25.07,
+   "tris": 19950,
+   "prims": 2,
+   "materials": 2,
+   "textures": 1,
+   "maxTexPx": null,
+   "skinned": true,
+   "joints": 48,
+   "animCount": 46,
+   "anims": [
+    "SK-Deer_Female|AA_Stand_Idle_01",
+    "SK-Deer_Female|Death_Lying_R01",
+    "SK-Deer_Female|Death_Lying_R01_DeathPose",
+    "SK-Deer_Female|Death_Sitting_L01",
+    "SK-Deer_Female|Death_Sitting_L01_DeathPose",
+    "SK-Deer_Female|Death_Stand_R01",
+    "SK-Deer_Female|Death_Stand_R01_DeathPose",
+    "SK-Deer_Female|GetUp_Stand_R01",
+    "SK-Deer_Female|Hit_Lying_L01",
+    "SK-Deer_Female|Hit_Sitting_L01",
+    "SK-Deer_Female|Hit_Stand_L01",
+    "SK-Deer_Female|Loco_Run",
+    "SK-Deer_Female|Loco_RunL",
+    "SK-Deer_Female|Loco_RunR",
+    "SK-Deer_Female|Loco_Sneak",
+    "SK-Deer_Female|Loco_SneakL",
+    "SK-Deer_Female|Loco_SneakR",
+    "SK-Deer_Female|Loco_Sprint",
+    "SK-Deer_Female|Loco_SprintL",
+    "SK-Deer_Female|Loco_SprintR",
+    "SK-Deer_Female|Loco_Trot",
+    "SK-Deer_Female|Loco_TrotL",
+    "SK-Deer_Female|Loco_TrotR",
+    "SK-Deer_Female|Loco_Walk",
+    "SK-Deer_Female|Loco_WalkL",
+    "SK-Deer_Female|Loco_WalkR",
+    "SK-Deer_Female|Loco_WalkSlow",
+    "SK-Deer_Female|Loco_WalkSlowL",
+    "SK-Deer_Female|Loco_WalkSlowR",
+    "SK-Deer_Female|Lying_Breathing_01",
+    "SK-Deer_Female|Lying_Idle_01",
+    "SK-Deer_Female|Sitting_Breathing_01",
+    "SK-Deer_Female|Sitting_Idle_01",
+    "SK-Deer_Female|Stand_Breathing_01",
+    "SK-Deer_Female|Stand_Eating_01",
+    "SK-Deer_Female|Stand_Idle_02",
+    "SK-Deer_Female|Trans_Lying_to_Sitting",
+    "SK-Deer_Female|Trans_Lying_to_Stand",
+    "SK-Deer_Female|Trans_Sitting_to_Lying",
+    "SK-Deer_Female|Trans_Sitting_to_Stand"
+   ],
+   "exts": [
+    "KHR_materials_pbrSpecularGlossiness"
+   ],
+   "variantGroup": "doe__realistic_animated_3d_model.glb",
+   "preferredFile": "doe__realistic_animated_3d_model (1) copy.glb",
+   "variants": [
+    {
+     "file": "doe__realistic_animated_3d_model (1) copy.glb",
+     "maxTexturePx": 4096,
+     "mb": 25.07,
+     "md5": "127731af16a6"
+    },
+    {
+     "file": "doe__realistic_animated_3d_model (1).glb",
+     "maxTexturePx": 4096,
+     "mb": 25.07,
+     "md5": "127731af16a6"
+    },
+    {
+     "file": "doe__realistic_animated_3d_model copy.glb",
+     "maxTexturePx": 1024,
+     "mb": 11.87,
+     "md5": "44fe9a0c58a7"
+    },
+    {
+     "file": "doe__realistic_animated_3d_model.glb",
+     "maxTexturePx": 1024,
+     "mb": 11.87,
+     "md5": "44fe9a0c58a7"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "dove_bird_rigged.glb",
+   "mb": 1.05,
+   "tris": 2462,
+   "prims": 1,
+   "materials": 1,
+   "textures": 1,
+   "maxTexPx": null,
+   "skinned": true,
+   "joints": 75,
+   "animCount": 1,
+   "anims": [
+    "Take 001"
+   ],
+   "exts": []
+  },
+  {
+   "dir": "3d models animals",
+   "file": "dragon_egg_lowpoly (1).glb",
+   "mb": 10.93,
+   "tris": 960,
+   "prims": 1,
+   "materials": 1,
+   "textures": 3,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [],
+   "variantGroup": "dragon_egg_lowpoly.glb",
+   "preferredFile": "dragon_egg_lowpoly (1).glb",
+   "variants": [
+    {
+     "file": "dragon_egg_lowpoly (1).glb",
+     "maxTexturePx": 2048,
+     "mb": 10.93,
+     "md5": "7a80d7c7d904"
+    },
+    {
+     "file": "dragon_egg_lowpoly.glb",
+     "maxTexturePx": 1024,
+     "mb": 3.11,
+     "md5": "943f92fadcee"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "dragon_egg.glb",
+   "mb": 0.18,
+   "tris": 1920,
+   "prims": 2,
+   "materials": 2,
+   "textures": 0,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": []
+  },
+  {
+   "dir": "3d models animals",
+   "file": "dragonstone_throne (1).glb",
+   "mb": 101.01,
+   "tris": 3132,
+   "prims": 2,
+   "materials": 2,
+   "textures": 6,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [],
+   "variantGroup": "dragonstone_throne.glb",
+   "preferredFile": "dragonstone_throne (1).glb",
+   "variants": [
+    {
+     "file": "dragonstone_throne (1).glb",
+     "maxTexturePx": 4096,
+     "mb": 101.01,
+     "md5": "4b326d51d310"
+    },
+    {
+     "file": "dragonstone_throne.glb",
+     "maxTexturePx": 1024,
+     "mb": 7.67,
+     "md5": "f77389696fa0"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "world build",
+   "file": "dread_dragon_armor.glb",
+   "mb": 7.73,
+   "tris": 288532,
+   "prims": 6,
+   "materials": 1,
+   "textures": 0,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": []
+  },
+  {
+   "dir": "3d models animals",
+   "file": "drogon__game_of_thrones_dragon (1).glb",
+   "mb": 112.97,
+   "tris": 39234,
+   "prims": 2,
+   "materials": 2,
+   "textures": 2,
+   "maxTexPx": null,
+   "skinned": true,
+   "joints": 292,
+   "animCount": 52,
+   "anims": [
+    "SKM_DaenerysDragon|AA_DaenerysDragon_Battle_Stand",
+    "SKM_DaenerysDragon|DaenerysDragon_Battle_Attack01",
+    "SKM_DaenerysDragon|DaenerysDragon_Battle_Attack02",
+    "SKM_DaenerysDragon|DaenerysDragon_Battle_Attack03",
+    "SKM_DaenerysDragon|DaenerysDragon_Battle_Attack04",
+    "SKM_DaenerysDragon|DaenerysDragon_Battle_Attack06",
+    "SKM_DaenerysDragon|DaenerysDragon_Battle_Down",
+    "SKM_DaenerysDragon|DaenerysDragon_Battle_Down02",
+    "SKM_DaenerysDragon|DaenerysDragon_Battle_Skill01",
+    "SKM_DaenerysDragon|DaenerysDragon_Battle_Skill02",
+    "SKM_DaenerysDragon|DaenerysDragon_Battle_Skill02_01",
+    "SKM_DaenerysDragon|DaenerysDragon_Battle_Skill03",
+    "SKM_DaenerysDragon|DaenerysDragon_Battle_Skill03_01",
+    "SKM_DaenerysDragon|DaenerysDragon_Battle_Skill05",
+    "SKM_DaenerysDragon|DaenerysDragon_Battle_Skill06",
+    "SKM_DaenerysDragon|DaenerysDragon_Battle_Skill07",
+    "SKM_DaenerysDragon|DaenerysDragon_Battle_Skill08",
+    "SKM_DaenerysDragon|DaenerysDragon_Battle_Skill10_L",
+    "SKM_DaenerysDragon|DaenerysDragon_Battle_Skill10_R",
+    "SKM_DaenerysDragon|DaenerysDragon_Battle_Skill11_L",
+    "SKM_DaenerysDragon|DaenerysDragon_Battle_Skill11_R",
+    "SKM_DaenerysDragon|DaenerysDragon_Battle_SkyMoveL",
+    "SKM_DaenerysDragon|DaenerysDragon_Battle_SkyMoveR",
+    "SKM_DaenerysDragon|DaenerysDragon_Battle_SkyMoveR01",
+    "SKM_DaenerysDragon|DaenerysDragon_Battle_TurnL180",
+    "SKM_DaenerysDragon|DaenerysDragon_Battle_TurnL20",
+    "SKM_DaenerysDragon|DaenerysDragon_Battle_TurnL90",
+    "SKM_DaenerysDragon|DaenerysDragon_Battle_TurnR180",
+    "SKM_DaenerysDragon|DaenerysDragon_Battle_TurnR20",
+    "SKM_DaenerysDragon|DaenerysDragon_Battle_TurnR90",
+    "SKM_DaenerysDragon|DaenerysDragon_Battle_Up",
+    "SKM_DaenerysDragon|DaenerysDragon_Battle_Walk",
+    "SKM_DaenerysDragon|DaenerysDragon_Battle_WalkL",
+    "SKM_DaenerysDragon|DaenerysDragon_Battle_WalkR",
+    "SKM_DaenerysDragon|DaenerysDragon_Damage_Add_BattleStand_Chest",
+    "SKM_DaenerysDragon|DaenerysDragon_Damage_Add_BattleStand_LeftFoot",
+    "SKM_DaenerysDragon|DaenerysDragon_Damage_Add_BattleStand_RightFoot",
+    "SKM_DaenerysDragon|DaenerysDragon_Damage_Add_Groggy",
+    "SKM_DaenerysDragon|DaenerysDragon_Damage_GroggyAttack",
+    "SKM_DaenerysDragon|DaenerysDragon_Damage_GroggyEnd"
+   ],
+   "exts": [
+    "KHR_materials_pbrSpecularGlossiness"
+   ],
+   "variantGroup": "drogon__game_of_thrones_dragon.glb",
+   "preferredFile": "drogon__game_of_thrones_dragon.glb",
+   "variants": [
+    {
+     "file": "drogon__game_of_thrones_dragon (1).glb",
+     "maxTexturePx": 1024,
+     "mb": 112.97,
+     "md5": "1529379aeee6"
+    },
+    {
+     "file": "drogon__game_of_thrones_dragon.glb",
+     "maxTexturePx": 2048,
+     "mb": 121.31,
+     "md5": "9565625b7af9"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "world build",
+   "file": "drogon_game_of_thrones.glb",
+   "mb": 25.12,
+   "tris": 817118,
+   "prims": 12,
+   "materials": 1,
+   "textures": 0,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": []
+  },
+  {
+   "dir": "world build",
+   "file": "early_buddhist_shrine_circa_3rd_century_bc.glb",
+   "mb": 10.89,
+   "tris": 27885,
+   "prims": 3,
+   "materials": 3,
+   "textures": 6,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": []
+  },
+  {
+   "dir": "3d models animals",
+   "file": "eclecticist_column_-_egyptromangreek_style (1).glb",
+   "mb": 10.1,
+   "tris": 148064,
+   "prims": 2,
+   "materials": 1,
+   "textures": 2,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [],
+   "variantGroup": "eclecticist_column_-_egyptromangreek_style.glb",
+   "preferredFile": "eclecticist_column_-_egyptromangreek_style (1).glb",
+   "variants": [
+    {
+     "file": "eclecticist_column_-_egyptromangreek_style (1).glb",
+     "maxTexturePx": 2048,
+     "mb": 10.1,
+     "md5": "3b0244299efc"
+    },
+    {
+     "file": "eclecticist_column_-_egyptromangreek_style.glb",
+     "maxTexturePx": 1024,
+     "mb": 8.16,
+     "md5": "ec83d7a63071"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "egg_of_rock (1).glb",
+   "mb": 15.87,
+   "tris": 6752,
+   "prims": 1,
+   "materials": 1,
+   "textures": 3,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [],
+   "variantGroup": "egg_of_rock.glb",
+   "preferredFile": "egg_of_rock (1).glb",
+   "variants": [
+    {
+     "file": "egg_of_rock (1).glb",
+     "maxTexturePx": 4096,
+     "mb": 15.87,
+     "md5": "56f75b452ace"
+    },
+    {
+     "file": "egg_of_rock.glb",
+     "maxTexturePx": 1024,
+     "mb": 1.84,
+     "md5": "07c2a6ea9b03"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "elephant (1).glb",
+   "mb": 8.12,
+   "tris": 1958,
+   "prims": 1,
+   "materials": 1,
+   "textures": 1,
+   "maxTexPx": null,
+   "skinned": true,
+   "joints": 54,
+   "animCount": 28,
+   "anims": [
+    "TRS|attack",
+    "TRS|bind pose",
+    "TRS|death",
+    "TRS|drop",
+    "TRS|drop2",
+    "TRS|eating",
+    "TRS|end idle",
+    "TRS|fight",
+    "TRS|fight idle",
+    "TRS|fight idle01",
+    "TRS|hit back",
+    "TRS|hit front",
+    "TRS|hit left",
+    "TRS|hit right",
+    "TRS|HIT2",
+    "TRS|idle",
+    "TRS|idle down",
+    "TRS|idle Trumped",
+    "TRS|idle trumpet",
+    "TRS|pick",
+    "TRS|pick_STAND",
+    "TRS|rest",
+    "TRS|run",
+    "TRS|run attack",
+    "TRS|sit and agressive",
+    "TRS|sleep",
+    "TRS|wakeup",
+    "TRS|walk"
+   ],
+   "exts": [],
+   "variantGroup": "elephant.glb",
+   "preferredFile": "elephant.glb",
+   "variants": [
+    {
+     "file": "elephant (1).glb",
+     "maxTexturePx": 1024,
+     "mb": 8.12,
+     "md5": "35262a2d2a75"
+    },
+    {
+     "file": "elephant.glb",
+     "maxTexturePx": 2048,
+     "mb": 10.66,
+     "md5": "819e7eca67a0"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "elephant_animation_idle.glb",
+   "mb": 3.81,
+   "tris": 5998,
+   "prims": 1,
+   "materials": 1,
+   "textures": 2,
+   "maxTexPx": null,
+   "skinned": true,
+   "joints": 41,
+   "animCount": 1,
+   "anims": [
+    "CINEMA_4D_Principal"
+   ],
+   "exts": []
+  },
+  {
+   "dir": "3d models animals",
+   "file": "enchanted_crystal (1).glb",
+   "mb": 7.81,
+   "tris": 336,
+   "prims": 1,
+   "materials": 1,
+   "textures": 4,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [
+    "KHR_materials_emissive_strength"
+   ],
+   "variantGroup": "enchanted_crystal.glb",
+   "preferredFile": "enchanted_crystal (1).glb",
+   "variants": [
+    {
+     "file": "enchanted_crystal (1).glb",
+     "maxTexturePx": 2048,
+     "mb": 7.81,
+     "md5": "ce4e43e38fd8"
+    },
+    {
+     "file": "enchanted_crystal (2).glb",
+     "maxTexturePx": 1024,
+     "mb": 2.75,
+     "md5": "a427dbea44d0"
+    },
+    {
+     "file": "enchanted_crystal (3).glb",
+     "maxTexturePx": 2048,
+     "mb": 7.81,
+     "md5": "ce4e43e38fd8"
+    },
+    {
+     "file": "enchanted_crystal.glb",
+     "maxTexturePx": 1024,
+     "mb": 2.75,
+     "md5": "a427dbea44d0"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "world build",
+   "file": "executioner_warrior_-_hooded_axe__armor.glb",
+   "mb": 106.02,
+   "tris": 1895294,
+   "prims": 21,
+   "materials": 1,
+   "textures": 3,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": []
+  },
+  {
+   "dir": "world build",
+   "file": "fantasy_table.glb",
+   "mb": 4.27,
+   "tris": 7292,
+   "prims": 22,
+   "materials": 13,
+   "textures": 8,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": []
+  },
+  {
+   "dir": "3d models animals",
+   "file": "fire_dragon (1).glb",
+   "mb": 18.79,
+   "tris": 235124,
+   "prims": 6,
+   "materials": 3,
+   "textures": 10,
+   "maxTexPx": null,
+   "skinned": true,
+   "joints": 86,
+   "animCount": 1,
+   "anims": [
+    "Take 001"
+   ],
+   "exts": [],
+   "variantGroup": "fire_dragon.glb",
+   "preferredFile": "fire_dragon.glb",
+   "variants": [
+    {
+     "file": "fire_dragon (1).glb",
+     "maxTexturePx": 1024,
+     "mb": 18.79,
+     "md5": "c1bef4d574c9"
+    },
+    {
+     "file": "fire_dragon.glb",
+     "maxTexturePx": 2048,
+     "mb": 37.1,
+     "md5": "c619cf5bb370"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "world build",
+   "file": "floating_rune_monolith_-_ancient_stone.glb",
+   "mb": 120.06,
+   "tris": 1866832,
+   "prims": 25,
+   "materials": 1,
+   "textures": 3,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": []
+  },
+  {
+   "dir": "3d models animals",
+   "file": "fox_katana_free_for_download (1).glb",
+   "mb": 78.56,
+   "tris": 39594,
+   "prims": 2,
+   "materials": 2,
+   "textures": 6,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [],
+   "variantGroup": "fox_katana_free_for_download.glb",
+   "preferredFile": "fox_katana_free_for_download (1).glb",
+   "variants": [
+    {
+     "file": "fox_katana_free_for_download (1).glb",
+     "maxTexturePx": 4096,
+     "mb": 78.56,
+     "md5": "bbe4834271e2"
+    },
+    {
+     "file": "fox_katana_free_for_download.glb",
+     "maxTexturePx": 1024,
+     "mb": 7.89,
+     "md5": "6606dd0b110d"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "free_-_crimson_fiend_greatsword_gameready (1).glb",
+   "mb": 36.43,
+   "tris": 6900,
+   "prims": 1,
+   "materials": 1,
+   "textures": 3,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [],
+   "variantGroup": "free_-_crimson_fiend_greatsword_gameready.glb",
+   "preferredFile": "free_-_crimson_fiend_greatsword_gameready (1).glb",
+   "variants": [
+    {
+     "file": "free_-_crimson_fiend_greatsword_gameready (1).glb",
+     "maxTexturePx": 4096,
+     "mb": 36.43,
+     "md5": "5a2f468200f4"
+    },
+    {
+     "file": "free_-_crimson_fiend_greatsword_gameready.glb",
+     "maxTexturePx": 1024,
+     "mb": 3.92,
+     "md5": "0cc34ee7e543"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "frontier_fortifications (1).glb",
+   "mb": 19.08,
+   "tris": 26641,
+   "prims": 1,
+   "materials": 1,
+   "textures": 3,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [],
+   "variantGroup": "frontier_fortifications.glb",
+   "preferredFile": "frontier_fortifications (1).glb",
+   "variants": [
+    {
+     "file": "frontier_fortifications (1).glb",
+     "maxTexturePx": 2048,
+     "mb": 19.08,
+     "md5": "2b9fe90fda80"
+    },
+    {
+     "file": "frontier_fortifications.glb",
+     "maxTexturePx": 1024,
+     "mb": 7.15,
+     "md5": "aa431d25e5f8"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "fur_rug (1).glb",
+   "mb": 46.26,
+   "tris": 28,
+   "prims": 1,
+   "materials": 1,
+   "textures": 3,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [
+    "KHR_materials_specular"
+   ],
+   "variantGroup": "fur_rug.glb",
+   "preferredFile": "fur_rug (1).glb",
+   "variants": [
+    {
+     "file": "fur_rug (1).glb",
+     "maxTexturePx": 4096,
+     "mb": 46.26,
+     "md5": "6d5fd551ab3e"
+    },
+    {
+     "file": "fur_rug.glb",
+     "maxTexturePx": 1024,
+     "mb": 3.42,
+     "md5": "dccd77c73879"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "ga_free_101_dripping_wax_candle_cluster.glb",
+   "mb": 33.61,
+   "tris": 508602,
+   "prims": 6,
+   "materials": 1,
+   "textures": 4,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [
+    "KHR_materials_pbrSpecularGlossiness"
+   ]
+  },
+  {
+   "dir": "3d models animals",
+   "file": "ga_free_101_village_hen__speckled_farm_chicken (1).glb",
+   "mb": 57.48,
+   "tris": 500000,
+   "prims": 13,
+   "materials": 8,
+   "textures": 5,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [],
+   "variantGroup": "ga_free_101_village_hen__speckled_farm_chicken.glb",
+   "preferredFile": "ga_free_101_village_hen__speckled_farm_chicken (1).glb",
+   "variants": [
+    {
+     "file": "ga_free_101_village_hen__speckled_farm_chicken (1).glb",
+     "maxTexturePx": 2048,
+     "mb": 57.48,
+     "md5": "3f7127719d58"
+    },
+    {
+     "file": "ga_free_101_village_hen__speckled_farm_chicken.glb",
+     "maxTexturePx": 1024,
+     "mb": 46.47,
+     "md5": "b8fd8179fb83"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "ga_free_901_fantasy_villager_1.0 (1).glb",
+   "mb": 50.41,
+   "tris": 881753,
+   "prims": 9,
+   "materials": 1,
+   "textures": 3,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [
+    "KHR_materials_pbrSpecularGlossiness"
+   ],
+   "variantGroup": "ga_free_901_fantasy_villager_1.0.glb",
+   "preferredFile": "ga_free_901_fantasy_villager_1.0.glb",
+   "variants": [
+    {
+     "file": "ga_free_901_fantasy_villager_1.0 (1).glb",
+     "maxTexturePx": 1024,
+     "mb": 50.41,
+     "md5": "efc7d20a8eb1"
+    },
+    {
+     "file": "ga_free_901_fantasy_villager_1.0.glb",
+     "maxTexturePx": 2048,
+     "mb": 56.32,
+     "md5": "5eadbe0e576c"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "ga-free-101-old-tree-stump/source/0001.glb",
+   "mb": 72.23,
+   "tris": 1328004,
+   "prims": 1,
+   "materials": 1,
+   "textures": 4,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": []
+  },
+  {
+   "dir": "3d models animals",
+   "file": "ga-free-101-village-hen-speckled-farm-chicken/source/Ri.glb",
+   "mb": 44.2,
+   "tris": 500000,
+   "prims": 8,
+   "materials": 8,
+   "textures": 24,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": []
+  },
+  {
+   "dir": "3d models animals",
+   "file": "game_ready_carpet (1).glb",
+   "mb": 2.9,
+   "tris": 10,
+   "prims": 1,
+   "materials": 1,
+   "textures": 3,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [],
+   "variantGroup": "game_ready_carpet.glb",
+   "preferredFile": "game_ready_carpet.glb",
+   "variants": [
+    {
+     "file": "game_ready_carpet (1).glb",
+     "maxTexturePx": 1024,
+     "mb": 2.9,
+     "md5": "db59b71c64bf"
+    },
+    {
+     "file": "game_ready_carpet.glb",
+     "maxTexturePx": 2048,
+     "mb": 12.29,
+     "md5": "fe17082cc8cc"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "world build",
+   "file": "gemstone_crystals_-_asset_pack.glb",
+   "mb": 3.63,
+   "tris": 264,
+   "prims": 5,
+   "materials": 1,
+   "textures": 5,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [
+    "KHR_materials_transmission",
+    "KHR_materials_specular"
+   ]
+  },
+  {
+   "dir": "world build",
+   "file": "gnarly_trees.glb",
+   "mb": 18.91,
+   "tris": 52443,
+   "prims": 8,
+   "materials": 5,
+   "textures": 15,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [
+    "KHR_materials_pbrSpecularGlossiness"
+   ]
+  },
+  {
+   "dir": "3d models animals",
+   "file": "gothic_bed_01.glb",
+   "mb": 3.14,
+   "tris": 18741,
+   "prims": 1,
+   "materials": 1,
+   "textures": 3,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": []
+  },
+  {
+   "dir": "3d models animals",
+   "file": "gothic_structures_-_round_version (1).glb",
+   "mb": 17.85,
+   "tris": 23627,
+   "prims": 2,
+   "materials": 2,
+   "textures": 6,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [
+    "KHR_materials_specular"
+   ],
+   "variantGroup": "gothic_structures_-_round_version.glb",
+   "preferredFile": "gothic_structures_-_round_version (1).glb",
+   "variants": [
+    {
+     "file": "gothic_structures_-_round_version (1).glb",
+     "maxTexturePx": 2048,
+     "mb": 17.85,
+     "md5": "a2caab3e8c42"
+    },
+    {
+     "file": "gothic_structures_-_round_version.glb",
+     "maxTexturePx": 1024,
+     "mb": 6.21,
+     "md5": "eefef64d2e6f"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "world build",
+   "file": "grass_patches.glb",
+   "mb": 1.55,
+   "tris": 1910,
+   "prims": 3,
+   "materials": 1,
+   "textures": 3,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [
+    "KHR_materials_pbrSpecularGlossiness"
+   ]
+  },
+  {
+   "dir": "3d models animals",
+   "file": "green_dragon_egg_by_tripo (1).glb",
+   "mb": 39.23,
+   "tris": 499990,
+   "prims": 5,
+   "materials": 1,
+   "textures": 3,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [],
+   "variantGroup": "green_dragon_egg_by_tripo.glb",
+   "preferredFile": "green_dragon_egg_by_tripo (1).glb",
+   "variants": [
+    {
+     "file": "green_dragon_egg_by_tripo (1).glb",
+     "maxTexturePx": 4096,
+     "mb": 39.23,
+     "md5": "62fdf06c3a94"
+    },
+    {
+     "file": "green_dragon_egg_by_tripo.glb",
+     "maxTexturePx": 1024,
+     "mb": 27.12,
+     "md5": "6adf0550892a"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "guineafowl-realistic-3d-model-temprit (1).glb",
+   "mb": 4.16,
+   "tris": 9105,
+   "prims": 1,
+   "materials": 1,
+   "textures": 1,
+   "maxTexPx": null,
+   "skinned": true,
+   "joints": 165,
+   "animCount": 3,
+   "anims": [
+    "Guineafowl|Guineafowl_A_Idle",
+    "Guineafowl|Guineafowl_A_WalkMedium",
+    "Guineafowl|Guineafowl_B_FlyFlapping"
+   ],
+   "exts": [],
+   "variantGroup": "guineafowl-realistic-3d-model-temprit.glb",
+   "preferredFile": "guineafowl-realistic-3d-model-temprit.glb",
+   "variants": [
+    {
+     "file": "guineafowl-realistic-3d-model-temprit (1).glb",
+     "maxTexturePx": 1024,
+     "mb": 4.16,
+     "md5": "036ffdd0f5e5"
+    },
+    {
+     "file": "guineafowl-realistic-3d-model-temprit.glb",
+     "maxTexturePx": 2048,
+     "mb": 9.13,
+     "md5": "8b82a7b2b6b4"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "horse_-_realistic_3d_model_demo_free (1).glb",
+   "mb": 21.72,
+   "tris": 82426,
+   "prims": 5,
+   "materials": 5,
+   "textures": 5,
+   "maxTexPx": null,
+   "skinned": true,
+   "joints": 677,
+   "animCount": 2,
+   "anims": [
+    "Horse|Horse_Idle",
+    "Horse|Horse_Walk"
+   ],
+   "exts": [
+    "KHR_materials_pbrSpecularGlossiness"
+   ],
+   "variantGroup": "horse_-_realistic_3d_model_demo_free.glb",
+   "preferredFile": "horse_-_realistic_3d_model_demo_free.glb",
+   "variants": [
+    {
+     "file": "horse_-_realistic_3d_model_demo_free (1).glb",
+     "maxTexturePx": 1024,
+     "mb": 21.72,
+     "md5": "4673513f3f03"
+    },
+    {
+     "file": "horse_-_realistic_3d_model_demo_free.glb",
+     "maxTexturePx": 2048,
+     "mb": 26.05,
+     "md5": "02c3b7015023"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "horse_walk (1).glb",
+   "mb": 20.17,
+   "tris": 20776,
+   "prims": 2,
+   "materials": 2,
+   "textures": 3,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 1,
+   "anims": [
+    "Object_0"
+   ],
+   "exts": [
+    "KHR_materials_specular"
+   ],
+   "variantGroup": "horse_walk.glb",
+   "preferredFile": "horse_walk (1).glb",
+   "variants": [
+    {
+     "file": "horse_walk (1).glb",
+     "maxTexturePx": 4096,
+     "mb": 20.17,
+     "md5": "8a4a8586628f"
+    },
+    {
+     "file": "horse_walk.glb",
+     "maxTexturePx": 1024,
+     "mb": 10.07,
+     "md5": "f9b69959d251"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "horse-3d-model-free/source/model.glb",
+   "mb": 49.07,
+   "tris": 956163,
+   "prims": 1,
+   "materials": 1,
+   "textures": 4,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": []
+  },
+  {
+   "dir": "3d models animals",
+   "file": "ice_crystal_sword (1).glb",
+   "mb": 7.72,
+   "tris": 1588,
+   "prims": 10,
+   "materials": 1,
+   "textures": 4,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [
+    "KHR_materials_emissive_strength"
+   ],
+   "variantGroup": "ice_crystal_sword.glb",
+   "preferredFile": "ice_crystal_sword (1).glb",
+   "variants": [
+    {
+     "file": "ice_crystal_sword (1).glb",
+     "maxTexturePx": 2048,
+     "mb": 7.72,
+     "md5": "799b459b0295"
+    },
+    {
+     "file": "ice_crystal_sword.glb",
+     "maxTexturePx": 1024,
+     "mb": 2.74,
+     "md5": "8dbcba388f00"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "lava (1).glb",
+   "mb": 42.77,
+   "tris": 15600,
+   "prims": 1,
+   "materials": 1,
+   "textures": 4,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [],
+   "variantGroup": "lava.glb",
+   "preferredFile": "lava (1).glb",
+   "variants": [
+    {
+     "file": "lava (1).glb",
+     "maxTexturePx": 4096,
+     "mb": 42.77,
+     "md5": "7ab6145639e0"
+    },
+    {
+     "file": "lava.glb",
+     "maxTexturePx": 1024,
+     "mb": 3.76,
+     "md5": "1ab08bd62b4b"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "leather-coat-pants-high-poly/source/model.glb",
+   "mb": 35.83,
+   "tris": 716571,
+   "prims": 1,
+   "materials": 1,
+   "textures": 4,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": []
+  },
+  {
+   "dir": "world build",
+   "file": "low_poly_forest_tree_pack.glb",
+   "mb": 9.78,
+   "tris": 3747,
+   "prims": 30,
+   "materials": 6,
+   "textures": 17,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [
+    "KHR_materials_specular"
+   ]
+  },
+  {
+   "dir": "3d models animals",
+   "file": "low_poly_stylized_gemstones (1).glb",
+   "mb": 9.1,
+   "tris": 2390,
+   "prims": 25,
+   "materials": 5,
+   "textures": 15,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [],
+   "variantGroup": "low_poly_stylized_gemstones.glb",
+   "preferredFile": "low_poly_stylized_gemstones (2).glb",
+   "variants": [
+    {
+     "file": "low_poly_stylized_gemstones (1).glb",
+     "maxTexturePx": 1024,
+     "mb": 9.1,
+     "md5": "ca84863ed2d5"
+    },
+    {
+     "file": "low_poly_stylized_gemstones (2).glb",
+     "maxTexturePx": 2048,
+     "mb": 31.33,
+     "md5": "3d1cf81b72f9"
+    },
+    {
+     "file": "low_poly_stylized_gemstones (3).glb",
+     "maxTexturePx": 1024,
+     "mb": 9.1,
+     "md5": "ca84863ed2d5"
+    },
+    {
+     "file": "low_poly_stylized_gemstones.glb",
+     "maxTexturePx": 2048,
+     "mb": 31.33,
+     "md5": "3d1cf81b72f9"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "low_poly_stylized_rocks.glb",
+   "mb": 31.11,
+   "tris": 1082,
+   "prims": 15,
+   "materials": 15,
+   "textures": 45,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": []
+  },
+  {
+   "dir": "3d models animals",
+   "file": "magic_crystal (1).glb",
+   "mb": 113.82,
+   "tris": 123048,
+   "prims": 9,
+   "materials": 9,
+   "textures": 31,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [],
+   "variantGroup": "magic_crystal.glb",
+   "preferredFile": "magic_crystal (1).glb",
+   "variants": [
+    {
+     "file": "magic_crystal (1).glb",
+     "maxTexturePx": 4096,
+     "mb": 113.82,
+     "md5": "7af3c2c7e61c"
+    },
+    {
+     "file": "magic_crystal.glb",
+     "maxTexturePx": 1024,
+     "mb": 14.23,
+     "md5": "70505d3922df"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "magic-book-game-asset.glb",
+   "mb": 0.47,
+   "tris": 5772,
+   "prims": 27,
+   "materials": 6,
+   "textures": 0,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [
+    "KHR_materials_emissive_strength"
+   ]
+  },
+  {
+   "dir": "3d models animals",
+   "file": "male_body_base_mesh_highpoly.glb",
+   "mb": 12.79,
+   "tris": 475650,
+   "prims": 5,
+   "materials": 1,
+   "textures": 0,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": []
+  },
+  {
+   "dir": "3d models animals",
+   "file": "mannequin_armor_dummy_medieval_game_prop.glb",
+   "mb": 4.11,
+   "tris": 958,
+   "prims": 1,
+   "materials": 1,
+   "textures": 3,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": []
+  },
+  {
+   "dir": "3d models animals",
+   "file": "manniquin (1).glb",
+   "mb": 56.69,
+   "tris": 8224,
+   "prims": 29,
+   "materials": 1,
+   "textures": 3,
+   "maxTexPx": null,
+   "skinned": true,
+   "joints": 31,
+   "animCount": 0,
+   "anims": [],
+   "exts": [
+    "KHR_materials_specular"
+   ],
+   "variantGroup": "manniquin.glb",
+   "preferredFile": "manniquin (1).glb",
+   "variants": [
+    {
+     "file": "manniquin (1).glb",
+     "maxTexturePx": 4096,
+     "mb": 56.69,
+     "md5": "18d73f84bbbe"
+    },
+    {
+     "file": "manniquin.glb",
+     "maxTexturePx": 1024,
+     "mb": 3.75,
+     "md5": "dd53fba96ac7"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "medieval_fireplace. (1).glb",
+   "mb": 18.86,
+   "tris": 14534,
+   "prims": 15,
+   "materials": 1,
+   "textures": 3,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [
+    "KHR_materials_specular"
+   ],
+   "variantGroup": "medieval_fireplace..glb",
+   "preferredFile": "medieval_fireplace. (1).glb",
+   "variants": [
+    {
+     "file": "medieval_fireplace. (1).glb",
+     "maxTexturePx": 2048,
+     "mb": 18.86,
+     "md5": "4d207b4638d1"
+    },
+    {
+     "file": "medieval_fireplace..glb",
+     "maxTexturePx": 1024,
+     "mb": 5.83,
+     "md5": "df7152e20104"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "medieval_market_tent_prop_01 (1).glb",
+   "mb": 124.94,
+   "tris": 659975,
+   "prims": 111,
+   "materials": 23,
+   "textures": 89,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [],
+   "variantGroup": "medieval_market_tent_prop_01.glb",
+   "preferredFile": "medieval_market_tent_prop_01 (1).glb",
+   "variants": [
+    {
+     "file": "medieval_market_tent_prop_01 (1).glb",
+     "maxTexturePx": 4096,
+     "mb": 124.94,
+     "md5": "a5748129621e"
+    },
+    {
+     "file": "medieval_market_tent_prop_01.glb",
+     "maxTexturePx": 1024,
+     "mb": 95.5,
+     "md5": "5b8fb9a848f2"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "medieval_sceneray (1).glb",
+   "mb": 239.26,
+   "tris": 50653,
+   "prims": 292,
+   "materials": 19,
+   "textures": 52,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [
+    "KHR_materials_specular",
+    "KHR_materials_transmission"
+   ],
+   "variantGroup": "medieval_sceneray.glb",
+   "preferredFile": "medieval_sceneray (1).glb",
+   "variants": [
+    {
+     "file": "medieval_sceneray (1).glb",
+     "maxTexturePx": 2048,
+     "mb": 239.26,
+     "md5": "1c5340074760"
+    },
+    {
+     "file": "medieval_sceneray.glb",
+     "maxTexturePx": 1024,
+     "mb": 72.2,
+     "md5": "d954f013874a"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "medieval_telescope.glb",
+   "mb": 19.12,
+   "tris": 69106,
+   "prims": 1,
+   "materials": 1,
+   "textures": 3,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": []
+  },
+  {
+   "dir": "3d models animals",
+   "file": "mega_wyvern.glb",
+   "mb": 5.34,
+   "tris": 16222,
+   "prims": 1,
+   "materials": 1,
+   "textures": 3,
+   "maxTexPx": null,
+   "skinned": true,
+   "joints": 70,
+   "animCount": 11,
+   "anims": [
+    "Idle",
+    "Flame Blast",
+    "Death",
+    "Combo Hit",
+    "Roar",
+    "Beam|Roar",
+    "Fire Balls",
+    "Talon Smash",
+    "Strike Swoop",
+    "Wind Blast|Wing Slap",
+    "Appearance"
+   ],
+   "exts": [
+    "KHR_materials_specular"
+   ]
+  },
+  {
+   "dir": "3d models animals",
+   "file": "midnight-black-horse-3d-model-free/source/Meshy_AI_Midnight_Grace_0620005504_texture.glb",
+   "mb": 43.96,
+   "tris": 1212676,
+   "prims": 1,
+   "materials": 1,
+   "textures": 4,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": []
+  },
+  {
+   "dir": "world build",
+   "file": "mudbrick-house.glb",
+   "mb": 0.01,
+   "tris": 1548,
+   "prims": 1,
+   "materials": 1,
+   "textures": 0,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [
+    "KHR_draco_mesh_compression"
+   ]
+  },
+  {
+   "dir": "3d models animals",
+   "file": "nightmare.glb",
+   "mb": 0.19,
+   "tris": 972,
+   "prims": 81,
+   "materials": 1,
+   "textures": 1,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 6,
+   "anims": [
+    "flying post image",
+    "standing post image",
+    "walking",
+    "idle roosting",
+    "flying",
+    "barrel roll"
+   ],
+   "exts": []
+  },
+  {
+   "dir": "3d models animals",
+   "file": "noble_columns_-_asset_pack (1).glb",
+   "mb": 42.13,
+   "tris": 296741,
+   "prims": 8,
+   "materials": 6,
+   "textures": 12,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [],
+   "variantGroup": "noble_columns_-_asset_pack.glb",
+   "preferredFile": "noble_columns_-_asset_pack (1).glb",
+   "variants": [
+    {
+     "file": "noble_columns_-_asset_pack (1).glb",
+     "maxTexturePx": 2048,
+     "mb": 42.13,
+     "md5": "9295e431f864"
+    },
+    {
+     "file": "noble_columns_-_asset_pack.glb",
+     "maxTexturePx": 1024,
+     "mb": 22.76,
+     "md5": "8f0a8b68129c"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "world build",
+   "file": "oak_trees.glb",
+   "mb": 8.91,
+   "tris": 14475,
+   "prims": 198,
+   "materials": 2,
+   "textures": 6,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": []
+  },
+  {
+   "dir": "world build",
+   "file": "obelisk.glb",
+   "mb": 0,
+   "tris": 776,
+   "prims": 1,
+   "materials": 1,
+   "textures": 0,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [
+    "KHR_draco_mesh_compression"
+   ]
+  },
+  {
+   "dir": "3d models animals",
+   "file": "opulent_rug (1).glb",
+   "mb": 54.29,
+   "tris": 28,
+   "prims": 1,
+   "materials": 1,
+   "textures": 3,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [
+    "KHR_materials_specular"
+   ],
+   "variantGroup": "opulent_rug.glb",
+   "preferredFile": "opulent_rug (1).glb",
+   "variants": [
+    {
+     "file": "opulent_rug (1).glb",
+     "maxTexturePx": 4096,
+     "mb": 54.29,
+     "md5": "c66638819a98"
+    },
+    {
+     "file": "opulent_rug.glb",
+     "maxTexturePx": 1024,
+     "mb": 5.17,
+     "md5": "61cf51064408"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "overgrown_courtyard_patio_ruin.glb",
+   "mb": 111.73,
+   "tris": 1910497,
+   "prims": 22,
+   "materials": 1,
+   "textures": 3,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": []
+  },
+  {
+   "dir": "world build",
+   "file": "paladin.glb",
+   "mb": 9.72,
+   "tris": 16840,
+   "prims": 6,
+   "materials": 3,
+   "textures": 9,
+   "maxTexPx": null,
+   "skinned": true,
+   "joints": 65,
+   "animCount": 0,
+   "anims": [],
+   "exts": []
+  },
+  {
+   "dir": "3d models animals",
+   "file": "patch_mercenary_stalker.glb",
+   "mb": 4.19,
+   "tris": 2200,
+   "prims": 1,
+   "materials": 1,
+   "textures": 3,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": []
+  },
+  {
+   "dir": "3d models animals",
+   "file": "pearl_inlaid_throne (1).glb",
+   "mb": 37.92,
+   "tris": 1054,
+   "prims": 1,
+   "materials": 1,
+   "textures": 3,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [],
+   "variantGroup": "pearl_inlaid_throne.glb",
+   "preferredFile": "pearl_inlaid_throne (1).glb",
+   "variants": [
+    {
+     "file": "pearl_inlaid_throne (1).glb",
+     "maxTexturePx": 4096,
+     "mb": 37.92,
+     "md5": "fcbd75c073a4"
+    },
+    {
+     "file": "pearl_inlaid_throne.glb",
+     "maxTexturePx": 1024,
+     "mb": 3.09,
+     "md5": "df0a4d756d54"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "pedestal (1).glb",
+   "mb": 14.51,
+   "tris": 702,
+   "prims": 1,
+   "materials": 1,
+   "textures": 4,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [],
+   "variantGroup": "pedestal.glb",
+   "preferredFile": "pedestal (1).glb",
+   "variants": [
+    {
+     "file": "pedestal (1).glb",
+     "maxTexturePx": 2048,
+     "mb": 14.51,
+     "md5": "26910c516044"
+    },
+    {
+     "file": "pedestal.glb",
+     "maxTexturePx": 1024,
+     "mb": 4,
+     "md5": "943af2393291"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "world build",
+   "file": "petrified_dragon_egg_-_fossil_prop.glb",
+   "mb": 98.96,
+   "tris": 1819649,
+   "prims": 20,
+   "materials": 1,
+   "textures": 3,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [],
+   "variantGroup": "petrified_dragon_egg_-_fossil_prop.glb",
+   "preferredFile": "petrified_dragon_egg_-_fossil_prop (1).glb",
+   "variants": [
+    {
+     "file": "petrified_dragon_egg_-_fossil_prop.glb",
+     "maxTexturePx": 1024,
+     "mb": 98.96,
+     "md5": "1f20e2f04759"
+    },
+    {
+     "file": "petrified_dragon_egg_-_fossil_prop (1).glb",
+     "maxTexturePx": 4096,
+     "mb": 110.43,
+     "md5": "a63ff4c1a27c"
+    },
+    {
+     "file": "petrified_dragon_egg_-_fossil_prop.glb",
+     "maxTexturePx": 1024,
+     "mb": 98.96,
+     "md5": "1f20e2f04759"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "world build",
+   "file": "portal.glb",
+   "mb": 3.69,
+   "tris": 1356,
+   "prims": 7,
+   "materials": 1,
+   "textures": 4,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [
+    "KHR_materials_pbrSpecularGlossiness"
+   ]
+  },
+  {
+   "dir": "3d models animals",
+   "file": "potion (1) copy.glb",
+   "mb": 27.35,
+   "tris": 4170,
+   "prims": 4,
+   "materials": 3,
+   "textures": 11,
+   "maxTexPx": null,
+   "skinned": true,
+   "joints": 37,
+   "animCount": 1,
+   "anims": [
+    "Take 001"
+   ],
+   "exts": [
+    "KHR_materials_emissive_strength",
+    "KHR_materials_transmission"
+   ],
+   "variantGroup": "potion.glb",
+   "preferredFile": "potion (1) copy.glb",
+   "variants": [
+    {
+     "file": "potion (1) copy.glb",
+     "maxTexturePx": 2048,
+     "mb": 27.35,
+     "md5": "1024371d4d79"
+    },
+    {
+     "file": "potion (1).glb",
+     "maxTexturePx": 2048,
+     "mb": 27.35,
+     "md5": "1024371d4d79"
+    },
+    {
+     "file": "potion copy.glb",
+     "maxTexturePx": 1024,
+     "mb": 8.33,
+     "md5": "f4837c7372c9"
+    },
+    {
+     "file": "potion.glb",
+     "maxTexturePx": 1024,
+     "mb": 8.33,
+     "md5": "f4837c7372c9"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "props_for_game (1).glb",
+   "mb": 51.48,
+   "tris": 220536,
+   "prims": 170,
+   "materials": 23,
+   "textures": 29,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [
+    "KHR_texture_transform"
+   ],
+   "variantGroup": "props_for_game.glb",
+   "preferredFile": "props_for_game (1).glb",
+   "variants": [
+    {
+     "file": "props_for_game (1).glb",
+     "maxTexturePx": 2048,
+     "mb": 51.48,
+     "md5": "aab86db389ad"
+    },
+    {
+     "file": "props_for_game.glb",
+     "maxTexturePx": 1024,
+     "mb": 22.47,
+     "md5": "b439828e773b"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "prowler_dragon_variant_rig (1).glb",
+   "mb": 16.22,
+   "tris": 19766,
+   "prims": 17,
+   "materials": 3,
+   "textures": 4,
+   "maxTexPx": null,
+   "skinned": true,
+   "joints": 126,
+   "animCount": 3,
+   "anims": [
+    "Walk",
+    "PoseLib",
+    "Landing"
+   ],
+   "exts": [],
+   "variantGroup": "prowler_dragon_variant_rig.glb",
+   "preferredFile": "prowler_dragon_variant_rig (1).glb",
+   "variants": [
+    {
+     "file": "prowler_dragon_variant_rig (1).glb",
+     "maxTexturePx": 2048,
+     "mb": 16.22,
+     "md5": "9e77be041dbe"
+    },
+    {
+     "file": "prowler_dragon_variant_rig.glb",
+     "maxTexturePx": 1024,
+     "mb": 7.24,
+     "md5": "95054bdca435"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "rabbit_rigged.glb",
+   "mb": 0.31,
+   "tris": 2578,
+   "prims": 1,
+   "materials": 1,
+   "textures": 1,
+   "maxTexPx": null,
+   "skinned": true,
+   "joints": 48,
+   "animCount": 1,
+   "anims": [
+    "Take 001"
+   ],
+   "exts": []
+  },
+  {
+   "dir": "3d models animals",
+   "file": "realistic_animals_full_pack_demo_free (1).glb",
+   "mb": 198.71,
+   "tris": 447818,
+   "prims": 68,
+   "materials": 67,
+   "textures": 61,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [
+    "KHR_materials_pbrSpecularGlossiness"
+   ],
+   "variantGroup": "realistic_animals_full_pack_demo_free.glb",
+   "preferredFile": "realistic_animals_full_pack_demo_free (1).glb",
+   "variants": [
+    {
+     "file": "realistic_animals_full_pack_demo_free (1).glb",
+     "maxTexturePx": 4096,
+     "mb": 198.71,
+     "md5": "780365ac90ed"
+    },
+    {
+     "file": "realistic_animals_full_pack_demo_free.glb",
+     "maxTexturePx": 1024,
+     "mb": 80.23,
+     "md5": "51ffff2bb0b0"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "red_wyvern.glb",
+   "mb": 0.12,
+   "tris": 608,
+   "prims": 64,
+   "materials": 1,
+   "textures": 1,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 1,
+   "anims": [
+    "animation_flying"
+   ],
+   "exts": []
+  },
+  {
+   "dir": "3d models animals",
+   "file": "retropc_chess (1).glb",
+   "mb": 29.2,
+   "tris": 213562,
+   "prims": 33,
+   "materials": 13,
+   "textures": 41,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [
+    "KHR_materials_emissive_strength"
+   ],
+   "variantGroup": "retropc_chess.glb",
+   "preferredFile": "retropc_chess.glb",
+   "variants": [
+    {
+     "file": "retropc_chess (1).glb",
+     "maxTexturePx": 1024,
+     "mb": 29.2,
+     "md5": "76cbe0252505"
+    },
+    {
+     "file": "retropc_chess.glb",
+     "maxTexturePx": 2048,
+     "mb": 78.95,
+     "md5": "8a97c56281c4"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "robowyvern (1).glb",
+   "mb": 11.75,
+   "tris": 30950,
+   "prims": 50,
+   "materials": 1,
+   "textures": 2,
+   "maxTexPx": null,
+   "skinned": true,
+   "joints": 40,
+   "animCount": 6,
+   "anims": [
+    "ArmatureAction",
+    "Armature|Armature",
+    "Armature|Armature.001",
+    "Armature|Armature.002",
+    "Armature|ArmatureAction",
+    "Armature|ArmatureAction.001"
+   ],
+   "exts": [],
+   "variantGroup": "robowyvern.glb",
+   "preferredFile": "robowyvern (1).glb",
+   "variants": [
+    {
+     "file": "robowyvern (1).glb",
+     "maxTexturePx": 2048,
+     "mb": 11.75,
+     "md5": "b2f5f19ef69f"
+    },
+    {
+     "file": "robowyvern.glb",
+     "maxTexturePx": 1024,
+     "mb": 7.34,
+     "md5": "69167f02b144"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "world build",
+   "file": "rocks_set_3 (1).glb",
+   "mb": 16.57,
+   "tris": 11352,
+   "prims": 11,
+   "materials": 4,
+   "textures": 12,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [],
+   "variantGroup": "rocks_set_3.glb",
+   "preferredFile": "rocks_set_3.glb",
+   "variants": [
+    {
+     "file": "rocks_set_3 (1).glb",
+     "maxTexturePx": 1024,
+     "mb": 16.57,
+     "md5": "b7c6665103af"
+    },
+    {
+     "file": "rocks_set_3.glb",
+     "maxTexturePx": 4096,
+     "mb": 146.41,
+     "md5": "afa2f38a0586"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "world build",
+   "file": "rocks_set2.glb",
+   "mb": 10.45,
+   "tris": 40041,
+   "prims": 12,
+   "materials": 2,
+   "textures": 6,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [
+    "KHR_materials_pbrSpecularGlossiness"
+   ]
+  },
+  {
+   "dir": "3d models animals",
+   "file": "samurai_oni_mask (1).glb",
+   "mb": 16.88,
+   "tris": 41488,
+   "prims": 1,
+   "materials": 1,
+   "textures": 3,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [],
+   "variantGroup": "samurai_oni_mask.glb",
+   "preferredFile": "samurai_oni_mask (1).glb",
+   "variants": [
+    {
+     "file": "samurai_oni_mask (1).glb",
+     "maxTexturePx": 2048,
+     "mb": 16.88,
+     "md5": "071493d27b57"
+    },
+    {
+     "file": "samurai_oni_mask.glb",
+     "maxTexturePx": 1024,
+     "mb": 5.69,
+     "md5": "670bfbc5a339"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "world build",
+   "file": "samurai_warrior_-_traditional_japanese_armor.glb",
+   "mb": 5.89,
+   "tris": 50015,
+   "prims": 1,
+   "materials": 1,
+   "textures": 2,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [
+    "KHR_materials_specular"
+   ]
+  },
+  {
+   "dir": "3d models animals",
+   "file": "siege_at_night_medievalremixchallenge (1).glb",
+   "mb": 42.55,
+   "tris": 522096,
+   "prims": 3284,
+   "materials": 63,
+   "textures": 17,
+   "maxTexPx": null,
+   "skinned": true,
+   "joints": 1,
+   "animCount": 0,
+   "anims": [],
+   "exts": [],
+   "variantGroup": "siege_at_night_medievalremixchallenge.glb",
+   "preferredFile": "siege_at_night_medievalremixchallenge (1).glb",
+   "variants": [
+    {
+     "file": "siege_at_night_medievalremixchallenge (1).glb",
+     "maxTexturePx": 2048,
+     "mb": 42.55,
+     "md5": "30d2b44ddd97"
+    },
+    {
+     "file": "siege_at_night_medievalremixchallenge.glb",
+     "maxTexturePx": 1024,
+     "mb": 42.06,
+     "md5": "ec62d9f6b5db"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "world build",
+   "file": "skeleton_lord.glb",
+   "mb": 10.41,
+   "tris": 8665,
+   "prims": 5,
+   "materials": 4,
+   "textures": 12,
+   "maxTexPx": null,
+   "skinned": true,
+   "joints": 89,
+   "animCount": 1,
+   "anims": [
+    "tposeidlewalk"
+   ],
+   "exts": []
+  },
+  {
+   "dir": "world build",
+   "file": "stone-well.glb",
+   "mb": 0.01,
+   "tris": 884,
+   "prims": 1,
+   "materials": 1,
+   "textures": 0,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [
+    "KHR_draco_mesh_compression"
+   ]
+  },
+  {
+   "dir": "3d models animals",
+   "file": "stove_forge_blacksmith.glb",
+   "mb": 36.15,
+   "tris": 99474,
+   "prims": 14,
+   "materials": 14,
+   "textures": 57,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [
+    "KHR_materials_specular",
+    "KHR_materials_emissive_strength"
+   ]
+  },
+  {
+   "dir": "world build",
+   "file": "strong_knight.glb",
+   "mb": 8.95,
+   "tris": 12944,
+   "prims": 5,
+   "materials": 3,
+   "textures": 9,
+   "maxTexPx": null,
+   "skinned": true,
+   "joints": 65,
+   "animCount": 1,
+   "anims": [
+    "idle1"
+   ],
+   "exts": [
+    "KHR_materials_pbrSpecularGlossiness"
+   ]
+  },
+  {
+   "dir": "world build",
+   "file": "stylised_crystal_shrine.glb",
+   "mb": 11.68,
+   "tris": 12285,
+   "prims": 15,
+   "materials": 15,
+   "textures": 16,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": []
+  },
+  {
+   "dir": "3d models animals",
+   "file": "stylised_rocks_asset_pack (1).glb",
+   "mb": 99.22,
+   "tris": 336872,
+   "prims": 184,
+   "materials": 4,
+   "textures": 16,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [
+    "KHR_materials_specular"
+   ],
+   "variantGroup": "stylised_rocks_asset_pack.glb",
+   "preferredFile": "stylised_rocks_asset_pack (1).glb",
+   "variants": [
+    {
+     "file": "stylised_rocks_asset_pack (1).glb",
+     "maxTexturePx": 2048,
+     "mb": 99.22,
+     "md5": "437dfcd5100b"
+    },
+    {
+     "file": "stylised_rocks_asset_pack.glb",
+     "maxTexturePx": 1024,
+     "mb": 65.48,
+     "md5": "9ece98258113"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "stylized_dianite_sword (1).glb",
+   "mb": 7.95,
+   "tris": 1172,
+   "prims": 1,
+   "materials": 1,
+   "textures": 3,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [],
+   "variantGroup": "stylized_dianite_sword.glb",
+   "preferredFile": "stylized_dianite_sword (1).glb",
+   "variants": [
+    {
+     "file": "stylized_dianite_sword (1).glb",
+     "maxTexturePx": 2048,
+     "mb": 7.95,
+     "md5": "d83d71b9aba1"
+    },
+    {
+     "file": "stylized_dianite_sword.glb",
+     "maxTexturePx": 1024,
+     "mb": 2.68,
+     "md5": "c9d61bbd4b07"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "stylized_dragon_flag (1).glb",
+   "mb": 1.28,
+   "tris": 2336,
+   "prims": 1,
+   "materials": 1,
+   "textures": 1,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [],
+   "variantGroup": "stylized_dragon_flag.glb",
+   "preferredFile": "stylized_dragon_flag (1).glb",
+   "variants": [
+    {
+     "file": "stylized_dragon_flag (1).glb",
+     "maxTexturePx": 2048,
+     "mb": 1.28,
+     "md5": "8478ce6b1f12"
+    },
+    {
+     "file": "stylized_dragon_flag.glb",
+     "maxTexturePx": 1024,
+     "mb": 0.53,
+     "md5": "c986dfd0b78b"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "stylized_ruby_sword (1).glb",
+   "mb": 9.08,
+   "tris": 2158,
+   "prims": 1,
+   "materials": 1,
+   "textures": 3,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [],
+   "variantGroup": "stylized_ruby_sword.glb",
+   "preferredFile": "stylized_ruby_sword (1).glb",
+   "variants": [
+    {
+     "file": "stylized_ruby_sword (1).glb",
+     "maxTexturePx": 2048,
+     "mb": 9.08,
+     "md5": "4778737c4cd3"
+    },
+    {
+     "file": "stylized_ruby_sword.glb",
+     "maxTexturePx": 1024,
+     "mb": 3.11,
+     "md5": "e8109674f8e8"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "world build",
+   "file": "tear_shape_sapphire.glb",
+   "mb": 0.04,
+   "tris": 544,
+   "prims": 1,
+   "materials": 1,
+   "textures": 0,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [
+    "KHR_materials_clearcoat",
+    "KHR_materials_transmission",
+    "KHR_materials_specular"
+   ]
+  },
+  {
+   "dir": "3d models animals",
+   "file": "temple_ruins_asset_pack (1).glb",
+   "mb": 24.28,
+   "tris": 231857,
+   "prims": 77,
+   "materials": 5,
+   "textures": 20,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [
+    "KHR_materials_specular"
+   ],
+   "variantGroup": "temple_ruins_asset_pack.glb",
+   "preferredFile": "temple_ruins_asset_pack.glb",
+   "variants": [
+    {
+     "file": "temple_ruins_asset_pack (1).glb",
+     "maxTexturePx": 1024,
+     "mb": 24.28,
+     "md5": "e1d118504956"
+    },
+    {
+     "file": "temple_ruins_asset_pack.glb",
+     "maxTexturePx": 2048,
+     "mb": 61.26,
+     "md5": "e95bcb073a2c"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "tent (1).glb",
+   "mb": 24.38,
+   "tris": 9201,
+   "prims": 3,
+   "materials": 3,
+   "textures": 7,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [],
+   "variantGroup": "tent.glb",
+   "preferredFile": "tent (1).glb",
+   "variants": [
+    {
+     "file": "tent (1).glb",
+     "maxTexturePx": 2048,
+     "mb": 24.38,
+     "md5": "2d953d3dd081"
+    },
+    {
+     "file": "tent.glb",
+     "maxTexturePx": 1024,
+     "mb": 7.16,
+     "md5": "172eeb6d2439"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "tent_tribal_guard_17_mb.glb",
+   "mb": 10.7,
+   "tris": 9201,
+   "prims": 3,
+   "materials": 3,
+   "textures": 9,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": []
+  },
+  {
+   "dir": "world build",
+   "file": "terracotta_worn_tiled_floor.glb",
+   "mb": 1.6,
+   "tris": 1536,
+   "prims": 1,
+   "materials": 1,
+   "textures": 2,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [
+    "KHR_materials_specular"
+   ]
+  },
+  {
+   "dir": "3d models animals",
+   "file": "the_medieval_book_stand (1).glb",
+   "mb": 8.09,
+   "tris": 2348,
+   "prims": 1,
+   "materials": 1,
+   "textures": 2,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [],
+   "variantGroup": "the_medieval_book_stand.glb",
+   "preferredFile": "the_medieval_book_stand (1).glb",
+   "variants": [
+    {
+     "file": "the_medieval_book_stand (1).glb",
+     "maxTexturePx": 2048,
+     "mb": 8.09,
+     "md5": "4c3b3e18855b"
+    },
+    {
+     "file": "the_medieval_book_stand.glb",
+     "maxTexturePx": 1024,
+     "mb": 2.27,
+     "md5": "cdf541cf7713"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "world build",
+   "file": "tomb-entrance.glb",
+   "mb": 0.01,
+   "tris": 2110,
+   "prims": 1,
+   "materials": 1,
+   "textures": 0,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [
+    "KHR_draco_mesh_compression"
+   ]
+  },
+  {
+   "dir": "3d models animals",
+   "file": "travelers_flask_relic_of_the_wilds (1).glb",
+   "mb": 43.63,
+   "tris": 58040,
+   "prims": 11,
+   "materials": 1,
+   "textures": 3,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [],
+   "variantGroup": "travelers_flask_relic_of_the_wilds.glb",
+   "preferredFile": "travelers_flask_relic_of_the_wilds (1).glb",
+   "variants": [
+    {
+     "file": "travelers_flask_relic_of_the_wilds (1).glb",
+     "maxTexturePx": 4096,
+     "mb": 43.63,
+     "md5": "b3597cc90038"
+    },
+    {
+     "file": "travelers_flask_relic_of_the_wilds.glb",
+     "maxTexturePx": 1024,
+     "mb": 5.04,
+     "md5": "40ffbae92b45"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "twixxel.glb",
+   "mb": 0.02,
+   "tris": 144,
+   "prims": 12,
+   "materials": 1,
+   "textures": 1,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": []
+  },
+  {
+   "dir": "3d models animals",
+   "file": "violet_crystal_formation_glowing_rock_cluster (1).glb",
+   "mb": 142.62,
+   "tris": 1998250,
+   "prims": 26,
+   "materials": 1,
+   "textures": 3,
+   "maxTexPx": null,
+   "skinned": false,
+   "joints": 0,
+   "animCount": 0,
+   "anims": [],
+   "exts": [],
+   "variantGroup": "violet_crystal_formation_glowing_rock_cluster.glb",
+   "preferredFile": "violet_crystal_formation_glowing_rock_cluster (1).glb",
+   "variants": [
+    {
+     "file": "violet_crystal_formation_glowing_rock_cluster (1).glb",
+     "maxTexturePx": 4096,
+     "mb": 142.62,
+     "md5": "b2c79563ce7c"
+    },
+    {
+     "file": "violet_crystal_formation_glowing_rock_cluster.glb",
+     "maxTexturePx": 1024,
+     "mb": 128.75,
+     "md5": "af730f4eae5d"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "world build",
+   "file": "warrior.glb",
+   "mb": 3.64,
+   "tris": 29076,
+   "prims": 1,
+   "materials": 1,
+   "textures": 3,
+   "maxTexPx": null,
+   "skinned": true,
+   "joints": 52,
+   "animCount": 1,
+   "anims": [
+    "Scene"
+   ],
+   "exts": []
+  },
+  {
+   "dir": "3d models animals",
+   "file": "wolf_with_animations (1).glb",
+   "mb": 4.18,
+   "tris": 2760,
+   "prims": 6,
+   "materials": 6,
+   "textures": 8,
+   "maxTexPx": null,
+   "skinned": true,
+   "joints": 49,
+   "animCount": 5,
+   "anims": [
+    "01_Run",
+    "02_walk",
+    "03_creep",
+    "04_Idle",
+    "05_site"
+   ],
+   "exts": [
+    "KHR_materials_pbrSpecularGlossiness"
+   ],
+   "variantGroup": "wolf_with_animations.glb",
+   "preferredFile": "wolf_with_animations (3).glb",
+   "variants": [
+    {
+     "file": "wolf_with_animations (1).glb",
+     "maxTexturePx": 1024,
+     "mb": 4.18,
+     "md5": "fb2acea89630"
+    },
+    {
+     "file": "wolf_with_animations (2).glb",
+     "maxTexturePx": 1024,
+     "mb": 4.18,
+     "md5": "fb2acea89630"
+    },
+    {
+     "file": "wolf_with_animations (3).glb",
+     "maxTexturePx": 4096,
+     "mb": 13.84,
+     "md5": "8e89843c9a03"
+    },
+    {
+     "file": "wolf_with_animations.glb",
+     "maxTexturePx": 4096,
+     "mb": 13.84,
+     "md5": "8e89843c9a03"
+    }
+   ],
+   "geometryIdenticalAcrossVariants": true
+  },
+  {
+   "dir": "3d models animals",
+   "file": "wyvern.glb",
+   "mb": 2.15,
+   "tris": 9800,
+   "prims": 1,
+   "materials": 1,
+   "textures": 3,
+   "maxTexPx": null,
+   "skinned": true,
+   "joints": 82,
+   "animCount": 0,
+   "anims": [],
+   "exts": [
+    "KHR_materials_pbrSpecularGlossiness"
+   ]
+  },
+  {
+   "dir": "world build",
+   "file": "zaculeu_the_master_architect.glb",
+   "mb": 5.69,
+   "tris": 32515,
+   "prims": 36,
+   "materials": 3,
+   "textures": 3,
+   "maxTexPx": null,
+   "skinned": true,
+   "joints": 67,
+   "animCount": 1,
+   "anims": [
+    "Take 001"
+   ],
+   "exts": [
+    "KHR_materials_unlit"
+   ]
+  }
+ ],
+ "variantGroups": 63,
+ "_note": "Files sharing a name differ by TEXTURE RESOLUTION, not geometry. preferredFile names the highest-res member. The \"(N)\" suffix is not a reliable quality signal."
+}

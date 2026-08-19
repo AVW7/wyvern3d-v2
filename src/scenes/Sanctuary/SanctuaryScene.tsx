@@ -3,16 +3,15 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { CharacterController, type CharacterState } from '@/render/controllers/CharacterController'
 import {
-  PlaceholderEgg,
   type CharacterGesture,
 } from '@/render/placeholders/PlaceholderProps'
 import { Prop, PropInstances } from '@/render/assets/props'
-import { BIOME_PROP_ATLAS } from '@/render/assets/manifest'
+import { BIOME_PROP_ATLAS, HATCHERY_PROP_ATLAS } from '@/render/assets/manifest'
 import { CONTROLS, isDown } from '@/render/controllers/input'
 import { useGame, useGameState } from '@/state/store'
 import { useUi } from '@/state/uiStore'
 import { SPECIES } from '@/core/data/species'
-import { getInteractables, GROUND_RADIUS, ROOSTS, buildColliders } from './layout'
+import { getInteractables, GROUND_RADIUS, KEEP, ROOSTS, buildColliders } from './layout'
 import {
   BIOME_SCATTER,
   HILLS,
@@ -197,7 +196,13 @@ export function SanctuaryScene() {
         const pad = ROOSTS[i]!
         return (
           <group key={egg.id} position={[pad[0], NEST_TOP, pad[1]]}>
-            <PlaceholderEgg color={SPECIES[egg.speciesId]?.color ?? '#cbbfa8'} scale={1.4} />
+            <Prop
+              id="prop.hatchery.egg"
+              atlas={HATCHERY_PROP_ATLAS}
+              position={[0, 0, 0]}
+              color={SPECIES[egg.speciesId]?.color ?? '#cbbfa8'}
+              emissive={{ color: '#ff7733', intensity: 0.25 }}
+            />
           </group>
         )
       })}
@@ -301,7 +306,31 @@ function KeepWalls() {
       <PropInstances id="prop.keep.floorB" items={KEEP_FLOOR.floorB} castShadow={false} />
       <PropInstances id="prop.keep.floorC" items={KEEP_FLOOR.floorC} castShadow={false} />
       <Prop id="prop.keep.gate" {...KEEP_GATE} />
+      {/* Dragon banners flanking the gate — the sanctuary's heraldry. */}
+      <GateFlags />
     </group>
+  )
+}
+
+/** Half the gate doorway plus banner clearance, from KEEP.doorWidth. */
+const GATE_FLAG_OFFSET = 4
+
+function GateFlags() {
+  return (
+    <>
+      {[-GATE_FLAG_OFFSET, GATE_FLAG_OFFSET].map((x) => (
+        <Prop
+          key={x}
+          id="prop.gate.flag"
+          atlas={HATCHERY_PROP_ATLAS}
+          position={[KEEP.centerX + x, 0, KEEP.centerZ + KEEP.halfD]}
+          rotationY={x > 0 ? -Math.PI / 2 : Math.PI / 2}
+          // A cloth banner can sway where stone cannot: per-metre sway factor
+          // tuned against the 3.2 m pole (firs use 0.028 at 5-7 m).
+          wind={0.09}
+        />
+      ))}
+    </>
   )
 }
 

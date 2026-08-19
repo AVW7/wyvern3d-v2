@@ -315,6 +315,7 @@ export const MODE_TRANSITIONS: Record<FlightLoopState, { duration: number; easin
   speed: { duration: 0.25, easing: 'easeOutCubic' },
   glide: { duration: 0.5, easing: 'easeInOutQuad' },
   dive: { duration: 0.2, easing: 'easeOutCubic' },
+  climb: { duration: 0.35, easing: 'easeOutCubic' },
   bankLeft: { duration: 0.3, easing: 'easeOutBack' },
   bankRight: { duration: 0.3, easing: 'easeOutBack' },
   hover: { duration: 0.6, easing: 'easeInOutCubic' },

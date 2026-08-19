@@ -101,7 +101,7 @@ export function SanctuaryCommandWheel() {
   const state = useGameState()
   const selected = useSanctuaryCommands((s) => s.selectedWyvernId)
   const agent = useSanctuaryCommands((s) => s.agent)
-  const anchor = useSanctuaryCommands((s) => s.wheelAnchor)
+  const anchorVisible = useSanctuaryCommands((s) => s.wheelAnchor.visible)
   const targetMode = useSanctuaryCommands((s) => s.targetMode)
   const targetValid = useSanctuaryCommands((s) => s.targetValid)
   const status = useSanctuaryCommands((s) => s.status)
@@ -152,10 +152,24 @@ export function SanctuaryCommandWheel() {
   useEffect(() => {
     if (!selected || targetMode) return
     const frame = window.requestAnimationFrame(() => {
-      wheelRef.current?.querySelector<HTMLButtonElement>('button:not(:disabled)')?.focus()
+      wheelRef.current?.querySelector<HTMLButtonElement>('button:not(:disabled)')?.focus({ preventScroll: true })
     })
     return () => window.cancelAnimationFrame(frame)
   }, [selected, targetMode])
+
+  // Write x/y directly to the DOM — bypasses React re-render on every frame tick.
+  // The anchor is frozen while visible (see SanctuaryWyverns.tsx), so in practice
+  // this only fires once on open and once on the wyvern leaving the viewport.
+  useEffect(() => {
+    return useSanctuaryCommands.subscribe((s, prev) => {
+      const a = s.wheelAnchor
+      const p = prev.wheelAnchor
+      if ((a.x !== p.x || a.y !== p.y) && wheelRef.current) {
+        wheelRef.current.style.left = `${a.x}px`
+        wheelRef.current.style.top = `${a.y}px`
+      }
+    })
+  }, [])
 
   if (!selected || !wyvern) return null
 
@@ -178,7 +192,7 @@ export function SanctuaryCommandWheel() {
 
   return (
     <>
-      {anchor.visible && !targetMode && (
+      {anchorVisible && !targetMode && (
         <>
           <div
             className="wyvern-command-backdrop"
@@ -190,7 +204,10 @@ export function SanctuaryCommandWheel() {
             className="wyvern-command-wheel"
             role="group"
             aria-label={`Commands for ${wyvern.name}`}
-            style={{ left: anchor.x, top: anchor.y }}
+            style={{
+              left: `${useSanctuaryCommands.getState().wheelAnchor.x}px`,
+              top: `${useSanctuaryCommands.getState().wheelAnchor.y}px`,
+            }}
           >
             <div className="wyvern-command-name">
               <strong>{wyvern.name}</strong>

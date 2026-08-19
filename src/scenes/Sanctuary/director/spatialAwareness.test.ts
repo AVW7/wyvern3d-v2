@@ -49,7 +49,7 @@ describe('spatialAwareness', () => {
   it('clamps head target angles within anatomical limits', () => {
     const selfPos = vec(0, 0, 0)
     const bodyYaw = 0
-    const targetPos = vec(100, 50, 0) // Extreme angle to the right and high up
+    const targetPos = vec(60, 20, 100) // Forward-right angle within FOV (~31 deg)
 
     const pose = calculateHeadTargetAngles(selfPos, bodyYaw, targetPos)
     expect(pose.yaw).toBeLessThanOrEqual(MAX_HEAD_YAW)
@@ -58,12 +58,22 @@ describe('spatialAwareness', () => {
     expect(pose.pitch).toBeGreaterThanOrEqual(MIN_HEAD_PITCH)
   })
 
+  it('relaxes head to forward when target is outside field of view', () => {
+    const selfPos = vec(0, 0, 0)
+    const bodyYaw = 0
+    const behindPos = vec(0, 0, -50) // Directly behind
+
+    const pose = calculateHeadTargetAngles(selfPos, bodyYaw, behindPos)
+    expect(pose.yaw).toBe(0)
+    expect(pose.pitch).toBe(0)
+  })
+
   it('damps head pose smoothly over time', () => {
     const startPose = { pitch: 0, yaw: 0 }
     const targetPose = { pitch: 0.3, yaw: 0.5 }
     const dt = 0.05
 
-    const damped = dampHeadPose(startPose, targetPose, dt, 6)
+    const damped = dampHeadPose(startPose, targetPose, dt, 3.5)
     expect(damped.yaw).toBeGreaterThan(0)
     expect(damped.yaw).toBeLessThan(0.5)
     expect(damped.pitch).toBeGreaterThan(0)

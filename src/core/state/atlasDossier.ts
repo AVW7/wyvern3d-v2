@@ -1,4 +1,11 @@
-import type { GameEvent, GameState, LandmarkDef, WyvernSpecies } from '../types'
+import type {
+  GameEvent,
+  GameState,
+  LandmarkDef,
+  SettlementCondition,
+  SettlementTrend,
+  WyvernSpecies,
+} from '../types'
 import { REGIONS, REGION_LIST } from '../data/regions'
 import { SPECIES } from '../data/species'
 import { UNITS } from '../data/units'
@@ -14,6 +21,7 @@ import {
   isRegionVisited,
 } from './atlasKnowledge'
 import { yieldMultiplier } from '../systems/economy'
+import { regionSettlementReading } from './settlement'
 
 export function calculateGarrisonStrength(garrison: { unitId: string; strength: number }[]): number {
   let total = 0
@@ -172,6 +180,14 @@ export function formatRegionalEvent(event: GameEvent, regionId: string): string 
     }
     case 'phenomenon_observed':
       return `Environmental phenomenon recorded in ${regName}.`
+    case 'settlement_condition_changed': {
+      const to = (event.payload?.to as string) ?? 'unknown'
+      const from = (event.payload?.from as string) ?? 'unknown'
+      const settlement = REGIONS[regionId]?.settlement?.name ?? regName
+      return to === 'revolting'
+        ? `${settlement} has turned openly defiant.`
+        : `${settlement} shifted from ${from} to ${to}.`
+    }
     case 'activity_completed': {
       const actName = (event.payload?.activityName as string) ?? 'Expedition activity'
       const tag = (event.payload?.knowledgeTag as string) ?? 'Mystery Solved'
@@ -256,6 +272,13 @@ export interface RegionDossierData {
     value: number
     level: 'stable' | 'moderate' | 'critical'
   }
+  /** Null for a region authored as uninhabited. */
+  settlement: {
+    name: string
+    tier: number
+    condition: SettlementCondition
+    trend: SettlementTrend
+  } | null
   history: RegionDossierHistoryEntry[]
 }
 
@@ -307,6 +330,7 @@ export function getRegionDossier(state: GameState, regionId: string): RegionDoss
   // Yields
   const unrest = regionState?.unrest ?? 0
   const mult = yieldMultiplier(unrest)
+  const reading = regionSettlementReading(state, regionId)
   const effectiveYields: Record<string, number> = {}
   for (const [k, v] of Object.entries(def.yields)) {
     effectiveYields[k] = Math.round((v ?? 0) * mult * 10) / 10
@@ -369,6 +393,15 @@ export function getRegionDossier(state: GameState, regionId: string): RegionDoss
       value: Math.round(unrest),
       level: unrestLevel,
     },
+    settlement: def.settlement && reading
+      ? {
+          name: def.settlement.name,
+          tier: def.settlement.tier,
+          // Same derivation the world map draws, so the two can never disagree.
+          condition: reading.condition,
+          trend: reading.trend,
+        }
+      : null,
     history,
   }
 }

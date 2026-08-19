@@ -22,6 +22,7 @@ const RAW_REGIONS: Record<string, Omit<RegionDef, 'atlas'>> = {
     nativeSpecies: 'emberback',
     garrison: [],
     defenders: [],
+    settlement: { name: 'Hearth', tier: 3, offset: { x: 0.0, z: -0.55 } },
   },
   sunkenreach: {
     id: 'sunkenreach',
@@ -35,6 +36,7 @@ const RAW_REGIONS: Record<string, Omit<RegionDef, 'atlas'>> = {
     nativeSpecies: 'emberback',
     garrison: [{ unitId: 'spearman', strength: 40 }],
     defenders: [],
+    settlement: { name: 'Tidewharf', tier: 2, offset: { x: 0.43, z: -0.34 } },
   },
   whisperingwoods: {
     id: 'whisperingwoods',
@@ -48,6 +50,7 @@ const RAW_REGIONS: Record<string, Omit<RegionDef, 'atlas'>> = {
     nativeSpecies: 'thornwing',
     garrison: [{ unitId: 'archer', strength: 40 }],
     defenders: [],
+    settlement: { name: 'Loamgate', tier: 2, offset: { x: -0.37, z: -0.41 } },
   },
   ashfen: {
     id: 'ashfen',
@@ -69,6 +72,7 @@ const RAW_REGIONS: Record<string, Omit<RegionDef, 'atlas'>> = {
     nativeSpecies: 'emberback',
     garrison: [{ unitId: 'spearman', strength: 45 }],
     defenders: [],
+    settlement: { name: 'Fenpost', tier: 1, offset: { x: 0.32, z: -0.45 } },
   },
   greyreach: {
     id: 'greyreach',
@@ -82,6 +86,7 @@ const RAW_REGIONS: Record<string, Omit<RegionDef, 'atlas'>> = {
     nativeSpecies: 'cragwing',
     garrison: [{ unitId: 'spearman', strength: 35 }, { unitId: 'archer', strength: 25 }],
     defenders: [],
+    settlement: { name: 'Cairnhold', tier: 2, offset: { x: -0.45, z: -0.32 } },
   },
   thornmarch: {
     id: 'thornmarch',
@@ -95,6 +100,7 @@ const RAW_REGIONS: Record<string, Omit<RegionDef, 'atlas'>> = {
     nativeSpecies: 'thornwing',
     garrison: [{ unitId: 'archer', strength: 45 }],
     defenders: [],
+    settlement: { name: 'Bramblewatch', tier: 1, offset: { x: 0.39, z: -0.39 } },
   },
   saltcrag: {
     id: 'saltcrag',
@@ -108,6 +114,7 @@ const RAW_REGIONS: Record<string, Omit<RegionDef, 'atlas'>> = {
     nativeSpecies: 'cragwing',
     garrison: [{ unitId: 'spearman', strength: 50 }, { unitId: 'archer', strength: 40 }],
     defenders: ['cragwing'],
+    settlement: { name: 'Saltmarket', tier: 2, offset: { x: -0.33, z: -0.44 } },
   },
   cinderpeaks: {
     id: 'cinderpeaks',
@@ -121,6 +128,7 @@ const RAW_REGIONS: Record<string, Omit<RegionDef, 'atlas'>> = {
     nativeSpecies: 'cragwing',
     garrison: [{ unitId: 'spearman', strength: 60 }, { unitId: 'siege', strength: 15 }],
     defenders: ['cragwing'],
+    settlement: { name: 'Slagfoot', tier: 1, offset: { x: 0.39, z: -0.39 } },
   },
   ironhold: {
     id: 'ironhold',
@@ -134,6 +142,7 @@ const RAW_REGIONS: Record<string, Omit<RegionDef, 'atlas'>> = {
     nativeSpecies: 'cragwing',
     garrison: [{ unitId: 'spearman', strength: 65 }, { unitId: 'rider', strength: 30 }],
     defenders: ['cragwing'],
+    settlement: { name: 'Ironhold Gate', tier: 3, offset: { x: 0.0, z: -0.55 } },
   },
   crystalgrotto: {
     id: 'crystalgrotto',
@@ -160,6 +169,7 @@ const RAW_REGIONS: Record<string, Omit<RegionDef, 'atlas'>> = {
     nativeSpecies: 'mirefang',
     garrison: [{ unitId: 'archer', strength: 60 }, { unitId: 'rider', strength: 25 }],
     defenders: ['mirefang'],
+    settlement: { name: 'Green Terrace', tier: 1, offset: { x: -0.42, z: -0.35 } },
   },
   mirelands: {
     id: 'mirelands',
@@ -173,6 +183,7 @@ const RAW_REGIONS: Record<string, Omit<RegionDef, 'atlas'>> = {
     nativeSpecies: 'mirefang',
     garrison: [{ unitId: 'archer', strength: 55 }, { unitId: 'rider', strength: 25 }],
     defenders: ['mirefang'],
+    settlement: { name: 'Stiltrow', tier: 1, offset: { x: 0.35, z: -0.43 } },
   },
   stonewatch: {
     id: 'stonewatch',
@@ -186,6 +197,7 @@ const RAW_REGIONS: Record<string, Omit<RegionDef, 'atlas'>> = {
     nativeSpecies: 'mirefang',
     garrison: [{ unitId: 'spearman', strength: 70 }, { unitId: 'archer', strength: 35 }],
     defenders: ['mirefang'],
+    settlement: { name: 'The Watchtown', tier: 2, offset: { x: -0.3, z: -0.46 } },
   },
   elderrootgrove: {
     id: 'elderrootgrove',
@@ -199,6 +211,7 @@ const RAW_REGIONS: Record<string, Omit<RegionDef, 'atlas'>> = {
     nativeSpecies: 'thornwing',
     garrison: [{ unitId: 'archer', strength: 50 }, { unitId: 'spearman', strength: 35 }],
     defenders: ['thornwing'],
+    settlement: { name: 'Elderroot Rest', tier: 2, offset: { x: 0.41, z: -0.37 } },
   },
   emberwaste: {
     id: 'emberwaste',
@@ -235,6 +248,7 @@ const RAW_REGIONS: Record<string, Omit<RegionDef, 'atlas'>> = {
     nativeSpecies: 'frostmaw',
     garrison: [{ unitId: 'spearman', strength: 75 }, { unitId: 'siege', strength: 35 }],
     defenders: ['frostmaw', 'cragwing'],
+    settlement: { name: 'Cindershelf', tier: 1, offset: { x: -0.37, z: -0.41 } },
   },
   stormshores: {
     id: 'stormshores',
@@ -248,6 +262,7 @@ const RAW_REGIONS: Record<string, Omit<RegionDef, 'atlas'>> = {
     nativeSpecies: 'frostmaw',
     garrison: [{ unitId: 'rider', strength: 55 }, { unitId: 'archer', strength: 50 }],
     defenders: ['frostmaw'],
+    settlement: { name: 'Breakwater', tier: 2, offset: { x: 0.32, z: -0.45 } },
   },
   glaciercrest: {
     id: 'glaciercrest',
@@ -274,6 +289,7 @@ const RAW_REGIONS: Record<string, Omit<RegionDef, 'atlas'>> = {
     nativeSpecies: 'frostmaw',
     garrison: [{ unitId: 'spearman', strength: 80 }, { unitId: 'archer', strength: 60 }],
     defenders: ['frostmaw'],
+    settlement: { name: 'Frostgate Keep', tier: 2, offset: { x: 0.0, z: -0.55 } },
   },
   hollowmoor: {
     id: 'hollowmoor',
@@ -287,6 +303,7 @@ const RAW_REGIONS: Record<string, Omit<RegionDef, 'atlas'>> = {
     nativeSpecies: 'frostmaw',
     garrison: [{ unitId: 'rider', strength: 60 }, { unitId: 'siege', strength: 30 }],
     defenders: ['frostmaw'],
+    settlement: { name: 'Barrowend', tier: 1, offset: { x: -0.4, z: -0.38 } },
   },
   shadowcitadel: {
     id: 'shadowcitadel',
@@ -304,6 +321,7 @@ const RAW_REGIONS: Record<string, Omit<RegionDef, 'atlas'>> = {
       { unitId: 'rider', strength: 40 },
     ],
     defenders: ['duskwyrm', 'frostmaw'],
+    settlement: { name: 'The Undercity', tier: 3, offset: { x: 0.0, z: -0.55 } },
   },
   duskspire: {
     id: 'duskspire',
@@ -321,6 +339,7 @@ const RAW_REGIONS: Record<string, Omit<RegionDef, 'atlas'>> = {
       { unitId: 'siege', strength: 50 },
     ],
     defenders: ['duskwyrm', 'frostmaw', 'frostmaw'],
+    settlement: { name: 'Duskspire Hold', tier: 3, offset: { x: 0.0, z: -0.55 } },
   },
 }
 

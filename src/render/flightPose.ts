@@ -35,6 +35,16 @@ const DIVE_ENTER_SPEED = 9
 const DIVE_EXIT_SPEED = 7
 
 /**
+ * Where a climb becomes a dedicated ascending flight mode.
+ *
+ * Sits within the upward procedural pitch range with hysteresis to prevent chatter.
+ */
+const CLIMB_ENTER_ANGLE = 0.35
+const CLIMB_EXIT_ANGLE = 0.22
+const CLIMB_ENTER_SPEED = 6
+const CLIMB_EXIT_SPEED = 4.5
+
+/**
  * Speed is measured as a ratio, because the two scenes are not in the same
  * units: the sanctuary cruises at 18 and sprints at 28, while a battle actor's
  * own speed is `14 + stats.speed * 0.4`.
@@ -80,6 +90,7 @@ export type FlightLoopState =
   | 'speed'
   | 'glide'
   | 'dive'
+  | 'climb'
   | 'bankLeft'
   | 'bankRight'
   | 'hover'
@@ -462,12 +473,11 @@ export function dampFlightPose(
 /**
  * Picks the skeletal flight loop.
  *
- * The ladder is dive -> glide -> hover -> bank -> scout -> speed -> cruise, and the
+ * The ladder is dive -> climb -> glide -> hover -> bank -> scout -> speed -> cruise, and the
  * order is physical rather than arbitrary:
  *
- * - **dive first**, because it is the only mode the runtime cannot express on
- *   its own. Past MAX_PITCH the procedural layer is saturated; every other mode
- *   still reads correctly with a generic body under it.
+ * - **dive and climb first**, because they are attitude-defining vertical trajectories
+ *   where the body rotates into steep ascent or descent.
  * - **glide above hover**, because hover is the *most* powered mode on this rig
  *   — `Sanct_Hover` measures four wingbeats to cruise's three. A wyvern that has
  *   stopped beating cannot hover, so `powered: false` has to exclude it rather
@@ -505,6 +515,18 @@ export function flightAnimationState(
       throughAir >= (held ? DIVE_EXIT_SPEED : DIVE_ENTER_SPEED)
     ) {
       return 'dive'
+    }
+  }
+
+  if (horizontalSpeed !== undefined && verticalSpeed !== undefined && verticalSpeed > 0) {
+    const held = current === 'climb'
+    const climbAngle = Math.atan2(verticalSpeed, Math.max(horizontalSpeed, MIN_PITCH_SPEED))
+    const throughAir = Math.hypot(horizontalSpeed, verticalSpeed)
+    if (
+      climbAngle >= (held ? CLIMB_EXIT_ANGLE : CLIMB_ENTER_ANGLE) &&
+      throughAir >= (held ? CLIMB_EXIT_SPEED : CLIMB_ENTER_SPEED)
+    ) {
+      return 'climb'
     }
   }
 

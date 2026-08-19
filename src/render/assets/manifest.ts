@@ -68,6 +68,7 @@ export type ModelState =
   | 'speed'
   | 'glide'
   | 'dive'
+  | 'climb'
   | 'bankLeft'
   | 'bankRight'
   | 'hover'
@@ -205,15 +206,20 @@ const WYVERN_CLIPS: AssetEntry['animations'] = {
   // Ground loops, planted on the measured low point of each pose.
   //
   // Re-measured on the promoted wing (`pnpm assets:gothic-wing`), where all
-  // three carry v1's own grounded wing performance. That performance hangs the
-  // folded wing far below the foot line — v1 authored it that way, and the raw
-  // graft put `walk`'s wing 2119 rig units under the plane its feet stand on —
-  // so the pipeline's lift pass raises each fold back onto that plane before
-  // export. What is left below the origin afterwards is tail and belly, not
-  // wing, and these are those depths negated.
-  idle: { clip: 'idle', yOffset: 152.89 },
-  walk: { clip: 'walk', yOffset: 85.57 },
-  rest: { clip: 'rest', yOffset: 368.8 },
+  // three carry v1's own grounded performance — body as well as wing on `idle`
+  // and `walk`, which are whole-clip grafts of `Battle_Stand` and `Battle_Walk`.
+  // The lift pass raises the folded wing onto the foot plane before export, so
+  // what is left below the origin afterwards is belly and knuckle, not a
+  // draping wing, and these are those depths negated.
+  //
+  // All three moved when the retarget stage stopped saving a stale 15-degree
+  // `RootMotion` pose into the rig, which had been tilting every clip in the
+  // model — see retarget-gothic-wing-blender.py. Re-measure here whenever that
+  // pipeline changes; the previous values predate it and planted the model up to
+  // 2.6 m out at the shipped fit.
+  idle: { clip: 'idle', yOffset: 229.14 },
+  walk: { clip: 'walk', yOffset: 183.46 },
+  rest: { clip: 'rest', yOffset: 26.74 },
 
   // One-shots. `fly` is the takeoff and chains to the cruise loop, so gameplay
   // only ever asks for `fly`.
@@ -233,6 +239,7 @@ const WYVERN_CLIPS: AssetEntry['animations'] = {
   hover: { clip: 'hover', yOffset: 0 },
   glide: { clip: 'glide', yOffset: 0 },
   dive: { clip: 'dive', yOffset: 0 },
+  climb: { clip: 'cruise', yOffset: 0 },
   speed: { clip: 'speed', yOffset: 0 },
 
   // The authored strike has no separate air variant; it reads acceptably
@@ -296,9 +303,27 @@ const WYVERN_CLIPS: AssetEntry['animations'] = {
  * 52-clip animation set for the vendor/Blender Drogon model (drogon.glb).
  */
 const DROGON_CLIPS: AssetEntry['animations'] = {
-  idle: { clip: 'SKM_DaenerysDragon|AA_DaenerysDragon_Battle_Stand', yOffset: 0 },
-  walk: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Battle_Walk', yOffset: 0 },
-  rest: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Damage_GroggyLoop', yOffset: 0 },
+  // Planted on the measured low point of each pose, the same way `WYVERN_CLIPS`
+  // is. This asset is a review reference — the Flight Lab's species picker and
+  // the model catalogue are its only two callers — and an unplanted reference is
+  // not one: with these at 0 it floated a metre above the plane the gothic model
+  // stands on, so the two could not be compared on stance, contact or ground
+  // clearance, which is most of what it is there to answer.
+  //
+  // Only the ground loops carry an offset, matching the gothic entry. `takeoff`
+  // and `land` measure ~23 here because they leave the ground mid-clip, and the
+  // Lab positions airborne states by altitude instead.
+  //
+  // The original idle/walk guesses were authored in world units against a rig
+  // measured in units 100x smaller, and idle carried the wrong sign — it lifted
+  // the reference *further* off the plane it was meant to plant. Re-measured
+  // headlessly (skeleton-clone + mixer + skinned-vertex Box3, dense-sampled over
+  // each cycle) — the method reproduces the sidecar-authored values (sleep 2.14,
+  // sit -0.58, seated -0.41, perch -1.46) to ±0.01, so the corrected numbers
+  // below are on the authoring pipeline's own basis.
+  idle: { clip: 'SKM_DaenerysDragon|AA_DaenerysDragon_Battle_Stand', yOffset: -1.52 },
+  walk: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Battle_Walk', yOffset: 0.29 },
+  rest: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Damage_GroggyLoop', yOffset: 2.048 },
 
   fly: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Battle_Up', loop: false, next: 'airborne', yOffset: 0 },
   land: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Battle_Down', loop: false, next: 'idle', yOffset: 0 },
@@ -312,6 +337,7 @@ const DROGON_CLIPS: AssetEntry['animations'] = {
   hover: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Battle_Down02', yOffset: 0 },
   glide: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Battle_Down02', yOffset: 0 },
   dive: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Battle_Down02', yOffset: 0 },
+  climb: { clip: 'Sanct_Climb', yOffset: 0 },
   speed: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Battle_Down02', yOffset: 0 },
 
   attack: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Battle_Attack06', loop: false, yOffset: 0 },
@@ -321,11 +347,11 @@ const DROGON_CLIPS: AssetEntry['animations'] = {
 
   sleep: { clip: 'Sanct_Sleep', yOffset: 2.14 },
   sit: { clip: 'Sanct_Sit', yOffset: -0.58 },
-  eat: { clip: 'Sanct_Eat', yOffset: 0.86 },
-  drink: { clip: 'Sanct_Drink', yOffset: 0.63 },
-  groom: { clip: 'Sanct_Groom', yOffset: -0.89 },
-  nuzzle: { clip: 'Sanct_Nuzzle', yOffset: 0 },
-  calm: { clip: 'Sanct_Calm', yOffset: 0 },
+  eat: { clip: 'Sanct_Eat', yOffset: 0.52 },
+  drink: { clip: 'Sanct_Drink', yOffset: 0.74 },
+  groom: { clip: 'Sanct_Groom', yOffset: -0.75 },
+  nuzzle: { clip: 'Sanct_Nuzzle', yOffset: -1.23 },
+  calm: { clip: 'Sanct_Calm', yOffset: -0.89 },
   perch: { clip: 'Sanct_PerchGrip', yOffset: -1.46 },
   hop: { clip: 'SKM_DaenerysDragon|DaenerysDragon_Battle_Skill07', yOffset: 0 },
   seated: { clip: 'Sanct_SitLoop', yOffset: -0.41 },
@@ -457,6 +483,7 @@ const THORNWING_CLIPS = {
   speed: THORNWING_CRUISE,
   glide: THORNWING_CRUISE,
   dive: THORNWING_CRUISE,
+  climb: THORNWING_CRUISE,
   bankLeft: THORNWING_CRUISE,
   bankRight: THORNWING_CRUISE,
   hover: THORNWING_CRUISE,
@@ -607,6 +634,16 @@ export const ASSETS: Record<AssetId, AssetEntry> = {
       fly: { clip: 'Guineafowl|Guineafowl_B_FlyFlapping' },
     },
   },
+  'wildlife.rabbit': {
+    url: '/models/wildlife/rabbit.glb',
+    // Numeric fit: 20.75382 authored units high -> 0.4 m adult rabbit
+    // (sitting-height; the rig's single clip is a sit/idle cycle).
+    scale: 0.01927,
+    yOffset: 0.35227,
+    animations: {
+      idle: { clip: 'Take 001' },
+    },
+  },
 
   /** Imported Meshy showcase assets. Static and cosmetic until placed by a scene/editor. */
   'library.alchemistWorkstation': {
@@ -688,6 +725,14 @@ export const PROP_ATLAS = '/models/sanctuary.glb'
 
 /** Small original static models used by feeding and sanctuary hunting. */
 export const FOOD_PROP_ATLAS = '/models/wyvern-food.glb'
+
+/**
+ * Hatchery and gate props: the incubating eggs on the roost pads and the
+ * banner beside the keep gate. Built by scripts/build-hatchery-atlas.mjs from
+ * licence-verified Sketchfab singles (see CREDITS.md); multi-material like the
+ * biome atlas, so props.tsx handles each prop as several primitives.
+ */
+export const HATCHERY_PROP_ATLAS = '/models/hatchery.glb'
 
 /**
  * Biome scenery atlas: trees, rocks, crystals and landmarks that dress the

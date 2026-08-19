@@ -1,7 +1,8 @@
 import type { GameState } from '../types'
 import { CONFIG } from '../data/config'
 import { REGIONS } from '../data/regions'
-import { log } from '../state/game'
+import { emit, log } from '../state/game'
+import { settlementCondition } from '../state/settlement'
 import { clamp } from '../math/vec'
 
 /**
@@ -32,11 +33,22 @@ export function regionTick(state: GameState): void {
       .reduce((sum, s) => sum + s.strength, 0)
 
     const suppression = (garrison / 10) * CONFIG.region.unrestPerGarrison * suppressionMult
+    // Sampled before the update so a band crossing can be detected without
+    // storing the previous condition — no new save state, no migration.
+    const conditionBefore = settlementCondition(region.owner, region.unrest)
     region.unrest = clamp(
       region.unrest + CONFIG.region.unrestPerTick * edictMult - suppression,
       0,
       CONFIG.region.revoltAt,
     )
+
+    const conditionAfter = settlementCondition(region.owner, region.unrest)
+    if (conditionAfter !== conditionBefore) {
+      emit(state, 'settlement_condition_changed', region.id, undefined, {
+        from: conditionBefore,
+        to: conditionAfter,
+      })
+    }
 
     if (region.unrest >= CONFIG.region.revoltAt) {
       revolt(state, region.id)

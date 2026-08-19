@@ -1,5 +1,6 @@
 'use client'
 
+import type { AssetId } from '@/render/assets/manifest'
 import type { PropBase } from '../props/PropBase'
 import {
   EXTRA_SCALES,
@@ -49,6 +50,8 @@ interface FlightLabControlPanelProps {
   overlays: boolean
   setOverlays: (overlays: boolean) => void
   speciesIndex: number
+  compareId: AssetId | null
+  setCompareId: (id: AssetId | null) => void
   setSpeciesIndex: (index: number) => void
   species: { id: string; label: string; scale: number }
   extraScale: number
@@ -82,6 +85,8 @@ export function FlightLabControlPanel({
   overlays,
   setOverlays,
   speciesIndex,
+  compareId,
+  setCompareId,
   setSpeciesIndex,
   species,
   extraScale,
@@ -350,6 +355,27 @@ export function FlightLabControlPanel({
               onClick={() => setSpeciesIndex(i)}
             >
               {item.label}
+            </LabButton>
+          ))}
+        </div>
+        {/* A/B against v1. Switching the picker compares two models from memory;
+            this draws them side by side so the comparison is structural. */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 8 }}>
+          <LabButton
+            active={compareId === null}
+            themeStyle={t}
+            onClick={() => setCompareId(null)}
+          >
+            compare: off
+          </LabButton>
+          {SPECIES.filter((item) => item.id !== species.id).map((item) => (
+            <LabButton
+              key={`compare-${item.id}`}
+              active={compareId === item.id}
+              themeStyle={t}
+              onClick={() => setCompareId(item.id as AssetId)}
+            >
+              vs {item.label.replace(/ [\d.]+$/, '')}
             </LabButton>
           ))}
         </div>

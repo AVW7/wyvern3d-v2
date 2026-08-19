@@ -12,6 +12,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "assets:validate-wyvern": "node scripts/validate-wyvern-clips.mjs",
+    "assets:reimport-wildlife": "node scripts/reimport-wildlife-masters.mjs",
     "assets:gothic-wing": "python3 scripts/build-gothic-wing.py",
     "assets:gothic-fold": "/Applications/Blender.app/Contents/MacOS/Blender --background .gothic/gothic-retargeted.blend --python scripts/bake-gothic-fold-blender.py -- --out src/render/wingFoldPose.ts --report .gothic/gothic-fold.json",
     "assets:validate-v1-catalog": "node scripts/validate-v1-action-catalog.mjs",
@@ -36,6 +37,7 @@
     "assets:wyvern-audit": "python3 scripts/audit-wyvern-clips.py",
     "assets:drogon-sidecar": "python3 scripts/build-sidecar.py",
     "assets:validate-sidecar": "node scripts/validate-sidecar-runtime.mjs",
+    "assets:validate-contact": "node scripts/validate-contact-stability.mjs",
     "sim:battle": "tsx scripts/sim-battle.ts",
     "sim:replay": "tsx scripts/sim-replay.ts"
   },

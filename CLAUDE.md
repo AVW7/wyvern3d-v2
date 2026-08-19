@@ -29,6 +29,10 @@ units and battle terrain still use procedural placeholders until their model pip
 | Improve sanctuary layout, environment art, assets, and prop interactions | `docs/SANCTUARY_ENVIRONMENT_ART_PLAN.md` |
 | Turn the Highlands hunt test into gameplay | `docs/HIGHLANDS_GAMEPLAY_PLAN.md` |
 | Build the searchable/discoverable world atlas | `docs/WORLD_ATLAS_PLAN.md` |
+| Make regions inhabited — settlements, unrest's face, livestock, contested ground | `docs/INHABITED_WORLD_PLAN.md` |
+| Add other powers, diplomacy, and marching armies | `docs/POWERS_AND_ARMIES_PLAN.md` |
+| Deepen biome content — landmark/scatter/fortification tiers, hero rig clips | `docs/WORLD_CONTENT_TIERS_PLAN.md` |
+| See what external source models exist and where each could plug in | `docs/EXTERNAL_MODEL_INDEX.md` |
 | Enhance explorable biome identity and activities | `docs/BIOME_ENHANCEMENT_PLAN.md` |
 | Change a scene's look | `src/scenes/{Sanctuary,WorldMap,Battle,Highlands}/` |
 | Change HUD/panels | `src/ui/` (DOM overlay, not in-canvas) |
@@ -411,7 +415,6 @@ Gaps the ledger still records, in case you trip over them first:
 - **Bank is a peer of the other modes, not a modifier.** `FlightLoopState` maps straight to one
   clip, so there is no authored inside-wing deformation while diving or at speed; the runtime's
   whole-model roll still banks them. Real bank variants would need a clip product.
-- Stage 6 (world event stream and flourishes) is not started.
 
 Known gap: the balance harness reports near-binary outcomes (100%/0%) — the curve is correctly
 ordered but damage variance is low, so fights are decisive rather than close. Tune in

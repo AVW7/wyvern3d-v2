@@ -1032,6 +1032,88 @@
           "because": "The head leads the stoop below the hips. Measured -3.89, the only flight clip with a negative head carry apart from speed's near-level 0.06."
         }
       ]
+    },
+    "climb": {
+      "summary": "an ascending powered flight loop: nose-up pitch trim with high-power wingbeats and streamlined limb carriage",
+      "clips": [
+        "Sanct_Climb"
+      ],
+      "rules": [
+        {
+          "channel": "body_axis_deg.mean",
+          "min": 14,
+          "max": 28,
+          "because": "Ascending flight holds a steady nose-up climb trim (~18-24 degrees) between cruise (2.6 deg) and hover (34.1 deg). Measured 21.5 degrees."
+        },
+        {
+          "channel": "cycle.beats",
+          "min": 3,
+          "because": "Climb requires active powered propulsion beats to generate vertical ascent lift. Measured 4 beats in 6.00s."
+        },
+        {
+          "channel": "wingtip_L.stroke_arc_deg",
+          "min": 70,
+          "because": "Climb requires full stroke amplitude. Measured 139.3 degrees."
+        },
+        {
+          "channel": "wing_elev_L.range",
+          "min": 60,
+          "because": "High-power stroke amplitude. Measured 95.5 degrees."
+        },
+        {
+          "channel": "symmetry_error.mean",
+          "max": 2.0,
+          "because": "Climbing ascent is symmetric powered flight. Measured 0.66."
+        },
+        {
+          "channel": "wing_elev_bias.mean",
+          "min": -3.5,
+          "max": 3.5,
+          "because": "Level ascent without turning bias. Measured -0.70."
+        },
+        {
+          "channel": "pelvis.path",
+          "max": 0.5,
+          "because": "Same origin contract as cruise: the simulation owns position. Measured 0.0."
+        },
+        {
+          "channel": "root_roll_delta_deg.range",
+          "max": 2,
+          "because": "Same channel and reason as cruise: torso pitch must not reintroduce landing flare. Measured 0.0."
+        },
+        {
+          "channel": "loop.pose_mean",
+          "max": 0.05,
+          "because": "An authored loop closes on its own opening key and should be at zero."
+        },
+        {
+          "channel": "wingtip_L.lateral.min",
+          "min": 4,
+          "because": "The left wingtip must stay on the left of the pelvis (+x) on every frame."
+        },
+        {
+          "channel": "wingtip_R.lateral.max",
+          "max": -4,
+          "because": "Mirror of the left-side rule."
+        },
+        {
+          "channel": "foot_drop.mean",
+          "min": 2.0,
+          "max": 3.0,
+          "because": "Legs remain aerodynamically tucked during high-power climb. Measured 2.24."
+        },
+        {
+          "channel": "foot_asymmetry.max",
+          "min": -0.15,
+          "max": 0.15,
+          "because": "Mirrored hind leg pair. Measured 0.04."
+        },
+        {
+          "channel": "toe_curl_deg.mean",
+          "min": 5,
+          "because": "Claws gathered for flight."
+        }
+      ]
     }
   }
 }

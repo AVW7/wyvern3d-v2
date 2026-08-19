@@ -11,6 +11,8 @@ import { nodeRadius, nodePedestalHeight, statusColor, regionStatus, nodeGroundCo
 import { regionCrestHeight } from '../terrain/mapTerrain'
 import { getTierGeometries, getSharedNodeMaterial } from '../mapResources'
 import { wasDrag } from '../interaction'
+import { SettlementCluster } from './SettlementCluster'
+import { TREND_MARK, SETTLEMENT_COLORS } from '../settlementVisuals'
 
 import type { AtlasLayerId, LayerRegionValue } from '@/core/state/atlasLayers'
 
@@ -38,7 +40,7 @@ export function RegionNode({
   const groupRef = useRef<Group>(null)
   const ringRef = useRef<Mesh>(null)
 
-  const { def, owner, attackable, unrest, garrisonStrength } = node
+  const { def, owner, attackable, unrest, garrisonStrength, settlement } = node
   const baseHeight = nodePedestalHeight(def.tier)
   const radius = nodeRadius(def.tier)
   const speciesColor = SPECIES[def.nativeSpecies]?.color ?? '#888'
@@ -149,8 +151,28 @@ export function RegionNode({
         </mesh>
       )}
 
+      {/* Settlement — who lives here, and how they are taking it */}
+      {def.settlement && (
+        <SettlementCluster
+          regionId={def.id}
+          settlement={def.settlement}
+          reading={settlement}
+          baseY={baseHeight + 0.6}
+          nodeRadius={radius}
+        />
+      )}
+
       {/* World Labels */}
       <WorldLabel text={def.name} position={[0, baseHeight + 7.5, 0]} size={3.6} variant="map" />
+      {def.settlement && isHeld && (
+        <WorldLabel
+          text={`${def.settlement.name} ${TREND_MARK[settlement.trend]}`}
+          position={[0, baseHeight + 6.2, 0]}
+          size={1.9}
+          variant="default"
+          color={SETTLEMENT_COLORS[settlement.condition]}
+        />
+      )}
       <WorldLabel
         text={badgeText}
         position={[0, baseHeight + 4.8, 0]}

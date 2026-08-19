@@ -6,6 +6,7 @@ import { createRng, deriveSeed } from '@/core/math/rng'
 import { angleDelta, flightAnimationState, type FlightLoopState } from '@/render/flightPose'
 import { readDirectWyvernFlightInput, stepDirectWyvernFlight } from '@/render/controllers/wyvernFlight'
 import { createWyvernFlightRig, type WyvernFlightRig } from '@/render/wyvernFlightRig'
+import { applyBoneOffset, applyNeckOffset } from '@/render/boneOffsets'
 import type { CharacterGesture } from '@/render/placeholders/PlaceholderProps'
 import type {
   SanctuaryCommand,
@@ -41,8 +42,8 @@ import {
 
 export const TRANSIT_SPEED = 18
 export const TRANSIT_ALTITUDE = 22
-export const TAKEOFF_SECONDS = 3.34
-export const LAND_SECONDS = 4.67
+export const TAKEOFF_SECONDS = 3.0
+export const LAND_SECONDS = 3.0
 export const NEAR_ATTACK = 14
 export const AMBIENT_MIN_DWELL = 15
 export const AMBIENT_MAX_DWELL = 45
@@ -816,11 +817,14 @@ export class SanctuaryDirector {
         const damped = dampHeadPose({ pitch: agent.headPitch, yaw: agent.headYaw }, targetPose, dt)
         agent.headPitch = damped.pitch
         agent.headYaw = damped.yaw
-        agent.rig.bones.head.rotation.set(agent.headPitch, agent.headYaw, 0, 'YXZ')
+        if (agent.rig.bones.neck.length > 0) {
+          applyNeckOffset(agent.rig.bones.neck, agent.headPitch * 0.35, agent.headYaw * 0.35)
+        }
+        applyBoneOffset(agent.rig.bones.head, agent.headPitch * 0.65, agent.headYaw * 0.65)
       } else if (
-        !isFlightPhase(agent.phase) &&
+        !isCruisePhase(agent.phase) &&
         agent.rig.bones.head &&
-        (agent.headPitch !== 0 || agent.headYaw !== 0)
+        (Math.abs(agent.headPitch) > 1e-4 || Math.abs(agent.headYaw) > 1e-4)
       ) {
         const damped = dampHeadPose(
           { pitch: agent.headPitch, yaw: agent.headYaw },
@@ -829,7 +833,10 @@ export class SanctuaryDirector {
         )
         agent.headPitch = damped.pitch
         agent.headYaw = damped.yaw
-        agent.rig.bones.head.rotation.set(agent.headPitch, agent.headYaw, 0, 'YXZ')
+        if (agent.rig.bones.neck.length > 0) {
+          applyNeckOffset(agent.rig.bones.neck, agent.headPitch * 0.35, agent.headYaw * 0.35)
+        }
+        applyBoneOffset(agent.rig.bones.head, agent.headPitch * 0.65, agent.headYaw * 0.65)
       }
 
       // Procedural rig stepping
@@ -839,7 +846,7 @@ export class SanctuaryDirector {
       const verticalSpeed = (agent.position.y - previousY) / Math.max(dt, 1e-4)
       const yawRate = angleDelta(agent.yaw, previousYaw) / Math.max(dt, 1e-4)
 
-      const gazeInput = isFlightPhase(agent.phase)
+      const gazeInput = isCruisePhase(agent.phase)
         ? {
             target: playerVec,
             kind: 'player' as const,
@@ -852,7 +859,7 @@ export class SanctuaryDirector {
         {
           position: agent.position,
           yaw: agent.yaw,
-          airborne: isFlightPhase(agent.phase),
+          airborne: isCruisePhase(agent.phase),
           flightMode: agent.flightAnimation,
           horizontalSpeed,
           verticalSpeed,

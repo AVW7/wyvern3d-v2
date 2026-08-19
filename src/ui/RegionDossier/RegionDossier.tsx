@@ -5,6 +5,23 @@ import { useGame, useGameState } from '@/state/store'
 import { useMapUiStore } from '@/state/mapUiStore'
 import { useUi } from '@/state/uiStore'
 import { getRegionDossier, type RegionDossierData } from '@/core/state/atlasDossier'
+import type { SettlementCondition, SettlementTrend } from '@/core/types'
+
+/** Prose for each derived settlement condition. Presentation only. */
+const SETTLEMENT_BLURB: Record<SettlementCondition, string> = {
+  prospering: 'Its people are settled and the hearths are lit.',
+  strained: 'Grumbling in the market, but the work still gets done.',
+  resentful: 'Doors close as your riders pass. Little is volunteered.',
+  revolting: 'Open defiance. The banner is being cut down.',
+  hostile: 'Not yours. Its people answer to someone else.',
+}
+
+const TREND_BLURB: Record<SettlementTrend, string> = {
+  improving: 'Your garrison is winning the ground back.',
+  holding: 'The garrison is holding the line exactly.',
+  worsening: 'Nothing stationed here is slowing it.',
+}
+
 
 export type DossierTab = 'overview' | 'ecology' | 'strategy' | 'history'
 
@@ -362,6 +379,19 @@ function StrategyTab({
               {dossier.unrest.level === 'stable' ? 'Territory is stable and loyal.' : dossier.unrest.level === 'moderate' ? 'Moderate dissent reduces economic yield.' : 'High unrest! Garrison recommended.'}
             </span>
           </div>
+          {dossier.settlement && (
+            <div className="settlement-row">
+              <span className={`settlement-badge ${dossier.settlement.condition}`}>
+                {dossier.settlement.name}
+              </span>
+              <span className="settlement-desc">
+                {SETTLEMENT_BLURB[dossier.settlement.condition]}{' '}
+                <em className={`settlement-trend ${dossier.settlement.trend}`}>
+                  {TREND_BLURB[dossier.settlement.trend]}
+                </em>
+              </span>
+            </div>
+          )}
         </div>
       )}
 

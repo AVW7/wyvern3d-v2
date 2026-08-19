@@ -116,6 +116,20 @@ export const CONFIG = {
     eggRegenTicks: 60,
     /** Max eggs a region can hold in reserve. */
     maxEggsHeld: 3,
+    /**
+     * Unrest bands for the settlement condition drawn on the world map. Purely
+     * a readability layer over `unrest` — nothing here feeds yields or revolt.
+     */
+    settlement: {
+      /** At or above this unrest a settlement reads `strained`. */
+      strainedAt: 25,
+      /** At or above this unrest it reads `resentful`. */
+      resentfulAt: 55,
+      /** At or above this unrest it reads `revolting` — short of the actual revolt. */
+      revoltingAt: 85,
+      /** Net unrest per tick inside this band counts as holding, not moving. */
+      trendDeadband: 0.02,
+    },
   },
 
   army: {

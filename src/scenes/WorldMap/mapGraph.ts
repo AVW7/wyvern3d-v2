@@ -1,6 +1,7 @@
-import { GameState, RegionDef } from '../../core/types'
+import { GameState, RegionDef, SettlementReading } from '../../core/types'
 import { REGIONS, REGION_LIST } from '../../core/data/regions'
 import { isAttackable } from '../../core/state/game'
+import { settlementReading, unrestModifiers } from '../../core/state/settlement'
 import { calculateGarrisonStrength } from '../../core/state/atlasDossier'
 
 export { calculateGarrisonStrength }
@@ -14,6 +15,12 @@ export interface MapNode {
   garrisonStrength: number
   attackable: boolean
   eggsAvailable: number
+  /**
+   * Derived settlement reading. Note this is NOT `garrisonStrength` above —
+   * that is the force defending the region, whereas unrest is suppressed by the
+   * player's own squads stationed there, which is what `regionTick` reads.
+   */
+  settlement: SettlementReading
 }
 
 export interface MapEdge {
@@ -25,6 +32,12 @@ export interface MapEdge {
 
 export function buildMapGraph(state: GameState): { nodes: Record<string, MapNode>; edges: MapEdge[] } {
   const nodes: Record<string, MapNode> = {}
+  const { unrestRateMultiplier, suppressionMultiplier } = unrestModifiers(state)
+  // One pass over squads instead of one per region.
+  const stationed: Record<string, number> = {}
+  for (const squad of Object.values(state.squads ?? {})) {
+    if (squad.stationedAt) stationed[squad.stationedAt] = (stationed[squad.stationedAt] ?? 0) + squad.strength
+  }
   for (const def of REGION_LIST) {
     const rState = state.regions[def.id]
     const owner = rState?.owner ?? (def.starting ? 'player' : 'enemy')
@@ -43,6 +56,13 @@ export function buildMapGraph(state: GameState): { nodes: Record<string, MapNode
       garrisonStrength,
       attackable,
       eggsAvailable,
+      settlement: settlementReading(
+        owner,
+        def.starting ? 0 : unrest,
+        stationed[def.id] ?? 0,
+        unrestRateMultiplier,
+        suppressionMultiplier,
+      ),
     }
   }
 

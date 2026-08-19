@@ -158,7 +158,14 @@ OVERRIDES: dict[str, str] = {}
 # once the importer collapses them.  Left to nearest-position matching they pair
 # with ``Bip002-Tail8_end`` at 0.4 units and inherit a meaningless rotation that
 # swings the entire body by +/-550 units.  They hold their rest pose instead.
-EXCLUDE_V2 = {"Root", "RootMotion"}
+#
+# ``L_LegRoot`` and ``R_LegRoot`` are the same class of fault one level down: they
+# are v2-only leg carriers sitting on top of the spine, so nearest-position
+# matching pairs both of them to ``Bip002-Spine_08`` at 0.37 units -- the bone
+# ``Spine1`` is already pairing to.  Each leg then received the *spine's*
+# rotation delta, and the thigh below it received the thigh's on top, doubling
+# the hip rotation.  They hold their rest pose too.
+EXCLUDE_V2 = {"Root", "RootMotion", "L_LegRoot", "R_LegRoot"}
 
 # Rotation-only transfer keeps bone lengths honest, but it also pins the hips:
 # v1's pelvis bobs through each stride, and dropping that makes the walk float.
@@ -167,53 +174,44 @@ EXCLUDE_V2 = {"Root", "RootMotion"}
 # v1's absolute placement.
 ROOT_TRANSLATION = "Bip002-Pelvis"
 
-# v1's posed data does not share the space its bind pose is in, and this
-# rotation is what reconciles them.  Measured on ``Battle_Walk``: the bind pose
-# spans 6280 x 1100 x 4380, while frame 20 of the clip spans 2400 x 4200 x 1700
-# -- tallest along Y, so the posed dragon's up-axis is Y where the bind's is Z.
+# Rest positions agree between the two rigs under ``to_v2`` alone -- the pairing
+# distances measure 0.37 units -- but rest *orientations* do not, because the two
+# rigs use different bone-axis conventions (3ds Max Biped against the v2
+# rebuild's).  One constant rotation reconciles them, and it is the v1 armature's
+# own world rotation, read off the object rather than written down:
 #
-# Because the offset is global and constant, one rotation applied to every
-# bone's target world orientation rigidly counter-rotates the whole FK chain,
-# which is the correction needed.
+#     axis_fix     = v1.matrix_world.to_3x3().normalized()
+#     desired_rot  = axis_fix @ (v1_posed_rot @ v1_rest_rot^-1) @ v2_rest_rot
 #
-# Do not remove it on the strength of matching v1's imported pose.  It is true
-# that ``R_FIX`` equals ``_rootJoint``'s rest ``matrix_local``, and true that
-# dropping it brings posed joint heads to within 15 units (mean, over 103 bones)
-# of ``to_v2(m1 @ v1_pose_bone.head)`` against 1801 with it.  That comparison is
-# circular: the reference is v1's imported posed data, which carries the very
-# rotation being corrected, so matching it exactly reproduces the fault.  Built
-# that way and viewed in the Model Library, the walk stands the dragon on its
-# tail while the authored clips in the same GLB render correctly.  Judge this
-# one on a render, not on a residual.
+# This script shipped with that constant *inverted* (hardcoded as ``R_FIX``,
+# which is ``axis_fix^-1``), and the two symptoms that produced are why the body
+# half of the transfer was written off as unusable.  All four candidates were
+# rendered side-on at ``v1_walk`` f20, against the authored ``rest`` from the
+# same camera:
 #
-# Keeping it is not a fix either, and this script does not currently produce a
-# usable ground clip.  Rendered side-on from the same camera that draws the
-# authored ``rest`` as a coherent dragon, ``v1_walk`` built WITH ``R_FIX`` is
-# contorted -- hind legs splayed upward, torso twisted, wings inside out.  So
-# the two known configurations fail differently rather than one being right:
-# without the rotation the pose is rigidly rotated 90 degrees, with it the pose
-# is mangled.  That points at the transfer itself, not at a missing constant,
-# and the next person here should start from a render of a single frame rather
-# than from any positional residual.
+#     R_FIX @ D @ Vr        mangled -- torso inverted, hind legs past the skull,
+#                           membrane in shards.  The shipped behaviour.
+#     D @ Vr                rigidly rotated 90 degrees: vertical, tail up,
+#                           spanning 2324 x 1791 x 4154.
+#     R_FIX @ D @ R_FIX^-1 @ Vr   no better; lands tallest along X.
+#     axis_fix @ D @ Vr     a coherent walking dragon: wings folded along the
+#                           flank, hind foot planted, body horizontal, spanning
+#                           2324 x 4154 x 1791 against the authored walk's
+#                           5297 x 3600 x 4432 (which holds its wings out, so a
+#                           smaller X is the folded wing, not an error).
 #
-# That render has now been done, and it confirms the diagnosis rather than
-# lifting it.  ``v1_stand`` at f60 renders as a torn mesh: torso inverted, hind
-# legs projecting upward past the skull, wing membrane shredded into
-# disconnected shards.  The bounding box says the same thing without the
-# picture -- 1920 x 4180 x 1319, tallest along Y, where a standing dragon is
-# tallest along Z.  Every full-body capture in this blend has that signature.
+# Two lessons worth keeping.  A positional residual cannot tell these apart --
+# the earlier note in this file was right that the comparison is circular -- but
+# a render can, in one frame.  And "tallest along Z" is not the test it was taken
+# for: a dragon with its wings folded is longest nose-to-tail, so the axis to
+# check is which way the *body* lies, not which number is biggest.
 #
-# THE USABLE PART IS THE WING CHAIN ALONE.  ``graft-v1-wing-clips-blender.py``
-# takes only the shoulder/elbow/wrist/digit quaternions from these captures and
-# mirrors one side onto the other, and the result renders as a coherent animal
-# and gates clean -- because the grafted wing bones were built from v1's own
-# transformed head/tail/roll and align to under 10 degrees, while the 34
-# original v2 bones sit roughly 90 degrees off their v1 counterparts.  The body
-# half of the transfer is what fails.  Do not widen the graft to torso, neck,
-# tail or legs on the strength of the wings working, and do not plan a
-# sanctuary-life capture (Batch E) on this path: sleep, sit, eat, drink and
-# groom are body performances, so they need authoring, not transfer.
-R_FIX = Matrix(((1, 0, 0), (0, 0, -1), (0, 1, 0)))
+# The body half of the transfer is therefore usable now, and
+# ``graft-v1-wing-clips-blender.py`` takes ``walk`` whole (``body=True``) rather
+# than wings-only.  The wing chain still needs no ``axis_fix`` work: the 66
+# grafted wing bones were built from v1's transformed head/tail/roll and align to
+# under 10 degrees, so the constant is near-identity there and the same code path
+# serves both groups.
 
 
 def pair_bones(v1_arm, v2_arm):
@@ -286,15 +284,20 @@ def run():
     order = hierarchy_order(v2)
 
     # cached rest data
+    # Every v1 bone, not just the paired ones: the parent-relative transfer
+    # reads each paired bone's parent, which is often unpaired itself.
     v1_rest_rot = {
-        n: v1.data.bones[n].matrix_local.to_3x3().normalized()
-        for n, _ in pairs.values()
+        b.name: b.matrix_local.to_3x3().normalized()
+        for b in v1.data.bones
     }
     m1 = v1.matrix_world
     hip = next((v2n for v2n, (v1n, _) in pairs.items()
                 if v1n.startswith(ROOT_TRANSLATION)), None)
     hip_rest = (to_v2(m1 @ v1.data.bones[pairs[hip][0]].matrix_local.to_translation())
                 if hip else None)
+    # Measured, not assumed: the bone-axis correction is the v1 armature's own
+    # world rotation.  Hardcoding it as its inverse is the bug this replaces.
+    axis_fix = v1.matrix_world.to_3x3().normalized()
     v2_rest = {b.name: b.matrix_local for b in v2.data.bones}
     rest_offset = {}
     for b in order:
@@ -340,15 +343,19 @@ def run():
                     v1_pb = v1.pose.bones[v1_name]
                     delta = (v1_pb.matrix.to_3x3().normalized()
                              @ v1_rest_rot[v1_name].inverted())
-                    desired = R_FIX @ delta @ v2_rest[b.name].to_3x3().normalized()
+                    desired = axis_fix @ delta @ v2_rest[b.name].to_3x3().normalized()
                     local = base.to_3x3().normalized().inverted() @ desired
                     basis = local.to_4x4()
                     pb = v2.pose.bones[b.name]
                     pb.rotation_quaternion = local.to_quaternion()
                     pb.keyframe_insert("rotation_quaternion", frame=frame)
                     if b.name == hip:
-                        bob = R_FIX @ (to_v2(m1 @ v1_pb.matrix.to_translation())
-                                       - hip_rest)
+                        # No `axis_fix` here: positions already agree under
+                        # `to_v2` alone, which is what the 0.37-unit pairing
+                        # distances measure.  The correction is a bone-axis
+                        # convention, not a change of space, so it belongs on
+                        # the rotation path only.
+                        bob = to_v2(m1 @ v1_pb.matrix.to_translation()) - hip_rest
                         target = v2_rest[b.name].to_translation() + bob
                         offset = (base.to_3x3().normalized().inverted()
                                   @ (target - base.to_translation()))

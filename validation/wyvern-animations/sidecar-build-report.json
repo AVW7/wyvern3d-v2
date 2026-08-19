@@ -8,6 +8,7 @@
     "Sanct_Breathe",
     "Sanct_BreatheAir",
     "Sanct_Calm",
+    "Sanct_Climb",
     "Sanct_Cruise",
     "Sanct_Dive",
     "Sanct_Drink",
@@ -30,13 +31,14 @@
     "Sanct_Soar",
     "Sanct_Speed"
   ],
-  "animation_count": 26,
+  "animation_count": 27,
   "channel_counts": {
     "Sanct_BankL": 876,
     "Sanct_BankR": 876,
     "Sanct_Breathe": 876,
     "Sanct_BreatheAir": 876,
     "Sanct_Calm": 876,
+    "Sanct_Climb": 876,
     "Sanct_Cruise": 876,
     "Sanct_Dive": 876,
     "Sanct_Drink": 876,
@@ -64,7 +66,7 @@
   "meshless": true,
   "skinless": true,
   "sidecar_node_count": 293,
-  "size_bytes": 16565564,
-  "hemisphere_flips_repaired": 520,
-  "loop_seams_smoothed": 1369
+  "size_bytes": 18072840,
+  "hemisphere_flips_repaired": 573,
+  "loop_seams_smoothed": 1526
 }

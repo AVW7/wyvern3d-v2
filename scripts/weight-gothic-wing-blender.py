@@ -418,6 +418,77 @@ def main() -> None:
         for name, weight in kept:
             groups[name].add([vertex.index], weight, "REPLACE")
 
+    # Weld the UV seams.
+    #
+    # The mesh carries 11003 vertices stacked in 5463 coincident pairs -- the
+    # duplicates a UV seam needs, occupying one position in space. Everything
+    # above solves each vertex on its own, by distance and then by smoothing over
+    # the edge graph, and neither step knows that two of them are the same point.
+    # 259 pairs came out with different weight sets, 258 of them on wing bones,
+    # and a pair that disagrees does not stay together: measured on `idle`, 865
+    # of them pulled apart once posed and the worst opened a 166-unit gap on the
+    # membrane between digits 2 and 3. That is the slit visible on the folded
+    # wing -- not a hole in the mesh, which has no wing-bone boundary edges at
+    # all, but a seam being torn open by its own skinning.
+    #
+    # Averaging the members and writing the result back to all of them makes the
+    # seam unsplittable by construction: identical weights cannot deform apart.
+    # Done last, after trimming, because trimming is the step most likely to
+    # leave two coincident vertices holding different influence counts.
+    coincident: dict = {}
+    for vertex in targets:
+        key = (
+            round(vertex.co.x, 3),
+            round(vertex.co.y, 3),
+            round(vertex.co.z, 3),
+        )
+        coincident.setdefault(key, []).append(vertex)
+
+    welded = 0
+    for members in coincident.values():
+        if len(members) < 2:
+            continue
+        # `names_all` predates the receiver groups this script creates, so it
+        # cannot name them; read the live mapping instead.
+        live = {group.index: name for name, group in groups.items()}
+        held = [
+            {
+                live[g.group]: g.weight
+                for g in member.groups
+                if g.group in live and g.weight > 1e-4
+            }
+            for member in members
+        ]
+        if all(entry == held[0] for entry in held[1:]):
+            continue
+        merged: dict = {}
+        for entry in held:
+            for name, weight in entry.items():
+                merged[name] = merged.get(name, 0.0) + weight
+        # The average, then trimmed to the tightest budget any member has, so
+        # the weld cannot push one of them over the export limit.
+        budget = min(shared_budget[member.index] for member in members)
+        ordered = sorted(
+            ((name, weight / len(held)) for name, weight in merged.items()),
+            key=lambda item: -item[1],
+        )
+        magnitude = sum(weight for _, weight in ordered)
+        kept = ordered[:budget]
+        total = sum(weight for _, weight in kept)
+        if total <= EPSILON or magnitude <= EPSILON:
+            continue
+        kept = [(name, weight * magnitude / total) for name, weight in kept]
+        for member in members:
+            for name in wing_names:
+                try:
+                    groups[name].remove([member.index])
+                except RuntimeError:
+                    pass
+            for name, weight in kept:
+                groups[name].add([member.index], weight, "REPLACE")
+        welded += 1
+    report["seam_pairs_welded"] = welded
+
     # Budget counting ignores negligible non-wing influences; the glTF limit
     # does not. Reconciling the two by actually pruning them, rather than by
     # counting them differently in two places -- a weight this small is export

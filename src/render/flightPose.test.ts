@@ -267,7 +267,7 @@ describe('dive selection', () => {
   it('never dives on a climb', () => {
     expect(
       flightAnimationState('cruise', 0, { horizontalSpeed: 18, verticalSpeed: 20 }),
-    ).toBe('cruise')
+    ).not.toBe('dive')
   })
 
   it('outranks bank and hover', () => {
@@ -281,6 +281,48 @@ describe('dive selection', () => {
 
   it('is unreachable for a caller that does not measure vertical speed', () => {
     expect(flightAnimationState('cruise', 0, { horizontalSpeed: 18 })).toBe('cruise')
+  })
+})
+
+describe('climb selection', () => {
+  it('enters on steep ascending flight path with sufficient speed', () => {
+    // 18 hspeed, +8 vspeed -> climb angle is atan2(8, 18) = 0.418 rad > 0.35
+    expect(
+      flightAnimationState('cruise', 0, { horizontalSpeed: 18, verticalSpeed: 8 }),
+    ).toBe('climb')
+    // Slower climb angle below 0.35 stays in cruise
+    expect(
+      flightAnimationState('cruise', 0, { horizontalSpeed: 18, verticalSpeed: 4 }),
+    ).toBe('cruise')
+  })
+
+  it('holds climb through a shallower angle than it entered on (hysteresis)', () => {
+    // Already in climb: exit angle is 0.22 rad. atan2(5, 18) = 0.27 rad > 0.22 -> holds climb
+    expect(
+      flightAnimationState('climb', 0, { horizontalSpeed: 18, verticalSpeed: 5 }),
+    ).toBe('climb')
+    // When climb angle drops below exit angle: atan2(3, 18) = 0.165 rad < 0.22 -> exits climb
+    expect(
+      flightAnimationState('climb', 0, { horizontalSpeed: 18, verticalSpeed: 3 }),
+    ).toBe('cruise')
+  })
+
+  it('outranks bank and speed during climb', () => {
+    expect(
+      flightAnimationState('cruise', 0.5, { horizontalSpeed: 18, verticalSpeed: 10 }),
+    ).toBe('climb')
+    expect(
+      flightAnimationState('cruise', 0, { horizontalSpeed: 25, verticalSpeed: 15, referenceSpeed: 18 }),
+    ).toBe('climb')
+  })
+
+  it('does not climb when descending or at level flight', () => {
+    expect(
+      flightAnimationState('cruise', 0, { horizontalSpeed: 18, verticalSpeed: 0 }),
+    ).toBe('cruise')
+    expect(
+      flightAnimationState('cruise', 0, { horizontalSpeed: 18, verticalSpeed: -5 }),
+    ).not.toBe('climb')
   })
 })
 

@@ -205,6 +205,7 @@ export function FlightLabClient({ initial }: { initial?: Partial<LabSearch> }) {
       <Suspense fallback={null}>
         <FlightLab
           speciesId={species.id}
+          compareId={state.compareId}
           requestedState={state.state}
           auto={state.auto}
           scale={state.extraScale}
@@ -310,6 +311,8 @@ export function FlightLabClient({ initial }: { initial?: Partial<LabSearch> }) {
                   setOverlays={state.setOverlays}
                   speciesIndex={state.speciesIndex}
                   setSpeciesIndex={state.setSpeciesIndex}
+                  compareId={state.compareId}
+                  setCompareId={state.setCompareId}
                   species={species}
                   extraScale={state.extraScale}
                   setExtraScale={state.setExtraScale}
