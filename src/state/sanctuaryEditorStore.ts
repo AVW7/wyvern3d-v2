@@ -11,7 +11,10 @@ export interface SanctuaryUndoSnapshot {
   token: number
   layout: SanctuaryLayoutState
   action: string
+  timestamp?: number
 }
+
+const MAX_UNDO_STACK = 20
 
 interface SanctuaryEditorStore {
   isEditing: boolean
@@ -25,6 +28,12 @@ interface SanctuaryEditorStore {
   pendingUndo: SanctuaryUndoSnapshot | null
   nextUndoToken: number
 
+  // Bounded Undo / Redo history
+  undoStack: SanctuaryUndoSnapshot[]
+  redoStack: SanctuaryUndoSnapshot[]
+  preDragLayout: SanctuaryLayoutState | null
+  isPlacementValid: boolean
+
   enterEditMode(): void
   exitEditMode(): void
   toggleEditMode(): void
@@ -37,6 +46,13 @@ interface SanctuaryEditorStore {
   toggleGridSnap(): void
   setSnapSize(size: number): void
   setCategoryTab(tab: SanctuaryEditorStore['activeCategoryTab']): void
+  setPlacementValid(valid: boolean): void
+  setPreDragLayout(layout: SanctuaryLayoutState | null): void
+
+  // History operations
+  pushUndo(layout: SanctuaryLayoutState, action: string): number
+  undo(currentLayout: SanctuaryLayoutState): SanctuaryUndoSnapshot | null
+  redo(currentLayout: SanctuaryLayoutState): SanctuaryUndoSnapshot | null
   stageUndo(layout: SanctuaryLayoutState, action: string): number
   consumeUndo(token: number): SanctuaryUndoSnapshot | null
   clearUndo(token?: number): void
@@ -53,17 +69,27 @@ export const useSanctuaryEditor = create<SanctuaryEditorStore>()((set, get) => (
   activeCategoryTab: 'all',
   pendingUndo: null,
   nextUndoToken: 1,
+  undoStack: [],
+  redoStack: [],
+  preDragLayout: null,
+  isPlacementValid: true,
 
   enterEditMode() {
-    set({ isEditing: true, selectedObjectId: null, placingItem: null, dragPosition: null })
+    set({ isEditing: true, selectedObjectId: null, placingItem: null, dragPosition: null, preDragLayout: null })
   },
 
   exitEditMode() {
-    set({ isEditing: false, selectedObjectId: null, placingItem: null, dragPosition: null })
+    set({ isEditing: false, selectedObjectId: null, placingItem: null, dragPosition: null, preDragLayout: null })
   },
 
   toggleEditMode() {
-    set((s) => ({ isEditing: !s.isEditing, selectedObjectId: null, placingItem: null, dragPosition: null }))
+    set((s) => ({
+      isEditing: !s.isEditing,
+      selectedObjectId: null,
+      placingItem: null,
+      dragPosition: null,
+      preDragLayout: null,
+    }))
   },
 
   selectObject(id) {
@@ -75,7 +101,7 @@ export const useSanctuaryEditor = create<SanctuaryEditorStore>()((set, get) => (
   },
 
   cancelPlacing() {
-    set({ placingItem: null, dragPosition: null })
+    set({ placingItem: null, dragPosition: null, preDragLayout: null })
   },
 
   setDragPosition(pos) {
@@ -111,13 +137,107 @@ export const useSanctuaryEditor = create<SanctuaryEditorStore>()((set, get) => (
     set({ activeCategoryTab })
   },
 
-  stageUndo(layout, action) {
+  setPlacementValid(isPlacementValid) {
+    set((state) => (state.isPlacementValid === isPlacementValid ? state : { isPlacementValid }))
+  },
+
+  setPreDragLayout(preDragLayout) {
+    set({ preDragLayout: preDragLayout ? cloneSanctuaryLayout(preDragLayout) : null })
+  },
+
+  pushUndo(layout, action) {
     const token = get().nextUndoToken
-    set({
-      pendingUndo: { token, layout: cloneSanctuaryLayout(layout), action },
-      nextUndoToken: token + 1,
+    const snapshot: SanctuaryUndoSnapshot = {
+      token,
+      layout: cloneSanctuaryLayout(layout),
+      action,
+      timestamp: Date.now(),
+    }
+
+    set((state) => {
+      const nextStack = [...state.undoStack, snapshot]
+      if (nextStack.length > MAX_UNDO_STACK) {
+        nextStack.shift()
+      }
+      return {
+        undoStack: nextStack,
+        redoStack: [], // New action clears redo stack
+        pendingUndo: snapshot,
+        nextUndoToken: token + 1,
+      }
     })
+
     return token
+  },
+
+  undo(currentLayout) {
+    const { undoStack } = get()
+    if (undoStack.length === 0) return null
+
+    const previousSnapshot = undoStack[undoStack.length - 1]!
+    const remainingUndo = undoStack.slice(0, -1)
+
+    const redoSnapshot: SanctuaryUndoSnapshot = {
+      token: get().nextUndoToken,
+      layout: cloneSanctuaryLayout(currentLayout),
+      action: previousSnapshot.action,
+      timestamp: Date.now(),
+    }
+
+    set((state) => {
+      const nextRedo = [...state.redoStack, redoSnapshot]
+      if (nextRedo.length > MAX_UNDO_STACK) {
+        nextRedo.shift()
+      }
+      return {
+        undoStack: remainingUndo,
+        redoStack: nextRedo,
+        pendingUndo: null,
+        nextUndoToken: state.nextUndoToken + 1,
+      }
+    })
+
+    return {
+      ...previousSnapshot,
+      layout: cloneSanctuaryLayout(previousSnapshot.layout),
+    }
+  },
+
+  redo(currentLayout) {
+    const { redoStack } = get()
+    if (redoStack.length === 0) return null
+
+    const targetSnapshot = redoStack[redoStack.length - 1]!
+    const remainingRedo = redoStack.slice(0, -1)
+
+    const undoSnapshot: SanctuaryUndoSnapshot = {
+      token: get().nextUndoToken,
+      layout: cloneSanctuaryLayout(currentLayout),
+      action: targetSnapshot.action,
+      timestamp: Date.now(),
+    }
+
+    set((state) => {
+      const nextUndo = [...state.undoStack, undoSnapshot]
+      if (nextUndo.length > MAX_UNDO_STACK) {
+        nextUndo.shift()
+      }
+      return {
+        undoStack: nextUndo,
+        redoStack: remainingRedo,
+        pendingUndo: null,
+        nextUndoToken: state.nextUndoToken + 1,
+      }
+    })
+
+    return {
+      ...targetSnapshot,
+      layout: cloneSanctuaryLayout(targetSnapshot.layout),
+    }
+  },
+
+  stageUndo(layout, action) {
+    return get().pushUndo(layout, action)
   },
 
   consumeUndo(token) {

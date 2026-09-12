@@ -1,6 +1,7 @@
 'use client'
 
 import { Prop } from '@/render/assets/props'
+import { HATCHERY_PROP_ATLAS } from '@/render/assets/manifest'
 import { emissiveFor } from '../../atmosphere/fireSources'
 import { InteractiveHealerHearth } from '../interactive/InteractiveHealerHearth'
 import { InteractiveSupplyContainer } from '../interactive/InteractiveSupplyContainer'
@@ -18,8 +19,14 @@ export function WarTableHeroStation({
     <group position={position} rotation={[0, rotationY, 0]} scale={scale}>
       {/* Raised stone foundation */}
       <Prop id="prop.keep.floorC" position={[0, 0, 0]} castShadow={false} />
-      {/* Strategic War Table */}
-      <Prop id="prop.warTable" position={[0, 0, 0]} scale={1.8} />
+      {/* Strategic War Table — carved fantasy council table (CC-BY MartynaLawniczak) */}
+      <Prop
+        id="prop.war.table"
+        atlas={HATCHERY_PROP_ATLAS}
+        position={[0, 0, 0]}
+        rotationY={Math.PI / 2}
+        scale={1.6}
+      />
       {/* Command Council Torches */}
       <Prop
         id="prop.torch"

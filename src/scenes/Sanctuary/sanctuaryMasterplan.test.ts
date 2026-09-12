@@ -110,14 +110,14 @@ describe('Sanctuary masterplan and zoning contracts', () => {
     expect(tooClose.reason).toContain('clipping risk')
   })
 
-  it('verifies save migration leaves edited player objects untouched', () => {
+  it('moves station-owned objects by the contract delta but leaves player props untouched', () => {
     const customLayout = createDefaultSanctuaryLayout()
-    // Move the war table to a custom position
-    const warTableObj = customLayout.objects.find((o) => o.id === 'warTable')!
-    warTableObj.position = [12.5, 0, 15.5]
+    customLayout.spatialContractVersion = undefined
+    // A player prop is not owned by any station and must remain untouched.
+    const playerProp = { id: 'player-cairn', propId: 'prop.perch.rockA', position: [12.5, 0, 15.5] as [number, number, number], rotationY: 0.7, category: 'scenery' as const, label: 'Player Cairn', scale: 1.4 }
+    customLayout.objects.push(playerProp)
 
     const migrated = migrateLegacySanctuaryLayout(customLayout)
-    const migratedWarTable = migrated.objects.find((o) => o.id === 'warTable')!
-    expect(migratedWarTable.position).toEqual([12.5, 0, 15.5])
+    expect(migrated.objects.find((o) => o.id === 'player-cairn')?.position).toEqual([12.5, 0, 15.5])
   })
 })

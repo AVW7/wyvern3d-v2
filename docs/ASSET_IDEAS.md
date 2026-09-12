@@ -44,7 +44,15 @@ first), **Idea**, **Fit** (where it lands in this codebase), and **Weight** —
 
 ## Tier 1 — fits existing seams now
 
-### A1. Real egg meshes in the hatchery 🥇
+### A1. Real egg meshes in the hatchery 🥇 ✅ DONE 2026-08-19
+
+Licence verified from the GLB's embedded `asset.extras` (Sketchfab exports
+carry it): `dragon_egg` CC-BY-4.0 by holderacademy. Shipped as
+`prop.hatchery.egg` in `public/models/hatchery.glb` (built by
+`scripts/build-hatchery-atlas.mjs`, gated by `pnpm assets:validate-hatchery-atlas`),
+rendered species-tinted with incubation glow on the hatchery roosts in
+`SanctuaryScene.tsx`. `egg_of_rock` (6,752 tris) judged too heavy for ambient
+multi-instance use and skipped; `PlaceholderEgg` import removed.
 
 **Source.** `dragon_egg` (0.18 MB, 1,920 tris) and `dragon_egg_lowpoly`
 (960 tris) in the animals folder; `docs/EXTERNAL_MODEL_INDEX.md` §Dragon-specific.
@@ -59,7 +67,15 @@ carries `panel`/`radius` metadata; the render side is a dressing-prop entry in
 the sanctuary atlas (`scripts/asset-sources.json` → `extract-assets.py`) plus a
 per-egg stage pick driven by core egg state. No new render code class needed.
 
-### A2. Sanctuary livestock — chicken and rabbit ambient life 🥇 (blocked on licence evidence)
+### A2. Sanctuary livestock — chicken and rabbit ambient life 🥇 (partially done)
+
+**Status 2026-08-19:** `rabbit_rigged` licence verified from embedded
+`asset.extras` (CC-BY-4.0 by FourthGreen) — shipped as `wildlife.rabbit`
+(0.4 m fit, `Take 001` idle clip), two rabbits at the meadow edge near the
+hatchery in `SanctuaryWildlife.tsx`, test row in `wildlifeModels.test.ts`.
+The chicken remains blocked: `chicken_rig` is CC-BY-**NC**-4.0 (excluded
+outright — commercial game), and the disk hen `ga_free_101` has no verified
+licence (GA Free_151 is a different asset).
 
 **Source.** `chicken_rig` (1,541 tris, 50 joints, `Idle`) and `rabbit_rigged`
 (2,578 tris, 48 joints, 1 clip) — the two cheapest properly-skinned animals in
@@ -117,7 +133,23 @@ gate) is the next eligible stage of `docs/SANCTUARY_ENVIRONMENT_ART_PLAN.md` —
 these belong there. The 1.9 M-tri scans must not enter before the decimation
 lane exists (see C3).
 
-### A5. Dragon heraldry at the gate 🥉
+⚠️ **2026-08-20 — decimation lane tested and FAILED for
+`crumbling_stone_watchtower`:** licence is fine (CC-BY-4.0, Pigcraft, verified
+from embedded `asset.extras`), but Blender headless weld+Decimate will not take
+the 5.69 M-face scan below **80,645 faces** — three ratios (0.0070 / 0.1175)
+with `delimit = set()` all stopped at the identical count, so collapse is
+boundary-limited by the scan's island structure, not the ratio. The 80 K result
+is 9.35 MB and near-cubic in proportion (0.92 × 0.98 × 0.65 — wider than tall),
+wrong silhouette for a tower landmark. Do not retry the same lane; if the tower
+matters, it needs a manually retopologized source or a different asset entirely.
+
+### A5. Dragon heraldry at the gate 🥉 ✅ DONE 2026-08-19
+
+`stylized_dragon_flag` licence verified from embedded `asset.extras`
+(CC-BY-4.0 by SamuelRochaJr). Shipped as `prop.gate.flag` in the hatchery
+atlas — two banners flanking the keep gate with wind sway (`wind={0.09}`),
+`SanctuaryScene.tsx` `GateFlags`. Display armour from `dread_dragon_armor`
+not pursued (7.7 MB, no licence evidence yet).
 
 **Source.** `stylized_dragon_flag` (1.28 MB, 2,336 tris), `dread_dragon_armor`
 (7.7 MB) as display armour.

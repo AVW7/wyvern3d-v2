@@ -10,6 +10,7 @@ import { useSanctuaryEditor } from '@/state/sanctuaryEditorStore'
 import { useUi } from '@/state/uiStore'
 import { GROUND_DECAL } from '../groundDecal'
 import { GROUND_RADIUS } from '../layout'
+import { checkPlacementOverlap } from '../editor/overlapFeedback'
 
 const GROUND_PLANE = new Plane(new Vector3(0, 1, 0), 0)
 
@@ -21,9 +22,11 @@ export function SanctuaryEditorControls() {
   const gridSnap = useSanctuaryEditor((s) => s.gridSnap)
   const snapSize = useSanctuaryEditor((s) => s.snapSize)
   const dragRotationY = useSanctuaryEditor((s) => s.dragRotationY)
+  const isPlacementValid = useSanctuaryEditor((s) => s.isPlacementValid)
   const selectObject = useSanctuaryEditor((s) => s.selectObject)
   const cancelPlacing = useSanctuaryEditor((s) => s.cancelPlacing)
   const setDragPosition = useSanctuaryEditor((s) => s.setDragPosition)
+  const setPlacementValid = useSanctuaryEditor((s) => s.setPlacementValid)
 
   const raycaster = useRef(new Raycaster())
   const mouseNdc = useRef(new Vector2())
@@ -77,7 +80,7 @@ export function SanctuaryEditorControls() {
 
     if (raycaster.current.ray.intersectPlane(GROUND_PLANE, hit)) {
       const dist = Math.hypot(hit.x, hit.z)
-      if (dist < GROUND_RADIUS) {
+      if (dist < GROUND_RADIUS + 5) {
         let x = hit.x
         let z = hit.z
 
@@ -88,6 +91,21 @@ export function SanctuaryEditorControls() {
 
         hoverPoint.current = [x, 0, z]
         setDragPosition([x, 0, z])
+
+        // Evaluate overlap & clearance
+        const activePropId = placingItem?.propId ?? selectedObject?.propId
+        if (activePropId) {
+          const check = checkPlacementOverlap(
+            {
+              id: selectedObjectId ?? undefined,
+              propId: activePropId,
+              position: [x, 0, z],
+              radius: placingItem?.radius ?? selectedObject?.radius,
+            },
+            objects,
+          )
+          setPlacementValid(check.valid)
+        }
       }
     }
 
@@ -96,6 +114,7 @@ export function SanctuaryEditorControls() {
       const [x, y, z] = hoverPoint.current
 
       if (placingItem) {
+        if (!state.sanctuaryLayout) return
         const undoToken = useSanctuaryEditor
           .getState()
           .stageUndo(state.sanctuaryLayout, `Placing ${placingItem.label}`)
@@ -119,6 +138,7 @@ export function SanctuaryEditorControls() {
           undoToken,
         })
       } else if (selectedObjectId && selectedObject) {
+        if (!state.sanctuaryLayout) return
         const undoToken = useSanctuaryEditor
           .getState()
           .stageUndo(state.sanctuaryLayout, `Moving ${selectedObject.label}`)
@@ -162,6 +182,7 @@ export function SanctuaryEditorControls() {
 
   const ghostPropId = placingItem?.propId ?? selectedObject?.propId
   const ghostScale = placingItem?.defaultScale ?? selectedObject?.scale ?? 1
+  const feedbackColor = isPlacementValid ? (placingItem ? '#22c55e' : '#38bdf8') : '#ef4444'
 
   return (
     <group>
@@ -181,13 +202,17 @@ export function SanctuaryEditorControls() {
         </group>
       )}
 
-      {/* Active Placement Ghost Preview */}
+      {/* Active Placement Ghost Preview with Real-time Overlap Feedback */}
       {hoverPoint.current && ghostPropId && (
         <group position={hoverPoint.current} rotation={[0, dragRotationY, 0]}>
           <Prop id={ghostPropId} position={[0, 0, 0]} scale={ghostScale} castShadow={false} />
           <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.05, 0]} renderOrder={4}>
-            <circleGeometry args={[2, 32]} />
-            <meshBasicMaterial {...GROUND_DECAL} color={placingItem ? '#22c55e' : '#38bdf8'} opacity={0.32} />
+            <circleGeometry args={[placingItem?.radius ?? selectedObject?.radius ?? 1.6, 32]} />
+            <meshBasicMaterial
+              {...GROUND_DECAL}
+              color={feedbackColor}
+              opacity={isPlacementValid ? 0.35 : 0.6}
+            />
           </mesh>
         </group>
       )}

@@ -14,6 +14,16 @@ import { BiomeWaterSurface } from './BiomeWaterSurface'
 
 export { BIOME_WORLD_RADIUS, GROVE_MOUND_HEIGHT, biomeHeightAt } from './biomeHeight'
 
+/**
+ * Ground mesh subdivisions per side.
+ *
+ * 220 m across / 96 = 2.3 m per vertex, which is what the height field actually
+ * carries: the micro basis has a ~14 m wavelength and the finest macro octave
+ * ~12 m, so anything coarser aliases the detail away and the terrain reads flat
+ * again. Costs ~13 ms to displace, once, behind the biome transition overlay.
+ */
+const GROUND_SEGMENTS = 96
+
 interface BiomeTerrainProps {
   biome: string
   regionId?: string
@@ -26,7 +36,12 @@ export function BiomeTerrain({ biome, regionId, seed = 42, weather }: BiomeTerra
   const palette = useMemo(() => getBiomePalette(biome), [biome])
 
   const geometry = useMemo(() => {
-    const ground = new PlaneGeometry(BIOME_WORLD_RADIUS * 2, BIOME_WORLD_RADIUS * 2, 48, 48)
+    const ground = new PlaneGeometry(
+      BIOME_WORLD_RADIUS * 2,
+      BIOME_WORLD_RADIUS * 2,
+      GROUND_SEGMENTS,
+      GROUND_SEGMENTS,
+    )
     const positions = ground.attributes.position!
 
     for (let i = 0; i < positions.count; i += 1) {

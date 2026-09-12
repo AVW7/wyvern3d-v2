@@ -1,0 +1,33 @@
+{
+  "maximumIndividualBytes": 32000000,
+  "maximumTotalBytes": 150000000,
+  "assets": [
+    { "path": "public/models/arcane-handler-animations/calm.glb", "redistributionApproved": true, "runtime": true },
+    { "path": "public/models/arcane-handler-animations/idle.glb", "redistributionApproved": true, "runtime": true },
+    { "path": "public/models/arcane-handler-animations/inspect.glb", "redistributionApproved": true, "runtime": true },
+    { "path": "public/models/arcane-handler-animations/offer.glb", "redistributionApproved": true, "runtime": true },
+    { "path": "public/models/arcane-handler-animations/pet.glb", "redistributionApproved": true, "runtime": true },
+    { "path": "public/models/arcane-handler-animations/run.glb", "redistributionApproved": true, "runtime": true },
+    { "path": "public/models/arcane-handler-animations/walk.glb", "redistributionApproved": true, "runtime": true },
+    { "path": "public/models/arcane-handler.glb", "redistributionApproved": true, "runtime": true },
+    { "path": "public/models/biomes.glb", "redistributionApproved": true, "runtime": true },
+    { "path": "public/models/drogon-sanctuary.glb", "redistributionApproved": true, "runtime": true },
+    { "path": "public/models/drogon.glb", "redistributionApproved": true, "runtime": true },
+    { "path": "public/models/hatchery.glb", "redistributionApproved": true, "runtime": true },
+    { "path": "public/models/library/ancient-tree.glb", "redistributionApproved": false, "runtime": true },
+    { "path": "public/models/library/arcane-academy-crest.glb", "redistributionApproved": true, "runtime": true },
+    { "path": "public/models/library/arcane-alchemist-workstation.glb", "redistributionApproved": true, "runtime": true },
+    { "path": "public/models/library/forest-wyvern-display.glb", "redistributionApproved": true, "runtime": true },
+    { "path": "public/models/library/throne-of-books.glb", "redistributionApproved": true, "runtime": true },
+    { "path": "public/models/sanctuary.glb", "redistributionApproved": true, "runtime": true },
+    { "path": "public/models/thornwing.glb", "redistributionApproved": true, "runtime": true },
+    { "path": "public/models/wyvern-bones.glb", "redistributionApproved": true, "runtime": true },
+    { "path": "public/models/wyvern-food.glb", "redistributionApproved": true, "runtime": true },
+    { "path": "public/models/wyvern-gothic.glb", "redistributionApproved": true, "runtime": true },
+    { "path": "public/models/wyvern-v1wing.glb", "redistributionApproved": true, "runtime": false },
+    { "path": "public/models/wyvern.glb", "redistributionApproved": true, "runtime": true }
+    ,{ "path": "public/models/wildlife/doe.glb", "redistributionApproved": true, "runtime": true }
+    ,{ "path": "public/models/wildlife/guineafowl.glb", "redistributionApproved": true, "runtime": true }
+    ,{ "path": "public/models/wildlife/rabbit.glb", "redistributionApproved": true, "runtime": true }
+  ]
+}

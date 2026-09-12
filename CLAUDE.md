@@ -18,6 +18,8 @@ units and battle terrain still use procedural placeholders until their model pip
 | Add biome scenery from the external model library | `docs/BIOME_LIBRARY.md`, then `scripts/biome-library.json` |
 | Browse biome props and per-biome dressing | `/biomes` (`src/app/biomes/`) |
 | Understand or change the biome system | `docs/BIOME_SYSTEM.md` |
+| Change what a biome's *ground* looks like — relief, craters, terraces, dunes | `BIOME_LANDFORMS` in `src/scenes/BiomeWorld/terrain/biomeLandforms.ts` |
+| Prototype biome look and shape without running this app | The biome studio at `~/Documents/biome/fantasy-biomes-next` — see *Biome authoring* below |
 | Develop or review wyvern flight animation | `docs/WYVERN_ANIMATION_BASELINE.md`, then `docs/FLIGHT_ANIMATION_DEVELOPMENT.md` |
 | Know what an animation actually measures | `validation/wyvern-animations/clip-signatures.json`; regenerate with `pnpm assets:analyze-clips` |
 | Edit a clip on the new `WyvernRig` (wing axes, loop seams) | `docs/WYVERN_CLIP_AUDIT.md`; check with `pnpm assets:wyvern-audit` and `pnpm assets:validate-wyvern` |
@@ -36,6 +38,38 @@ units and battle terrain still use procedural placeholders until their model pip
 | Enhance explorable biome identity and activities | `docs/BIOME_ENHANCEMENT_PLAN.md` |
 | Change a scene's look | `src/scenes/{Sanctuary,WorldMap,Battle,Highlands}/` |
 | Change HUD/panels | `src/ui/` (DOM overlay, not in-canvas) |
+
+## Biome authoring happens in a separate studio
+
+Biome and environment content is authored in `~/Documents/biome/fantasy-biomes-next`
+— a small Next.js/Three.js studio of 24 standalone biome tiles — and ported here.
+The maintainer works that way because this app is heavy to run: a persistent game
+canvas plus several GLB atlases. **Don't assume the dev server can just be
+started**; prefer `pnpm test`, `pnpm typecheck`, and rendering pure functions
+directly (a hillshade of `biomeHeightAt` shows terrain shape better than a
+ground-level screenshot).
+
+**Biome ids do not match between the two projects and share no names.** Ours are
+physical terrain classes bound to regions and yields (`valley`, `spire`,
+`ashland`); the studio's are art-directed tiles (`voidscar`, `firelands`,
+`mirror-steppe`). The canonical mapping is `src/wyvernBiomeLink.ts` **in the
+studio**, which records for each of our 15 biomes the tile to prototype it in and
+how much of a change survives the trip. Two studio biomes — `eldritch-wastes` and
+`ethereal` — have no counterpart here and are the standing candidates for new
+terrain classes.
+
+Terrain relief uses the same vocabulary in both projects: a weighted noise basis
+(macro / ridge / micro) then geomorphic operators. A landform tuned in the studio
+transfers as a row in `BIOME_LANDFORMS`, not as ported code. The RNGs are already
+byte-identical (both mulberry32; both hash FNV-1a with `0x01000193`), so seeded
+studio generators are safe on the replay path here. **Check units when porting:**
+the studio works on 36 m tiles in 1-3 unit heights, our biome world is 220 m
+across in metres. That gap already turned `terrace`'s `steps` into 14 cm treads on
+a 17 m mountain — a silent no-op — which is why our operator takes `stepHeight` in
+metres instead.
+
+Gameplay stays here. Yields, combat and region rules live in `src/core/**` and
+never move to the studio; nothing cosmetic, in either project, may feed them.
 
 ## The invariant: `src/core/**` is pure
 

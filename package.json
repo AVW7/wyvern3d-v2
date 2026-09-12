@@ -2,6 +2,7 @@
   "name": "wyvern3d-v2",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@10.28.2",
   "type": "module",
   "scripts": {
     "dev": "next dev",
@@ -10,6 +11,9 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "biome:contract:sync": "node scripts/biome-contract.mjs sync",
+    "biome:contract:check": "node scripts/biome-contract.mjs check",
+    "assets:runtime:check": "node scripts/validate-runtime-assets.mjs",
     "test:watch": "vitest",
     "assets:validate-wyvern": "node scripts/validate-wyvern-clips.mjs",
     "assets:reimport-wildlife": "node scripts/reimport-wildlife-masters.mjs",
@@ -17,6 +21,8 @@
     "assets:gothic-fold": "/Applications/Blender.app/Contents/MacOS/Blender --background .gothic/gothic-retargeted.blend --python scripts/bake-gothic-fold-blender.py -- --out src/render/wingFoldPose.ts --report .gothic/gothic-fold.json",
     "assets:validate-v1-catalog": "node scripts/validate-v1-action-catalog.mjs",
     "assets:food": "node scripts/build-food-models.mjs",
+    "assets:hatchery-atlas": "node scripts/build-hatchery-atlas.mjs",
+    "assets:validate-hatchery-atlas": "node scripts/validate-hatchery-atlas.mjs",
     "assets:inspect-model": "node scripts/inspect-model-asset.mjs",
     "assets:player-sidecars": "python3 scripts/extract-meshy-animation-sidecars.py",
     "assets:player-lod": "node scripts/build-player-lod.mjs",
@@ -39,7 +45,15 @@
     "assets:validate-sidecar": "node scripts/validate-sidecar-runtime.mjs",
     "assets:validate-contact": "node scripts/validate-contact-stability.mjs",
     "sim:battle": "tsx scripts/sim-battle.ts",
-    "sim:replay": "tsx scripts/sim-replay.ts"
+    "sim:replay": "tsx scripts/sim-replay.ts",
+    "assets:bones": "node scripts/build-bone-props.mjs",
+    "assets:water": "node scripts/build-water-props.mjs",
+    "assets:fungal": "node scripts/build-fungal-props.mjs",
+    "assets:ruin": "node scripts/build-ruin-props.mjs",
+    "assets:arcane": "node scripts/build-arcane-props.mjs",
+    "assets:corrupt": "node scripts/build-corrupt-props.mjs",
+    "assets:reed": "node scripts/build-reed-props.mjs",
+    "assets:terrain": "node scripts/build-terrain-props.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",

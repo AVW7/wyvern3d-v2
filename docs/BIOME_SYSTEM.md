@@ -33,6 +33,7 @@ selected world-map region
   -> RegionDef.biome
   -> BiomeScene
      -> biomePalettes.ts       atmosphere and terrain colours
+     -> biomeLandforms.ts      per-biome relief recipe (noise weights + operators)
      -> BiomeTerrain           deterministic height field
      -> biomeLibrary.ts        layer recipes
      -> biomeScatter.ts        deterministic instance transforms
@@ -50,6 +51,7 @@ selected world-map region
 | Atmosphere and ground palette per biome | `src/scenes/BiomeWorld/atmosphere/biomePalettes.ts` |
 | Explorable-biome prop layers | `src/render/assets/biomeLibrary.ts` |
 | Explorable-biome placement maths | `src/scenes/BiomeWorld/dressing/biomeScatter.ts` |
+| Biome relief composition (amplitude, noise weights, operators) | `src/scenes/BiomeWorld/terrain/biomeLandforms.ts` |
 | Biome terrain and height sampling | `src/scenes/BiomeWorld/terrain/` |
 | Curated external source nodes and target measurements | `scripts/biome-library.json` |
 | Built prop measurements | `public/models/biomes.glb`, `asset.extras.wyvern3dBiomeAtlas` |

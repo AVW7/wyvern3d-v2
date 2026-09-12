@@ -6,6 +6,7 @@ import { useSanctuaryEditor } from '@/state/sanctuaryEditorStore'
 import { useSanctuaryColors } from '@/state/sanctuaryColorsStore'
 import { PROP_CATALOG, isPropUnlocked } from '@/core/state/sanctuaryLayout'
 import { useUi } from '@/state/uiStore'
+import { SnapshotManager } from './SnapshotManager'
 
 export function SanctuaryEditorHud() {
   const state = useGameState()
@@ -48,6 +49,52 @@ export function SanctuaryEditorHud() {
     )
   })
 
+  const undoStack = useSanctuaryEditor((s) => s.undoStack)
+  const redoStack = useSanctuaryEditor((s) => s.redoStack)
+  const undoAction = useSanctuaryEditor((s) => s.undo)
+  const redoAction = useSanctuaryEditor((s) => s.redo)
+  const [snapshotsOpen, setSnapshotsOpen] = useState(false)
+
+  const handleUndo = () => {
+    if (!state.sanctuaryLayout || undoStack.length === 0) return
+    const snapshot = undoAction(state.sanctuaryLayout)
+    if (snapshot) {
+      dispatch({ type: 'RESTORE_SANCTUARY_LAYOUT', layout: snapshot.layout })
+      selectObject(null)
+      useUi.getState().notify({ tone: 'success', message: `Undone: ${snapshot.action}` })
+    }
+  }
+
+  const handleRedo = () => {
+    if (!state.sanctuaryLayout || redoStack.length === 0) return
+    const snapshot = redoAction(state.sanctuaryLayout)
+    if (snapshot) {
+      dispatch({ type: 'RESTORE_SANCTUARY_LAYOUT', layout: snapshot.layout })
+      selectObject(null)
+      useUi.getState().notify({ tone: 'success', message: `Redone: ${snapshot.action}` })
+    }
+  }
+
+  // Keyboard shortcut listener for Undo / Redo
+  useEffect(() => {
+    if (!isEditing) return
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (document.querySelector('[role="alertdialog"]') || document.querySelector('[role="dialog"]')) return
+      const isCmdOrCtrl = e.metaKey || e.ctrlKey
+      if (isCmdOrCtrl && (e.key === 'z' || e.key === 'Z') && !e.shiftKey) {
+        e.preventDefault()
+        handleUndo()
+      } else if (isCmdOrCtrl && ((e.key === 'z' || e.key === 'Z' && e.shiftKey) || e.key === 'y' || e.key === 'Y')) {
+        e.preventDefault()
+        handleRedo()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [isEditing, undoStack, redoStack, state.sanctuaryLayout])
+
   return (
     <div className="sanctuary-editor-overlay">
       {/* Top Header Control Bar */}
@@ -58,6 +105,33 @@ export function SanctuaryEditorHud() {
         </div>
 
         <div className="editor-controls-group">
+          {/* Undo / Redo */}
+          <button
+            className="editor-btn-sub"
+            onClick={handleUndo}
+            disabled={undoStack.length === 0}
+            title="Undo (Ctrl+Z)"
+          >
+            <UndoIcon />
+            <span>Undo</span>
+          </button>
+
+          <button
+            className="editor-btn-sub"
+            onClick={handleRedo}
+            disabled={redoStack.length === 0}
+            title="Redo (Ctrl+Shift+Z)"
+          >
+            <RedoIcon />
+            <span>Redo</span>
+          </button>
+
+          {/* Snapshots */}
+          <button className={`editor-btn ${snapshotsOpen ? 'active' : ''}`} onClick={() => setSnapshotsOpen(true)}>
+            <CameraIcon />
+            <span>Snapshots</span>
+          </button>
+
           <button className={`editor-btn ${colorsOpen ? 'active' : ''}`} onClick={() => setColorsOpen((v) => !v)}>
             <PaletteIcon />
             <span>Terrain Colors</span>
@@ -287,6 +361,8 @@ export function SanctuaryEditorHud() {
         </div>
       </div>
 
+      {snapshotsOpen && <SnapshotManager onClose={() => setSnapshotsOpen(false)} />}
+
       {resetConfirmationOpen && (
         <ResetLayoutDialog
           onCancel={() => setResetConfirmationOpen(false)}
@@ -399,6 +475,33 @@ function TerrainColorsPanel({ onClose }: { onClose: () => void }) {
         Reset to Default
       </button>
     </div>
+  )
+}
+
+function UndoIcon() {
+  return (
+    <svg className="icon-monotone" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+      <path d="M3 3v5h5"/>
+    </svg>
+  )
+}
+
+function RedoIcon() {
+  return (
+    <svg className="icon-monotone" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 12a9 9 0 1 1-9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+      <path d="M21 3v5h-5"/>
+    </svg>
+  )
+}
+
+function CameraIcon() {
+  return (
+    <svg className="icon-monotone" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" />
+      <circle cx="12" cy="13" r="3" />
+    </svg>
   )
 }
 

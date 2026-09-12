@@ -30,6 +30,21 @@
 - **Guineafowl licence:** CC-BY-4.0
 - **Guineafowl file:** `public/models/wildlife/guineafowl.glb`
 - **Guineafowl modifications:** re-imported from the 2048px master (`scripts/reimport-wildlife-masters.mjs`), replacing the 1024px first import; texture re-encoded 2048px WebP; manifest scale fitted numerically to 0.55 m overall height
+- **Rabbit source:** rabbit_rigged by FourthGreen ([Sketchfab](https://sketchfab.com/3d-models/rabbit-rigged-3d-model)) — licence verified from the GLB's embedded `asset.extras` Sketchfab metadata
+- **Rabbit licence:** CC-BY-4.0
+- **Rabbit file:** `public/models/wildlife/rabbit.glb`
+- **Rabbit modifications:** none to the mesh; manifest scale fitted numerically to 0.4 m overall height
+
+## Hatchery and gate props atlas
+
+- **File:** `public/models/hatchery.glb` (built by `scripts/build-hatchery-atlas.mjs`)
+- **Egg source:** dragon_egg by holderacademy ([Sketchfab](https://sketchfab.com/3d-models/dragon-egg)) — 1,920 triangles
+- **Egg licence:** CC-BY-4.0 (verified from embedded `asset.extras`)
+- **Flag source:** stylized_dragon_flag by SamuelRochaJr ([Sketchfab](https://sketchfab.com/3d-models/stylized-dragon-flag)) — 2,336 triangles
+- **Flag licence:** CC-BY-4.0 (verified from embedded `asset.extras`)
+- **War table source:** fantasy_table by MartynaLawniczak ([Sketchfab](https://sketchfab.com/3d-models/fantasy-table)) — 7,292 triangles
+- **War table licence:** CC-BY-4.0 (verified from embedded `asset.extras`)
+- **Modifications:** merged into a single atlas GLB with logical node names (`prop.hatchery.egg`, `prop.gate.flag`, `prop.war.table`), world-frame bounds measured for y=0 anchoring, textures re-encoded ≤1024px WebP, authored scales fitted numerically (egg 0.75 m tall, flag 3.2 m tall, table 0.95 m tall)
 
 ## Elderroot Grove landmark
 

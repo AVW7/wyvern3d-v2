@@ -33,3 +33,9 @@ __pycache__/
 
 # Gothic wing rebuild working files (scripts/build-gothic-wing-blender.py)
 .gothic/
+
+# Agent and temporary files
+.learnings/
+scripts/tmp-glb-*.mjs
+*.tsbuildinfo
+

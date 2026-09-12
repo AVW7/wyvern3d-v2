@@ -79,9 +79,9 @@ export const PERCHES: [number, number][] = [
 export const TRAINING_POSTS: Record<string, [number, number]> = {
   huntingPen: [-41, 5],
   flightRing: [-13, 34],
-  burnRange: [23, 42],
-  enduranceRun: [-48, 19],
-  scaleForge: [43, -9],
+  burnRange: [20, 44],
+  enduranceRun: [-52, 18],
+  scaleForge: [53, -14],
 }
 
 export const BREEDING_POSTS: [[number, number], [number, number]] = [

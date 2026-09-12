@@ -4,7 +4,7 @@ import { useLayoutEffect, useMemo, useRef } from 'react'
 import { useGLTF } from '@react-three/drei'
 import { Matrix4, Quaternion, Vector3 } from 'three'
 import type { BufferGeometry, InstancedMesh, Material, Mesh, MeshStandardMaterial, Object3D } from 'three'
-import { BIOME_PROP_ATLAS, FOOD_PROP_ATLAS, HATCHERY_PROP_ATLAS, PROP_ATLAS } from './manifest'
+import { ARCANE_PROP_ATLAS, BIOME_PROP_ATLAS, BONE_PROP_ATLAS, CORRUPT_PROP_ATLAS, FOOD_PROP_ATLAS, FUNGAL_PROP_ATLAS, HATCHERY_PROP_ATLAS, PROP_ATLAS, REED_PROP_ATLAS, RUIN_PROP_ATLAS, TERRAIN_PROP_ATLAS, WATER_PROP_ATLAS } from './manifest'
 
 // Prevent Drei's useGLTF from garbage collecting during Next.js fast-refresh
 if (process.env.NODE_ENV === 'development') {
@@ -402,5 +402,13 @@ export function usePropAtlas(): void {
   useGLTF(PROP_ATLAS)
   useGLTF(FOOD_PROP_ATLAS)
   useGLTF(BIOME_PROP_ATLAS)
+  useGLTF(BONE_PROP_ATLAS)
+  useGLTF(WATER_PROP_ATLAS)
+  useGLTF(FUNGAL_PROP_ATLAS)
+  useGLTF(RUIN_PROP_ATLAS)
+  useGLTF(ARCANE_PROP_ATLAS)
+  useGLTF(CORRUPT_PROP_ATLAS)
+  useGLTF(REED_PROP_ATLAS)
+  useGLTF(TERRAIN_PROP_ATLAS)
   useGLTF(HATCHERY_PROP_ATLAS)
 }

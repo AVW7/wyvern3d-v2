@@ -1,0 +1,1283 @@
+{
+  "links": [
+    {
+      "alternateStudioIds": [
+        "feygrove"
+      ],
+      "fidelity": "strong",
+      "primaryStudioId": "world-tree-grove",
+      "transferNotes": "Both are an ancient living sanctuary around a world tree; Wyvern3D's grove plants its landmark and stone ring on a flattened central mound.",
+      "wyvernId": "grove"
+    },
+    {
+      "alternateStudioIds": [],
+      "fidelity": "strong",
+      "primaryStudioId": "jagged-expanse",
+      "transferNotes": "Knife-edge ridges, scree and ravines. The tallest tile in each project, and the only one carrying a ridge spine.",
+      "wyvernId": "mountain"
+    },
+    {
+      "alternateStudioIds": [
+        "infernal",
+        "obsidian-wastes"
+      ],
+      "fidelity": "partial",
+      "primaryStudioId": "firelands",
+      "transferNotes": "Caldera and lava runnels, but at different scales: firelands is a high fractured caldera under a roost crag, Wyvern3D's ashland a shallow crater floor with a low lip. Lava treatment and dressing transfer; relief does not. infernal is the flatter open-magma variant and is the closer match for the floor itself.",
+      "wyvernId": "ashland"
+    },
+    {
+      "alternateStudioIds": [
+        "crystal-forest"
+      ],
+      "fidelity": "strong",
+      "primaryStudioId": "icebound-wastes",
+      "transferNotes": "Glacial drifts. Both stay low-relief with wind-driven dune banding rather than peaks.",
+      "wyvernId": "tundra"
+    },
+    {
+      "alternateStudioIds": [
+        "crystal-forest"
+      ],
+      "fidelity": "strong",
+      "primaryStudioId": "subterranean",
+      "transferNotes": "Crystal-lit cavern floor. Wyvern3D's only cavern region is Crystal Grotto, so the two are effectively the same place.",
+      "wyvernId": "cavern"
+    },
+    {
+      "alternateStudioIds": [],
+      "fidelity": "strong",
+      "primaryStudioId": "shadowfen",
+      "transferNotes": "Blackwater cypress fen over peat. Both flood their hollows and both must keep gameplay sites on dry hummocks.",
+      "wyvernId": "swamp"
+    },
+    {
+      "alternateStudioIds": [],
+      "fidelity": "strong",
+      "primaryStudioId": "mercurial-marsh",
+      "transferNotes": "Mirrored runnels through low wetland. Palette differs in saturation only.",
+      "wyvernId": "marsh"
+    },
+    {
+      "alternateStudioIds": [
+        "shifting-sands"
+      ],
+      "fidelity": "strong",
+      "primaryStudioId": "sulfur-barrens",
+      "transferNotes": "Ash crust and vents. Use shifting-sands when the dune operator is the thing being tuned.",
+      "wyvernId": "barrens"
+    },
+    {
+      "alternateStudioIds": [],
+      "fidelity": "partial",
+      "primaryStudioId": "stormlands",
+      "transferNotes": "Rain-cut highlands. The terraced benching transfers directly; the lightning-shrine dressing does not.",
+      "wyvernId": "highland"
+    },
+    {
+      "alternateStudioIds": [],
+      "fidelity": "partial",
+      "primaryStudioId": "bloodwood",
+      "transferNotes": "Canopy forest structure and scatter density transfer; the crimson palette is specific to the studio tile.",
+      "wyvernId": "forest"
+    },
+    {
+      "alternateStudioIds": [],
+      "fidelity": "partial",
+      "primaryStudioId": "mushroom-forest",
+      "transferNotes": "Dense canopy over heavy undergrowth. Layer counts and radius bands transfer; the fungal art direction does not.",
+      "wyvernId": "jungle"
+    },
+    {
+      "alternateStudioIds": [
+        "underwater"
+      ],
+      "fidelity": "partial",
+      "primaryStudioId": "windtorn-isles",
+      "transferNotes": "Neither studio tile is a plain beach. windtorn-isles gives the island-and-water edge; underwater gives the submerged shelf.",
+      "wyvernId": "coast"
+    },
+    {
+      "alternateStudioIds": [],
+      "fidelity": "partial",
+      "primaryStudioId": "voidscar",
+      "transferNotes": "Jagged teeth around a collapsed basin. Wyvern3D's spire inverts it into a raised pillar with a scree rim, so operators transfer with their sign flipped.",
+      "wyvernId": "spire"
+    },
+    {
+      "alternateStudioIds": [],
+      "fidelity": "proxy",
+      "primaryStudioId": "blightlands",
+      "transferNotes": "Both are bleak, open, low-relief ground, but the blight's acid fissures have no counterpart in a windswept heath. Landform only.",
+      "wyvernId": "moor"
+    },
+    {
+      "alternateStudioIds": [
+        "dreamlands"
+      ],
+      "fidelity": "proxy",
+      "primaryStudioId": "mirror-steppe",
+      "transferNotes": "The flattest studio tiles, which is the one property valley needs. Both are far more alien than a sheltered lowland; take the relief and leave the look.",
+      "wyvernId": "valley"
+    }
+  ],
+  "nonBiomeStudioIds": [
+    "custom-canvas"
+  ],
+  "rng": {
+    "algorithm": "mulberry32-v1",
+    "hash": "fnv1a32-v1",
+    "vectors": [
+      {
+        "hash": 2166136261,
+        "label": "",
+        "seed": 0,
+        "values": [
+          0.6112444522,
+          0.4935242918,
+          0.7740248835,
+          0.4122861116
+        ]
+      },
+      {
+        "hash": 2752598897,
+        "label": "firelands",
+        "seed": 1337,
+        "values": [
+          0.8881422121,
+          0.7094044622,
+          0.4956863932,
+          0.3746178243
+        ]
+      },
+      {
+        "hash": 1073680252,
+        "label": "world-tree-grove",
+        "seed": 4294967295,
+        "values": [
+          0.4524692569,
+          0.9535680362,
+          0.3382363049,
+          0.8318745291
+        ]
+      }
+    ]
+  },
+  "schemaVersion": 1,
+  "source": {
+    "heightUnitMeters": 1,
+    "project": "fantasy-biomes-next",
+    "worldSizeMeters": 36
+  },
+  "studioBiomes": [
+    {
+      "id": "firelands",
+      "landform": {
+        "amplitudeScale": 0.85,
+        "heightMeters": 0.62,
+        "noise": {
+          "macro": 0.65,
+          "micro": 0.1,
+          "ridge": 0.25
+        },
+        "operators": [
+          {
+            "amount": 0.42,
+            "field": "ridge",
+            "kind": "noiseBoost"
+          },
+          {
+            "amount": 0.48,
+            "center": [
+              0.25,
+              -0.15
+            ],
+            "falloff": 0.35,
+            "kind": "rim",
+            "radius": 1.9
+          },
+          {
+            "amount": 0.38,
+            "center": [
+              0.25,
+              -0.15
+            ],
+            "kind": "basin",
+            "radius": 1.75
+          }
+        ],
+        "units": {
+          "frequency": "radians-per-metre",
+          "horizontal": "metre",
+          "vertical": "metre",
+          "weights": "dimensionless"
+        }
+      },
+      "name": "Firelands",
+      "profile": {
+        "climate": "volcanic",
+        "features": [
+          "lava runnels",
+          "a roost crag",
+          "fracture lines"
+        ],
+        "hazards": [
+          "heat",
+          "lava"
+        ],
+        "hydrology": "molten",
+        "kind": "volcanic caldera",
+        "relief": "steep",
+        "substrate": "ash",
+        "summary": "A dragon roost above a fractured caldera threaded with lava runnels.",
+        "traits": [
+          "lava",
+          "obsidian",
+          "geyser",
+          "bone",
+          "shrine"
+        ],
+        "vegetation": "barren"
+      }
+    },
+    {
+      "id": "stormlands",
+      "landform": {
+        "amplitudeScale": 1,
+        "heightMeters": 0.58,
+        "noise": {
+          "macro": 0.65,
+          "micro": 0.1,
+          "ridge": 0.25
+        },
+        "operators": [],
+        "units": {
+          "frequency": "radians-per-metre",
+          "horizontal": "metre",
+          "vertical": "metre",
+          "weights": "dimensionless"
+        }
+      },
+      "name": "Stormlands",
+      "profile": {
+        "climate": "cold",
+        "features": [
+          "the lightning shrine",
+          "rain gullies",
+          "wind-flagged scrub"
+        ],
+        "hazards": [
+          "lightning",
+          "exposure"
+        ],
+        "hydrology": "flowing",
+        "kind": "rain-cut highland",
+        "relief": "broken",
+        "substrate": "rock",
+        "summary": "An ancient lightning shrine above wind-scoured, rain-cut uplands.",
+        "traits": [
+          "boulder",
+          "scree",
+          "shrine",
+          "arcane",
+          "luminous"
+        ],
+        "vegetation": "scrub"
+      }
+    },
+    {
+      "id": "icebound-wastes",
+      "landform": {
+        "amplitudeScale": 1,
+        "heightMeters": 0.26,
+        "noise": {
+          "macro": 0.65,
+          "micro": 0.1,
+          "ridge": 0.25
+        },
+        "operators": [],
+        "units": {
+          "frequency": "radians-per-metre",
+          "horizontal": "metre",
+          "vertical": "metre",
+          "weights": "dimensionless"
+        }
+      },
+      "name": "Icebound Wastes",
+      "profile": {
+        "climate": "frozen",
+        "features": [
+          "crevasse fields",
+          "the burning heart",
+          "ice erratics"
+        ],
+        "hazards": [
+          "exposure",
+          "thin ice"
+        ],
+        "hydrology": "dry",
+        "kind": "glacial waste",
+        "relief": "flat",
+        "substrate": "ice",
+        "summary": "A fractured glacier gathered around an ancient, still-burning heart.",
+        "traits": [
+          "ice",
+          "crystal",
+          "boulder",
+          "arcane",
+          "luminous"
+        ],
+        "vegetation": "lichen"
+      }
+    },
+    {
+      "id": "windtorn-isles",
+      "landform": {
+        "amplitudeScale": 1,
+        "heightMeters": 0.38,
+        "noise": {
+          "macro": 0.65,
+          "micro": 0.1,
+          "ridge": 0.25
+        },
+        "operators": [],
+        "units": {
+          "frequency": "radians-per-metre",
+          "horizontal": "metre",
+          "vertical": "metre",
+          "weights": "dimensionless"
+        }
+      },
+      "name": "Windtorn Isles",
+      "profile": {
+        "climate": "temperate",
+        "features": [
+          "floating islets",
+          "falling water",
+          "root undersides"
+        ],
+        "hazards": [
+          "falls"
+        ],
+        "hydrology": "flowing",
+        "kind": "floating archipelago",
+        "relief": "broken",
+        "substrate": "rock",
+        "summary": "Floating stone islands trailing waterfalls and exposed root masses.",
+        "traits": [
+          "boulder",
+          "broadleaf",
+          "freshwater",
+          "ruin",
+          "arcane"
+        ],
+        "vegetation": "broadleaf"
+      }
+    },
+    {
+      "id": "shifting-sands",
+      "landform": {
+        "amplitudeScale": 0.5,
+        "heightMeters": 0.4,
+        "noise": {
+          "macro": 0.65,
+          "micro": 0.1,
+          "ridge": 0.25
+        },
+        "operators": [
+          {
+            "amount": 0.08,
+            "frequency": 2.4,
+            "kind": "dune",
+            "skew": 0.6,
+            "warp": 3
+          },
+          {
+            "amount": 0.06,
+            "field": "ridge",
+            "kind": "noiseBoost"
+          }
+        ],
+        "units": {
+          "frequency": "radians-per-metre",
+          "horizontal": "metre",
+          "vertical": "metre",
+          "weights": "dimensionless"
+        }
+      },
+      "name": "Shifting Sands",
+      "profile": {
+        "climate": "arid",
+        "features": [
+          "dune fields",
+          "the oasis court",
+          "buried masonry"
+        ],
+        "hazards": [
+          "heat",
+          "sandstorm"
+        ],
+        "hydrology": "dry",
+        "kind": "desert waystation",
+        "relief": "rolling",
+        "substrate": "sand",
+        "summary": "A half-buried caravan waystation with an oasis court and wind-carved rock.",
+        "traits": [
+          "dune",
+          "succulent",
+          "boulder",
+          "camp",
+          "ruin"
+        ],
+        "vegetation": "scrub"
+      }
+    },
+    {
+      "id": "mercurial-marsh",
+      "landform": {
+        "amplitudeScale": 0.55,
+        "heightMeters": 0.2,
+        "noise": {
+          "macro": 0.65,
+          "micro": 0.1,
+          "ridge": 0.25
+        },
+        "operators": [],
+        "units": {
+          "frequency": "radians-per-metre",
+          "horizontal": "metre",
+          "vertical": "metre",
+          "weights": "dimensionless"
+        }
+      },
+      "name": "Mercurial Marsh",
+      "profile": {
+        "climate": "temperate",
+        "features": [
+          "mirrored runnels",
+          "the quicksilver heart",
+          "silver reeds"
+        ],
+        "hazards": [
+          "bog",
+          "toxic air"
+        ],
+        "hydrology": "standing",
+        "kind": "mirrored fen",
+        "relief": "flat",
+        "substrate": "peat",
+        "summary": "A quicksilver heart feeding mirrored runnels through silver wetland.",
+        "traits": [
+          "reed",
+          "freshwater",
+          "mist",
+          "arcane",
+          "luminous"
+        ],
+        "vegetation": "aquatic"
+      }
+    },
+    {
+      "id": "blightlands",
+      "landform": {
+        "amplitudeScale": 1,
+        "heightMeters": 0.28,
+        "noise": {
+          "macro": 0.65,
+          "micro": 0.1,
+          "ridge": 0.25
+        },
+        "operators": [],
+        "units": {
+          "frequency": "radians-per-metre",
+          "horizontal": "metre",
+          "vertical": "metre",
+          "weights": "dimensionless"
+        }
+      },
+      "name": "Blightlands",
+      "profile": {
+        "climate": "temperate",
+        "features": [
+          "acid fissures",
+          "blighted scrub",
+          "sores in the ground"
+        ],
+        "hazards": [
+          "disease",
+          "toxic air"
+        ],
+        "hydrology": "seasonal",
+        "kind": "diseased flat",
+        "relief": "rolling",
+        "substrate": "loam",
+        "summary": "Diseased soil split by acid fissures, holding corrupted vegetation.",
+        "traits": [
+          "deadwood",
+          "corrupt",
+          "geyser",
+          "bone"
+        ],
+        "vegetation": "scrub"
+      }
+    },
+    {
+      "id": "eldritch-wastes",
+      "landform": {
+        "amplitudeScale": 1,
+        "heightMeters": 0.32,
+        "noise": {
+          "macro": 0.65,
+          "micro": 0.1,
+          "ridge": 0.25
+        },
+        "operators": [],
+        "units": {
+          "frequency": "radians-per-metre",
+          "horizontal": "metre",
+          "vertical": "metre",
+          "weights": "dimensionless"
+        }
+      },
+      "name": "Eldritch Wastes",
+      "profile": {
+        "climate": "unnatural",
+        "features": [
+          "the portal scar",
+          "cyan veining",
+          "watching shapes"
+        ],
+        "hazards": [
+          "arcane backlash"
+        ],
+        "hydrology": "dry",
+        "kind": "portal scar",
+        "relief": "broken",
+        "substrate": "glass",
+        "summary": "A watchful portal scar threaded with cyan corruption and long shadows.",
+        "traits": [
+          "obsidian",
+          "corrupt",
+          "arcane",
+          "luminous",
+          "ruin"
+        ],
+        "vegetation": "barren"
+      }
+    },
+    {
+      "id": "shadowfen",
+      "landform": {
+        "amplitudeScale": 1,
+        "heightMeters": 0.27,
+        "noise": {
+          "macro": 0.65,
+          "micro": 0.1,
+          "ridge": 0.25
+        },
+        "operators": [],
+        "units": {
+          "frequency": "radians-per-metre",
+          "horizontal": "metre",
+          "vertical": "metre",
+          "weights": "dimensionless"
+        }
+      },
+      "name": "Shadowfen",
+      "profile": {
+        "climate": "humid",
+        "features": [
+          "the cypress crossing",
+          "shadow ferns",
+          "black pools"
+        ],
+        "hazards": [
+          "bog",
+          "low visibility"
+        ],
+        "hydrology": "standing",
+        "kind": "blackwater fen",
+        "relief": "flat",
+        "substrate": "peat",
+        "summary": "A blackwater cypress crossing veiled by shadow ferns and deep peat.",
+        "traits": [
+          "reed",
+          "deadwood",
+          "freshwater",
+          "mist",
+          "fungal"
+        ],
+        "vegetation": "aquatic"
+      }
+    },
+    {
+      "id": "mirror-steppe",
+      "landform": {
+        "amplitudeScale": 0.22,
+        "heightMeters": 0.16,
+        "noise": {
+          "macro": 0.65,
+          "micro": 0.1,
+          "ridge": 0.25
+        },
+        "operators": [],
+        "units": {
+          "frequency": "radians-per-metre",
+          "horizontal": "metre",
+          "vertical": "metre",
+          "weights": "dimensionless"
+        }
+      },
+      "name": "Mirror Steppe",
+      "profile": {
+        "climate": "unnatural",
+        "features": [
+          "mirrored pools",
+          "magenta pylons",
+          "pale flagstone"
+        ],
+        "hazards": [
+          "arcane backlash"
+        ],
+        "hydrology": "standing",
+        "kind": "reflective plain",
+        "relief": "flat",
+        "substrate": "crystal",
+        "summary": "Pale reflective stone under mirrored pools and magenta pylons.",
+        "traits": [
+          "crystal",
+          "freshwater",
+          "arcane",
+          "luminous",
+          "tower"
+        ],
+        "vegetation": "barren"
+      }
+    },
+    {
+      "id": "bloodwood",
+      "landform": {
+        "amplitudeScale": 1,
+        "heightMeters": 0.26,
+        "noise": {
+          "macro": 0.65,
+          "micro": 0.1,
+          "ridge": 0.25
+        },
+        "operators": [],
+        "units": {
+          "frequency": "radians-per-metre",
+          "horizontal": "metre",
+          "vertical": "metre",
+          "weights": "dimensionless"
+        }
+      },
+      "name": "Bloodwood",
+      "profile": {
+        "climate": "temperate",
+        "features": [
+          "red canopy",
+          "thorn roots",
+          "sap pools"
+        ],
+        "hazards": [
+          "ambush cover",
+          "thorns"
+        ],
+        "hydrology": "seasonal",
+        "kind": "crimson wood",
+        "relief": "rolling",
+        "substrate": "loam",
+        "summary": "Red canopy over thorn roots, sap pools and crimson undergrowth.",
+        "traits": [
+          "broadleaf",
+          "deadwood",
+          "corrupt",
+          "boulder"
+        ],
+        "vegetation": "broadleaf"
+      }
+    },
+    {
+      "id": "feygrove",
+      "landform": {
+        "amplitudeScale": 1,
+        "heightMeters": 0.2,
+        "noise": {
+          "macro": 0.65,
+          "micro": 0.1,
+          "ridge": 0.25
+        },
+        "operators": [],
+        "units": {
+          "frequency": "radians-per-metre",
+          "horizontal": "metre",
+          "vertical": "metre",
+          "weights": "dimensionless"
+        }
+      },
+      "name": "Feygrove",
+      "profile": {
+        "climate": "temperate",
+        "features": [
+          "the moonwell",
+          "fairy rings",
+          "luminous flowers"
+        ],
+        "hazards": [],
+        "hydrology": "flowing",
+        "kind": "moonwell sanctuary",
+        "relief": "flat",
+        "substrate": "loam",
+        "summary": "A moonwell sanctuary of fairy rings and luminous flowers.",
+        "traits": [
+          "broadleaf",
+          "grass",
+          "shrine",
+          "sacred",
+          "luminous",
+          "arcane"
+        ],
+        "vegetation": "broadleaf"
+      }
+    },
+    {
+      "id": "voidscar",
+      "landform": {
+        "amplitudeScale": 1,
+        "heightMeters": 0.45,
+        "noise": {
+          "macro": 0.65,
+          "micro": 0.1,
+          "ridge": 0.25
+        },
+        "operators": [
+          {
+            "amount": 0.42,
+            "kind": "basin",
+            "radius": 2.2
+          }
+        ],
+        "units": {
+          "frequency": "radians-per-metre",
+          "horizontal": "metre",
+          "vertical": "metre",
+          "weights": "dimensionless"
+        }
+      },
+      "name": "Voidscar",
+      "profile": {
+        "climate": "unnatural",
+        "features": [
+          "the singularity",
+          "obsidian teeth",
+          "collapse rings"
+        ],
+        "hazards": [
+          "arcane backlash"
+        ],
+        "hydrology": "dry",
+        "kind": "collapsed basin",
+        "relief": "steep",
+        "substrate": "glass",
+        "summary": "A collapsed obsidian basin around a violet singularity and jagged teeth.",
+        "traits": [
+          "obsidian",
+          "scree",
+          "arcane",
+          "corrupt",
+          "luminous"
+        ],
+        "vegetation": "barren"
+      }
+    },
+    {
+      "id": "mushroom-forest",
+      "landform": {
+        "amplitudeScale": 1,
+        "heightMeters": 0.22,
+        "noise": {
+          "macro": 0.65,
+          "micro": 0.1,
+          "ridge": 0.25
+        },
+        "operators": [],
+        "units": {
+          "frequency": "radians-per-metre",
+          "horizontal": "metre",
+          "vertical": "metre",
+          "weights": "dimensionless"
+        }
+      },
+      "name": "Mushroom Forest",
+      "profile": {
+        "climate": "humid",
+        "features": [
+          "cap canopy",
+          "spore clouds",
+          "purple loam"
+        ],
+        "hazards": [
+          "disease",
+          "low visibility"
+        ],
+        "hydrology": "standing",
+        "kind": "fungal canopy",
+        "relief": "rolling",
+        "substrate": "loam",
+        "summary": "A bioluminescent fungal canopy over purple loam and drifting spores.",
+        "traits": [
+          "fungal",
+          "luminous",
+          "mist",
+          "deadwood"
+        ],
+        "vegetation": "fungal"
+      }
+    },
+    {
+      "id": "world-tree-grove",
+      "landform": {
+        "amplitudeScale": 1,
+        "heightMeters": 0.24,
+        "noise": {
+          "macro": 0.65,
+          "micro": 0.1,
+          "ridge": 0.25
+        },
+        "operators": [],
+        "units": {
+          "frequency": "radians-per-metre",
+          "horizontal": "metre",
+          "vertical": "metre",
+          "weights": "dimensionless"
+        }
+      },
+      "name": "World Tree Grove",
+      "profile": {
+        "climate": "temperate",
+        "features": [
+          "the world tree",
+          "meadow paths",
+          "root spurs"
+        ],
+        "hazards": [],
+        "hydrology": "flowing",
+        "kind": "sacred grove",
+        "relief": "flat",
+        "substrate": "loam",
+        "summary": "An ancient living sanctuary of meadow paths, wildlife and one colossal tree.",
+        "traits": [
+          "broadleaf",
+          "grass",
+          "shrine",
+          "sacred",
+          "freshwater"
+        ],
+        "vegetation": "broadleaf"
+      }
+    },
+    {
+      "id": "jagged-expanse",
+      "landform": {
+        "amplitudeScale": 1,
+        "heightMeters": 0.74,
+        "noise": {
+          "macro": 0.65,
+          "micro": 0.1,
+          "ridge": 0.25
+        },
+        "operators": [],
+        "units": {
+          "frequency": "radians-per-metre",
+          "horizontal": "metre",
+          "vertical": "metre",
+          "weights": "dimensionless"
+        }
+      },
+      "name": "Jagged Expanse",
+      "profile": {
+        "climate": "cold",
+        "features": [
+          "knife ridges",
+          "ravines",
+          "talus fans"
+        ],
+        "hazards": [
+          "rockfall",
+          "unlandable slope"
+        ],
+        "hydrology": "seasonal",
+        "kind": "alpine range",
+        "relief": "steep",
+        "substrate": "scree",
+        "summary": "Knife-edge mountains over scree, ravines and blasted earth.",
+        "traits": [
+          "scree",
+          "boulder",
+          "ice",
+          "bone"
+        ],
+        "vegetation": "lichen"
+      }
+    },
+    {
+      "id": "ethereal",
+      "landform": {
+        "amplitudeScale": 1,
+        "heightMeters": 0.36,
+        "noise": {
+          "macro": 0.65,
+          "micro": 0.1,
+          "ridge": 0.25
+        },
+        "operators": [],
+        "units": {
+          "frequency": "radians-per-metre",
+          "horizontal": "metre",
+          "vertical": "metre",
+          "weights": "dimensionless"
+        }
+      },
+      "name": "Ethereal",
+      "profile": {
+        "climate": "unnatural",
+        "features": [
+          "floating shards",
+          "mist ribbons",
+          "crystal crowns"
+        ],
+        "hazards": [
+          "falls"
+        ],
+        "hydrology": "dry",
+        "kind": "radiant shardfield",
+        "relief": "broken",
+        "substrate": "crystal",
+        "summary": "White floating shards and mist ribbons around radiant crystal crowns.",
+        "traits": [
+          "crystal",
+          "mist",
+          "luminous",
+          "sacred",
+          "arcane"
+        ],
+        "vegetation": "barren"
+      }
+    },
+    {
+      "id": "infernal",
+      "landform": {
+        "amplitudeScale": 1,
+        "heightMeters": 0.2,
+        "noise": {
+          "macro": 0.65,
+          "micro": 0.1,
+          "ridge": 0.25
+        },
+        "operators": [],
+        "units": {
+          "frequency": "radians-per-metre",
+          "horizontal": "metre",
+          "vertical": "metre",
+          "weights": "dimensionless"
+        }
+      },
+      "name": "Infernal",
+      "profile": {
+        "climate": "volcanic",
+        "features": [
+          "open magma",
+          "crust plates",
+          "molten boulders"
+        ],
+        "hazards": [
+          "heat",
+          "lava",
+          "toxic air"
+        ],
+        "hydrology": "molten",
+        "kind": "magma sea",
+        "relief": "flat",
+        "substrate": "ash",
+        "summary": "An open magma sea over black crust, with geysers and molten boulders.",
+        "traits": [
+          "lava",
+          "obsidian",
+          "geyser",
+          "boulder"
+        ],
+        "vegetation": "barren"
+      }
+    },
+    {
+      "id": "crystal-forest",
+      "landform": {
+        "amplitudeScale": 1,
+        "heightMeters": 0.2,
+        "noise": {
+          "macro": 0.65,
+          "micro": 0.1,
+          "ridge": 0.25
+        },
+        "operators": [],
+        "units": {
+          "frequency": "radians-per-metre",
+          "horizontal": "metre",
+          "vertical": "metre",
+          "weights": "dimensionless"
+        }
+      },
+      "name": "Crystal Forest",
+      "profile": {
+        "climate": "frozen",
+        "features": [
+          "coral crystal growths",
+          "frost mist",
+          "blue floor ice"
+        ],
+        "hazards": [
+          "exposure"
+        ],
+        "hydrology": "dry",
+        "kind": "frozen crystal field",
+        "relief": "rolling",
+        "substrate": "crystal",
+        "summary": "A frozen blue floor grown over with coral-like crystal and frost mist.",
+        "traits": [
+          "crystal",
+          "ice",
+          "mist",
+          "luminous"
+        ],
+        "vegetation": "barren"
+      }
+    },
+    {
+      "id": "dreamlands",
+      "landform": {
+        "amplitudeScale": 1,
+        "heightMeters": 0.16,
+        "noise": {
+          "macro": 0.65,
+          "micro": 0.1,
+          "ridge": 0.25
+        },
+        "operators": [],
+        "units": {
+          "frequency": "radians-per-metre",
+          "horizontal": "metre",
+          "vertical": "metre",
+          "weights": "dimensionless"
+        }
+      },
+      "name": "Dreamlands",
+      "profile": {
+        "climate": "unnatural",
+        "features": [
+          "oversized flowers",
+          "candy trees",
+          "floating islets"
+        ],
+        "hazards": [],
+        "hydrology": "standing",
+        "kind": "pastel dreamscape",
+        "relief": "flat",
+        "substrate": "loam",
+        "summary": "Pastel soil under oversized flowers, candy trees and floating pieces.",
+        "traits": [
+          "broadleaf",
+          "grass",
+          "luminous",
+          "arcane"
+        ],
+        "vegetation": "exotic"
+      }
+    },
+    {
+      "id": "obsidian-wastes",
+      "landform": {
+        "amplitudeScale": 1,
+        "heightMeters": 0.3,
+        "noise": {
+          "macro": 0.65,
+          "micro": 0.1,
+          "ridge": 0.25
+        },
+        "operators": [],
+        "units": {
+          "frequency": "radians-per-metre",
+          "horizontal": "metre",
+          "vertical": "metre",
+          "weights": "dimensionless"
+        }
+      },
+      "name": "Obsidian Wastes",
+      "profile": {
+        "climate": "volcanic",
+        "features": [
+          "fractured plates",
+          "purple veining",
+          "glass shards"
+        ],
+        "hazards": [
+          "heat",
+          "sharp ground"
+        ],
+        "hydrology": "dry",
+        "kind": "volcanic glass plain",
+        "relief": "broken",
+        "substrate": "glass",
+        "summary": "Glossy volcanic glass in fractured plates shot through with purple veins.",
+        "traits": [
+          "obsidian",
+          "scree",
+          "corrupt",
+          "luminous"
+        ],
+        "vegetation": "barren"
+      }
+    },
+    {
+      "id": "underwater",
+      "landform": {
+        "amplitudeScale": 0.42,
+        "heightMeters": 0.24,
+        "noise": {
+          "macro": 0.65,
+          "micro": 0.1,
+          "ridge": 0.25
+        },
+        "operators": [],
+        "units": {
+          "frequency": "radians-per-metre",
+          "horizontal": "metre",
+          "vertical": "metre",
+          "weights": "dimensionless"
+        }
+      },
+      "name": "Underwater",
+      "profile": {
+        "climate": "temperate",
+        "features": [
+          "broken colonnades",
+          "kelp stands",
+          "fish shoals"
+        ],
+        "hazards": [
+          "drowning",
+          "low visibility"
+        ],
+        "hydrology": "marine",
+        "kind": "drowned reef",
+        "relief": "broken",
+        "substrate": "sand",
+        "summary": "A drowned temple reef of broken colonnades and shoaling fish.",
+        "traits": [
+          "saltwater",
+          "kelp",
+          "ruin",
+          "boulder",
+          "shrine"
+        ],
+        "vegetation": "aquatic"
+      }
+    },
+    {
+      "id": "subterranean",
+      "landform": {
+        "amplitudeScale": 1,
+        "heightMeters": 0.52,
+        "noise": {
+          "macro": 0.65,
+          "micro": 0.1,
+          "ridge": 0.25
+        },
+        "operators": [],
+        "units": {
+          "frequency": "radians-per-metre",
+          "horizontal": "metre",
+          "vertical": "metre",
+          "weights": "dimensionless"
+        }
+      },
+      "name": "Subterranean",
+      "profile": {
+        "climate": "cold",
+        "features": [
+          "mine tracks",
+          "sulfur springs",
+          "crystal clusters"
+        ],
+        "hazards": [
+          "darkness",
+          "collapse",
+          "toxic air"
+        ],
+        "hydrology": "standing",
+        "kind": "cavern mine camp",
+        "relief": "broken",
+        "substrate": "crystal",
+        "summary": "A crystal-lit cavern camp with mine tracks and sulfur springs.",
+        "traits": [
+          "crystal",
+          "boulder",
+          "fungal",
+          "camp",
+          "geyser",
+          "luminous"
+        ],
+        "vegetation": "fungal"
+      }
+    },
+    {
+      "id": "sulfur-barrens",
+      "landform": {
+        "amplitudeScale": 1,
+        "heightMeters": 0.22,
+        "noise": {
+          "macro": 0.65,
+          "micro": 0.1,
+          "ridge": 0.25
+        },
+        "operators": [],
+        "units": {
+          "frequency": "radians-per-metre",
+          "horizontal": "metre",
+          "vertical": "metre",
+          "weights": "dimensionless"
+        }
+      },
+      "name": "Sulfur Barrens",
+      "profile": {
+        "climate": "arid",
+        "features": [
+          "sulfur vents",
+          "grey snags",
+          "poison haze"
+        ],
+        "hazards": [
+          "toxic air",
+          "heat"
+        ],
+        "hydrology": "dry",
+        "kind": "poisoned flat",
+        "relief": "rolling",
+        "substrate": "ash",
+        "summary": "Ash crust and sulfur vents among grey trees under a poisonous haze.",
+        "traits": [
+          "dune",
+          "geyser",
+          "deadwood",
+          "corrupt",
+          "bone"
+        ],
+        "vegetation": "barren"
+      }
+    }
+  ],
+  "unlinkedStudioBiomes": [
+    "eldritch-wastes",
+    "ethereal"
+  ]
+}

@@ -5,6 +5,7 @@ import {
   sanctuaryPosition3,
   type SanctuaryStationId,
 } from '../data/sanctuaryStations'
+import { SANCTUARY_CONTRACT_VERSION } from '../data/sanctuarySpatialContract'
 
 export interface PropCatalogEntry {
   propId: string
@@ -128,7 +129,7 @@ export function createDefaultSanctuaryLayout(): SanctuaryLayoutState {
     'prop.burn.burnedTree': 2,
   }
 
-  return { objects, storage }
+  return { objects, storage, spatialContractVersion: SANCTUARY_CONTRACT_VERSION }
 }
 
 /**
@@ -143,6 +144,7 @@ export function cloneSanctuaryLayout(layout: SanctuaryLayoutState): SanctuaryLay
       position: [...object.position] as [number, number, number],
     })),
     storage: { ...layout.storage },
+    spatialContractVersion: layout.spatialContractVersion,
   }
 }
 
@@ -175,22 +177,47 @@ function isAt(position: readonly [number, number, number], expected: readonly [n
  * decorations remain exactly where the sanctuary editor put them.
  */
 export function migrateLegacySanctuaryLayout(layout: SanctuaryLayoutState): SanctuaryLayoutState {
+  if ((layout.spatialContractVersion ?? 0) >= SANCTUARY_CONTRACT_VERSION) return layout
+
+  // The v2 contract deliberately promotes the Studio's measured 120 m plan.
+  // Station-owned furniture follows the authored station delta exactly once;
+  // all player-created props, rotations, scale and inventory stay untouched.
+  const previousCampus: Record<SanctuaryStationId, readonly [number, number]> = {
+    warTable: [0, -30], roster: [-9, -30], barracks: [9, -30], infirmary: [-13, -22],
+    hatchery: [14, -3], breeding: [34, 8], huntingPen: [-30, 2], flightRing: [0, 30],
+    burnRange: [34, 32], enduranceRun: [-38, 26], scaleForge: [32, -12],
+  }
+  const ownedFurniture: Partial<Record<SanctuaryStationId, readonly string[]>> = {
+    warTable: ['torch_wt_l', 'torch_wt_r', 'chest_wt'], roster: ['chest_roster'],
+    barracks: ['crate_barracks_1', 'barrel_barracks_1'], infirmary: ['logpile_infirmary'],
+    hatchery: ['torch_hatchery_l', 'torch_hatchery_r'], breeding: ['runestone_breeding_1', 'runestone_breeding_2'],
+    scaleForge: ['anvil_forge', 'trough_forge', 'grindstone_forge'],
+  }
+  const deltas = new Map<string, readonly [number, number]>()
+  for (const id of Object.keys(SANCTUARY_STATIONS) as SanctuaryStationId[]) {
+    const before = previousCampus[id]
+    const after = SANCTUARY_STATIONS[id].position
+    const delta: [number, number] = [after[0] - before[0], after[1] - before[1]]
+    deltas.set(id, delta)
+    for (const furnitureId of ownedFurniture[id] ?? []) deltas.set(furnitureId, delta)
+  }
   for (const object of layout.objects) {
     if (object.id in SANCTUARY_STATIONS) {
       const id = object.id as SanctuaryStationId
       if (isAt(object.position, LEGACY_SANCTUARY_STATION_POSITIONS[id])) {
         object.position = sanctuaryPosition3(id)
+        continue
       }
-      continue
     }
-
     const legacy = LEGACY_SUPPORT_POSITIONS[object.id]
     const modern = MODERN_SUPPORT_POSITIONS[object.id]
     if (legacy && modern && isAt(object.position, legacy)) {
       object.position = [modern[0], object.position[1], modern[1]]
     }
+    const delta = deltas.get(object.id)
+    if (delta) object.position = [object.position[0] + delta[0], object.position[1], object.position[2] + delta[1]]
   }
-
+  layout.spatialContractVersion = SANCTUARY_CONTRACT_VERSION
   return layout
 }
 

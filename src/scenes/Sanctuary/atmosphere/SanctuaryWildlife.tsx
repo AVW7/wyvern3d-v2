@@ -21,6 +21,11 @@ const GUINEAFOWL = [
   { id: 'guineafowl-2', position: [-26, 0, 8] as const, yaw: -0.35 },
 ]
 
+const RABBITS = [
+  { id: 'rabbit-1', position: [18, 0, 10] as const, yaw: 2.2 },
+  { id: 'rabbit-2', position: [21, 0, 14] as const, yaw: -1.1 },
+]
+
 export function SanctuaryWildlife({ agents }: { agents: React.RefObject<Map<string, Agent>> }) {
   const state = useGameState()
   const herd = useMemo(() => placeDeer(state.seed, HERD_SIZE), [state.seed])
@@ -116,6 +121,33 @@ export function SanctuaryWildlife({ agents }: { agents: React.RefObject<Map<stri
           />
         </group>
       ))}
+      {/* Rabbits at the meadow's edge near the hatchery; the single clip is a
+          sit/idle cycle, so no wander logic — they just sit and twitch. */}
+      {RABBITS.map((rabbit, index) => (
+        <group key={rabbit.id} position={rabbit.position} rotation={[0, rabbit.yaw, 0]}>
+          <GameModel
+            id="wildlife.rabbit"
+            state="idle"
+            seed={index}
+            fallback={<RabbitFallback />}
+          />
+        </group>
+      ))}
+    </group>
+  )
+}
+
+function RabbitFallback() {
+  return (
+    <group position={[0, 0.16, 0]}>
+      <mesh castShadow>
+        <sphereGeometry args={[0.14, 8, 6]} />
+        <meshStandardMaterial color="#9c8f80" roughness={0.95} />
+      </mesh>
+      <mesh position={[0, 0.12, -0.1]} castShadow>
+        <sphereGeometry args={[0.09, 7, 5]} />
+        <meshStandardMaterial color="#8a7d6e" roughness={0.95} />
+      </mesh>
     </group>
   )
 }

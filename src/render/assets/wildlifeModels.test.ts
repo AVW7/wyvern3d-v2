@@ -43,6 +43,14 @@ describe('wildlife prey models', () => {
       animations: 3,
       clips: ['Guineafowl|Guineafowl_A_Idle', 'Guineafowl|Guineafowl_A_WalkMedium', 'Guineafowl|Guineafowl_B_FlyFlapping'],
     },
+    {
+      id: 'wildlife.rabbit' as const,
+      file: 'public/models/wildlife/rabbit.glb',
+      height: 0.4,
+      triangles: 2_578,
+      animations: 1,
+      clips: ['Take 001'],
+    },
   ])('$id stays grounded, correctly sized, rigged, and within the web budget', ({ id, file, height, triangles, animations, clips }) => {
     const report = inspect(file, height)
     const entry = ASSETS[id]!

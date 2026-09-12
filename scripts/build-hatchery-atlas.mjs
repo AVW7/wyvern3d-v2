@@ -1,41 +1,30 @@
-#!/usr/bin/env node
-/* global Buffer, console, process */
-/**
- * Build the hatchery/gate props atlas (public/models/hatchery.glb).
- *
- * Sources are single-prop Sketchfab GLBs that do not fit the Poly Perfect
- * sanctuary-atlas pipeline (different units, their own materials/textures).
- * Merges each source document into one atlas GLB where every prop is a
- * top-level node named by its logical id — the <Prop>/usePropTemplates
- * contract shared with every other atlas.
- *
- * Processing mirrors the established chains: spec/gloss -> metalrough when
- * present, texture re-encode to WebP (sips-probed explicit resize, cwebp q80,
- * sips fallback), centred in x/z and re-anchored to y=0 via node TRS with an
- * authored scale (extract-assets.py semantics). Idempotent; sources read-only.
- */
 import { Buffer } from 'node:buffer'
-import console from 'node:console'
 import { execFileSync } from 'node:child_process'
+import console from 'node:console'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
-import process from 'node:process'
 import { fileURLToPath } from 'node:url'
 
-const REPO = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..')
+const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 
 const SOURCES = [
   {
     source: '/Users/ajadvanwyk/Desktop/3d models animals/dragon_egg.glb',
     id: 'prop.hatchery.egg',
-    scale: 0.75 / 2.726, // 2.726 authored units tall -> 0.75 m egg
+    targetHeight: 0.75, // metres tall on the roost pads
     textureMax: 1024,
   },
   {
     source: '/Users/ajadvanwyk/Desktop/3d models animals/stylized_dragon_flag (1).glb',
     id: 'prop.gate.flag',
-    scale: 3.2 / 71.35, // 71.35 authored units tall -> 3.2 m banner
+    targetHeight: 3.2, // a 3.2 m banner beside the keep gate
+    textureMax: 1024,
+  },
+  {
+    source: '/Users/ajadvanwyk/Desktop/world build/fantasy_table.glb',
+    id: 'prop.war.table',
+    targetHeight: 0.95, // council tabletop height
     textureMax: 1024,
   },
 ]
@@ -239,6 +228,12 @@ for (const item of SOURCES) {
   const { json, binary } = readGlb(item.source)
   convertMaterials(json)
 
+  // Scale is derived from measured world-frame bounds, never guessed from
+  // authored units (Sketchfab roots rotate; the flag's Y is not its height).
+  const measured = worldBounds(json)
+  const scale = item.targetHeight / (measured.max[1] - measured.min[1])
+  const { min, max } = measured
+
   const viewBase = doc.bufferViews.length
   const accessorBase = doc.accessors.length
   const meshBase = doc.meshes.length
@@ -270,14 +265,13 @@ for (const item of SOURCES) {
   }
 
   // World-frame bounds (Sketchfab roots rotate; raw accessor bounds would
-  // swap Y and Z) — the re-anchor TRS is derived from these.
-  const { min, max } = worldBounds(json)
+  // swap Y and Z) — measured above; the re-anchor TRS is derived from these.
 
   for (const accessor of json.accessors ?? []) {
     doc.accessors.push({ ...accessor, bufferView: accessor.bufferView + viewBase })
   }
   for (const material of json.materials ?? []) {
-    const copy = structuredClone(material)
+    const copy = JSON.parse(JSON.stringify(material))
     for (const slot of [
       copy.pbrMetallicRoughness?.baseColorTexture,
       copy.pbrMetallicRoughness?.metallicRoughnessTexture,
@@ -312,14 +306,13 @@ for (const item of SOURCES) {
 
   // Clone the source node hierarchy under one named, re-anchored atlas node.
   const cloneNodes = (index) => {
-    const clone = structuredClone(json.nodes[index])
+    const clone = JSON.parse(JSON.stringify(json.nodes[index]))
     if (clone.mesh !== undefined) clone.mesh += meshBase
     if (clone.children) clone.children = clone.children.map(cloneNodes)
     if (clone.skin !== undefined) delete clone.skin // static atlas: no skins
     return doc.nodes.push(clone) - 1
   }
   const roots = json.scenes[json.scene ?? 0].nodes.map(cloneNodes)
-  const scale = item.scale
   // Node transform is T·R·S: a child point p lands at translation + scale·p.
   // The re-anchor translation therefore needs the scale folded in — raw
   // -min.y would leave the prop hovering at min.y·(1 - scale).

@@ -1,6 +1,6 @@
 # Sanctuary gameplay — staged work orders
 
-**Status: OPEN.** Stage 0 of `docs/SANCTUARY_GAMEPLAY_PLAN.md` is DONE. Follow the handoff protocol below to take the first incomplete stage (Stage 1: Context action and physical carry).
+**Status: COMPLETE — all seven stages (0–6) landed.**
 
 This plan turns the sanctuary from a hub of panels and ambient animation into a place where the
 player performs short, physical care routines. It is deliberately written as self-contained work
@@ -144,7 +144,7 @@ Keep all numbers in `src/core/data/config.ts`. Initial guidance, subject to test
 | 3 | Medicine, companionship, and flight exercise | DONE | 2 | Implemented 4-duty care vocabulary in core & presentation (`feed`, `medicine`, `companionship`, `flightExercise`), deterministic candidate priority generator, config costs & relief, tested in `duties.test.ts` and `actionResolver.test.ts`. |
 | 4 | Sanctuary improvement unlocks | DONE | 3 | Milestone thresholds in config, save migration 11->12, storage rewards and `sanctuary_milestone_unlocked` event emission, catalog lock badges in `SanctuaryEditorHud`, ambient idle prop weighting in `wyvernDirector`, fully unit-tested. |
 | 5 | Sanctuary audio layer | DONE | 2 | Procedural Web Audio synthesis in `sanctuaryAudio.ts`, spatial landmark loops, locomotion footsteps, interaction one-shots (`collect`, `delivery`, `invalid`, `duty_completed`, `milestone_unlocked`), wyvern vocal cues, visibility pause/resume, tested in `sanctuaryAudio.test.ts`. |
-| 6 | Layout snapshots and editor feedback | NOT STARTED | 4 | — |
+| 6 | Layout snapshots and editor feedback | DONE — 2026-08-19 | 4 | Continuous overlap/bounds feedback with green/red ghost tint, bounded 20-entry undo/redo history, cancel-to-original, localStorage layout snapshots with catalog/lock validation and warning modal, tested in `overlapFeedback.test.ts`, `sanctuaryEditorStore.test.ts`, and `snapshotValidation.test.ts`. |
 
 Stages 5 and 6 are independent once their listed dependencies are complete, but the handoff
 protocol remains one stage per agent/commit unless the user explicitly requests parallel work.
@@ -349,7 +349,8 @@ disabled, and scene changes leak neither listeners nor playing elements.
 
 # STAGE 6 — Layout snapshots and editor feedback
 
-**Status:** NOT STARTED · **Depends on:** Stage 4
+**Status:** DONE — 2026-08-19 · **Depends on:** Stage 4
+
 
 **Goal.** Adopt the useful Room Ritual editor patterns: trustworthy previews, collision feedback,
 and named sanctuary layouts, without bypassing Wyvern's intent/replay architecture.

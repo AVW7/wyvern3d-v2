@@ -597,9 +597,10 @@ describe('save', () => {
     expect(migrated.nextEventSeq).toBeDefined()
   })
 
-  it('moves untouched legacy sanctuary defaults but preserves edited stations', () => {
+  it('promotes a legacy station to the v2 spatial contract', () => {
     const old = createInitialState(55)
     old.saveVersion = 1
+    old.sanctuaryLayout.spatialContractVersion = undefined
 
     const huntingPen = old.sanctuaryLayout.objects.find((object) => object.id === 'huntingPen')!
     const flightRing = old.sanctuaryLayout.objects.find((object) => object.id === 'flightRing')!
@@ -609,8 +610,10 @@ describe('save', () => {
     const migrated = migrate(old)
 
     expect(migrated.saveVersion).toBe(SAVE_VERSION)
-    expect(huntingPen.position).toEqual([-30, 0, 2])
-    expect(flightRing.position).toEqual([7, 0, 7])
+    expect(huntingPen.position).toEqual([-26, 0, 4])
+    // Station-owned locations move by their authored delta once; player props
+    // are covered separately and remain untouched.
+    expect(flightRing.position).toEqual([7, 0, 1])
     expect(migrated.events).toEqual([])
     expect(migrated.nextEventSeq).toBe(0)
   })

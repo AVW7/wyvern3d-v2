@@ -1,4 +1,8 @@
+import { deriveSeed } from '@/core/math/rng'
 import { getRegionBiomeModifiers } from './regionModifiers'
+import { DEFAULT_WEIGHTS, getBiomeLandform } from './biomeLandforms'
+import { applyOperator } from './landformOperators'
+import { noiseBasisAt } from './terrainNoise'
 import {
   DRY_SITE_CLEARANCE,
   drySiteLift,
@@ -84,6 +88,26 @@ export function surfaceHeight(
   return base + lift
 }
 
+/**
+ * Per-region noise seed.
+ *
+ * Two regions sharing a biome must not be a rotated copy of one another, so the
+ * basis is re-seeded rather than only re-phased. Kept small: `hashNoise` folds
+ * the seed into a `Math.sin` argument, where a full 32-bit value costs
+ * precision without adding variety.
+ */
+function noiseSeedFor(regionId: string | undefined, seed: number): number {
+  return deriveSeed(seed, `${regionId ?? 'generic'}:relief`) % 100003
+}
+
+/**
+ * The one relief expression, for every biome.
+ *
+ * A weighted sum of the three noise basis fields, then the biome's geomorphic
+ * operators in turn, then its datum and the rim lift. What distinguishes a
+ * mountain from a marsh is entirely the row in `BIOME_LANDFORMS` — there is no
+ * per-biome branch here to drift out of sync with the table.
+ */
 function baseSurfaceHeight(
   biome: string,
   x: number,
@@ -98,64 +122,32 @@ function baseSurfaceHeight(
   const cosR = Math.cos(mod.terrainRotation)
   const sinR = Math.sin(mod.terrainRotation)
 
-  // Region-rotated & scaled coords for local micro-features
+  // Region-rotated, scaled and phased coordinates — for the noise basis only.
   const rx = (x * cosR - y * sinR) * mod.terrainFreqScale + mod.terrainPhaseX
   const ry = (x * sinR + y * cosR) * mod.terrainFreqScale + mod.terrainPhaseZ
 
-  switch (biome) {
-    case 'mountain': {
-      const ridge = Math.sin(rx * 0.06) * Math.cos(ry * 0.06) * 4.5
-      const peaks = Math.abs(Math.sin(rx * 0.12 + ry * 0.08)) * 3.2
-      return ridge + peaks + edge * edge * 8.0
-    }
-    case 'coast': {
-      const island = Math.max(0, 1 - dist / 65)
-      const waves = Math.sin(rx * 0.08) * 0.4 + Math.cos(ry * 0.08) * 0.4
-      return (island * 3.5 - 1.2) + waves
-    }
-    case 'ashland': {
-      const crater = Math.sin(dist * 0.07) * 2.5
-      const jagged = Math.sin(rx * 0.15) * Math.cos(ry * 0.15) * 1.8
-      return crater + jagged + edge * edge * 5.0
-    }
-    case 'cavern': {
-      const basin = -Math.cos(dist * 0.04) * 3.0
-      const bumps = Math.sin(rx * 0.1) * Math.sin(ry * 0.1) * 1.5
-      return basin + bumps + edge * edge * 7.0
-    }
-    case 'spire': {
-      const pillar = dist < 45 ? 4.0 : -2.0
-      const rim = Math.sin(rx * 0.08 + ry * 0.08) * 1.2
-      return pillar + rim + edge * edge * 6.0
-    }
-    case 'tundra': {
-      const drifts = Math.sin(rx * 0.04 + ry * 0.05) * 1.8 + Math.cos(rx * 0.09) * 0.9
-      return drifts + edge * edge * 3.0
-    }
-    case 'marsh':
-    case 'swamp': {
-      const bog = Math.sin(rx * 0.09) * 0.8 + Math.cos(ry * 0.09) * 0.8
-      return bog - 0.4 + edge * edge * 2.5
-    }
-    case 'grove': {
-      // A meadow that lifts into a low mound under the world tree, so the
-      // landmark reads as standing on a rise rather than on flat ground.
-      const mound = Math.max(0, 1 - dist / 40) * GROVE_MOUND_HEIGHT
-      const meadow = Math.sin(rx * 0.05) * 0.9 + Math.cos(ry * 0.06 + rx * 0.02) * 0.7
-      return mound + meadow + edge * edge * 3.5
-    }
-    case 'jungle':
-    case 'forest': {
-      const rolls = Math.sin(rx * 0.07) * 1.2 + Math.cos(ry * 0.06 + rx * 0.02) * 1.0
-      return rolls + edge * edge * 4.0
-    }
-    default:
-      return (
-        Math.sin(rx * 0.08) * 0.72 +
-        Math.cos(ry * 0.07 + rx * 0.025) * 0.55 +
-        edge * edge * 2.8
-      )
+  const basis = noiseBasisAt(noiseSeedFor(regionId, seed), rx, ry)
+
+  const landform = getBiomeLandform(biome)
+  const wMacro = landform.weights?.macro ?? DEFAULT_WEIGHTS.macro
+  const wRidge = landform.weights?.ridge ?? DEFAULT_WEIGHTS.ridge
+  const wMicro = landform.weights?.micro ?? DEFAULT_WEIGHTS.micro
+
+  // macro and micro are centred so they cut as well as lift. ridge is left
+  // uncentred: it is a lifted massif creased by ravines, so weighting it raises
+  // the biome's floor as well as sharpening it.
+  let height =
+    ((basis.macro - 0.5) * 2 * wMacro + basis.ridge * wRidge + (basis.micro - 0.5) * 2 * wMicro) *
+    landform.amplitude
+
+  // Operators read *world* coordinates, so an authored centre or spine sits in
+  // the same frame as landmark anchors and protected sites. Local y = -world z.
+  const worldZ = -y
+  for (const operator of landform.operators ?? []) {
+    height = applyOperator(operator, height, x, worldZ, basis)
   }
+
+  return height + (landform.datum ?? 0) + edge * edge * landform.rimLift
 }
 
 /**

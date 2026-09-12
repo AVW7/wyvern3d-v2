@@ -403,6 +403,8 @@ export interface SanctuaryPlacedObject {
 export interface SanctuaryLayoutState {
   objects: SanctuaryPlacedObject[]
   storage: Record<string, number>
+  /** Last authored campus contract applied to station-owned defaults. */
+  spatialContractVersion?: number
 }
 
 // ---------------------------------------------------------------------------
