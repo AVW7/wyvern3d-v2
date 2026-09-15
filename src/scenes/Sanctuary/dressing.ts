@@ -376,3 +376,72 @@ export const HILLS: PropPlacement[] = Array.from({ length: 7 }, (_, i) => {
     scale: 0.9 + (i % 3) * 0.25,
   }
 })
+
+// ---------------------------------------------------------------------------
+// Story clusters
+// ---------------------------------------------------------------------------
+
+/**
+ * Hand-authored prop groups that make each zone legible as a working place.
+ *
+ * Placement rules:
+ * - All positions are outside the central flight corridor (tested in dressing.test.ts).
+ * - All positions are within GROUND_RADIUS.
+ * - Each cluster has one clear focal prop and a maximum of two support pieces.
+ * - No scatter RNG — positions are authored constants so the storytelling reads
+ *   the same every session.
+ * - Only existing atlas prop IDs are used; the 57-prop cap must not be broken.
+ */
+export const STORY_CLUSTERS: Record<string, PropPlacement[]> = {
+  // Repaired keep wall: a scaffold log pile and a supply crate flanking the
+  // south wall of the keep, reading as active maintenance work.
+  'prop.logPile': [
+    { position: [east + 1.8, 0, south - 2.5], rotationY: 0.3 },
+    { position: [west - 1.8, 0, south - 1.8], rotationY: -0.4 },
+    // Forge yard fuel stack beside the chimney
+    { position: [46, 0, -16.5], rotationY: 0.8 },
+  ],
+  'prop.crate': [
+    { position: [east + 2.4, 0, south - 4.2], rotationY: 0.5 },
+    // Infirmary medicine store — small crate beside the campfire
+    { position: [-13.2, 0, -18.4], rotationY: -0.3 },
+    // Hatchery supply crate near cave entrance
+    { position: [19.2, 0, -5.2], rotationY: 0.7 },
+  ],
+  'prop.barrel': [
+    // Infirmary water barrel — drying rack proxy next to the campfire
+    { position: [-8.8, 0, -19.6], rotationY: 0.2 },
+    // Forge quench water barrel beside the trough
+    { position: [44.4, 0, -12.8], rotationY: -0.5 },
+    // Flight ring gear barrel — kit storage east of the corridor at ring approach
+    { position: [17.5, 0, 19.2], rotationY: 1.1 },
+    // Weather shelter barrel on the windward (northwest) side
+    { position: [-32.5, 0, -4.2], rotationY: 0.6 },
+  ],
+  // Hatchery bedding: weathered stump near the juvenile roost pad for resting handlers
+  'prop.perch.stump': [
+    { position: [24.5, 0, -7.4], rotationY: 1.4 },
+    // Infirmary patient perch — stump beside the campfire where the healer works
+    { position: [-12.0, 0, -21.8], rotationY: -0.8 },
+  ],
+  // Flight gear chest at the flight ring approach — east of the corridor
+  'prop.chest': [
+    { position: [17.2, 0, 20.5], rotationY: -0.4 },
+  ],
+  // Weather shelter fence sections on the northwest windward edge
+  'prop.fenceA': [
+    { position: [-35.5, 0, -6.8], rotationY: Math.PI * 0.55 },
+    { position: [-38.2, 0, -3.2], rotationY: Math.PI * 0.45 },
+  ],
+}
+
+/**
+ * Whether a world-space [x, z] position sits inside the central flight
+ * corridor that wyverns use for landing and takeoff.
+ *
+ * Wraps the masterplan's `isInsideFlightCorridor` so caller code can validate
+ * props without importing the masterplan directly, and so this rule is
+ * testable without a browser context.
+ */
+export { isInsideFlightCorridor as isPropInFlightCorridor } from '@/core/data/sanctuaryMasterplan'
+

@@ -1,6 +1,6 @@
 # Sanctuary environment art — staged work orders
 
-**Status: OPEN.** Stages 0, 1, 2, 3, 4, 5, and 6 are DONE. Stage 7 (Storytelling polish, performance, and release gate) is the next eligible stage.
+**Status: CLOSED — all 8 stages done 2026-09-15.**
 
 This plan improves the sanctuary's spatial design, 3D asset quality, environmental realism, and
 physical interaction language. It is a production plan for coding, technical-art, and environment-
@@ -195,7 +195,7 @@ normal intents for persistent consequences and use the existing event/flourish s
 | 4 | Architectural kit and hero work areas | 1, 2 | DONE | StationHeroBuildings.tsx for all 11 hero stations, 5 priority replacements, clearance & flight corridor verified |
 | 5 | Materials, lighting, and weathering pass | 3, 4 | DONE | Stylized water shader & pools in SanctuaryWater.tsx, multi-factor weathering & roughness in terrain.ts, atmospheric lighting and hero landmark tuning. |
 | 6 | Interaction-ready prop vertical slices | 4; Sanctuary Gameplay Stage 1 | DONE | Implemented 6 priority interactive prop vertical slices (trough water shimmer, forge sparks, hatchery thermal nest, supply containers, healer hearth, perches), context action integration, and 5 unit tests in interactiveProps.test.ts. |
-| 7 | Storytelling polish, performance, and release gate | 5, 6 | TODO | Final integration |
+| 7 | Storytelling polish, performance, and release gate | 5, 6 | DONE — 2026-09-15 | Story clusters in dressing.ts, AshDrift in Ambience.tsx, PropCatalog group/flightClearanceRequired fields, StoryDressing component, 10 new release gate tests |
 
 Stages 1 and 2 may be assigned to separate agents after Stage 0. Stages 3 and 4 may also proceed in
 parallel after both prerequisites are DONE, provided one owns the ecological shell and the other the
@@ -480,7 +480,7 @@ resource, bond, hunger, injury, or training value changes, then run standard gat
 
 ## STAGE 7 — Storytelling polish, performance, and release gate
 
-**Status: TODO**
+**Status: DONE — 2026-09-15**
 
 ### Goal
 

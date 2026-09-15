@@ -11,6 +11,8 @@ export interface PropCatalogEntry {
   propId: string
   label: string
   category: SanctuaryObjectCategory
+  /** Variant group for editor catalogue grouping (e.g. 'forge', 'perch', 'ring'). */
+  group?: string
   defaultScale?: number
   description: string
   isStructure?: boolean
@@ -19,6 +21,8 @@ export interface PropCatalogEntry {
   radius?: number
   requiredDuties?: number
   milestoneName?: string
+  /** Prop must never be placed inside the central flight corridor. */
+  flightClearanceRequired?: boolean
 }
 
 /** Catalog of all placeable props and structures in the Sanctuary */
@@ -41,24 +45,24 @@ export const PROP_CATALOG: Record<string, PropCatalogEntry> = {
   'prop.logPile': { propId: 'prop.logPile', label: 'Log Pile', category: 'utility', description: 'Firewood fuel stack.' },
   'prop.blockade': { propId: 'prop.blockade', label: 'Wooden Blockade', category: 'furniture', description: 'Heavy timber defensive barrier.' },
   'prop.campfire': { propId: 'prop.campfire', label: 'Infirmary Fire', category: 'utility', description: 'Warm fire for healing injuries.' },
-  'prop.forge.anvil': { propId: 'prop.forge.anvil', label: 'Forge Anvil', category: 'utility', defaultScale: 0.55, description: 'Struck steel for scale-plate armor.' },
-  'prop.forge.trough': { propId: 'prop.forge.trough', label: 'Quenching Trough', category: 'utility', requiredDuties: 6, milestoneName: 'Quenching Basin & Troughs', description: 'Water bath for cooling hot metal and watering wyverns.' },
-  'prop.forge.grindstone': { propId: 'prop.forge.grindstone', label: 'Grinding Stone', category: 'utility', description: 'Whetstone wheel for finishing edges.' },
+  'prop.forge.anvil': { propId: 'prop.forge.anvil', label: 'Forge Anvil', category: 'utility', group: 'forge', defaultScale: 0.55, description: 'Struck steel for scale-plate armor.' },
+  'prop.forge.trough': { propId: 'prop.forge.trough', label: 'Quenching Trough', category: 'utility', group: 'forge', requiredDuties: 6, milestoneName: 'Quenching Basin & Troughs', description: 'Water bath for cooling hot metal and watering wyverns.' },
+  'prop.forge.grindstone': { propId: 'prop.forge.grindstone', label: 'Grinding Stone', category: 'utility', group: 'forge', description: 'Whetstone wheel for finishing edges.' },
 
   // Scenery & Decor
-  'prop.roost.runeStone': { propId: 'prop.roost.runeStone', label: 'Rune Stone', category: 'scenery', description: 'Ancient carved stone emitting arcane energy.' },
-  'prop.fenceA': { propId: 'prop.fenceA', label: 'Picket Fence A', category: 'scenery', description: 'Rustic wooden fencing section.' },
-  'prop.fenceB': { propId: 'prop.fenceB', label: 'Picket Fence B', category: 'scenery', description: 'Post and rail fence section.' },
-  'prop.pathA': { propId: 'prop.pathA', label: 'Stone Flagstone', category: 'scenery', description: 'Cobblestone walkway segment.' },
-  'prop.pathB': { propId: 'prop.pathB', label: 'Curved Flagstone', category: 'scenery', description: 'Curved stone walkway segment.' },
-  'prop.perch.stump': { propId: 'prop.perch.stump', label: 'Tree Stump', category: 'scenery', description: 'Weathered stump for resting.' },
-  'prop.perch.rockA': { propId: 'prop.perch.rockA', label: 'Moss Rock A', category: 'scenery', description: 'Mossy boulder accent.' },
-  'prop.perch.rockB': { propId: 'prop.perch.rockB', label: 'Moss Rock B', category: 'scenery', description: 'Jagged rock formation.' },
-  'prop.perch.trunk': { propId: 'prop.perch.trunk', label: 'Wyvern Log Perch', category: 'scenery', requiredDuties: 3, milestoneName: 'Sanctuary Perches & Roosts', description: 'Fallen tree log for wyverns to roost.' },
-  'prop.ring.menhir': { propId: 'prop.ring.menhir', label: 'Sacred Menhir', category: 'scenery', requiredDuties: 10, milestoneName: 'Sacred Menhir Monoliths', description: 'Ancient floating menhir stone that inspires grooming and rest.' },
-  'prop.burn.lavaStone': { propId: 'prop.burn.lavaStone', label: 'Lava Stone', category: 'scenery', description: 'Glowing volcanic stone.' },
-  'prop.burn.lavaColumn': { propId: 'prop.burn.lavaColumn', label: 'Lava Hearth Column', category: 'scenery', requiredDuties: 15, milestoneName: 'Volcanic Hearth Beacon', description: 'Glowing basalt pillar radiating volcanic warmth.' },
-  'prop.burn.burnedTree': { propId: 'prop.burn.burnedTree', label: 'Scorched Tree', category: 'scenery', description: 'Charred pine trunk.' },
+  'prop.roost.runeStone': { propId: 'prop.roost.runeStone', label: 'Rune Stone', category: 'scenery', group: 'roost', description: 'Ancient carved stone emitting arcane energy.' },
+  'prop.fenceA': { propId: 'prop.fenceA', label: 'Picket Fence A', category: 'scenery', group: 'fence', description: 'Rustic wooden fencing section.' },
+  'prop.fenceB': { propId: 'prop.fenceB', label: 'Picket Fence B', category: 'scenery', group: 'fence', description: 'Post and rail fence section.' },
+  'prop.pathA': { propId: 'prop.pathA', label: 'Stone Flagstone', category: 'scenery', group: 'path', description: 'Cobblestone walkway segment.' },
+  'prop.pathB': { propId: 'prop.pathB', label: 'Curved Flagstone', category: 'scenery', group: 'path', description: 'Curved stone walkway segment.' },
+  'prop.perch.stump': { propId: 'prop.perch.stump', label: 'Tree Stump', category: 'scenery', group: 'perch', description: 'Weathered stump for resting.' },
+  'prop.perch.rockA': { propId: 'prop.perch.rockA', label: 'Moss Rock A', category: 'scenery', group: 'perch', description: 'Mossy boulder accent.' },
+  'prop.perch.rockB': { propId: 'prop.perch.rockB', label: 'Moss Rock B', category: 'scenery', group: 'perch', description: 'Jagged rock formation.' },
+  'prop.perch.trunk': { propId: 'prop.perch.trunk', label: 'Wyvern Log Perch', category: 'scenery', group: 'perch', requiredDuties: 3, milestoneName: 'Sanctuary Perches & Roosts', description: 'Fallen tree log for wyverns to roost.', flightClearanceRequired: true },
+  'prop.ring.menhir': { propId: 'prop.ring.menhir', label: 'Sacred Menhir', category: 'scenery', group: 'ring', requiredDuties: 10, milestoneName: 'Sacred Menhir Monoliths', description: 'Ancient floating menhir stone that inspires grooming and rest.', flightClearanceRequired: true },
+  'prop.burn.lavaStone': { propId: 'prop.burn.lavaStone', label: 'Lava Stone', category: 'scenery', group: 'burn', description: 'Glowing volcanic stone.' },
+  'prop.burn.lavaColumn': { propId: 'prop.burn.lavaColumn', label: 'Lava Hearth Column', category: 'scenery', group: 'burn', requiredDuties: 15, milestoneName: 'Volcanic Hearth Beacon', description: 'Glowing basalt pillar radiating volcanic warmth.' },
+  'prop.burn.burnedTree': { propId: 'prop.burn.burnedTree', label: 'Scorched Tree', category: 'scenery', group: 'burn', description: 'Charred pine trunk.' },
 }
 
 /**

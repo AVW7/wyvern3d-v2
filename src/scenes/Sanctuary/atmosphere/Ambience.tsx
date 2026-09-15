@@ -188,3 +188,108 @@ export function SmokePlumes() {
     </group>
   )
 }
+
+const ASH_COUNT = 80
+// Forge furnace and burn range positions from sanctuarySpatialContract.
+// Hand-copied to avoid importing non-pure spatial contract into this render file.
+const ASH_SOURCES: readonly [number, number, number][] = [
+  [42, 3.5, -14],  // scaleForge furnace
+  [30, 2.0, 38],   // burnRange volcano
+]
+
+/**
+ * Drifting ash from the forge furnace and burn range.
+ *
+ * Same pattern as `Ambience` — one `Points` draw call, positions uploaded once,
+ * all drift computed in the vertex shader off a time uniform. Ash is darker and
+ * falls faster than ambient motes. Sources are close to each fire so the effect
+ * reads as local rather than global.
+ */
+export function AshDrift() {
+  const geometry = useMemo(() => {
+    const rng = createRng(deriveSeed(0xA5, 'sanctuary:ash'))
+    const positions = new Float32Array(ASH_COUNT * 3)
+    const offsets = new Float32Array(ASH_COUNT)
+    const scales = new Float32Array(ASH_COUNT)
+
+    const perSource = Math.ceil(ASH_COUNT / ASH_SOURCES.length)
+    for (let i = 0; i < ASH_COUNT; i++) {
+      const src = ASH_SOURCES[Math.floor(i / perSource)]!
+      // Spread within 4 m of the source, rising 2–8 m.
+      const angle = rng.next() * Math.PI * 2
+      const radius = rng.range(0.3, 4.0)
+      positions[i * 3] = src[0] + Math.cos(angle) * radius
+      positions[i * 3 + 1] = src[1] + rng.range(0.2, 8.0)
+      positions[i * 3 + 2] = src[2] + Math.sin(angle) * radius
+      offsets[i] = rng.next() * Math.PI * 2
+      scales[i] = rng.range(0.4, 1.1)
+    }
+
+    const buffer = new BufferGeometry()
+    buffer.setAttribute('position', new BufferAttribute(positions, 3))
+    buffer.setAttribute('aOffset', new BufferAttribute(offsets, 1))
+    buffer.setAttribute('aScale', new BufferAttribute(scales, 1))
+    return buffer
+  }, [])
+
+  const material = useMemo(
+    () =>
+      new ShaderMaterial({
+        transparent: true,
+        depthWrite: false,
+        blending: AdditiveBlending,
+        uniforms: {
+          uTime: { value: 0 },
+          uOpacity: { value: 0.28 },
+          uColor: { value: new Color('#2a1f14') },
+        },
+        vertexShader: `
+          attribute float aOffset;
+          attribute float aScale;
+          uniform float uTime;
+          varying float vFade;
+          void main() {
+            vec3 drift = position;
+            // Ash drifts in lazy arcs — slower lateral, faster vertical fall.
+            drift.x += sin(uTime * 0.15 + aOffset) * 2.2;
+            drift.z += cos(uTime * 0.12 + aOffset * 1.3) * 2.2;
+            // Rises then gently falls back — net upward over the fire.
+            drift.y += sin(uTime * 0.22 + aOffset * 1.8) * 1.2 - uTime * 0.004 * aOffset;
+            vec4 mv = modelViewMatrix * vec4(drift, 1.0);
+            vFade = 0.3 + 0.7 * sin(uTime * 0.9 + aOffset * 2.4);
+            gl_PointSize = aScale * 28.0 / max(-mv.z, 1.0);
+            gl_Position = projectionMatrix * mv;
+          }
+        `,
+        fragmentShader: `
+          uniform vec3 uColor;
+          uniform float uOpacity;
+          varying float vFade;
+          void main() {
+            float d = length(gl_PointCoord - vec2(0.5));
+            if (d > 0.5) discard;
+            float soft = smoothstep(0.5, 0.1, d);
+            gl_FragColor = vec4(uColor, soft * vFade * uOpacity);
+          }
+        `,
+      }),
+    [],
+  )
+
+  useEffect(
+    () => () => {
+      geometry.dispose()
+      material.dispose()
+    },
+    [geometry, material],
+  )
+
+  useFrame((_, rawDelta) => {
+    material.uniforms.uTime!.value += Math.min(rawDelta, 0.05)
+    // Ash is strongest when there's a fire — constant low opacity, no day cycle.
+    material.uniforms.uOpacity!.value = 0.22
+  })
+
+  return <points geometry={geometry} material={material} frustumCulled={false} />
+}
+

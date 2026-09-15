@@ -21,12 +21,13 @@ import {
   KEEP_WALLS,
   PATHS,
   SCATTER,
+  STORY_CLUSTERS,
 } from './dressing'
 import { SanctuaryWyverns } from './SanctuaryWyverns'
 import { SanctuaryAtmosphere } from './atmosphere/SanctuaryAtmosphere'
 import { Firelight } from './atmosphere/Firelight'
 import { SanctuaryWind } from './atmosphere/SanctuaryWind'
-import { Ambience, SmokePlumes } from './atmosphere/Ambience'
+import { Ambience, SmokePlumes, AshDrift } from './atmosphere/Ambience'
 import { SanctuaryGround } from './atmosphere/SanctuaryGround'
 import { SanctuaryWaterPools } from './atmosphere/SanctuaryWater'
 import { outerHeightAt } from './atmosphere/terrain'
@@ -179,9 +180,11 @@ export function SanctuaryScene() {
       <SanctuaryWind />
       <Ambience />
       <SmokePlumes />
+      <AshDrift />
       <SanctuaryGround />
       <SanctuaryWaterPools />
       <Scenery />
+      <StoryDressing />
       <KeepWalls />
       <DynamicSanctuaryObjects />
       <ProductionBuildings3D />
@@ -292,6 +295,29 @@ function Scenery() {
         <PropInstances key={id} id={id} items={items} castShadow={false} />
       ))}
       <PropInstances id="prop.scatter.hill" items={seatedHills} color={soil} />
+    </group>
+  )
+}
+
+/**
+ * Story dressing — purposeful prop clusters that make each zone read as a
+ * working place. Log piles cast shadows (large enough to matter); barrel,
+ * crate, stump and chest furniture does not (too small to contribute).
+ *
+ * Deliberately separate from Scenery so the two sets have distinct names
+ * in the Three.js inspector and can be toggled independently in dev.
+ */
+function StoryDressing() {
+  return (
+    <group name="story-dressing" userData={{ sanctuaryAttackBlocker: true }}>
+      {Object.entries(STORY_CLUSTERS).map(([id, items]) => (
+        <PropInstances
+          key={id}
+          id={id}
+          items={items}
+          castShadow={id === 'prop.logPile'}
+        />
+      ))}
     </group>
   )
 }

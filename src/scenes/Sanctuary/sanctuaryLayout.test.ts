@@ -275,3 +275,53 @@ describe('Prop catalog completeness', () => {
     ).toBe(true)
   })
 })
+
+describe('Stage 7: PropCatalog grouping and flight clearance contracts', () => {
+  const KNOWN_GROUPS = new Set(['forge', 'perch', 'ring', 'burn', 'roost', 'fence', 'path'])
+
+  it('all group values in PROP_CATALOG use known group IDs', () => {
+    for (const [propId, entry] of Object.entries(PROP_CATALOG)) {
+      if (entry.group !== undefined) {
+        expect(
+          KNOWN_GROUPS.has(entry.group),
+          `"${propId}" has unknown group "${entry.group}"`,
+        ).toBe(true)
+      }
+    }
+  })
+
+  it('forge props all belong to the forge group', () => {
+    const forgeProps = ['prop.forge.anvil', 'prop.forge.trough', 'prop.forge.grindstone']
+    for (const propId of forgeProps) {
+      expect(PROP_CATALOG[propId]?.group).toBe('forge')
+    }
+  })
+
+  it('perch variants all belong to the perch group', () => {
+    const perchProps = ['prop.perch.stump', 'prop.perch.rockA', 'prop.perch.rockB', 'prop.perch.trunk']
+    for (const propId of perchProps) {
+      expect(PROP_CATALOG[propId]?.group).toBe('perch')
+    }
+  })
+
+  it('props with flightClearanceRequired are not in the corridor in the default layout', () => {
+    // isInsideFlightCorridor uses FLIGHT_CORRIDOR_BOX = [-16, -12, 16, 28]
+    const flightClearanceProps = Object.values(PROP_CATALOG).filter((e) => e.flightClearanceRequired)
+    expect(flightClearanceProps.length).toBeGreaterThan(0)
+
+    const layout = createDefaultSanctuaryLayout()
+    for (const entry of flightClearanceProps) {
+      const placed = layout.objects.filter((o) => o.propId === entry.propId)
+      for (const obj of placed) {
+        const [x, , z] = obj.position
+        // Flight corridor box: x in [-16, 16], z in [-12, 28]
+        const insideCorridor = x >= -16 && x <= 16 && z >= -12 && z <= 28
+        expect(
+          insideCorridor,
+          `"${entry.propId}" (id: ${obj.id}) at [${x}, ${z}] is inside the flight corridor`,
+        ).toBe(false)
+      }
+    }
+  })
+})
+

@@ -110,7 +110,9 @@ The sanctuary splits across the purity boundary, and the split is deliberate:
   stored inventory), each wyvern's `assignment` and optional `preferredPerchIndex`, and the
   `ADD/MOVE/ROTATE/STORE_SANCTUARY_OBJECT` and `RESET_SANCTUARY_LAYOUT` intents. `PROP_CATALOG` in
   `core/state/sanctuaryLayout.ts` is the list of everything placeable, and a catalogue entry can
-  carry `station`/`panel`/`radius`, which is how a placed prop becomes an interactable.
+  carry `station`/`panel`/`radius`, which is how a placed prop becomes an interactable. Entries also
+  carry `group` (e.g. `'forge'`, `'perch'`, `'ring'`) for editor catalogue grouping, and
+  `flightClearanceRequired: true` for props that must never be placed in the wyvern landing corridor.
 - **Outside core** owns everything per-frame: `scenes/Sanctuary/director/wyvernDirector.ts` drives
   position, yaw, phase and `ModelState` for every sanctuary wyvern; `director/spatialAwareness.ts`
   aims heads at the player and neighbours; `state/sanctuaryCommands.ts` is a zustand queue of
@@ -132,6 +134,20 @@ Editor UI state
 Placing an object goes through the normal Intent → Execution path; the save is at version 2, whose
 migration spreads a legacy sanctuary into the campus layout without moving anything the player has
 already placed.
+
+### Sanctuary scene dressing contracts (Stage 7 — DONE 2026-09-15)
+
+- **`scenes/Sanctuary/dressing.ts`** exports `STORY_CLUSTERS` — seven prop-cluster records
+  (logPile, crate, barrel, perch.stump, chest, fenceA) placed around purposeful zones (keep
+  repair, forge yard, infirmary, hatchery, flight ring, windward shelter). All positions are outside
+  the central flight corridor and within `GROUND_RADIUS`. Only existing 57-atlas prop IDs are used.
+- **`scenes/Sanctuary/atmosphere/Ambience.tsx`** exports `AshDrift` — one `Points` draw call for
+  drifting ash from the forge and burn range, seeded off `deriveSeed(0xA5, 'sanctuary:ash')`,
+  GPU-only drift (no per-frame JS position writes), disposed on unmount. Mount alongside `SmokePlumes`.
+- **`scenes/Sanctuary/SanctuaryScene.tsx`** renders `<StoryDressing />` after `<Scenery />` and
+  `<AshDrift />` after `<SmokePlumes />`. `StoryDressing` uses `PropInstances` with
+  `castShadow={id === 'prop.logPile'}` — furniture too small to contribute is shadow-free.
+
 
 ## Code architecture & modularity
 
