@@ -21,6 +21,7 @@ units and battle terrain still use procedural placeholders until their model pip
 | Change what a biome's *ground* looks like — relief, craters, terraces, dunes | `BIOME_LANDFORMS` in `src/scenes/BiomeWorld/terrain/biomeLandforms.ts` |
 | Prototype biome look and shape without running this app | The biome studio at `~/Documents/biome/fantasy-biomes-next` — see *Biome authoring* below |
 | Develop or review wyvern flight animation | `docs/WYVERN_ANIMATION_BASELINE.md`, then `docs/FLIGHT_ANIMATION_DEVELOPMENT.md` |
+| Audit or organize the Gothic V2 rig in Blender | `docs/BLENDER_RIG_WORKFLOW.md`, then `scripts/blender/wyvern_v2_rig_contract.json` |
 | Know what an animation actually measures | `validation/wyvern-animations/clip-signatures.json`; regenerate with `pnpm assets:analyze-clips` |
 | Edit a clip on the new `WyvernRig` (wing axes, loop seams) | `docs/WYVERN_CLIP_AUDIT.md`; check with `pnpm assets:wyvern-audit` and `pnpm assets:validate-wyvern` |
 | Add/swap a static scenery prop | `scripts/asset-sources.json`, then run `scripts/extract-assets.py` |
