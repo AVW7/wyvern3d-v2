@@ -53,6 +53,9 @@ export const TAIL_CONFIG = {
   /** Per-bone weights for distributed motion (tail1 to tail6) */
   BONE_WEIGHTS: [0.08, 0.14, 0.20, 0.24, 0.20, 0.14],
   
+  /** 10-bone weight distribution for Gothic V2 tail chain (Tail1 to Tail10) */
+  BONE_WEIGHTS_10: [0.06, 0.09, 0.12, 0.14, 0.14, 0.13, 0.11, 0.09, 0.07, 0.05],
+
   /** Mode-specific behavior multipliers */
   DIVE_EXTEND_FACTOR: 1.4,    // Tail extends back during dive
   HOVER_DROP_FACTOR: 0.6,     // Tail drops during hover
@@ -282,7 +285,10 @@ export function dynamicTailController(
     const bonePhase = state.phase - phaseOffset * Math.PI * 2
     
     // Weight distribution: inner bones move less, outer bones more
-    const weight = TAIL_CONFIG.BONE_WEIGHTS[i] ?? 0.1
+    const weight =
+      boneCount >= 10
+        ? (TAIL_CONFIG.BONE_WEIGHTS_10[i] ?? 0.05)
+        : (TAIL_CONFIG.BONE_WEIGHTS[i] ?? 0.1)
     
     // Add wave propagation on top of base motion
     const waveMultiplier = Math.sin(bonePhase) * 0.3

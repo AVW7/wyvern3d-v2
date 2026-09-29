@@ -51,6 +51,16 @@ export const SPEED_PRESETS = {
     legTuckWeight: 1,
     wingFlutterFreq: 3,
   },
+  speed: {
+    airspeed: 42,
+    pitchAngle: -4,
+    headGazeWeight: 0.9,
+    neckStreamFactor: 0.9,
+    tailStiffness: 1.6,
+    tailWaveAmp: 0.07,
+    legTuckWeight: 1.25,
+    wingFlutterFreq: 3.8,
+  },
   dive: {
     airspeed: 50,
     pitchAngle: -25,

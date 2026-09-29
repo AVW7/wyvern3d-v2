@@ -17,7 +17,7 @@ interface FlightLabUIProps {
   onChangeSpeedDynamics: (updates: Partial<SpeedDynamicsState>) => void
   controllerIsolation: ControllerIsolationState
   onToggleController: (controllerKey: keyof ControllerIsolationState) => void
-  onApplyPreset: (presetName: 'hover' | 'glide' | 'cruise' | 'dive') => void
+  onApplyPreset: (presetName: 'hover' | 'glide' | 'cruise' | 'speed' | 'dive') => void
   onClearLogs?: () => void
   poseEdits: FlightLabPoseEdits
   poseComposer: boolean

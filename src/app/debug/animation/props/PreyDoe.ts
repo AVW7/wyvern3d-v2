@@ -5,8 +5,8 @@ export type DoeState = 'grazing' | 'alert' | 'fleeing' | 'roasting' | 'dead'
 
 export class PreyDoe extends PropBase {
   state: DoeState = 'grazing'
-  detectionRadius: number = 25.0
-  runSpeed: number = 10.0
+  detectionRadius: number = 35.0
+  runSpeed: number = 12.0
   wanderTimer: number = 0
   wanderSeed: number
   moveTarget: Vector3
@@ -20,32 +20,51 @@ export class PreyDoe extends PropBase {
   update(dt: number, wyvernPos: Vector3): void {
     if (this.isDead) {
       this.state = 'dead'
+      this.velocity.set(0, 0, 0)
       return
     }
 
-    const distToWyvern = this.position.distanceTo(wyvernPos)
+    // Wyvern ground projection (shadow)
+    const wyvernShadow = new Vector3(wyvernPos.x, 0, wyvernPos.z)
+    const distToShadow = this.position.distanceTo(wyvernShadow)
+    const dist3D = this.position.distanceTo(wyvernPos)
 
     // State machine updates
     if (this.isRoasting && this.hp > 0) {
       this.state = 'roasting'
-    } else if (distToWyvern < 12.0 || this.hp < this.maxHp) {
+    } else if (distToShadow < 15.0 || dist3D < 18.0 || this.hp < this.maxHp) {
       this.state = 'fleeing'
-    } else if (distToWyvern < this.detectionRadius) {
+    } else if (distToShadow < this.detectionRadius) {
       this.state = 'alert'
     } else {
       this.state = 'grazing'
     }
 
     // Movement logic per state
-    if (this.state === 'fleeing') {
-      // Flee directly away from wyvern
-      const fleeDir = new Vector3().subVectors(this.position, wyvernPos).normalize()
-      fleeDir.y = 0 // Ground travel
-      this.velocity.copy(fleeDir).multiplyScalar(this.runSpeed)
+    if (this.state === 'fleeing' || this.state === 'roasting') {
+      // Panic sprint directly away from wyvern ground shadow
+      const fleeDir = new Vector3().subVectors(this.position, wyvernShadow)
+      fleeDir.y = 0 // Keep to ground plane
+      if (fleeDir.lengthSq() < 1e-4) {
+        fleeDir.set(1, 0, 0)
+      } else {
+        fleeDir.normalize()
+      }
+
+      const currentSpeed = this.state === 'roasting' ? this.runSpeed * 1.25 : this.runSpeed
+      this.velocity.copy(fleeDir).multiplyScalar(currentSpeed)
       this.position.addScaledVector(this.velocity, dt)
 
-      // Rotate toward fleeing direction
+      // Orient toward flight direction
       this.rotation.y = Math.atan2(fleeDir.x, fleeDir.z)
+    } else if (this.state === 'alert') {
+      // Orient toward the threat, freeze/tread slowly
+      const lookDir = new Vector3().subVectors(wyvernShadow, this.position)
+      lookDir.y = 0
+      if (lookDir.lengthSq() > 1e-4) {
+        this.rotation.y = Math.atan2(lookDir.x, lookDir.z)
+      }
+      this.velocity.set(0, 0, 0)
     } else if (this.state === 'grazing') {
       // Slow wander
       this.wanderTimer -= dt
@@ -60,12 +79,18 @@ export class PreyDoe extends PropBase {
       }
 
       const dir = new Vector3().subVectors(this.moveTarget, this.position)
+      dir.y = 0
       if (dir.length() > 0.5) {
         dir.normalize().multiplyScalar(2.0)
-        dir.y = 0
+        this.velocity.copy(dir)
         this.position.addScaledVector(dir, dt)
         this.rotation.y = Math.atan2(dir.x, dir.z)
+      } else {
+        this.velocity.set(0, 0, 0)
       }
     }
+
+    // Keep doe grounded
+    this.position.y = 0
   }
 }

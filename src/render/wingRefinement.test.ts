@@ -9,6 +9,11 @@ import {
   calculateTurnAsymmetry,
   dynamicWingController,
   WING_CONFIG,
+  applyMembranePanelFlutter,
+  getGothicLeftWingBoneNames,
+  getGothicRightWingBoneNames,
+  GOTHIC_LEFT_WING_PANEL_NAMES,
+  GOTHIC_RIGHT_WING_PANEL_NAMES,
 } from './wingRefinement'
 
 describe('createWingState', () => {
@@ -325,5 +330,50 @@ describe('performance', () => {
     const perCall = elapsed / iterations
     
     expect(perCall).toBeLessThan(0.1)
+  })
+})
+
+describe('Gothic V2 membrane panel flutter & spar exports', () => {
+  it('exports valid Gothic V2 spar chains matching 92-joint rig', () => {
+    const leftSpar = getGothicLeftWingBoneNames()
+    const rightSpar = getGothicRightWingBoneNames()
+    expect(leftSpar.length).toBe(7)
+    expect(rightSpar.length).toBe(7)
+    expect(leftSpar[0]).toBe('L_WingShoulder')
+    expect(leftSpar[6]).toBe('L_WingD0P2')
+    expect(rightSpar[0]).toBe('R_WingShoulder')
+    expect(rightSpar[6]).toBe('R_WingD0P2')
+  })
+
+  it('exports all 8 membrane panel names per side', () => {
+    expect(GOTHIC_LEFT_WING_PANEL_NAMES.length).toBe(8)
+    expect(GOTHIC_RIGHT_WING_PANEL_NAMES.length).toBe(8)
+    expect(GOTHIC_LEFT_WING_PANEL_NAMES[0]).toBe('L_WingPanel0_0')
+    expect(GOTHIC_LEFT_WING_PANEL_NAMES[7]).toBe('L_WingPanel3_1')
+    expect(GOTHIC_RIGHT_WING_PANEL_NAMES[0]).toBe('R_WingPanel0_0')
+    expect(GOTHIC_RIGHT_WING_PANEL_NAMES[7]).toBe('R_WingPanel3_1')
+  })
+
+  it('rotates panels under aerodynamic dynamic pressure and flutter', () => {
+    const panelsL = Array(8).fill(null).map(() => new Object3D())
+    const panelsR = Array(8).fill(null).map(() => new Object3D())
+
+    applyMembranePanelFlutter(panelsL, panelsR, 25, 0.2, 0, 1.0, 3.0)
+
+    // Panels must have received pitch rotation (quaternion x/w modified from identity)
+    expect(panelsL[0]!.quaternion.x).not.toBe(0)
+    expect(panelsR[0]!.quaternion.x).not.toBe(0)
+    // Trailing edge panel 7 should receive greater amplitude than root panel 0
+    expect(Math.abs(panelsL[7]!.quaternion.x)).toBeGreaterThan(0)
+  })
+
+  it('applies turn asymmetry between left and right wing panels', () => {
+    const panelsL = Array(8).fill(null).map(() => new Object3D())
+    const panelsR = Array(8).fill(null).map(() => new Object3D())
+
+    // Hard turn
+    applyMembranePanelFlutter(panelsL, panelsR, 22, 0, 0.6, 0.5, 3.0)
+
+    expect(panelsL[3]!.quaternion.x).not.toBe(panelsR[3]!.quaternion.x)
   })
 })

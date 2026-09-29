@@ -29,7 +29,7 @@ interface AnimationControlsProps {
   onChangeSpeedDynamics: (updates: Partial<SpeedDynamicsState>) => void
   controllerIsolation: ControllerIsolationState
   onToggleController: (controllerKey: keyof ControllerIsolationState) => void
-  onApplyPreset: (presetName: 'hover' | 'glide' | 'cruise' | 'dive') => void
+  onApplyPreset: (presetName: 'hover' | 'glide' | 'cruise' | 'speed' | 'dive') => void
 }
 
 export function AnimationControls({
@@ -69,6 +69,13 @@ export function AnimationControls({
             active={speedDynamics.airspeed === 22}
           >
             Cruise (22)
+          </LabButton>
+          <LabButton
+            themeStyle={t}
+            onClick={() => onApplyPreset('speed')}
+            active={speedDynamics.airspeed === 42}
+          >
+            Sprint (42)
           </LabButton>
           <LabButton
             themeStyle={t}

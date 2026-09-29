@@ -28,7 +28,7 @@ import {
   type FlightPose,
   type HeadNeckPose,
 } from '@/render/flightPose'
-import { propagateFullBodyWave, calculatePhase } from '@/render/spineWave'
+import { propagateSpineWave, propagateFullBodyWave, calculatePhase } from '@/render/spineWave'
 import {
   createHeadNeckState,
   intelligentHeadNeckController,
@@ -56,10 +56,13 @@ import {
   type PoseTransitionState,
 } from '@/render/poseTransition'
 import {
+  applyMembranePanelFlutter,
   createWingsState,
   dynamicWingController,
   getLeftWingBoneNames,
   getRightWingBoneNames,
+  GOTHIC_LEFT_WING_PANEL_NAMES,
+  GOTHIC_RIGHT_WING_PANEL_NAMES,
   type WingsState,
 } from '@/render/wingRefinement'
 import type { FlightLabProps } from '../FlightLab'
@@ -78,7 +81,7 @@ import {
   activeControllerNames,
 } from '../labDynamics'
 import { AIRBORNE_STATES, flightLabAltitude, resolveClipName } from '../labPresets'
-import { evaluateLabContract, formatReadout, type LabTelemetry } from '../labTelemetry'
+import { calculateClipLoopSeam, evaluateLabContract, formatReadout, type LabTelemetry } from '../labTelemetry'
 import { useLabCamera } from '../hooks/useLabCamera'
 import { ComparisonModel } from './ComparisonModel'
 import { PreyField } from './PreyField'
@@ -141,9 +144,12 @@ export function FlightLabRigContainer({
   const wingsState = useRef<WingsState>(createWingsState())
   const wingBonesL = useRef<Object3D[]>([])
   const wingBonesR = useRef<Object3D[]>([])
+  const wingPanelsL = useRef<Object3D[]>([])
+  const wingPanelsR = useRef<Object3D[]>([])
   const legTuck = useRef(0)
   const modelRoot = useRef<Group | null>(null)
   const mixerRef = useRef<AnimationMixer | null>(null)
+  const clipSeamCache = useRef<Map<string, number>>(new Map())
   const bones = useRef<Map<string, Object3D>>(new Map())
   const neckBones = useRef<Object3D[]>([])
   const headBone = useRef<Object3D | null>(null)
@@ -210,6 +216,7 @@ export function FlightLabRigContainer({
     ])
     headBone.current = resolveFirstBone(root, ['Head', 'Bip002-Head_015'])
     spineBones.current = resolveBoneChain(root, [
+      ['Spine1', 'Spine2', 'Spine3'],
       ['Spine1', 'Spine2', 'Spine3', 'Body'],
       ['Bip002-Spine_08', 'Bip002-Spine1_09', 'Bip002-Spine2_010', 'Bip002-Spine3_011', 'Bip002_06'],
     ])
@@ -242,15 +249,31 @@ export function FlightLabRigContainer({
     ])
 
     wingBonesL.current = resolveBoneChain(root, [
+      ['L_WingShoulder', 'L_WingElbow', 'L_WingWrist', 'L_WingHand', 'L_WingD0P0', 'L_WingD0P1', 'L_WingD0P2'],
+      ['L_WingShoulder', 'L_WingElbow', 'L_WingWrist', 'L_WingHand', 'L_WingD3P0', 'L_WingD3P1', 'L_WingD3P2'],
       getLeftWingBoneNames(),
-      ['L_WingShoulder', 'L_WingElbow', 'L_WingWrist', 'L_WingHand', 'L_WingD0P0', 'L_WingD1P0', 'L_WingD2P0', 'L_WingD3P0'],
       ['Bip002-L-Clavicle_049', 'Bip002-L-UpperArm_050', 'Bip002-L-Forearm_051', 'Bip002-L-Hand_052', 'Bip002-L-Finger0_073', 'Bip002-L-Finger1_067', 'Bip002-L-Finger2_061', 'Bip002-L-Finger3_055'],
     ])
     wingBonesR.current = resolveBoneChain(root, [
+      ['R_WingShoulder', 'R_WingElbow', 'R_WingWrist', 'R_WingHand', 'R_WingD0P0', 'R_WingD0P1', 'R_WingD0P2'],
+      ['R_WingShoulder', 'R_WingElbow', 'R_WingWrist', 'R_WingHand', 'R_WingD3P0', 'R_WingD3P1', 'R_WingD3P2'],
       getRightWingBoneNames(),
-      ['R_WingShoulder', 'R_WingElbow', 'R_WingWrist', 'R_WingHand', 'R_WingD0P0', 'R_WingD1P0', 'R_WingD2P0', 'R_WingD3P0'],
       ['Bip002-R-Clavicle_086', 'Bip002-R-UpperArm_087', 'Bip002-R-Forearm_088', 'Bip002-R-Hand_089', 'Bip002-R-Finger0_0108', 'Bip002-R-Finger1_0102', 'Bip002-R-Finger2_096', 'Bip002-R-Finger3_090'],
     ])
+
+    const panelsL: Object3D[] = []
+    for (const name of GOTHIC_LEFT_WING_PANEL_NAMES) {
+      const b = root.getObjectByName(name)
+      if (b) panelsL.push(b)
+    }
+    wingPanelsL.current = panelsL
+
+    const panelsR: Object3D[] = []
+    for (const name of GOTHIC_RIGHT_WING_PANEL_NAMES) {
+      const b = root.getObjectByName(name)
+      if (b) panelsR.push(b)
+    }
+    wingPanelsR.current = panelsR
 
     // Store all rig bone names directly in bones map
     root.traverse((obj) => {
@@ -285,6 +308,11 @@ export function FlightLabRigContainer({
   }, [scene, helper, overlays])
 
   const world = useMemo(() => new Vector3(), [])
+  const mouthWorldPos = useMemo(() => new Vector3(), [])
+  const neckWorldPos = useMemo(() => new Vector3(), [])
+  const mouthForward = useMemo(() => new Vector3(), [])
+  const lFootWorldPos = useMemo(() => new Vector3(), [])
+  const rFootWorldPos = useMemo(() => new Vector3(), [])
   const labTime = useRef(0)
 
   useFrame((_, rawDelta) => {
@@ -306,19 +334,26 @@ export function FlightLabRigContainer({
     let clipName = '—'
     let clipTime = 0
     let duration = 0
+    let seamRotationRad = 0
     if (mixer) {
-      let best: { name: string; time: number; duration: number; weight: number } | null = null
+      let best: {
+        name: string
+        time: number
+        duration: number
+        weight: number
+        clip: { name: string; duration: number; tracks: { name: string; times: ArrayLike<number>; values: ArrayLike<number> }[] }
+      } | null = null
       const actions = (mixer as unknown as { _actions?: unknown[] })._actions ?? []
       for (const entry of actions) {
         const action = entry as {
           getEffectiveWeight(): number
           time: number
-          getClip(): { name: string; duration: number }
+          getClip(): { name: string; duration: number; tracks: { name: string; times: ArrayLike<number>; values: ArrayLike<number> }[] }
         }
         const weight = action.getEffectiveWeight()
         if (!best || weight > best.weight) {
           const clip = action.getClip()
-          best = { name: clip.name, time: action.time, duration: clip.duration, weight }
+          best = { name: clip.name, time: action.time, duration: clip.duration, weight, clip }
         }
         if (frozen && scrub !== null && weight > 0) {
           action.time = scrub * action.getClip().duration
@@ -328,6 +363,12 @@ export function FlightLabRigContainer({
         clipName = best.name
         clipTime = best.time
         duration = best.duration
+        if (clipSeamCache.current.has(best.name)) {
+          seamRotationRad = clipSeamCache.current.get(best.name)!
+        } else {
+          seamRotationRad = calculateClipLoopSeam(best.clip)
+          clipSeamCache.current.set(best.name, seamRotationRad)
+        }
       }
       if (frozen) {
         mixer.update(0)
@@ -462,16 +503,19 @@ export function FlightLabRigContainer({
       applyNeckOffset(neckBones.current, blendedNeckPitch, blendedNeckYaw)
       applyBoneOffset(headBone.current, blendedHeadPitch, blendedHeadYaw, blendedHeadRoll)
 
-      if (loopStateRef.current === 'speed' || dyn.neckStreamFactor > 0.5) {
-        const straightAmount = loopStateRef.current === 'speed' ? 1.0 : dyn.neckStreamFactor
+      const speedStream = horizontalSpeed > 18 ? Math.min(1, (horizontalSpeed - 18) / 24) : 0
+      const effectiveStream = Math.max(dyn.neckStreamFactor, speedStream, loopStateRef.current === 'speed' ? 1.0 : 0)
+
+      if (effectiveStream > 0.1) {
         const anchor = bones.current.get('pelvis') ?? bones.current.get('Body') ?? spineBones.current[0]
         if (anchor) {
-          if (neckHeadChain.current.length > 0) {
-            alignChainToBody(neckHeadChain.current, anchor, straightAmount)
-            holdStreamlinedHeadPose(headBone.current, straightAmount)
+          if (neckHeadChain.current.length > 0 && effectiveStream > 0.3) {
+            const neckStraightAmount = (effectiveStream - 0.3) / 0.7
+            alignChainToBody(neckHeadChain.current, anchor, neckStraightAmount)
+            holdStreamlinedHeadPose(headBone.current, neckStraightAmount)
           }
           if (tailBones.current.length > 0) {
-            alignTailToBody(tailBones.current, anchor, straightAmount)
+            alignTailToBody(tailBones.current, anchor, effectiveStream)
           }
         }
       }
@@ -510,12 +554,21 @@ export function FlightLabRigContainer({
 
       poseTransition.current = updatePoseTransition(poseTransition.current, dt)
 
-      if (iso.spineWave) {
+      if (iso.spineWave && spineBones.current.length > 0) {
+        const spinePhase = calculatePhase(labTime.current, 2.5)
+        propagateSpineWave(
+          spineBones.current,
+          spinePhase,
+          horizontalSpeed,
+          yawRate,
+        )
         const breathePhase = getLoopPhase(poseTransition.current, 3.0)
         const breatheOscillation = Math.sin(breathePhase * Math.PI * 2) * 0.02
         const swayOscillation = oscillate(poseTransition.current, 0.15, 0.03)
-        if (spineBones.current[0]) {
-          applyBoneOffset(spineBones.current[0], breatheOscillation * 0.5, swayOscillation)
+        // Maintain chest stability: Spine1 anchors leg roots; Spine2/Spine3 articulate breathing/flex
+        const flexBone = spineBones.current[1] ?? spineBones.current[0]
+        if (flexBone) {
+          applyBoneOffset(flexBone, breatheOscillation * 0.5, swayOscillation)
         }
       }
 
@@ -526,7 +579,7 @@ export function FlightLabRigContainer({
           : 1.0
         const transitionProgress = poseTransition.current.pitch.progress
         const effectiveTuck = baseTuck * modeTuckMult * (isTransitioning(poseTransition.current) ? transitionProgress : 1)
-        const finalTuck = Math.max(0, Math.min(1, effectiveTuck + legsState.current.left.extension * 0.3))
+        const finalTuck = Math.max(-0.6, Math.min(1.2, effectiveTuck + legsState.current.left.extension * 0.3))
         for (const chain of legBones.current) {
           applyLegTuck(chain, finalTuck)
         }
@@ -552,6 +605,17 @@ export function FlightLabRigContainer({
           wingsState.current,
           dt,
         )
+        if (wingPanelsL.current.length > 0 || wingPanelsR.current.length > 0) {
+          applyMembranePanelFlutter(
+            wingPanelsL.current,
+            wingPanelsR.current,
+            horizontalSpeed,
+            turbulence,
+            yawRate,
+            labTime.current,
+            dyn.wingFlutterFreq,
+          )
+        }
       }
     }
 
@@ -651,6 +715,7 @@ export function FlightLabRigContainer({
       footDropL: footDrop,
       wingSpan,
       poseComposer: pc,
+      seamRotationRad,
     })
     const sample: LabTelemetry = {
       timestamp: labTime.current,
@@ -669,6 +734,7 @@ export function FlightLabRigContainer({
       footDropR,
       bodyAxisDeg: axisAngle,
       wingSpan,
+      seamRotationRad,
       clipName,
       clipTime,
       clipDuration: duration,
@@ -692,6 +758,37 @@ export function FlightLabRigContainer({
       if (key !== lastSampleKey.current) {
         lastSampleKey.current = key
         telemetryCbRef.current?.(sample)
+      }
+    }
+
+    // ── Phase 5: Combat Simulation (Fire Breath Cone & Talon Swoop) ──────────
+    if (propManager) {
+      if (fireBreath || state === 'breathe' || state === 'breatheAir') {
+        const head = headBone.current
+        if (head) {
+          head.getWorldPosition(mouthWorldPos)
+          const lastNeck = neckBones.current.at(-1)
+          if (lastNeck) {
+            lastNeck.getWorldPosition(neckWorldPos)
+            mouthForward.copy(mouthWorldPos).sub(neckWorldPos)
+          } else {
+            head.getWorldDirection(mouthForward)
+          }
+          if (mouthForward.lengthSq() < 1e-6) mouthForward.set(0, 0, 1)
+          mouthForward.normalize()
+          mouthWorldPos.addScaledVector(mouthForward, 1.35)
+
+          propManager.applyFireCone(mouthWorldPos, mouthForward, 50 * dt, 0.4 * dt, 26)
+        }
+      }
+
+      if (state === 'attack' || state === 'attackAir' || state === 'huntGrip' || state === 'dive') {
+        const [lFoot, rFoot] = footBones.current
+        if (lFoot && rFoot) {
+          lFoot.getWorldPosition(lFootWorldPos)
+          rFoot.getWorldPosition(rFootWorldPos)
+          propManager.applyTalonSwoop(lFootWorldPos, rFootWorldPos, 60 * dt, 2.5)
+        }
       }
     }
   })

@@ -1,8 +1,8 @@
 import type { ModelState } from '@/render/assets/manifest'
 import type { FlightLabPoseEdits, LabCamera, LabTheme } from './FlightLab'
 
-export const WYVERN_MODEL = '/models/wyvern.glb'
-export const WYVERN_ANIMATIONS = '/models/wyvern.glb'
+export const WYVERN_MODEL = '/models/wyvern-gothic.glb'
+export const WYVERN_ANIMATIONS = '/models/wyvern-gothic.glb'
 
 export const LEG_CHAIN = {
   L: ['L_Thigh', 'L_Calf', 'L_Foot'],
@@ -35,11 +35,11 @@ export const TAIL_WEIGHTS = [0.06, 0.09, 0.12, 0.14, 0.14, 0.13, 0.11, 0.09, 0.0
 export const MARKERS: { key: string; bone: string; color: string }[] = [
   { key: 'head', bone: 'Head', color: '#f0d9a8' },
   { key: 'pelvis', bone: 'Body', color: '#7fd1c1' },
-  { key: 'tail', bone: 'Tail6', color: '#c9773a' },
+  { key: 'tail', bone: 'Tail10', color: '#c9773a' },
   { key: 'footL', bone: 'L_Foot', color: '#8fa8d6' },
   { key: 'footR', bone: 'R_Foot', color: '#8fa8d6' },
-  { key: 'wingL', bone: 'L_WingFinger3_end', color: '#d67f9a' },
-  { key: 'wingR', bone: 'R_WingFinger3_end', color: '#d67f9a' },
+  { key: 'wingL', bone: 'L_WingD0P2', color: '#d67f9a' },
+  { key: 'wingR', bone: 'R_WingD0P2', color: '#d67f9a' },
 ]
 
 export const CAMERAS: Record<

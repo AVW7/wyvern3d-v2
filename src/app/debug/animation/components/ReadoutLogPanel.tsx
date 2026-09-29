@@ -88,7 +88,7 @@ export function ReadoutLogPanel({
         </div>
 
         {/* Copy Buttons */}
-        <div style={{ display: 'flex', gap: 4, marginBottom: 8 }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 8 }}>
           <LabButton
             themeStyle={t}
             onClick={handleCopyPoseCode}
@@ -106,6 +106,15 @@ export function ReadoutLogPanel({
             {copiedType === 'json' ? <IconCheck /> : <IconCopy />}
             <span>{copiedType === 'json' ? 'Copied JSON' : 'Copy JSON'}</span>
           </LabButton>
+
+          <LabButton
+            themeStyle={t}
+            onClick={handleCopyLogs}
+            style={{ fontSize: 10, display: 'inline-flex', alignItems: 'center', gap: 4 }}
+          >
+            {copiedType === 'logs' ? <IconCheck /> : <IconCopy />}
+            <span>{copiedType === 'logs' ? 'Copied Logs' : 'Copy Logs'}</span>
+          </LabButton>
         </div>
 
         {activeTab === 'readout' ? (
@@ -118,49 +127,119 @@ export function ReadoutLogPanel({
               fontSize: 10.5,
               fontFamily: 'ui-monospace, SFMono-Regular, monospace',
               color: t.readoutText,
-              maxHeight: 220,
+              maxHeight: 260,
               overflowY: 'auto',
               display: 'flex',
               flexDirection: 'column',
               gap: 6,
             }}
           >
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4 }}>
+            {/* Primary Metrics Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6, paddingBottom: 6, borderBottom: `1px solid ${t.border}` }}>
               <div>
                 <span style={{ color: t.muted }}>Speed: </span>
                 <span style={{ fontWeight: 600, color: t.text }}>{telemetry.airspeed.toFixed(1)} u/s</span>
               </div>
               <div>
-                <span style={{ color: t.muted }}>Pitch: </span>
-                <span style={{ fontWeight: 600, color: t.text }}>{telemetry.pitchAngle.toFixed(1)}°</span>
+                <span style={{ color: t.muted }}>Pitch / Bank: </span>
+                <span style={{ fontWeight: 600, color: t.text }}>{telemetry.pitchAngle.toFixed(1)}° / {telemetry.bankAngle.toFixed(1)}°</span>
               </div>
               <div>
                 <span style={{ color: t.muted }}>Gate: </span>
-                <span style={{ fontWeight: 700, color: telemetry.contractStatus === 'pass' ? '#4ade80' : '#f87171' }}>
+                <span style={{
+                  fontWeight: 700,
+                  color: telemetry.contractStatus === 'pass' ? '#4ade80' : telemetry.contractStatus === 'warn' ? '#f5c86b' : '#f87171',
+                }}>
                   {telemetry.contractStatus.toUpperCase()}
                 </span>
               </div>
             </div>
 
-            <div>
-              <span style={{ color: t.muted }}>Active Controllers: </span>
-              <span style={{ color: t.text }}>{telemetry.activeControllers.join(', ')}</span>
+            {/* Spatial Geometry & Clearance Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 6, paddingBottom: 6, borderBottom: `1px solid ${t.border}` }}>
+              <div>
+                <span style={{ color: t.muted }}>Body Axis: </span>
+                <span style={{
+                  fontWeight: 600,
+                  color: !Number.isNaN(telemetry.bodyAxisDeg) && Math.abs(telemetry.bodyAxisDeg) <= 55 ? t.text : '#f87171',
+                }}>
+                  {Number.isNaN(telemetry.bodyAxisDeg) ? '—' : `${telemetry.bodyAxisDeg.toFixed(1)}°`}
+                </span>
+                <span style={{ fontSize: 9.5, color: t.muted, marginLeft: 4 }}>
+                  {!Number.isNaN(telemetry.bodyAxisDeg) && Math.abs(telemetry.bodyAxisDeg) <= 55 ? '(±55° OK)' : '(OUT)'}
+                </span>
+              </div>
+              <div>
+                <span style={{ color: t.muted }}>Wing Span: </span>
+                <span style={{ fontWeight: 600, color: t.text }}>
+                  {Number.isNaN(telemetry.wingSpan) ? '—' : `${telemetry.wingSpan.toFixed(2)} m`}
+                </span>
+              </div>
+              <div>
+                <span style={{ color: t.muted }}>Foot Drop: </span>
+                <span style={{ color: t.text }}>
+                  L {Number.isNaN(telemetry.footDropL) ? '—' : telemetry.footDropL.toFixed(2)} / R {Number.isNaN(telemetry.footDropR) ? '—' : telemetry.footDropR.toFixed(2)} m
+                </span>
+              </div>
+              <div>
+                <span style={{ color: t.muted }}>Tail Extent: </span>
+                <span style={{ color: t.text }}>
+                  {Number.isNaN(telemetry.tailExtent) ? '—' : `${telemetry.tailExtent.toFixed(2)} m`}
+                </span>
+              </div>
+              <div>
+                <span style={{ color: t.muted }}>Seam Delta: </span>
+                <span style={{
+                  fontWeight: 600,
+                  color: (telemetry.seamRotationRad ?? 0) <= 0.05 ? '#4ade80' : '#f5c86b',
+                }}>
+                  {telemetry.seamRotationRad !== undefined ? `${telemetry.seamRotationRad.toFixed(4)} rad` : '0.0000 rad'}
+                </span>
+              </div>
+              <div>
+                <span style={{ color: t.muted }}>Neck / Head: </span>
+                <span style={{ color: t.text }}>
+                  N {telemetry.neckCurve.toFixed(2)} · H {telemetry.headOrientation.pitch.toFixed(2)}
+                </span>
+              </div>
             </div>
 
-            <div>
-              <span style={{ color: t.muted }}>Tail Extent: </span>
-              <span style={{ color: t.text }}>{Number.isNaN(telemetry.tailExtent) ? '—' : `${telemetry.tailExtent.toFixed(2)} u`}</span>
+            {/* Playback info */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10 }}>
+              <div>
+                <span style={{ color: t.muted }}>Clip: </span>
+                <span style={{ fontWeight: 600, color: t.accentColor }}>{telemetry.clipName}</span>
+                <span style={{ color: t.muted }}> ({telemetry.loopState})</span>
+              </div>
+              <div>
+                <span style={{ color: t.muted }}>Time: </span>
+                <span style={{ color: t.text }}>{telemetry.clipTime.toFixed(2)}s / {telemetry.clipDuration.toFixed(2)}s</span>
+              </div>
             </div>
-            <div>
-              <span style={{ color: t.muted }}>Wing span: </span>
-              <span style={{ color: t.text }}>{Number.isNaN(telemetry.wingSpan) ? '—' : `${telemetry.wingSpan.toFixed(1)} u`}</span>
+
+            {/* Markers Status */}
+            <div style={{ display: 'flex', gap: 8, fontSize: 9.5, alignItems: 'center' }}>
+              <span style={{ color: t.muted }}>Markers:</span>
+              {(['head', 'tail', 'pelvis', 'wingL', 'wingR'] as const).map((key) => {
+                const ok = telemetry.markers[key]
+                return (
+                  <span key={key} style={{ display: 'inline-flex', alignItems: 'center', gap: 2, color: ok ? '#4ade80' : '#f87171' }}>
+                    <span>{ok ? '●' : '○'}</span>
+                    <span>{key}</span>
+                  </span>
+                )
+              })}
             </div>
+
+            {/* Controllers */}
             <div>
-              <span style={{ color: t.muted }}>Clip: </span>
-              <span style={{ color: t.text }}>{telemetry.clipName}</span>
+              <span style={{ color: t.muted }}>Controllers: </span>
+              <span style={{ color: t.text }}>{telemetry.activeControllers.join(', ') || 'none'}</span>
             </div>
+
+            {/* Contract notes */}
             {telemetry.contractNotes.map((note) => (
-              <div key={note} style={{ color: t.muted }}>{note}</div>
+              <div key={note} style={{ color: t.muted, fontSize: 9.5 }}>• {note}</div>
             ))}
           </div>
         ) : (

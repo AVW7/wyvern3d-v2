@@ -19,9 +19,13 @@ public/models/source/
 public/models/wyvern-rig.blend
 public/models/drogon*.glb
 public/models/drogon-sanctuary.glb
+public/models/*-repaired.glb
 validation/drogon-uncompressed.glb
 *.blend
 *.blend1
+*.blend2
+*.blend@
+*.blend.*
 *.fbx
 
 # Python bytecode from the Blender authoring scripts

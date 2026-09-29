@@ -38,6 +38,10 @@ export const SPINE_WAVE_CONFIG = {
   // Weight distribution for spine chain (from WYVERN_RIG_MEASUREMENTS.md)
   // Spine → Spine1 → Spine2 → Spine3 → Pelvis
   spineWeights: [0.08, 0.18, 0.25, 0.30, 0.19],
+
+  // Weight distribution for Gothic V2 3-joint spine (Spine1 → Spine2 → Spine3)
+  // Spine1 keeps leg root planting stable while Spine2 and Spine3 articulate breathing/flex
+  spineWeights3: [0.02, 0.22, 0.32],
   
   // Weight distribution for neck chain (from measurements)
   // Neck → Neck1 → Neck2 → Head
@@ -68,6 +72,7 @@ export function propagateSpineWave(
     speedForMinAmplitude: number
     turnAsymmetryFactor: number
     spineWeights: readonly number[]
+    spineWeights3: readonly number[]
     neckWeights: readonly number[]
   }>
 ): void {
@@ -90,8 +95,8 @@ export function propagateSpineWave(
     turnRate * config.turnAsymmetryFactor
   ));
   
-  // Get weights (use default if fewer bones than expected)
-  const weights = config.spineWeights;
+  // Get weights (use 3-bone distribution for Gothic V2 Spine1..3 to keep leg root planting stable)
+  const weights = options?.spineWeights ?? (spineBones.length === 3 ? config.spineWeights3 : config.spineWeights);
   
   // Apply wave to each bone
   spineBones.forEach((bone, index) => {

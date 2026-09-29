@@ -16,6 +16,7 @@ export interface LabTelemetry {
   footDropR: number
   bodyAxisDeg: number
   wingSpan: number
+  seamRotationRad?: number
   clipName: string
   clipTime: number
   clipDuration: number
@@ -48,6 +49,7 @@ export const EMPTY_TELEMETRY: LabTelemetry = {
   footDropR: Number.NaN,
   bodyAxisDeg: Number.NaN,
   wingSpan: Number.NaN,
+  seamRotationRad: 0,
   clipName: '—',
   clipTime: 0,
   clipDuration: 0,
@@ -61,6 +63,43 @@ export const EMPTY_TELEMETRY: LabTelemetry = {
   markers: { head: false, tail: false, pelvis: false, wingL: false, wingR: false },
 }
 
+/**
+ * Calculates the maximum loop-seam discrepancy (in radians / rig units)
+ * across all tracks in an AnimationClip between the first key and last key.
+ */
+export function calculateClipLoopSeam(clip: {
+  tracks: { name: string; times: ArrayLike<number>; values: ArrayLike<number> }[]
+}): number {
+  let maxSeam = 0
+  for (const track of clip.tracks) {
+    if (track.name.endsWith('.quaternion') && track.values.length >= 8) {
+      const q0x = track.values[0]!
+      const q0y = track.values[1]!
+      const q0z = track.values[2]!
+      const q0w = track.values[3]!
+      const len = track.values.length
+      const q1x = track.values[len - 4]!
+      const q1y = track.values[len - 3]!
+      const q1z = track.values[len - 2]!
+      const q1w = track.values[len - 1]!
+      const dot = Math.min(1, Math.abs(q0x * q1x + q0y * q1y + q0z * q1z + q0w * q1w))
+      const angle = 2 * Math.acos(dot)
+      if (angle > maxSeam) maxSeam = angle
+    } else if (track.name.endsWith('.position') && track.values.length >= 6) {
+      const p0x = track.values[0]!
+      const p0y = track.values[1]!
+      const p0z = track.values[2]!
+      const len = track.values.length
+      const p1x = track.values[len - 3]!
+      const p1y = track.values[len - 2]!
+      const p1z = track.values[len - 1]!
+      const dist = Math.hypot(p1x - p0x, p1y - p0y, p1z - p0z)
+      if (dist > maxSeam) maxSeam = dist
+    }
+  }
+  return maxSeam
+}
+
 export interface ContractInput {
   requestedState: ModelState
   resolvedClip: string | undefined
@@ -70,6 +109,7 @@ export interface ContractInput {
   footDropL: number
   wingSpan: number
   poseComposer: boolean
+  seamRotationRad?: number
 }
 
 export function evaluateLabContract(input: ContractInput): { status: ContractStatus; notes: string[] } {
@@ -98,6 +138,10 @@ export function evaluateLabContract(input: ContractInput): { status: ContractSta
     notes.push(`Grounded wing span ${input.wingSpan.toFixed(1)} is cruise-open — membrane may still be a sheet.`)
   }
 
+  if (input.seamRotationRad !== undefined && input.seamRotationRad > 0.05) {
+    notes.push(`Loop seam delta ${input.seamRotationRad.toFixed(4)} rad exceeds review envelope (0.050 rad).`)
+  }
+
   if (input.poseComposer) {
     notes.push('Pose composer is on — this is an edit, not an authored-clip review.')
   }
@@ -122,44 +166,58 @@ export function telemetryChanged(prev: LabTelemetry, next: LabTelemetry): boolea
     prev.bodyAxisDeg.toFixed(1) !== next.bodyAxisDeg.toFixed(1) ||
     prev.footDropL.toFixed(2) !== next.footDropL.toFixed(2) ||
     prev.wingSpan.toFixed(1) !== next.wingSpan.toFixed(1) ||
+    prev.seamRotationRad !== next.seamRotationRad ||
     prev.activeControllers.join() !== next.activeControllers.join()
   )
 }
 
 export function formatPoseExport(telemetry: LabTelemetry): string {
-  return `// Flight Lab sample — measured, not slider fiction
-export const LAB_SAMPLED_POSE = {
+  const pitchRad = (telemetry.pitchAngle * Math.PI) / 180
+  const bankRad = (telemetry.bankAngle * Math.PI) / 180
+  return `import type { FlightPose, HeadNeckPose } from '@/render/flightPose'
+
+// Sampled Flight Lab Pose — measured directly from live rig
+export const SAMPLED_FLIGHT_POSE: FlightPose = {
+  pitch: ${pitchRad.toFixed(4)},
+  bank: ${bankRad.toFixed(4)},
+}
+
+export const SAMPLED_HEAD_NECK_POSE: HeadNeckPose = {
+  neckPitch: ${telemetry.neckCurve.toFixed(4)},
+  neckYaw: 0,
+  headPitch: ${telemetry.headOrientation.pitch.toFixed(4)},
+  headYaw: ${telemetry.headOrientation.yaw.toFixed(4)},
+  headRoll: ${telemetry.headOrientation.roll.toFixed(4)},
+}
+
+export const SAMPLED_TELEMETRY_SNAPSHOT = {
   requestedState: '${telemetry.requestedState}',
-  clip: '${telemetry.clipName}',
+  clipName: '${telemetry.clipName}',
   loopState: '${telemetry.loopState}',
-  speed: ${telemetry.airspeed.toFixed(1)},
-  pitchRad: ${((telemetry.pitchAngle * Math.PI) / 180).toFixed(4)},
-  bankRad: ${((telemetry.bankAngle * Math.PI) / 180).toFixed(4)},
-  headNeck: {
-    pitch: ${telemetry.headOrientation.pitch.toFixed(4)},
-    yaw: ${telemetry.headOrientation.yaw.toFixed(4)},
-    roll: ${telemetry.headOrientation.roll.toFixed(4)},
-    neckPitch: ${telemetry.neckCurve.toFixed(4)},
-  },
-  tailExtent: ${Number.isNaN(telemetry.tailExtent) ? 'null' : telemetry.tailExtent.toFixed(3)},
-  footDrop: {
-    L: ${Number.isNaN(telemetry.footDropL) ? 'null' : telemetry.footDropL.toFixed(3)},
-    R: ${Number.isNaN(telemetry.footDropR) ? 'null' : telemetry.footDropR.toFixed(3)},
-  },
+  airspeed: ${telemetry.airspeed.toFixed(1)},
+  pitchAngle: ${telemetry.pitchAngle.toFixed(2)},
+  bankAngle: ${telemetry.bankAngle.toFixed(2)},
   bodyAxisDeg: ${Number.isNaN(telemetry.bodyAxisDeg) ? 'null' : telemetry.bodyAxisDeg.toFixed(2)},
   wingSpan: ${Number.isNaN(telemetry.wingSpan) ? 'null' : telemetry.wingSpan.toFixed(2)},
-  contract: '${telemetry.contractStatus}',
-  notes: ${JSON.stringify(telemetry.contractNotes)},
-}
+  footDropL: ${Number.isNaN(telemetry.footDropL) ? 'null' : telemetry.footDropL.toFixed(3)},
+  footDropR: ${Number.isNaN(telemetry.footDropR) ? 'null' : telemetry.footDropR.toFixed(3)},
+  tailExtent: ${Number.isNaN(telemetry.tailExtent) ? 'null' : telemetry.tailExtent.toFixed(3)},
+  seamRotationRad: ${(telemetry.seamRotationRad ?? 0).toFixed(4)},
+  contractStatus: '${telemetry.contractStatus}',
+  contractNotes: ${JSON.stringify(telemetry.contractNotes)},
+} as const
 `
 }
 
 export function formatReadout(telemetry: LabTelemetry): string {
   const ratioNote = telemetry.airspeed.toFixed(1)
-  const axis = Number.isNaN(telemetry.bodyAxisDeg) ? '—' : `${telemetry.bodyAxisDeg.toFixed(1)}deg nose-up`
-  const footL = Number.isNaN(telemetry.footDropL) ? '—' : telemetry.footDropL.toFixed(2)
-  const footR = Number.isNaN(telemetry.footDropR) ? '—' : telemetry.footDropR.toFixed(2)
-  const span = Number.isNaN(telemetry.wingSpan) ? '—' : telemetry.wingSpan.toFixed(1)
+  const axis = Number.isNaN(telemetry.bodyAxisDeg)
+    ? '—'
+    : `${telemetry.bodyAxisDeg.toFixed(1)}° (${Math.abs(telemetry.bodyAxisDeg) <= 55 ? 'envelope OK' : 'OUTSIDE ±55°'})`
+  const footL = Number.isNaN(telemetry.footDropL) ? '—' : `${telemetry.footDropL.toFixed(2)} m`
+  const footR = Number.isNaN(telemetry.footDropR) ? '—' : `${telemetry.footDropR.toFixed(2)} m`
+  const span = Number.isNaN(telemetry.wingSpan) ? '—' : `${telemetry.wingSpan.toFixed(2)} m`
+  const seam = telemetry.seamRotationRad !== undefined ? `${telemetry.seamRotationRad.toFixed(4)} rad` : '—'
   const phase =
     telemetry.clipDuration > 0
       ? ((telemetry.clipTime % telemetry.clipDuration) / telemetry.clipDuration).toFixed(3)
@@ -169,13 +227,14 @@ export function formatReadout(telemetry: LabTelemetry): string {
     `clip        ${telemetry.clipName}${telemetry.resolvedClip && telemetry.resolvedClip !== telemetry.clipName ? `  (mapped ${telemetry.resolvedClip})` : ''}`,
     `time        ${telemetry.clipTime.toFixed(2)}s / ${telemetry.clipDuration.toFixed(2)}s  (phase ${phase})`,
     `speed       ${ratioNote} u/s`,
-    `pitch/bank  ${telemetry.pitchAngle.toFixed(1)} / ${telemetry.bankAngle.toFixed(1)} deg`,
+    `pitch/bank  ${telemetry.pitchAngle.toFixed(1)}° / ${telemetry.bankAngle.toFixed(1)}°`,
     `neck/head   neck ${telemetry.neckCurve.toFixed(3)}  head ${telemetry.headOrientation.pitch.toFixed(3)}/${telemetry.headOrientation.yaw.toFixed(3)}`,
     `body axis   ${axis}`,
     `foot drop   L ${footL}  R ${footR}`,
     `wing span   ${span}`,
+    `seam delta  ${seam}`,
     `controllers ${telemetry.activeControllers.join(', ') || 'none'}`,
-    `contract    ${telemetry.contractStatus}${telemetry.contractNotes[0] ? ` — ${telemetry.contractNotes[0]}` : ''}`,
+    `contract    ${telemetry.contractStatus.toUpperCase()}${telemetry.contractNotes[0] ? ` — ${telemetry.contractNotes[0]}` : ''}`,
     `pose lab    ${telemetry.poseComposer ? 'ON' : 'off (authored clip plus selected runtime layers only)'}`,
   ].join('\n')
 }

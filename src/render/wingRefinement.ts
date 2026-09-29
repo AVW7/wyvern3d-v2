@@ -10,6 +10,7 @@
 
 import { Object3D } from 'three'
 import type { FlightLoopState } from '@/render/flightPose'
+import { applyBoneOffset } from '@/render/boneOffsets'
 
 /**
  * Configuration for wing physics behavior.
@@ -389,4 +390,128 @@ export function getRightWingBoneNames(): string[] {
     'R_WingFinger3',
     'R_WingFinger3_end',
   ]
+}
+
+/**
+ * Gothic V2 leading spar bone chain (D0).
+ */
+export function getGothicLeftWingBoneNames(): string[] {
+  return [
+    'L_WingShoulder',
+    'L_WingElbow',
+    'L_WingWrist',
+    'L_WingHand',
+    'L_WingD0P0',
+    'L_WingD0P1',
+    'L_WingD0P2',
+  ]
+}
+
+export function getGothicRightWingBoneNames(): string[] {
+  return [
+    'R_WingShoulder',
+    'R_WingElbow',
+    'R_WingWrist',
+    'R_WingHand',
+    'R_WingD0P0',
+    'R_WingD0P1',
+    'R_WingD0P2',
+  ]
+}
+
+/**
+ * Gothic V2 membrane panel bone names (8 panels per wing).
+ */
+export const GOTHIC_LEFT_WING_PANEL_NAMES: readonly string[] = [
+  'L_WingPanel0_0',
+  'L_WingPanel0_1',
+  'L_WingPanel1_0',
+  'L_WingPanel1_1',
+  'L_WingPanel2_0',
+  'L_WingPanel2_1',
+  'L_WingPanel3_0',
+  'L_WingPanel3_1',
+]
+
+export const GOTHIC_RIGHT_WING_PANEL_NAMES: readonly string[] = [
+  'R_WingPanel0_0',
+  'R_WingPanel0_1',
+  'R_WingPanel1_0',
+  'R_WingPanel1_1',
+  'R_WingPanel2_0',
+  'R_WingPanel2_1',
+  'R_WingPanel3_0',
+  'R_WingPanel3_1',
+]
+
+/**
+ * Applies aerodynamic membrane panel flutter to Gothic V2 wing panels.
+ *
+ * Driven by:
+ * 1. Airspeed dynamic pressure (q proportional to v^1.3) causing camber lift billow.
+ * 2. High-frequency flutter oscillation rippling outward along the panel chain.
+ * 3. Turbulence stochastic micro-jitter.
+ * 4. Asymmetric turn lift: outside wing develops higher lift camber than inside wing.
+ *
+ * @param panelsL - Array of left wing panel Object3D instances
+ * @param panelsR - Array of right wing panel Object3D instances
+ * @param speed - Horizontal airspeed (0 - 60 u/s)
+ * @param turbulence - Turbulence factor (0 - 1)
+ * @param turnRate - Yaw rate (radians/s)
+ * @param time - Flight time accumulator (s)
+ * @param flutterFreq - Flutter frequency slider value (Hz)
+ */
+export function applyMembranePanelFlutter(
+  panelsL: (Object3D | null | undefined)[],
+  panelsR: (Object3D | null | undefined)[],
+  speed: number,
+  turbulence: number,
+  turnRate: number,
+  time: number,
+  flutterFreq: number = 3.0,
+): void {
+  if (panelsL.length === 0 && panelsR.length === 0) return
+
+  // Normalized speed and dynamic pressure
+  const speedRatio = Math.max(0, Math.min(2.5, speed / 22))
+  const qFactor = Math.pow(speedRatio, 1.3) * 0.045
+  const asymmetry = calculateTurnAsymmetry(turnRate, speed)
+
+  // Frequency scales with base slider and slightly with airspeed
+  const baseFreq = Math.max(1, flutterFreq) * (1 + speedRatio * 0.4)
+  const amp = (0.012 + qFactor * 0.6) * (1 + turbulence * 0.8)
+
+  const applyPanels = (
+    panels: (Object3D | null | undefined)[],
+    asymmetryMult: number,
+    sideSign: number,
+  ) => {
+    const count = panels.length
+    for (let i = 0; i < count; i += 1) {
+      const panel = panels[i]
+      if (!panel) continue
+
+      // Outboard panels (trailing edge: Panel2, Panel3) flutter with higher amplitude
+      const distalFactor = 0.5 + (i / Math.max(1, count - 1)) * 0.8
+
+      // Phase ripples from root to tip and with slight side offset
+      const phase = time * baseFreq * Math.PI * 2 + i * 0.55 + sideSign * 0.3
+      const primary = Math.sin(phase) * amp * distalFactor
+      const secondary = Math.sin(phase * 1.7 + 0.8) * amp * 0.35 * distalFactor
+      const turbulenceJitter = turbulence > 0.02
+        ? Math.sin(phase * 2.6 + 1.2) * amp * turbulence * 0.5
+        : 0
+
+      // Lift camber: upward billow proportional to dynamic pressure
+      const liftCamber = qFactor * 0.7 * distalFactor
+
+      const pitchOffset = (liftCamber + primary + secondary + turbulenceJitter) * asymmetryMult
+      const rollRipple = (primary * 0.35 + turbulenceJitter * 0.2) * asymmetryMult * sideSign
+
+      applyBoneOffset(panel, pitchOffset, 0, rollRipple)
+    }
+  }
+
+  applyPanels(panelsL, asymmetry.left, 1)
+  applyPanels(panelsR, asymmetry.right, -1)
 }

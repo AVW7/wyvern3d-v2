@@ -285,5 +285,21 @@ describe('spineWave', () => {
         propagateSpineWave([bone], 0.5, 20, 0, customConfig);
       }).not.toThrow();
     });
+
+    it('should use spineWeights3 for Gothic V2 3-joint spine to ensure leg root stability', () => {
+      const bones = [new MockBone(), new MockBone(), new MockBone()];
+      // Sample at peak phase
+      propagateSpineWave(bones, 0.25, 30, 0);
+
+      // Spine1 has weight 0.02, Spine2 has 0.22, Spine3 has 0.32
+      // Therefore Spine1 rotation must be substantially smaller than Spine2 and Spine3
+      const rot1 = Math.abs(bones[0]!.quaternion.x);
+      const rot2 = Math.abs(bones[1]!.quaternion.x);
+      const rot3 = Math.abs(bones[2]!.quaternion.x);
+
+      expect(rot1).toBeLessThan(rot2);
+      expect(rot1).toBeLessThan(rot3);
+      expect(rot2).toBeGreaterThan(rot1 * 3);
+    });
   });
 });

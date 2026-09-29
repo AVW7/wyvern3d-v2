@@ -31,6 +31,40 @@ export function applyComposerWings(
   applyBoneOffset(wristL, fold * 0.35, 0, 0)
   applyBoneOffset(wristR, fold * 0.35, 0, 0)
 
+  const handL = bones.get('L_WingHand')
+  const handR = bones.get('R_WingHand')
+  if (handL) applyBoneOffset(handL, fold * 0.2, 0, 0)
+  if (handR) applyBoneOffset(handR, fold * 0.2, 0, 0)
+
+  // Gothic V2 wing digits (6 spars: D0 through D5, 3 phalanges each: P0..P2)
+  for (let digit = 0; digit <= 5; digit += 1) {
+    for (let phalanx = 0; phalanx <= 2; phalanx += 1) {
+      const boneL = bones.get(`L_WingD${digit}P${phalanx}`)
+      if (boneL) {
+        applyBoneOffset(boneL, fold * 0.15 + pe.membraneBillow * 0.15, pe.membraneBillow * 0.2, 0)
+      }
+      const boneR = bones.get(`R_WingD${digit}P${phalanx}`)
+      if (boneR) {
+        applyBoneOffset(boneR, fold * 0.15 + pe.membraneBillow * 0.15, -pe.membraneBillow * 0.2, 0)
+      }
+    }
+  }
+
+  // Gothic V2 membrane panels (8 panels per side: Panel0_0..Panel3_1)
+  for (let panel = 0; panel <= 3; panel += 1) {
+    for (let seg = 0; seg <= 1; seg += 1) {
+      const panelL = bones.get(`L_WingPanel${panel}_${seg}`)
+      if (panelL) {
+        applyBoneOffset(panelL, fold * 0.2 + pe.membraneBillow * 0.35, 0, 0)
+      }
+      const panelR = bones.get(`R_WingPanel${panel}_${seg}`)
+      if (panelR) {
+        applyBoneOffset(panelR, fold * 0.2 + pe.membraneBillow * 0.35, 0, 0)
+      }
+    }
+  }
+
+  // Legacy rig fallbacks
   const fingers = ['L_WingFinger1', 'L_WingFinger2', 'L_WingFinger3', 'R_WingFinger1', 'R_WingFinger2', 'R_WingFinger3']
   for (const name of fingers) {
     const bone = bones.get(name)
